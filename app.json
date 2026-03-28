@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "name": "MiAppDeCafe",
+    "slug": "miappdecafe",
+    "version": "1.0.0",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "experiments": {
+      "newArchEnabled": false
+    }
+  }
+}

@@ -5,12 +5,16 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
+    "jsEngine": "jsc",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.hommemaktub.miappdecafe"
+      "bundleIdentifier": "com.zarezfamily.appcafe"
     },
     "android": {
-      "package": "com.hommemaktub.miappdecafe"
+      "package": "com.zarezfamily.appcafe"
+    },
+    "web": {
+      "bundler": "metro"
     }
   }
 }

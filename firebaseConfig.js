@@ -1,7 +1,7 @@
-import { initializeApp } from "firebase/app";
+// Cambiamos la forma de importar la base de Firebase
+import * as FirebaseApp from "firebase/app";
 import { getFirestore } from "firebase/firestore/lite";
 
-// Datos de tu proyecto
 const firebaseConfig = {
   apiKey: "AIzaSyA1BcU0iRk3HyFtV92CLrnalHFKLaOWH24",
   authDomain: "miappdecafe.firebaseapp.com",
@@ -11,5 +11,6 @@ const firebaseConfig = {
   appId: "1:274010206666:web:d86abc7543e3772f8c9f33"
 };
 
-// Inicialización directa sin variables intermedias
-export const db = getFirestore(initializeApp(firebaseConfig));
+// Inicialización manual sin variables ocultas
+const app = FirebaseApp.initializeApp(firebaseConfig);
+export const db = getFirestore(app);

@@ -1,11 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { CameraView, useCameraPermissions } from 'expo-camera';
-import * as ImagePicker from 'expo-image-picker';
 import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
-  Image,
   LogBox,
   ScrollView,
   StyleSheet, Text,
@@ -14,11 +12,10 @@ import {
 } from 'react-native';
 import "react-native-get-random-values";
 
-// 1. IMPORTACIÓN LITE (Solución definitiva para el error 'S' y 'default')
+// 1. IMPORTACIÓN LITE V2 (SIN LLAVES PARA MATAR LA 'S')
 import * as Firestore from "firebase/firestore/lite";
 import { db } from './firebaseConfig';
 
-// Ocultar avisos amarillos para que no molesten en la pantalla
 LogBox.ignoreAllLogs();
 
 export default function App() {
@@ -32,8 +29,7 @@ export default function App() {
   const [topCafes, setTopCafes] = useState([]);
   const [subiendo, setSubiendo] = useState(false);
 
-  // --- CARGA DE DATOS ---
-  // Nota: 'lite' no soporta onSnapshot (tiempo real), usamos getDocs
+  // --- CARGA DE DATOS V2 ---
   const cargarDatos = async () => {
     if (!db) return;
     try {
@@ -56,7 +52,7 @@ export default function App() {
       snapRank.forEach(d => docsRank.push({ id: d.id, ...d.data() }));
       setTopCafes(docsRank);
     } catch (e) {
-      console.log("Error al cargar:", e);
+      console.log("Error V2:", e);
     }
   };
 
@@ -64,12 +60,10 @@ export default function App() {
     cargarDatos();
   }, []);
 
-  // --- LÓGICA DE NEGOCIO ---
   const guardarCafe = async () => {
-    if (!nombreCafe) return Alert.alert("Aviso", "Escribe el nombre del café");
+    if (!nombreCafe) return Alert.alert("Aviso", "Nombre obligatorio");
     setSubiendo(true);
     try {
-      // Guardar café
       await Firestore.addDoc(Firestore.collection(db, "cafes"), {
         nombre: nombreCafe,
         puntuacion: rating,
@@ -78,7 +72,6 @@ export default function App() {
         fecha: new Date().toISOString()
       });
 
-      // Actualizar Ranking
       const refRank = Firestore.doc(db, "ranking", nombreCafe);
       const snapRank = await Firestore.getDoc(refRank);
       if (snapRank.exists()) {
@@ -87,26 +80,19 @@ export default function App() {
         await Firestore.setDoc(refRank, { nombre: nombreCafe, votos: 1 });
       }
 
-      Alert.alert("✅ Éxito", "Café guardado");
+      Alert.alert("✅ Éxito V2", "Guardado correctamente");
       setNombreCafe(''); setNotas(''); setRating(0); setFoto(null); setScanned(false);
-      cargarDatos(); // Recargar lista manualmente
+      cargarDatos();
     } catch (e) {
-      console.log(e);
-      Alert.alert("Error", "Error de conexión");
+      Alert.alert("Error", "Fallo de conexión");
     } finally { setSubiendo(false); }
-  };
-
-  const hacerFoto = async () => {
-    const res = await ImagePicker.launchCameraAsync({ allowsEditing: true, quality: 0.5 });
-    if (!res.canceled) setFoto(res.assets[0].uri);
-  };
+  }
 
   if (!permission?.granted) {
     return (
       <View style={styles.center}>
-        <Ionicons name="cafe" size={80} color="#6F4E37" />
         <TouchableOpacity style={styles.btn} onPress={requestPermission}>
-          <Text style={styles.btnText}>ACTIVAR CÁMARA</Text>
+          <Text style={styles.btnText}>ACTIVAR CÁMARA V2</Text>
         </TouchableOpacity>
       </View>
     );
@@ -117,12 +103,15 @@ export default function App() {
       {!scanned ? (
         <View style={{ flex: 1 }}>
           <CameraView onBarcodeScanned={() => setScanned(true)} style={StyleSheet.absoluteFillObject} />
-          <View style={styles.overlay}><Text style={styles.overlayText}>Escanea un código</Text></View>
+          <View style={styles.overlay}><Text style={styles.overlayText}>Escanea un café</Text></View>
         </View>
       ) : (
         <ScrollView contentContainerStyle={styles.scroll}>
-          <Text style={styles.title}>☕ Nueva Entrada</Text>
-          <TextInput style={styles.input} placeholder="Nombre" value={nombreCafe} onChangeText={setNombreCafe} />
+          {/* TÍTULO V2 PARA CONFIRMAR CARGA LIMPIA */}
+          <Text style={styles.title}>☕ Mi Bodega V2</Text>
+          <Text style={styles.versionTag}>(ANTI-ERROR S ACTIVADO)</Text>
+          
+          <TextInput style={styles.input} placeholder="Nombre del Café" value={nombreCafe} onChangeText={setNombreCafe} />
           
           <View style={styles.stars}>
             {[1,2,3,4,5].map(s => (
@@ -132,18 +121,13 @@ export default function App() {
             ))}
           </View>
 
-          <TouchableOpacity style={styles.btnSec} onPress={hacerFoto}>
-            <Text style={styles.btnSecText}>TOMAR FOTO</Text>
-          </TouchableOpacity>
-          {foto && <Image source={{ uri: foto }} style={styles.preview} />}
-
           <TouchableOpacity style={styles.btn} onPress={guardarCafe} disabled={subiendo}>
-            {subiendo ? <ActivityIndicator color="white" /> : <Text style={styles.btnText}>GUARDAR</Text>}
+            {subiendo ? <ActivityIndicator color="white" /> : <Text style={styles.btnText}>GUARDAR CAFÉ</Text>}
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => setScanned(false)}><Text style={styles.cancel}>Volver</Text></TouchableOpacity>
+          <TouchableOpacity onPress={() => setScanned(false)}><Text style={styles.cancel}>Volver al Escáner</Text></TouchableOpacity>
 
-          <Text style={styles.subTitle}>🏆 Top 5</Text>
+          <Text style={styles.subTitle}>🏆 Ranking Global</Text>
           {topCafes.map((c, i) => (
             <View key={c.id} style={styles.rankItem}><Text>{i+1}. {c.nombre}</Text><Text>{c.votos} pts</Text></View>
           ))}
@@ -157,15 +141,13 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FDF5E6' },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   scroll: { padding: 25, paddingTop: 60 },
-  title: { fontSize: 26, fontWeight: 'bold', color: '#4B2C20', textAlign: 'center', marginBottom: 20 },
+  title: { fontSize: 26, fontWeight: 'bold', color: '#4B2C20', textAlign: 'center' },
+  versionTag: { fontSize: 10, color: 'green', textAlign: 'center', marginBottom: 20 },
   input: { backgroundColor: 'white', padding: 15, borderRadius: 12, marginBottom: 15, borderWidth: 1, borderColor: '#D2B48C' },
   stars: { flexDirection: 'row', justifyContent: 'center', marginBottom: 20 },
   btn: { backgroundColor: '#6F4E37', padding: 18, borderRadius: 30, alignItems: 'center' },
   btnText: { color: 'white', fontWeight: 'bold' },
-  btnSec: { padding: 10, borderWidth: 1, borderColor: '#6F4E37', borderRadius: 12, alignItems: 'center', marginBottom: 20 },
-  btnSecText: { color: '#6F4E37', fontWeight: 'bold' },
-  preview: { width: 100, height: 100, borderRadius: 15, alignSelf: 'center', marginBottom: 20 },
-  cancel: { color: 'red', textAlign: 'center', marginTop: 20 },
+  cancel: { color: 'red', textAlign: 'center', marginTop: 25 },
   overlay: { position: 'absolute', bottom: 60, alignSelf: 'center' },
   overlayText: { color: 'white', backgroundColor: 'rgba(0,0,0,0.7)', padding: 10, borderRadius: 10 },
   subTitle: { fontSize: 18, fontWeight: 'bold', marginTop: 30, marginBottom: 10 },

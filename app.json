@@ -10,9 +10,6 @@
       "bundleIdentifier": "com.hommemaktub.miappdecafe"
     },
     "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#ffffff"
-      },
       "package": "com.hommemaktub.miappdecafe"
     }
   }

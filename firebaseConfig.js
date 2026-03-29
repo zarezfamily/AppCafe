@@ -10,8 +10,13 @@ const firebaseConfig = {
   appId: "1:274010206666:web:d86abc7543e3772f8c9f33"
 };
 
-// Inicialización segura para Expo
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-const db = getFirestore(app);
+// Inicialización ultra-segura
+let app;
+if (getApps().length === 0) {
+  app = initializeApp(firebaseConfig);
+} else {
+  app = getApp();
+}
 
+const db = getFirestore(app);
 export { db };

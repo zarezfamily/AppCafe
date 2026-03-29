@@ -14,11 +14,11 @@ import {
 } from 'react-native';
 import "react-native-get-random-values";
 
-// 1. IMPORTACIÓN BLINDADA (Clave para matar el error 'S')
-import * as Firestore from "firebase/firestore";
+// 1. IMPORTACIÓN LITE (Solución definitiva para el error 'S' y 'default')
+import * as Firestore from "firebase/firestore/lite";
 import { db } from './firebaseConfig';
 
-// Ignorar alertas visuales para una interfaz limpia
+// Ocultar avisos amarillos para que no molesten en la pantalla
 LogBox.ignoreAllLogs();
 
 export default function App() {
@@ -32,42 +32,44 @@ export default function App() {
   const [topCafes, setTopCafes] = useState([]);
   const [subiendo, setSubiendo] = useState(false);
 
-  // --- CARGA DE DATOS DESDE FIREBASE ---
-  useEffect(() => {
+  // --- CARGA DE DATOS ---
+  // Nota: 'lite' no soporta onSnapshot (tiempo real), usamos getDocs
+  const cargarDatos = async () => {
     if (!db) return;
+    try {
+      const qCafes = Firestore.query(
+        Firestore.collection(db, "cafes"), 
+        Firestore.orderBy("fecha", "desc")
+      );
+      const snapCafes = await Firestore.getDocs(qCafes);
+      const docsCafes = [];
+      snapCafes.forEach(d => docsCafes.push({ id: d.id, ...d.data() }));
+      setMisCafes(docsCafes);
 
-    // Escuchar Bodega Personal
-    const qCafes = Firestore.query(
-      Firestore.collection(db, "cafes"), 
-      Firestore.orderBy("fecha", "desc")
-    );
-    const unsubCafes = Firestore.onSnapshot(qCafes, (snap) => {
-      const docs = [];
-      snap.forEach(d => docs.push({ id: d.id, ...d.data() }));
-      setMisCafes(docs);
-    }, (err) => console.log("Error Firestore:", err));
+      const qRank = Firestore.query(
+        Firestore.collection(db, "ranking"), 
+        Firestore.orderBy("votos", "desc"), 
+        Firestore.limit(5)
+      );
+      const snapRank = await Firestore.getDocs(qRank);
+      const docsRank = [];
+      snapRank.forEach(d => docsRank.push({ id: d.id, ...d.data() }));
+      setTopCafes(docsRank);
+    } catch (e) {
+      console.log("Error al cargar:", e);
+    }
+  };
 
-    // Escuchar Ranking Global
-    const qRank = Firestore.query(
-      Firestore.collection(db, "ranking"), 
-      Firestore.orderBy("votos", "desc"), 
-      Firestore.limit(5)
-    );
-    const unsubRank = Firestore.onSnapshot(qRank, (snap) => {
-      const docs = [];
-      snap.forEach(d => docs.push({ id: d.id, ...d.data() }));
-      setTopCafes(docs);
-    }, (err) => console.log("Error Ranking:", err));
-
-    return () => { unsubCafes(); unsubRank(); };
+  useEffect(() => {
+    cargarDatos();
   }, []);
 
-  // --- LÓGICA DE GUARDADO ---
+  // --- LÓGICA DE NEGOCIO ---
   const guardarCafe = async () => {
     if (!nombreCafe) return Alert.alert("Aviso", "Escribe el nombre del café");
     setSubiendo(true);
     try {
-      // Guardar en la colección de cafés
+      // Guardar café
       await Firestore.addDoc(Firestore.collection(db, "cafes"), {
         nombre: nombreCafe,
         puntuacion: rating,
@@ -76,25 +78,22 @@ export default function App() {
         fecha: new Date().toISOString()
       });
 
-      // Actualizar Ranking Global
-      const refRanking = Firestore.doc(db, "ranking", nombreCafe);
-      const docSnap = await Firestore.getDoc(refRanking);
-      if (docSnap.exists()) {
-        await Firestore.updateDoc(refRanking, { votos: Firestore.increment(1) });
+      // Actualizar Ranking
+      const refRank = Firestore.doc(db, "ranking", nombreCafe);
+      const snapRank = await Firestore.getDoc(refRank);
+      if (snapRank.exists()) {
+        await Firestore.updateDoc(refRank, { votos: (snapRank.data().votos || 0) + 1 });
       } else {
-        await Firestore.setDoc(refRanking, { nombre: nombreCafe, votos: 1 });
+        await Firestore.setDoc(refRank, { nombre: nombreCafe, votos: 1 });
       }
 
-      Alert.alert("✅ Guardado", "Tu café ya está en la bodega");
-      limpiarFormulario();
+      Alert.alert("✅ Éxito", "Café guardado");
+      setNombreCafe(''); setNotas(''); setRating(0); setFoto(null); setScanned(false);
+      cargarDatos(); // Recargar lista manualmente
     } catch (e) {
       console.log(e);
-      Alert.alert("Error", "No se pudo conectar con la base de datos");
+      Alert.alert("Error", "Error de conexión");
     } finally { setSubiendo(false); }
-  };
-
-  const limpiarFormulario = () => {
-    setNombreCafe(''); setNotas(''); setRating(0); setFoto(null); setScanned(false);
   };
 
   const hacerFoto = async () => {
@@ -102,12 +101,10 @@ export default function App() {
     if (!res.canceled) setFoto(res.assets[0].uri);
   };
 
-  // --- RENDERIZADO ---
   if (!permission?.granted) {
     return (
       <View style={styles.center}>
         <Ionicons name="cafe" size={80} color="#6F4E37" />
-        <Text style={{ textAlign: 'center', margin: 20 }}>Necesitamos permiso de cámara para escanear tus cafés.</Text>
         <TouchableOpacity style={styles.btn} onPress={requestPermission}>
           <Text style={styles.btnText}>ACTIVAR CÁMARA</Text>
         </TouchableOpacity>
@@ -120,14 +117,13 @@ export default function App() {
       {!scanned ? (
         <View style={{ flex: 1 }}>
           <CameraView onBarcodeScanned={() => setScanned(true)} style={StyleSheet.absoluteFillObject} />
-          <View style={styles.overlay}><Text style={styles.overlayText}>Enfoca el paquete de café</Text></View>
+          <View style={styles.overlay}><Text style={styles.overlayText}>Escanea un código</Text></View>
         </View>
       ) : (
         <ScrollView contentContainerStyle={styles.scroll}>
           <Text style={styles.title}>☕ Nueva Entrada</Text>
+          <TextInput style={styles.input} placeholder="Nombre" value={nombreCafe} onChangeText={setNombreCafe} />
           
-          <TextInput style={styles.input} placeholder="Nombre del Café" value={nombreCafe} onChangeText={setNombreCafe} />
-
           <View style={styles.stars}>
             {[1,2,3,4,5].map(s => (
               <TouchableOpacity key={s} onPress={() => setRating(s)}>
@@ -136,44 +132,20 @@ export default function App() {
             ))}
           </View>
 
-          <TextInput style={[styles.input, {height: 80}]} placeholder="Notas de sabor..." multiline value={notas} onChangeText={setNotas} />
-
           <TouchableOpacity style={styles.btnSec} onPress={hacerFoto}>
-            <Ionicons name="camera" size={20} color="#6F4E37" />
-            <Text style={styles.btnSecText}>HACER FOTO</Text>
+            <Text style={styles.btnSecText}>TOMAR FOTO</Text>
           </TouchableOpacity>
-
           {foto && <Image source={{ uri: foto }} style={styles.preview} />}
 
           <TouchableOpacity style={styles.btn} onPress={guardarCafe} disabled={subiendo}>
-            {subiendo ? <ActivityIndicator color="white" /> : <Text style={styles.btnText}>GUARDAR EN LA NUBE</Text>}
+            {subiendo ? <ActivityIndicator color="white" /> : <Text style={styles.btnText}>GUARDAR</Text>}
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={limpiarFormulario}><Text style={styles.cancel}>Volver a Escanear</Text></TouchableOpacity>
+          <TouchableOpacity onPress={() => setScanned(false)}><Text style={styles.cancel}>Volver</Text></TouchableOpacity>
 
-          {/* SECCIÓN RANKING */}
-          <View style={styles.rankingBox}>
-            <Text style={styles.subTitle}>🏆 Ranking Global</Text>
-            {topCafes.map((c, i) => (
-              <View key={c.id} style={styles.rankItem}>
-                <Text>{i+1}. {c.nombre}</Text>
-                <Text style={{fontWeight:'bold'}}>{c.votos} pts</Text>
-              </View>
-            ))}
-          </View>
-
-          {/* SECCIÓN BODEGA PERSONAL */}
-          <Text style={styles.subTitle}>📦 Mi Bodega</Text>
-          {misCafes.map(item => (
-            <View key={item.id} style={styles.card}>
-              <View style={{flex:1}}>
-                <Text style={styles.cardTitle}>{item.nombre}</Text>
-                <Text style={{color:'#888'}}>{'⭐'.repeat(item.puntuacion)}</Text>
-              </View>
-              <TouchableOpacity onPress={() => Firestore.deleteDoc(Firestore.doc(db, "cafes", item.id))}>
-                <Ionicons name="trash" size={20} color="#FF6347" />
-              </TouchableOpacity>
-            </View>
+          <Text style={styles.subTitle}>🏆 Top 5</Text>
+          {topCafes.map((c, i) => (
+            <View key={c.id} style={styles.rankItem}><Text>{i+1}. {c.nombre}</Text><Text>{c.votos} pts</Text></View>
           ))}
         </ScrollView>
       )}
@@ -181,25 +153,21 @@ export default function App() {
   );
 }
 
-// --- ESTILOS ---
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FDF5E6' },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 30 },
-  scroll: { padding: 25, paddingTop: 60, paddingBottom: 50 },
-  title: { fontSize: 26, fontWeight: 'bold', color: '#4B2C20', marginBottom: 20, textAlign: 'center' },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  scroll: { padding: 25, paddingTop: 60 },
+  title: { fontSize: 26, fontWeight: 'bold', color: '#4B2C20', textAlign: 'center', marginBottom: 20 },
   input: { backgroundColor: 'white', padding: 15, borderRadius: 12, marginBottom: 15, borderWidth: 1, borderColor: '#D2B48C' },
   stars: { flexDirection: 'row', justifyContent: 'center', marginBottom: 20 },
   btn: { backgroundColor: '#6F4E37', padding: 18, borderRadius: 30, alignItems: 'center' },
   btnText: { color: 'white', fontWeight: 'bold' },
-  btnSec: { flexDirection: 'row', justifyContent: 'center', marginBottom: 20, padding: 10, borderWidth: 1, borderColor: '#6F4E37', borderRadius: 12 },
-  btnSecText: { color: '#6F4E37', marginLeft: 10, fontWeight: 'bold' },
-  preview: { width: 120, height: 120, borderRadius: 15, alignSelf: 'center', marginBottom: 20 },
-  cancel: { color: '#A52A2A', textAlign: 'center', marginTop: 25, fontWeight: 'bold' },
+  btnSec: { padding: 10, borderWidth: 1, borderColor: '#6F4E37', borderRadius: 12, alignItems: 'center', marginBottom: 20 },
+  btnSecText: { color: '#6F4E37', fontWeight: 'bold' },
+  preview: { width: 100, height: 100, borderRadius: 15, alignSelf: 'center', marginBottom: 20 },
+  cancel: { color: 'red', textAlign: 'center', marginTop: 20 },
   overlay: { position: 'absolute', bottom: 60, alignSelf: 'center' },
-  overlayText: { color: 'white', backgroundColor: 'rgba(0,0,0,0.7)', padding: 12, borderRadius: 15 },
-  subTitle: { fontSize: 18, fontWeight: 'bold', marginTop: 35, marginBottom: 15, color: '#4B2C20' },
-  rankingBox: { backgroundColor: '#FFF5EE', padding: 15, borderRadius: 15, borderWidth: 1, borderColor: '#D2B48C' },
-  rankItem: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 0.5, borderBottomColor: '#EEE' },
-  card: { flexDirection: 'row', backgroundColor: 'white', padding: 15, borderRadius: 15, marginBottom: 10, alignItems: 'center', elevation: 2 },
-  cardTitle: { fontWeight: 'bold', fontSize: 16 }
+  overlayText: { color: 'white', backgroundColor: 'rgba(0,0,0,0.7)', padding: 10, borderRadius: 10 },
+  subTitle: { fontSize: 18, fontWeight: 'bold', marginTop: 30, marginBottom: 10 },
+  rankItem: { flexDirection: 'row', justifyContent: 'space-between', padding: 10, backgroundColor: 'white', marginBottom: 5, borderRadius: 8 }
 });

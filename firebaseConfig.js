@@ -1,5 +1,6 @@
 import { getApp, getApps, initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+// IMPORTANTE: Usar /lite aquí también
+import { getFirestore } from "firebase/firestore/lite";
 
 const firebaseConfig = {
   apiKey: "AIzaSyA1BcU0iRk3HyFtV92CLrnalHFKLaOWH24",
@@ -10,13 +11,8 @@ const firebaseConfig = {
   appId: "1:274010206666:web:d86abc7543e3772f8c9f33"
 };
 
-// Inicialización ultra-segura
-let app;
-if (getApps().length === 0) {
-  app = initializeApp(firebaseConfig);
-} else {
-  app = getApp();
-}
-
+// Inicialización segura
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 const db = getFirestore(app);
+
 export { db };

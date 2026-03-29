@@ -153,3 +153,5 @@ const styles = StyleSheet.create({
   subTitle: { fontSize: 18, fontWeight: 'bold', marginTop: 30, marginBottom: 10 },
   rankItem: { flexDirection: 'row', justifyContent: 'space-between', padding: 10, backgroundColor: 'white', marginBottom: 5, borderRadius: 8 }
 });
+// Añade esto al final del todo del archivo App.js
+console.log("CARGA_LIMPIA_V3");

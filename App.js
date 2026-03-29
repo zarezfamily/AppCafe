@@ -1,129 +1,253 @@
 import { Ionicons } from '@expo/vector-icons';
 import { CameraView, useCameraPermissions } from 'expo-camera';
-import * as FS from "firebase/firestore/lite";
+import * as ImagePicker from 'expo-image-picker';
 import { useEffect, useState } from 'react';
 import {
-  ActivityIndicator, LogBox, SafeAreaView,
+  ActivityIndicator,
+  Alert,
+  Image,
   ScrollView,
-  StyleSheet, Text,
+  StyleSheet,
+  Text,
+  TextInput,
   TouchableOpacity,
   View
 } from 'react-native';
 import "react-native-get-random-values";
-import { db } from './firebaseConfig';
 
-LogBox.ignoreAllLogs();
+import * as Firestore from "firebase/firestore/lite";
+import { db } from './firebaseConfig';
 
 export default function App() {
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
   const [nombreCafe, setNombreCafe] = useState('');
+  const [notas, setNotas] = useState('');
   const [rating, setRating] = useState(0);
+  const [foto, setFoto] = useState(null);
   const [misCafes, setMisCafes] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [topCafes, setTopCafes] = useState([]);
+  const [subiendo, setSubiendo] = useState(false);
 
+  // --- CARGA DE DATOS ---
   const cargarDatos = async () => {
+    if (!db) return;
     try {
-      const q = FS.query(FS.collection(db, "cafes"), FS.orderBy("fecha", "desc"));
-      const snap = await FS.getDocs(q);
-      const docs = [];
-      snap.forEach(d => docs.push({ id: d.id, ...d.data() }));
-      setMisCafes(docs);
-    } catch (e) { console.log(e); }
-    finally { setLoading(false); }
+      // Cargar Bodega Personal
+      const qCafes = Firestore.query(
+        Firestore.collection(db, "cafes"),
+        Firestore.orderBy("fecha", "desc")
+      );
+      const snapCafes = await Firestore.getDocs(qCafes);
+      const docsCafes = [];
+      snapCafes.forEach(d => docsCafes.push({ id: d.id, ...d.data() }));
+      setMisCafes(docsCafes);
+
+      // Cargar Ranking
+      const qRank = Firestore.query(
+        Firestore.collection(db, "ranking"),
+        Firestore.orderBy("votos", "desc"),
+        Firestore.limit(5)
+      );
+      const snapRank = await Firestore.getDocs(qRank);
+      const docsRank = [];
+      snapRank.forEach(d => docsRank.push({ id: d.id, ...d.data() }));
+      setTopCafes(docsRank);
+    } catch (e) {
+      console.error("Error de carga:", e);
+      Alert.alert("Error", "No se pudieron cargar los datos");
+    }
   };
 
-  useEffect(() => { cargarDatos(); }, []);
+  useEffect(() => {
+    cargarDatos();
+  }, []);
+
+  // --- LÓGICA DE GUARDADO ---
+  const guardarCafe = async () => {
+    if (!nombreCafe.trim()) return Alert.alert("Aviso", "Escribe el nombre del café");
+    setSubiendo(true);
+    try {
+      // Guardar en la colección principal
+      // NOTA: 'foto' guarda la URI local. Para persistencia real entre dispositivos,
+      // sube la imagen a Firebase Storage y guarda la URL remota aquí.
+      await Firestore.addDoc(Firestore.collection(db, "cafes"), {
+        nombre: nombreCafe.trim(),
+        puntuacion: rating,
+        notas: notas,
+        foto: foto,
+        fecha: new Date().toISOString()
+      });
+
+      // Actualizar Ranking Global
+      // Usamos nombre normalizado como ID para evitar duplicados por mayúsculas/tildes
+      const rankId = nombreCafe.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const refRank = Firestore.doc(db, "ranking", rankId);
+      const snapRank = await Firestore.getDoc(refRank);
+      if (snapRank.exists()) {
+        await Firestore.updateDoc(refRank, { votos: (snapRank.data().votos || 0) + 1 });
+      } else {
+        await Firestore.setDoc(refRank, { nombre: nombreCafe.trim(), votos: 1 });
+      }
+
+      Alert.alert("✅ Guardado", "Café registrado en la nube");
+      setNombreCafe('');
+      setNotas('');
+      setRating(0);
+      setFoto(null);
+      setScanned(false);
+      cargarDatos();
+    } catch (e) {
+      console.error("Error al guardar:", e);
+      Alert.alert("Error", "No se pudo conectar con Firebase");
+    } finally {
+      setSubiendo(false);
+    }
+  };
+
+  const hacerFoto = async () => {
+    // Solicitamos permiso de cámara para la galería antes de abrir
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert("Permiso denegado", "Necesitas permitir el acceso a la cámara para hacer fotos.");
+      return;
+    }
+    const res = await ImagePicker.launchCameraAsync({ allowsEditing: true, quality: 0.5 });
+    if (!res.canceled) setFoto(res.assets[0].uri);
+  };
+
+  const eliminarCafe = async (item) => {
+    Alert.alert(
+      "Eliminar café",
+      `¿Seguro que quieres eliminar "${item.nombre}"?`,
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar", style: "destructive", onPress: async () => {
+            try {
+              await Firestore.deleteDoc(Firestore.doc(db, "cafes", item.id));
+              cargarDatos();
+            } catch (e) {
+              console.error("Error al eliminar:", e);
+              Alert.alert("Error", "No se pudo eliminar el café");
+            }
+          }
+        }
+      ]
+    );
+  };
 
   if (!permission?.granted) {
     return (
       <View style={styles.center}>
-        <TouchableOpacity style={styles.btnPrimary} onPress={requestPermission}>
-          <Text style={styles.btnText}>DAR PERMISO A LA CÁMARA</Text>
+        <Ionicons name="cafe" size={80} color="#6F4E37" />
+        <Text style={{ textAlign: 'center', margin: 20 }}>Permiso de cámara necesario.</Text>
+        <TouchableOpacity style={styles.btn} onPress={requestPermission}>
+          <Text style={styles.btnText}>ACTIVAR CÁMARA</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       {!scanned ? (
-        <View style={styles.mainContainer}>
-          <View style={styles.header}>
-            <Text style={styles.brand}>BODEGA CAFE</Text>
-            <TouchableOpacity><Ionicons name="person-circle-outline" size={30} color="#333" /></TouchableOpacity>
+        <View style={{ flex: 1 }}>
+          <CameraView onBarcodeScanned={() => setScanned(true)} style={StyleSheet.absoluteFillObject} />
+          <View style={styles.overlay}>
+            <Text style={styles.overlayText}>Enfoca el paquete de café</Text>
           </View>
-
-          <ScrollView showsVerticalScrollIndicator={false}>
-            <Text style={styles.sectionTitle}>Tus Cafés Recientes</Text>
-            {loading ? <ActivityIndicator color="#6F4E37" /> : (
-              misCafes.map(item => (
-                <View key={item.id} style={styles.wineCard}>
-                  <View style={styles.cardImagePlaceholder}>
-                    <Ionicons name="cafe" size={40} color="#D2B48C" />
-                  </View>
-                  <View style={styles.cardInfo}>
-                    <Text style={styles.cardBrand}>Tostaduría Artesanal</Text>
-                    <Text style={styles.cardName}>{item.nombre}</Text>
-                    <View style={styles.ratingRow}>
-                      <Text style={styles.ratingText}>{item.puntuacion}.0</Text>
-                      <Ionicons name="star" size={14} color="#B22222" />
-                      <Text style={styles.dateText}> • {new Date(item.fecha).toLocaleDateString()}</Text>
-                    </View>
-                  </View>
-                </View>
-              ))
-            )}
-          </ScrollView>
-
-          {/* BOTÓN FLOTANTE ESTILO VIVINO */}
-          <TouchableOpacity style={styles.fab} onPress={() => setScanned(true)}>
-            <Ionicons name="camera" size={30} color="white" />
-          </TouchableOpacity>
         </View>
       ) : (
-        <View style={styles.cameraContainer}>
-          <CameraView onBarcodeScanned={() => setScanned(false)} style={StyleSheet.absoluteFillObject} />
-          <TouchableOpacity style={styles.closeCam} onPress={() => setScanned(false)}>
-            <Ionicons name="close-circle" size={50} color="white" />
-          </TouchableOpacity>
-          <View style={styles.camOverlay}>
-            <Text style={styles.camText}>Enfoca la etiqueta del café</Text>
+        <ScrollView contentContainerStyle={styles.scroll}>
+          <Text style={styles.title}>☕ Nueva Entrada</Text>
+
+          <TextInput
+            style={styles.input}
+            placeholder="Nombre del Café"
+            value={nombreCafe}
+            onChangeText={setNombreCafe}
+          />
+
+          <View style={styles.stars}>
+            {[1, 2, 3, 4, 5].map(s => (
+              <TouchableOpacity key={s} onPress={() => setRating(s)}>
+                <Ionicons name={s <= rating ? "star" : "star-outline"} size={35} color="#6F4E37" />
+              </TouchableOpacity>
+            ))}
           </View>
-        </View>
+
+          <TextInput
+            style={[styles.input, { height: 60 }]}
+            placeholder="Notas..."
+            value={notas}
+            onChangeText={setNotas}
+            multiline
+          />
+
+          <TouchableOpacity style={styles.btnSec} onPress={hacerFoto}>
+            <Text style={styles.btnSecText}>HACER FOTO</Text>
+          </TouchableOpacity>
+          {foto && <Image source={{ uri: foto }} style={styles.preview} />}
+
+          <TouchableOpacity style={styles.btn} onPress={guardarCafe} disabled={subiendo}>
+            {subiendo
+              ? <ActivityIndicator color="white" />
+              : <Text style={styles.btnText}>GUARDAR CAFÉ</Text>
+            }
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => setScanned(false)}>
+            <Text style={styles.cancel}>Volver al Escáner</Text>
+          </TouchableOpacity>
+
+          {/* RANKING */}
+          <Text style={styles.subTitle}>🏆 Ranking Global</Text>
+          {topCafes.map((c, i) => (
+            <View key={c.id} style={styles.rankItem}>
+              <Text>{i + 1}. {c.nombre}</Text>
+              <Text style={{ fontWeight: 'bold' }}>{c.votos} pts</Text>
+            </View>
+          ))}
+
+          {/* BODEGA */}
+          <Text style={styles.subTitle}>📦 Mi Bodega</Text>
+          {misCafes.map(item => (
+            <View key={item.id} style={styles.card}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.cardTitle}>{item.nombre}</Text>
+                <Text style={{ color: '#888' }}>{'⭐'.repeat(item.puntuacion)}</Text>
+                {item.notas ? <Text style={styles.cardNotas}>{item.notas}</Text> : null}
+              </View>
+              <TouchableOpacity onPress={() => eliminarCafe(item)}>
+                <Ionicons name="trash" size={20} color="#FF6347" />
+              </TouchableOpacity>
+            </View>
+          ))}
+        </ScrollView>
       )}
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFF' },
-  mainContainer: { flex: 1, paddingHorizontal: 20 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', height: 60 },
-  brand: { fontSize: 18, fontWeight: '900', letterSpacing: 2, color: '#333' },
-  sectionTitle: { fontSize: 22, fontWeight: 'bold', marginVertical: 20, color: '#1a1a1a' },
-  wineCard: { 
-    flexDirection: 'row', 
-    backgroundColor: '#fff', 
-    borderRadius: 12, 
-    padding: 15, 
-    marginBottom: 15,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3
-  },
-  cardImagePlaceholder: { width: 70, height: 90, backgroundColor: '#F9F9F9', borderRadius: 8, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#EEE' },
-  cardInfo: { flex: 1, marginLeft: 15, justifyContent: 'center' },
-  cardBrand: { fontSize: 12, color: '#888', textTransform: 'uppercase', fontWeight: 'bold' },
-  cardName: { fontSize: 18, fontWeight: '700', color: '#333', marginVertical: 2 },
-  ratingRow: { flexDirection: 'row', alignItems: 'center' },
-  ratingText: { fontSize: 16, fontWeight: 'bold', color: '#B22222', marginRight: 4 },
-  dateText: { fontSize: 12, color: '#999' },
-  fab: { 
-    position: 'absolute', bottom: 30, alignSelf: 'center', 
-    backgroundColor: '#B22222', width: 70, height: 70, borderRadius: 35, 
-    justifyContent: 'center', alignItems: 'center', elevation: 5, shadowOpacity: 0.3 
-  },
-  cameraContainer: { flex: 1, backgroundColor: 'black' },
-  closeCam: { position: 'absolute', top: 50, right: 20 },
-  camOverlay: { position: 'absolute', bottom: 100, width: '100%', alignItems: 'center' },
-  camText: { color: 'white', backgroundColor: 'rgba(0,0,0,0.6)', padding: 10, borderRadius: 20 }
+  container: { flex: 1, backgroundColor: '#FDF5E6' },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 30 },
+  scroll: { padding: 25, paddingTop: 60, paddingBottom: 50 },
+  title: { fontSize: 26, fontWeight: 'bold', color: '#4B2C20', textAlign: 'center', marginBottom: 20 },
+  input: { backgroundColor: 'white', padding: 15, borderRadius: 12, marginBottom: 15, borderWidth: 1, borderColor: '#D2B48C' },
+  stars: { flexDirection: 'row', justifyContent: 'center', marginBottom: 20 },
+  btn: { backgroundColor: '#6F4E37', padding: 18, borderRadius: 30, alignItems: 'center' },
+  btnText: { color: 'white', fontWeight: 'bold' },
+  btnSec: { padding: 10, borderWidth: 1, borderColor: '#6F4E37', borderRadius: 12, alignItems: 'center', marginBottom: 15 },
+  btnSecText: { color: '#6F4E37', fontWeight: 'bold' },
+  preview: { width: 100, height: 100, borderRadius: 15, alignSelf: 'center', marginBottom: 15 },
+  cancel: { color: '#A52A2A', textAlign: 'center', marginTop: 25, fontWeight: 'bold' },
+  overlay: { position: 'absolute', bottom: 60, alignSelf: 'center' },
+  overlayText: { color: 'white', backgroundColor: 'rgba(0,0,0,0.7)', padding: 12, borderRadius: 15 },
+  subTitle: { fontSize: 18, fontWeight: 'bold', marginTop: 35, marginBottom: 15, color: '#4B2C20' },
+  rankItem: { flexDirection: 'row', justifyContent: 'space-between', padding: 10, backgroundColor: 'white', marginBottom: 5, borderRadius: 10, borderWidth: 1, borderColor: '#EEE' },
+  card: { flexDirection: 'row', backgroundColor: 'white', padding: 15, borderRadius: 15, marginBottom: 10, alignItems: 'center' },
+  cardTitle: { fontWeight: 'bold', fontSize: 16 },
+  cardNotas: { color: '#aaa', fontSize: 12, marginTop: 2 },
 });

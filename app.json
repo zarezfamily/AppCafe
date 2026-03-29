@@ -3,14 +3,50 @@
     "name": "MiAppDeCafe",
     "slug": "miappdecafe",
     "version": "1.0.0",
-    "jsEngine": "jsc", 
+    "orientation": "portrait",
+    "jsEngine": "jsc",
+    "icon": "./assets/images/icon.png",
+    "splash": {
+      "image": "./assets/images/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FDF5E6"
+    },
     "ios": {
       "jsEngine": "jsc",
       "supportsTablet": true,
-      "bundleIdentifier": "com.zarezfamily.appcafe"
+      "bundleIdentifier": "com.zarezfamily.appcafe",
+      "infoPlist": {
+        "NSCameraUsageDescription": "La app necesita acceso a la cámara para escanear paquetes de café y hacer fotos.",
+        "NSPhotoLibraryUsageDescription": "La app necesita acceso a la galería para seleccionar fotos de café."
+      }
     },
     "android": {
-      "jsEngine": "jsc"
-    }
+      "jsEngine": "jsc",
+      "package": "com.zarezfamily.appcafe",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "La app necesita acceso a la cámara para escanear paquetes de café."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "La app necesita acceso a la cámara para hacer fotos de café.",
+          "photosPermission": "La app necesita acceso a la galería para seleccionar fotos."
+        }
+      ]
+    ]
   }
 }

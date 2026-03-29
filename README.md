@@ -1,56 +1,103 @@
-# Welcome to your Expo app 👋
+# ☕ AppCafe
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+App móvil para registrar, puntuar y gestionar tu colección de cafés. Escanea el código de barras del paquete, añade notas y puntuación, y consulta el ranking global de los cafés más populares.
 
-## Get started
+## ✨ Funcionalidades
 
-1. Install dependencies
+- 📷 **Escáner de código de barras** — escanea cualquier paquete de café para iniciar una entrada
+- ⭐ **Puntuación de 1 a 5 estrellas**
+- 📝 **Notas personales** por cada café
+- 📸 **Foto del café** (guardada localmente)
+- 🏆 **Ranking global** — los 5 cafés más votados en tiempo real
+- 📦 **Mi Bodega** — tu colección personal con opción de eliminar entradas
 
-   ```bash
-   npm install
-   ```
+## 🛠️ Tecnologías
 
-2. Start the app
+- [React Native](https://reactnative.dev/) + [Expo](https://expo.dev/) ~54
+- [Firebase Firestore Lite](https://firebase.google.com/docs/firestore) para la base de datos en la nube
+- [expo-camera](https://docs.expo.dev/versions/latest/sdk/camera/) para el escáner
+- [expo-image-picker](https://docs.expo.dev/versions/latest/sdk/imagepicker/) para las fotos
 
-   ```bash
-   npx expo start
-   ```
+> **¿Por qué `jsEngine: "jsc"` en app.json?**
+> Firebase Firestore Lite tiene incompatibilidades con el motor Hermes de React Native. Usando JSC (JavaScriptCore) se evitan errores de inicialización en producción.
 
-In the output, you'll find options to open the app in a
+## 🚀 Instalación
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+### 1. Clona el repositorio
 
 ```bash
-npm run reset-project
+git clone https://github.com/zarezfamily/AppCafe.git
+cd AppCafe
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 2. Instala las dependencias
 
-### Other setup steps
+```bash
+npm install
+```
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+### 3. Configura Firebase
 
-## Learn more
+Copia el fichero de ejemplo y rellena con tus credenciales:
 
-To learn more about developing your project with Expo, look at the following resources:
+```bash
+cp .env.example .env
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Edita `.env` con tus datos de Firebase:
 
-## Join the community
+```
+EXPO_PUBLIC_FIREBASE_API_KEY=tu_api_key
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=tu_proyecto.firebaseapp.com
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=tu_proyecto_id
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=tu_proyecto.firebasestorage.app
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=tu_sender_id
+EXPO_PUBLIC_FIREBASE_APP_ID=tu_app_id
+```
 
-Join our community of developers creating universal apps.
+Puedes encontrar estos valores en la **Consola de Firebase → Configuración del proyecto**.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+> ⚠️ **Nunca subas el fichero `.env` a GitHub.** Ya está incluido en `.gitignore`.
+
+### 4. Configura las reglas de seguridad de Firestore
+
+En la consola de Firebase → Firestore → Reglas, usa al menos:
+
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if true; // Cambia a autenticación cuando añadas login
+    }
+  }
+}
+```
+
+### 5. Arranca la app
+
+```bash
+npx expo start
+```
+
+Escanea el QR con **Expo Go** o abre en un emulador.
+
+## 📁 Estructura del proyecto
+
+```
+AppCafe/
+├── App.js              # Componente principal y toda la lógica
+├── firebaseConfig.js   # Inicialización de Firebase (sin credenciales)
+├── app.json            # Configuración de Expo (permisos, iconos, etc.)
+├── metro.config.js     # Configuración de Metro (soporte .mjs para Firebase)
+├── babel.config.js     # Configuración de Babel
+├── .env.example        # Plantilla de variables de entorno
+├── assets/             # Imágenes e iconos
+└── scripts/            # Scripts de utilidad de Expo
+```
+
+## 🔒 Seguridad
+
+- Las credenciales de Firebase **nunca** se incluyen en el código fuente
+- Se gestionan mediante variables de entorno con el prefijo `EXPO_PUBLIC_`
+- El fichero `.env` está en `.gitignore`

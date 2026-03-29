@@ -3,6 +3,7 @@
     "name": "MiAppDeCafe",
     "slug": "miappdecafe",
     "version": "1.0.0",
+    "scheme": "miappdecafe",
     "ios": {
       "supportsTablet": true
     },
@@ -11,6 +12,9 @@
         "backgroundColor": "#ffffff"
       }
     },
+    "plugins": [
+      "expo-router"
+    ],
     "experiments": {
       "newArchEnabled": false
     }

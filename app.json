@@ -3,15 +3,14 @@
     "name": "MiAppDeCafe",
     "slug": "miappdecafe",
     "version": "1.0.0",
-    "jsEngine": "jsc",
+    "jsEngine": "jsc", 
     "ios": {
       "jsEngine": "jsc",
       "supportsTablet": true,
       "bundleIdentifier": "com.zarezfamily.appcafe"
     },
     "android": {
-      "jsEngine": "jsc",
-      "package": "com.zarezfamily.appcafe"
+      "jsEngine": "jsc"
     }
   }
 }

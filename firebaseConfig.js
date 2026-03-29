@@ -1,15 +1,7 @@
-import * as FirebaseApp from "firebase/app";
-import { getFirestore } from "firebase/firestore/lite";
-
-// Las credenciales se cargan desde el fichero .env (nunca subas .env a GitHub)
-// Crea un fichero .env en la raíz con estas variables:
-//
-// EXPO_PUBLIC_FIREBASE_API_KEY=tu_api_key
-// EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=tu_proyecto.firebaseapp.com
-// EXPO_PUBLIC_FIREBASE_PROJECT_ID=tu_proyecto
-// EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=tu_proyecto.firebasestorage.app
-// EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=tu_sender_id
-// EXPO_PUBLIC_FIREBASE_APP_ID=tu_app_id
+// Importación compatible con Metro bundler de Expo
+// NO usar import { initializeApp } from 'firebase/app' — causa el error de 'S' undefined
+import { initializeApp } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore/lite';
 
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
@@ -20,4 +12,5 @@ const firebaseConfig = {
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
 };
 
-export const db = getFirestore(FirebaseApp.initializeApp(firebaseConfig));
+const app = initializeApp(firebaseConfig);
+export const db = getFirestore(app);

@@ -15,7 +15,20 @@ import {
 } from 'react-native';
 import "react-native-get-random-values";
 
-import * as Firestore from "firebase/firestore/lite";
+// Imports directos (no namespace) — evita el error 'S' undefined con Metro
+import {
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  setDoc,
+  updateDoc,
+} from 'firebase/firestore/lite';
 import { db } from './firebaseConfig';
 
 export default function App() {
@@ -29,27 +42,17 @@ export default function App() {
   const [topCafes, setTopCafes] = useState([]);
   const [subiendo, setSubiendo] = useState(false);
 
-  // --- CARGA DE DATOS ---
   const cargarDatos = async () => {
     if (!db) return;
     try {
-      // Cargar Bodega Personal
-      const qCafes = Firestore.query(
-        Firestore.collection(db, "cafes"),
-        Firestore.orderBy("fecha", "desc")
-      );
-      const snapCafes = await Firestore.getDocs(qCafes);
+      const qCafes = query(collection(db, "cafes"), orderBy("fecha", "desc"));
+      const snapCafes = await getDocs(qCafes);
       const docsCafes = [];
       snapCafes.forEach(d => docsCafes.push({ id: d.id, ...d.data() }));
       setMisCafes(docsCafes);
 
-      // Cargar Ranking
-      const qRank = Firestore.query(
-        Firestore.collection(db, "ranking"),
-        Firestore.orderBy("votos", "desc"),
-        Firestore.limit(5)
-      );
-      const snapRank = await Firestore.getDocs(qRank);
+      const qRank = query(collection(db, "ranking"), orderBy("votos", "desc"), limit(5));
+      const snapRank = await getDocs(qRank);
       const docsRank = [];
       snapRank.forEach(d => docsRank.push({ id: d.id, ...d.data() }));
       setTopCafes(docsRank);
@@ -63,15 +66,11 @@ export default function App() {
     cargarDatos();
   }, []);
 
-  // --- LÓGICA DE GUARDADO ---
   const guardarCafe = async () => {
     if (!nombreCafe.trim()) return Alert.alert("Aviso", "Escribe el nombre del café");
     setSubiendo(true);
     try {
-      // Guardar en la colección principal
-      // NOTA: 'foto' guarda la URI local. Para persistencia real entre dispositivos,
-      // sube la imagen a Firebase Storage y guarda la URL remota aquí.
-      await Firestore.addDoc(Firestore.collection(db, "cafes"), {
+      await addDoc(collection(db, "cafes"), {
         nombre: nombreCafe.trim(),
         puntuacion: rating,
         notas: notas,
@@ -79,15 +78,14 @@ export default function App() {
         fecha: new Date().toISOString()
       });
 
-      // Actualizar Ranking Global
-      // Usamos nombre normalizado como ID para evitar duplicados por mayúsculas/tildes
+      // ID normalizado para evitar duplicados por tildes/mayúsculas
       const rankId = nombreCafe.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      const refRank = Firestore.doc(db, "ranking", rankId);
-      const snapRank = await Firestore.getDoc(refRank);
+      const refRank = doc(db, "ranking", rankId);
+      const snapRank = await getDoc(refRank);
       if (snapRank.exists()) {
-        await Firestore.updateDoc(refRank, { votos: (snapRank.data().votos || 0) + 1 });
+        await updateDoc(refRank, { votos: (snapRank.data().votos || 0) + 1 });
       } else {
-        await Firestore.setDoc(refRank, { nombre: nombreCafe.trim(), votos: 1 });
+        await setDoc(refRank, { nombre: nombreCafe.trim(), votos: 1 });
       }
 
       Alert.alert("✅ Guardado", "Café registrado en la nube");
@@ -106,7 +104,6 @@ export default function App() {
   };
 
   const hacerFoto = async () => {
-    // Solicitamos permiso de cámara para la galería antes de abrir
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
       Alert.alert("Permiso denegado", "Necesitas permitir el acceso a la cámara para hacer fotos.");
@@ -125,7 +122,7 @@ export default function App() {
         {
           text: "Eliminar", style: "destructive", onPress: async () => {
             try {
-              await Firestore.deleteDoc(Firestore.doc(db, "cafes", item.id));
+              await deleteDoc(doc(db, "cafes", item.id));
               cargarDatos();
             } catch (e) {
               console.error("Error al eliminar:", e);
@@ -201,7 +198,6 @@ export default function App() {
             <Text style={styles.cancel}>Volver al Escáner</Text>
           </TouchableOpacity>
 
-          {/* RANKING */}
           <Text style={styles.subTitle}>🏆 Ranking Global</Text>
           {topCafes.map((c, i) => (
             <View key={c.id} style={styles.rankItem}>
@@ -210,7 +206,6 @@ export default function App() {
             </View>
           ))}
 
-          {/* BODEGA */}
           <Text style={styles.subTitle}>📦 Mi Bodega</Text>
           {misCafes.map(item => (
             <View key={item.id} style={styles.card}>

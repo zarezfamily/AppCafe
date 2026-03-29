@@ -3,13 +3,17 @@
     "name": "MiAppDeCafe",
     "slug": "miappdecafe",
     "version": "1.0.0",
-    "scheme": "miappdecafe",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.tuusuario.miappdecafe"
+      "bundleIdentifier": "com.hommemaktub.miappdecafe"
     },
     "android": {
-      "package": "com.tuusuario.miappdecafe"
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.hommemaktub.miappdecafe"
     }
   }
 }

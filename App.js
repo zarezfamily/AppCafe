@@ -13,87 +13,68 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import "react-native-get-random-values";
 
-// Imports directos (no namespace) — evita el error 'S' undefined con Metro
+// Sin Firebase SDK — usamos nuestra API REST propia (100% compatible con Expo)
 import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDoc,
-  getDocs,
-  limit,
-  orderBy,
-  query,
-  setDoc,
-  updateDoc,
-} from 'firebase/firestore/lite';
-import { db } from './firebaseConfig';
+  addDocument,
+  deleteDocument,
+  getCollection,
+  getDocument,
+  setDocument,
+  updateDocument,
+} from './firebaseConfig';
 
 export default function App() {
   const [permission, requestPermission] = useCameraPermissions();
-  const [scanned, setScanned] = useState(false);
+  const [scanned, setScanned]       = useState(false);
   const [nombreCafe, setNombreCafe] = useState('');
-  const [notas, setNotas] = useState('');
-  const [rating, setRating] = useState(0);
-  const [foto, setFoto] = useState(null);
-  const [misCafes, setMisCafes] = useState([]);
-  const [topCafes, setTopCafes] = useState([]);
-  const [subiendo, setSubiendo] = useState(false);
+  const [notas, setNotas]           = useState('');
+  const [rating, setRating]         = useState(0);
+  const [foto, setFoto]             = useState(null);
+  const [misCafes, setMisCafes]     = useState([]);
+  const [topCafes, setTopCafes]     = useState([]);
+  const [subiendo, setSubiendo]     = useState(false);
 
   const cargarDatos = async () => {
-    if (!db) return;
     try {
-      const qCafes = query(collection(db, "cafes"), orderBy("fecha", "desc"));
-      const snapCafes = await getDocs(qCafes);
-      const docsCafes = [];
-      snapCafes.forEach(d => docsCafes.push({ id: d.id, ...d.data() }));
-      setMisCafes(docsCafes);
-
-      const qRank = query(collection(db, "ranking"), orderBy("votos", "desc"), limit(5));
-      const snapRank = await getDocs(qRank);
-      const docsRank = [];
-      snapRank.forEach(d => docsRank.push({ id: d.id, ...d.data() }));
-      setTopCafes(docsRank);
+      const cafes = await getCollection("cafes", "fecha");
+      setMisCafes(cafes);
+      const ranking = await getCollection("ranking", "votos", 5);
+      setTopCafes(ranking);
     } catch (e) {
       console.error("Error de carga:", e);
       Alert.alert("Error", "No se pudieron cargar los datos");
     }
   };
 
-  useEffect(() => {
-    cargarDatos();
-  }, []);
+  useEffect(() => { cargarDatos(); }, []);
 
   const guardarCafe = async () => {
     if (!nombreCafe.trim()) return Alert.alert("Aviso", "Escribe el nombre del café");
     setSubiendo(true);
     try {
-      await addDoc(collection(db, "cafes"), {
+      await addDocument("cafes", {
         nombre: nombreCafe.trim(),
         puntuacion: rating,
         notas: notas,
-        foto: foto,
-        fecha: new Date().toISOString()
+        foto: foto || '',
+        fecha: new Date().toISOString(),
       });
 
-      // ID normalizado para evitar duplicados por tildes/mayúsculas
-      const rankId = nombreCafe.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      const refRank = doc(db, "ranking", rankId);
-      const snapRank = await getDoc(refRank);
-      if (snapRank.exists()) {
-        await updateDoc(refRank, { votos: (snapRank.data().votos || 0) + 1 });
+      // Ranking: ID normalizado para evitar duplicados por tildes/mayúsculas
+      const rankId = nombreCafe.trim().toLowerCase()
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/\s+/g, "_");
+
+      const existente = await getDocument("ranking", rankId);
+      if (existente) {
+        await updateDocument("ranking", rankId, { votos: (existente.votos || 0) + 1 });
       } else {
-        await setDoc(refRank, { nombre: nombreCafe.trim(), votos: 1 });
+        await setDocument("ranking", rankId, { nombre: nombreCafe.trim(), votos: 1 });
       }
 
       Alert.alert("✅ Guardado", "Café registrado en la nube");
-      setNombreCafe('');
-      setNotas('');
-      setRating(0);
-      setFoto(null);
-      setScanned(false);
+      setNombreCafe(''); setNotas(''); setRating(0); setFoto(null); setScanned(false);
       cargarDatos();
     } catch (e) {
       console.error("Error al guardar:", e);
@@ -106,14 +87,14 @@ export default function App() {
   const hacerFoto = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert("Permiso denegado", "Necesitas permitir el acceso a la cámara para hacer fotos.");
+      Alert.alert("Permiso denegado", "Necesitas permitir el acceso a la cámara.");
       return;
     }
     const res = await ImagePicker.launchCameraAsync({ allowsEditing: true, quality: 0.5 });
     if (!res.canceled) setFoto(res.assets[0].uri);
   };
 
-  const eliminarCafe = async (item) => {
+  const eliminarCafe = (item) => {
     Alert.alert(
       "Eliminar café",
       `¿Seguro que quieres eliminar "${item.nombre}"?`,
@@ -122,7 +103,7 @@ export default function App() {
         {
           text: "Eliminar", style: "destructive", onPress: async () => {
             try {
-              await deleteDoc(doc(db, "cafes", item.id));
+              await deleteDocument("cafes", item.id);
               cargarDatos();
             } catch (e) {
               console.error("Error al eliminar:", e);
@@ -226,23 +207,23 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FDF5E6' },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 30 },
-  scroll: { padding: 25, paddingTop: 60, paddingBottom: 50 },
-  title: { fontSize: 26, fontWeight: 'bold', color: '#4B2C20', textAlign: 'center', marginBottom: 20 },
-  input: { backgroundColor: 'white', padding: 15, borderRadius: 12, marginBottom: 15, borderWidth: 1, borderColor: '#D2B48C' },
-  stars: { flexDirection: 'row', justifyContent: 'center', marginBottom: 20 },
-  btn: { backgroundColor: '#6F4E37', padding: 18, borderRadius: 30, alignItems: 'center' },
-  btnText: { color: 'white', fontWeight: 'bold' },
-  btnSec: { padding: 10, borderWidth: 1, borderColor: '#6F4E37', borderRadius: 12, alignItems: 'center', marginBottom: 15 },
+  container:  { flex: 1, backgroundColor: '#FDF5E6' },
+  center:     { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 30 },
+  scroll:     { padding: 25, paddingTop: 60, paddingBottom: 50 },
+  title:      { fontSize: 26, fontWeight: 'bold', color: '#4B2C20', textAlign: 'center', marginBottom: 20 },
+  input:      { backgroundColor: 'white', padding: 15, borderRadius: 12, marginBottom: 15, borderWidth: 1, borderColor: '#D2B48C' },
+  stars:      { flexDirection: 'row', justifyContent: 'center', marginBottom: 20 },
+  btn:        { backgroundColor: '#6F4E37', padding: 18, borderRadius: 30, alignItems: 'center' },
+  btnText:    { color: 'white', fontWeight: 'bold' },
+  btnSec:     { padding: 10, borderWidth: 1, borderColor: '#6F4E37', borderRadius: 12, alignItems: 'center', marginBottom: 15 },
   btnSecText: { color: '#6F4E37', fontWeight: 'bold' },
-  preview: { width: 100, height: 100, borderRadius: 15, alignSelf: 'center', marginBottom: 15 },
-  cancel: { color: '#A52A2A', textAlign: 'center', marginTop: 25, fontWeight: 'bold' },
-  overlay: { position: 'absolute', bottom: 60, alignSelf: 'center' },
-  overlayText: { color: 'white', backgroundColor: 'rgba(0,0,0,0.7)', padding: 12, borderRadius: 15 },
-  subTitle: { fontSize: 18, fontWeight: 'bold', marginTop: 35, marginBottom: 15, color: '#4B2C20' },
-  rankItem: { flexDirection: 'row', justifyContent: 'space-between', padding: 10, backgroundColor: 'white', marginBottom: 5, borderRadius: 10, borderWidth: 1, borderColor: '#EEE' },
-  card: { flexDirection: 'row', backgroundColor: 'white', padding: 15, borderRadius: 15, marginBottom: 10, alignItems: 'center' },
-  cardTitle: { fontWeight: 'bold', fontSize: 16 },
-  cardNotas: { color: '#aaa', fontSize: 12, marginTop: 2 },
+  preview:    { width: 100, height: 100, borderRadius: 15, alignSelf: 'center', marginBottom: 15 },
+  cancel:     { color: '#A52A2A', textAlign: 'center', marginTop: 25, fontWeight: 'bold' },
+  overlay:    { position: 'absolute', bottom: 60, alignSelf: 'center' },
+  overlayText:{ color: 'white', backgroundColor: 'rgba(0,0,0,0.7)', padding: 12, borderRadius: 15 },
+  subTitle:   { fontSize: 18, fontWeight: 'bold', marginTop: 35, marginBottom: 15, color: '#4B2C20' },
+  rankItem:   { flexDirection: 'row', justifyContent: 'space-between', padding: 10, backgroundColor: 'white', marginBottom: 5, borderRadius: 10, borderWidth: 1, borderColor: '#EEE' },
+  card:       { flexDirection: 'row', backgroundColor: 'white', padding: 15, borderRadius: 15, marginBottom: 10, alignItems: 'center' },
+  cardTitle:  { fontWeight: 'bold', fontSize: 16 },
+  cardNotas:  { color: '#aaa', fontSize: 12, marginTop: 2 },
 });

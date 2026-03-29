@@ -1,5 +1,5 @@
-import { getApp, getApps, initializeApp } from "firebase/app";
-// IMPORTANTE: Usar /lite aquí también
+import { initializeApp } from "firebase/app";
+// IMPORTANTE: Forzamos la versión Lite aquí también
 import { getFirestore } from "firebase/firestore/lite";
 
 const firebaseConfig = {
@@ -11,8 +11,6 @@ const firebaseConfig = {
   appId: "1:274010206666:web:d86abc7543e3772f8c9f33"
 };
 
-// Inicialización segura
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-const db = getFirestore(app);
-
-export { db };
+// Inicialización ultra-simple
+const app = initializeApp(firebaseConfig);
+export const db = getFirestore(app);

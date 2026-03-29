@@ -1,4 +1,4 @@
-// 1. IMPORTACIONES CRÍTICAS (Orden específico para evitar fallos en iOS)
+// 1. IMPORTACIONES DE SISTEMA
 import { Ionicons } from '@expo/vector-icons';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
@@ -14,14 +14,14 @@ import {
 } from 'react-native';
 import "react-native-get-random-values";
 
-// 2. IMPORTACIÓN DE FIREBASE (Técnica de bloque para evitar el error 'S')
+// 2. CONFIGURACIÓN DE FIREBASE (Importación segura anti-error 'S')
 import * as Firestore from "firebase/firestore";
 import { db } from './firebaseConfig';
 
-// Ignorar advertencias innecesarias en la pantalla del móvil
+// Ignoramos warnings visuales para una interfaz limpia
 LogBox.ignoreAllLogs();
 
-// --- COMPONENTE VISUAL: ESTRELLAS ---
+// --- COMPONENTE DE ESTRELLAS ---
 const StarRating = ({ rating, setRating, interactive = false }) => (
   <View style={styles.starContainer}>
     {[1, 2, 3, 4, 5].map((star) => (
@@ -42,7 +42,7 @@ const StarRating = ({ rating, setRating, interactive = false }) => (
 );
 
 export default function App() {
-  // --- ESTADOS DE LA APLICACIÓN ---
+  // --- ESTADOS ---
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
   const [barcode, setBarcode] = useState('');
@@ -54,11 +54,11 @@ export default function App() {
   const [topCafes, setTopCafes] = useState([]);
   const [subiendo, setSubiendo] = useState(false);
 
-  // --- CARGA DE DATOS EN TIEMPO REAL ---
+  // --- CARGA DE DATOS (ESCUCHA ACTIVA) ---
   useEffect(() => {
     if (!db) return;
 
-    // Escuchar colección "cafes" (Tu Bodega Personal)
+    // Consulta Bodega Personal
     const qCafes = Firestore.query(
       Firestore.collection(db, "cafes"), 
       Firestore.orderBy("fecha", "desc")
@@ -68,9 +68,9 @@ export default function App() {
       const docs = [];
       snap.forEach((d) => docs.push({ id: d.id, ...d.data() }));
       setMisCafes(docs);
-    }, (err) => console.error("Error Firestore Cafes:", err));
+    });
 
-    // Escuchar colección "ranking" (Los más populares)
+    // Consulta Ranking Global
     const qRanking = Firestore.query(
       Firestore.collection(db, "ranking"), 
       Firestore.orderBy("votos", "desc"), 
@@ -81,7 +81,7 @@ export default function App() {
       const docs = [];
       snap.forEach(d => docs.push({ id: d.id, ...d.data() }));
       setTopCafes(docs);
-    }, (err) => console.error("Error Firestore Ranking:", err));
+    });
 
     return () => {
       unsubCafes();
@@ -89,7 +89,7 @@ export default function App() {
     };
   }, []);
 
-  // --- FUNCIONES DE LÓGICA ---
+  // --- LÓGICA DE NEGOCIO ---
   
   const sumarVoto = async (nombre) => {
     try {
@@ -100,12 +100,12 @@ export default function App() {
       } else {
         await Firestore.setDoc(refRanking, { nombre: nombre, votos: 1 });
       }
-    } catch (e) { console.log("Error al votar:", e); }
+    } catch (e) { console.log("Error voto:", e); }
   };
 
   const hacerFoto = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== 'granted') return Alert.alert("Error", "Necesitamos permiso de cámara");
+    if (status !== 'granted') return Alert.alert("Error", "Permiso de cámara denegado");
     
     let result = await ImagePicker.launchCameraAsync({
       allowsEditing: true, aspect: [1, 1], quality: 0.5,
@@ -114,7 +114,7 @@ export default function App() {
   };
 
   const guardarCafe = async () => {
-    if (!nombreCafe) return Alert.alert("Aviso", "Escribe el nombre del café");
+    if (!nombreCafe) return Alert.alert("Aviso", "Ponle un nombre a tu café");
     setSubiendo(true);
     try {
       await Firestore.addDoc(Firestore.collection(db, "cafes"), {
@@ -126,14 +126,13 @@ export default function App() {
         fecha: new Date().toISOString()
       });
       
-      // Al guardar, también sumamos un voto al ranking global
       await sumarVoto(nombreCafe);
       
-      Alert.alert("🎉 ¡Guardado!", "Tu café ya está en la bodega");
+      Alert.alert("✅ Éxito", "Café añadido a tu bodega");
       setScanned(false);
       setNombreCafe(''); setNotas(''); setRating(0); setFotoTemporal(null);
     } catch (e) {
-      Alert.alert("Error", "No se pudo conectar con Firebase");
+      Alert.alert("Error", "Error de conexión con Firebase");
       console.log(e);
     } finally { setSubiendo(false); }
   };
@@ -141,17 +140,16 @@ export default function App() {
   const handleBarCodeScanned = ({ data }) => {
     setBarcode(data);
     setScanned(true);
-    setNombreCafe("Café Escaneado"); 
   };
 
-  // --- RENDERIZADO DE INTERFAZ ---
+  // --- INTERFAZ ---
   if (!permission?.granted) {
     return (
       <View style={styles.center}>
-        <Ionicons name="camera-reverse" size={60} color="#6F4E37" />
-        <Text style={{ textAlign: 'center', marginVertical: 20 }}>Necesitamos acceso a la cámara</Text>
+        <Ionicons name="cafe" size={80} color="#6F4E37" />
+        <Text style={{ textAlign: 'center', margin: 20 }}>Bienvenido a tu Bodega de Café. Necesitamos la cámara para escanear.</Text>
         <TouchableOpacity style={styles.btn} onPress={requestPermission}>
-          <Text style={styles.btnText}>DAR PERMISO</Text>
+          <Text style={styles.btnText}>ACTIVAR CÁMARA</Text>
         </TouchableOpacity>
       </View>
     );
@@ -163,48 +161,48 @@ export default function App() {
         <View style={{ flex: 1 }}>
            <CameraView onBarcodeScanned={handleBarCodeScanned} style={StyleSheet.absoluteFillObject} />
            <View style={styles.overlay}>
-              <Text style={styles.overlayText}>Escanea el código de barras del café</Text>
+              <Text style={styles.overlayText}>Enfoca el código de barras</Text>
            </View>
         </View>
       ) : (
         <ScrollView contentContainerStyle={styles.scroll}>
-          <Text style={styles.title}>☕ Mi Bodega de Café</Text>
+          <Text style={styles.title}>☕ Nueva Entrada</Text>
           
-          <TextInput style={styles.input} placeholder="Nombre o Marca" value={nombreCafe} onChangeText={setNombreCafe} />
+          <TextInput style={styles.input} placeholder="Nombre del Café" value={nombreCafe} onChangeText={setNombreCafe} />
           
           <StarRating rating={rating} setRating={setRating} interactive={true} />
           
-          <TextInput style={[styles.input, {height: 70}]} placeholder="Notas de sabor (ej: Chocolate, Afrutado...)" multiline value={notas} onChangeText={setNotas} />
+          <TextInput style={[styles.input, {height: 80}]} placeholder="Notas de cata..." multiline value={notas} onChangeText={setNotas} />
 
           <TouchableOpacity style={styles.btnSecundario} onPress={hacerFoto}>
             <Ionicons name="camera" size={20} color="#6F4E37" />
-            <Text style={styles.btnSecundarioText}>HACER FOTO</Text>
+            <Text style={styles.btnSecundarioText}>TOMAR FOTO</Text>
           </TouchableOpacity>
 
           {fotoTemporal && <Image source={{ uri: fotoTemporal }} style={styles.preview} />}
 
           <TouchableOpacity style={styles.btn} onPress={guardarCafe} disabled={subiendo}>
-            <Text style={styles.btnText}>{subiendo ? "GUARDANDO..." : "GUARDAR EN LA NUBE"}</Text>
+            <Text style={styles.btnText}>{subiendo ? "GUARDANDO..." : "GUARDAR EN BODEGA"}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => setScanned(false)}>
-            <Text style={styles.cancel}>Volver a Escanear</Text>
+            <Text style={styles.cancel}>Volver al escáner</Text>
           </TouchableOpacity>
 
-          {/* SECCIÓN RANKING GLOBAL */}
+          {/* RANKING */}
           <View style={styles.rankingBox}>
-            <Text style={styles.sectionTitle}>🔥 Los más votados</Text>
+            <Text style={styles.sectionTitle}>🏆 Los Favoritos</Text>
             {topCafes.map((item, index) => (
               <View key={item.id} style={styles.rankingItem}>
-                <Text style={styles.rankNum}>#{index + 1}</Text>
+                <Text style={styles.rankNum}>{index + 1}.</Text>
                 <Text style={styles.rankName}>{item.nombre}</Text>
-                <Text style={styles.rankVotes}>{item.votos} pts</Text>
+                <Text style={styles.rankVotes}>{item.votos} votos</Text>
               </View>
             ))}
           </View>
 
-          {/* SECCIÓN LISTA PERSONAL */}
-          <Text style={styles.sectionTitle}>🏺 Mi Colección</Text>
+          {/* MI BODEGA */}
+          <Text style={styles.sectionTitle}>📦 Mi Bodega</Text>
           {misCafes.map(item => (
             <View key={item.id} style={styles.card}>
               <View style={styles.cardInfo}>
@@ -212,7 +210,7 @@ export default function App() {
                 <StarRating rating={item.puntuacion} />
               </View>
               <TouchableOpacity onPress={() => Firestore.deleteDoc(Firestore.doc(db, "cafes", item.id))}>
-                <Ionicons name="trash-outline" size={20} color="#FF6347" />
+                <Ionicons name="trash" size={20} color="#FF6347" />
               </TouchableOpacity>
             </View>
           ))}
@@ -225,26 +223,26 @@ export default function App() {
 // --- ESTILOS ---
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FDF5E6' },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
-  scroll: { padding: 25, paddingTop: 60, paddingBottom: 40 },
-  title: { fontSize: 28, fontWeight: 'bold', color: '#4B2C20', marginBottom: 25, textAlign: 'center' },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 30 },
+  scroll: { padding: 25, paddingTop: 60, paddingBottom: 50 },
+  title: { fontSize: 26, fontWeight: 'bold', color: '#4B2C20', marginBottom: 20, textAlign: 'center' },
   input: { width: '100%', backgroundColor: 'white', padding: 15, borderRadius: 12, marginBottom: 15, borderWidth: 1, borderColor: '#D2B48C' },
   starContainer: { flexDirection: 'row', marginBottom: 20, justifyContent: 'center' },
-  btn: { backgroundColor: '#6F4E37', padding: 18, borderRadius: 30, width: '100%', alignItems: 'center', elevation: 3 },
+  btn: { backgroundColor: '#6F4E37', padding: 18, borderRadius: 30, width: '100%', alignItems: 'center' },
   btnText: { color: 'white', fontWeight: 'bold', fontSize: 16 },
   btnSecundario: { flexDirection: 'row', padding: 12, borderWidth: 1, borderColor: '#6F4E37', borderRadius: 12, marginBottom: 20, alignItems: 'center', justifyContent: 'center' },
   btnSecundarioText: { color: '#6F4E37', marginLeft: 10, fontWeight: 'bold' },
-  preview: { width: 120, height: 120, borderRadius: 15, marginBottom: 20, alignSelf: 'center' },
-  cancel: { color: '#A52A2A', textAlign: 'center', marginTop: 20, fontWeight: 'bold' },
-  overlay: { position: 'absolute', bottom: 50, width: '100%', alignItems: 'center' },
-  overlayText: { color: 'white', backgroundColor: 'rgba(0,0,0,0.6)', padding: 10, borderRadius: 10 },
-  sectionTitle: { fontSize: 20, fontWeight: 'bold', marginTop: 35, marginBottom: 15, color: '#4B2C20', borderLeftWidth: 4, borderLeftColor: '#6F4E37', paddingLeft: 10 },
-  rankingBox: { backgroundColor: '#FFF5EE', padding: 15, borderRadius: 20, borderWidth: 1, borderColor: '#FFDAB9' },
-  rankingItem: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10, backgroundColor: 'white', padding: 10, borderRadius: 10 },
-  rankNum: { fontWeight: 'bold', color: '#D2691E', width: 25 },
-  rankName: { flex: 1, marginLeft: 10, color: '#4B2C20' },
-  rankVotes: { fontSize: 12, color: '#888', fontWeight: 'bold' },
-  card: { flexDirection: 'row', backgroundColor: 'white', padding: 15, borderRadius: 15, marginBottom: 12, alignItems: 'center', elevation: 2 },
+  preview: { width: 150, height: 150, borderRadius: 15, marginBottom: 20, alignSelf: 'center' },
+  cancel: { color: '#A52A2A', textAlign: 'center', marginTop: 25, fontWeight: 'bold' },
+  overlay: { position: 'absolute', bottom: 60, width: '100%', alignItems: 'center' },
+  overlayText: { color: 'white', backgroundColor: 'rgba(0,0,0,0.7)', padding: 12, borderRadius: 15 },
+  sectionTitle: { fontSize: 18, fontWeight: 'bold', marginTop: 40, marginBottom: 15, color: '#4B2C20' },
+  rankingBox: { backgroundColor: '#FFF5EE', padding: 15, borderRadius: 20, borderStyle: 'dashed', borderWidth: 1, borderColor: '#D2B48C' },
+  rankingItem: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 0.5, borderBottomColor: '#EEE' },
+  rankNum: { fontWeight: 'bold', color: '#6F4E37' },
+  rankName: { flex: 1, marginLeft: 10 },
+  rankVotes: { color: '#888', fontSize: 12 },
+  card: { flexDirection: 'row', backgroundColor: 'white', padding: 15, borderRadius: 15, marginBottom: 10, alignItems: 'center', elevation: 2 },
   cardInfo: { flex: 1 },
-  cardTitle: { fontWeight: 'bold', fontSize: 17, color: '#4B2C20' }
+  cardTitle: { fontWeight: 'bold', fontSize: 16, color: '#4B2C20' }
 });

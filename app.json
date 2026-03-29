@@ -5,15 +5,11 @@
     "version": "1.0.0",
     "scheme": "miappdecafe",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.tuusuario.miappdecafe"
     },
     "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#ffffff"
-      }
-    },
-    "experiments": {
-      "newArchEnabled": false
+      "package": "com.tuusuario.miappdecafe"
     }
   }
 }

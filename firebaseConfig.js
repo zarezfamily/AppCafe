@@ -9,7 +9,7 @@ if (!FIREBASE_PROJECT_ID || !FIREBASE_API_KEY) {
 }
 
 // URL regional Madrid
-const BASE_URL = `https://europe-west1-firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/default/documents`;
+const BASE_URL = `https://europe-west1-firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
 
 // ─── TOKEN GLOBAL ─────────────────────────────────────────────────────────────
 

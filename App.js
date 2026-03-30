@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-//  App.js — Graino ☕
+//  App.js — Etiove ☕
 //  Refactorizado: autenticación, componentes separados, Hermes-compatible
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -163,7 +163,7 @@ function AuthScreen({ onAuth }) {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={s.authScroll}>
           <Ionicons name="cafe" size={64} color="#e8590c" style={{ marginBottom: 8 }} />
-          <Text style={s.authTitle}>Graino ☕</Text>
+          <Text style={s.authTitle}>Etiove ☕</Text>
           <Text style={s.authSub}>
             {modo === 'login'    ? 'Inicia sesión para continuar' :
              modo === 'register' ? 'Crea tu cuenta gratuita'      :
@@ -485,7 +485,7 @@ function MainScreen({ onLogout }) {
           <View>
             <View style={s.topBar}>
               <View style={s.locationPill}>
-                <Text style={s.locationText}>🇪🇸  Graino</Text>
+                <Text style={s.locationText}>🇪🇸  Etiove</Text>
               </View>
               <View style={{ flexDirection: 'row', gap: 16, alignItems: 'center' }}>
                 <TouchableOpacity onPress={handleLogout}>

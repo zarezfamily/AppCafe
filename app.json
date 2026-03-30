@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Graino",
-    "slug": "graino",
+    "name": "Etiove",
+    "slug": "etiove",
     "version": "1.0.0",
     "orientation": "portrait",
     "jsEngine": "jsc",
@@ -14,7 +14,7 @@
     "ios": {
       "jsEngine": "jsc",
       "supportsTablet": true,
-      "bundleIdentifier": "com.zarezfamily.graino",
+      "bundleIdentifier": "com.zarezfamily.etiove",
       "infoPlist": {
         "NSCameraUsageDescription": "La app necesita acceso a la cámara para escanear paquetes de café y hacer fotos.",
         "NSPhotoLibraryUsageDescription": "La app necesita acceso a la galería para seleccionar fotos de café."
@@ -22,7 +22,7 @@
     },
     "android": {
       "jsEngine": "jsc",
-      "package": "com.zarezfamily.graino",
+      "package": "com.zarezfamily.etiove",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",

@@ -1,0 +1,15 @@
+env: load .env
+env: export EXPO_PUBLIC_FIREBASE_API_KEY EXPO_PUBLIC_FIREBASE_PROJECT_ID
+Starting project at /Users/homme.maktub/Apps Moviles/etiove
+Starting Metro Bundler
+warning: Bundler cache is empty, rebuilding (this may take a minute)
+The following packages should be updated for best compatibility with the installed expo version:
+  expo-image-picker@16.0.6 - expected version: ~17.0.10
+  expo-status-bar@2.0.1 - expected version: ~3.0.9
+  react@18.3.1 - expected version: 19.1.0
+  react-dom@18.3.1 - expected version: 19.1.0
+  react-native@0.81.6 - expected version: 0.81.5
+  @types/react@18.3.28 - expected version: ~19.1.10
+Your project may not work correctly until you install the expected versions of the packages.
+Waiting on http://localhost:8081
+Logs for your project will appear below.

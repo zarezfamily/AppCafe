@@ -61,6 +61,8 @@ const authHeader = (uid) => uid ? { 'X-User-UID': uid } : {};
 export const getCollection = async (colName, orderByField = null, limitN = null) => {
   const url = `${BASE_URL}/${colName}?key=${FIREBASE_API_KEY}`;
   const res  = await fetch(url);
+  // 404 significa que la colección aún no tiene documentos → array vacío
+  if (res.status === 404) return [];
   if (!res.ok) throw new Error(`getCollection(${colName}) → ${res.status}`);
   const json = await res.json();
   if (!json.documents) return [];
@@ -77,8 +79,12 @@ export const getCollection = async (colName, orderByField = null, limitN = null)
 
 // Obtener solo los cafés de un usuario concreto
 export const getUserCafes = async (uid) => {
-  const todos = await getCollection('cafes', 'fecha');
-  return todos.filter(c => c.uid === uid);
+  try {
+    const todos = await getCollection('cafes', 'fecha');
+    return todos.filter(c => c.uid === uid);
+  } catch {
+    return [];
+  }
 };
 
 export const getDocument = async (colName, docId) => {

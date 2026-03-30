@@ -657,7 +657,7 @@ export default function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleAuth   = (userData) => setUser(userData);
+  const handleAuth   = (userData) => { console.log('TOKEN COMPLETO:', userData.token); setUser(userData); };
   const handleLogout = () => setUser(null);
 
   if (showWelcome) return <WelcomeScreen />;

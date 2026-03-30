@@ -1,7 +1,7 @@
 // seed_cafes_v2.js — 300 cafés con información completa y fotos de Unsplash
 const FIREBASE_PROJECT_ID = "miappdecafe";
 const FIREBASE_API_KEY    = "AIzaSyA1BcU0iRk3HyFtV92CLrnalHFKLaOWH24";
-const BASE_URL = `https://europe-southwest1-firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/default/documents`;
+const BASE_URL = `https://europe-west1-firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/default/documents`;
 
 // Fotos de Unsplash libres de derechos — variadas para dar diversidad visual
 const FOTOS = [

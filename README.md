@@ -1,4 +1,4 @@
-# ☕ AppCafe
+# ☕ Etiove
 
 App móvil para registrar, puntuar y gestionar tu colección de cafés. Escanea el código de barras del paquete, añade notas y puntuación, y consulta el ranking global de los cafés más populares.
 
@@ -26,8 +26,8 @@ App móvil para registrar, puntuar y gestionar tu colección de cafés. Escanea 
 ### 1. Clona el repositorio
 
 ```bash
-git clone https://github.com/zarezfamily/AppCafe.git
-cd AppCafe
+git clone https://github.com/zarezfamily/Etiove.git
+cd Etiove
 ```
 
 ### 2. Instala las dependencias
@@ -85,7 +85,7 @@ Escanea el QR con **Expo Go** o abre en un emulador.
 ## 📁 Estructura del proyecto
 
 ```
-AppCafe/
+Etiove/
 ├── App.js              # Componente principal y toda la lógica
 ├── firebaseConfig.js   # Inicialización de Firebase (sin credenciales)
 ├── app.json            # Configuración de Expo (permisos, iconos, etc.)

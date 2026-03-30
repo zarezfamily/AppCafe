@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { CameraView, useCameraPermissions } from 'expo-camera';
+import { useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import { useEffect, useState } from 'react';
 import {
@@ -135,7 +135,7 @@ export default function App() {
       <View style={s.permissionScreen}>
         <StatusBar barStyle="light-content" />
         <Ionicons name="cafe" size={72} color="#c8860a" />
-        <Text style={s.permTitle}>CaféLog necesita la cámara</Text>
+        <Text style={s.permTitle}>Etiove necesita la cámara</Text>
         <Text style={s.permSub}>Para escanear paquetes de café y hacer fotos</Text>
         <TouchableOpacity style={s.goldBtn} onPress={requestPermission}>
           <Text style={s.goldBtnText}>Activar cámara</Text>
@@ -223,7 +223,7 @@ export default function App() {
 
       {/* Header */}
       <View style={s.header}>
-        <Text style={s.logo}>CaféLog</Text>
+        <Text style={s.logo}>Etiove</Text>
         <TouchableOpacity style={s.scanBtn} onPress={() => setScanned(true)}>
           <Ionicons name="scan" size={16} color="#1a1008" />
           <Text style={s.scanBtnText}>Escanear</Text>

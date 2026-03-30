@@ -1,6 +1,5 @@
-// Configuración para API REST de Firestore (sin SDK de Firebase)
-// Las credenciales se leen SIEMPRE desde variables de entorno .env
-// NUNCA pongas valores reales aquí directamente.
+// Configuración para API REST de Firestore
+// Usa Firebase Auth token (Bearer) en lugar de API key para autenticar peticiones
 
 export const FIREBASE_PROJECT_ID = process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID;
 export const FIREBASE_API_KEY    = process.env.EXPO_PUBLIC_FIREBASE_API_KEY;
@@ -13,7 +12,32 @@ if (!FIREBASE_PROJECT_ID || !FIREBASE_API_KEY) {
   );
 }
 
-const BASE_URL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
+// URL regional Madrid — sin (default), con default
+const BASE_URL = `https://europe-southwest1-firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/default/documents`;
+
+// ─── TOKEN GLOBAL ─────────────────────────────────────────────────────────────
+// Se establece tras el login y se usa en todas las peticiones
+
+let _authToken = null;
+
+export const setAuthToken = (token) => { _authToken = token; };
+export const clearAuthToken = () => { _authToken = null; };
+
+const authHeaders = () => {
+  const headers = { 'Content-Type': 'application/json' };
+  if (_authToken) {
+    headers['Authorization'] = `Bearer ${_authToken}`;
+  }
+  return headers;
+};
+
+// Para peticiones de solo lectura públicas usamos API key como fallback
+const readUrl = (path) =>
+  _authToken
+    ? `${BASE_URL}/${path}`
+    : `${BASE_URL}/${path}?key=${FIREBASE_API_KEY}`;
+
+const writeUrl = (path) => `${BASE_URL}/${path}`;
 
 // ─── UTILIDADES ────────────────────────────────────────────────────────────────
 
@@ -52,16 +76,11 @@ const toFields = (obj) => {
   return { fields };
 };
 
-// ─── HELPERS INTERNOS ──────────────────────────────────────────────────────────
-
-const authHeader = (uid) => uid ? { 'X-User-UID': uid } : {};
-
 // ─── API ───────────────────────────────────────────────────────────────────────
 
 export const getCollection = async (colName, orderByField = null, limitN = null) => {
-  const url = `${BASE_URL}/${colName}?key=${FIREBASE_API_KEY}`;
-  const res  = await fetch(url);
-  // 404 significa que la colección aún no tiene documentos → array vacío
+  const url = readUrl(`${colName}?pageSize=${limitN ? limitN * 3 : 100}`);
+  const res  = await fetch(url, { headers: authHeaders() });
   if (res.status === 404) return [];
   if (!res.ok) throw new Error(`getCollection(${colName}) → ${res.status}`);
   const json = await res.json();
@@ -77,7 +96,6 @@ export const getCollection = async (colName, orderByField = null, limitN = null)
   return docs;
 };
 
-// Obtener solo los cafés de un usuario concreto
 export const getUserCafes = async (uid) => {
   try {
     const todos = await getCollection('cafes', 'fecha');
@@ -88,17 +106,17 @@ export const getUserCafes = async (uid) => {
 };
 
 export const getDocument = async (colName, docId) => {
-  const url = `${BASE_URL}/${colName}/${docId}?key=${FIREBASE_API_KEY}`;
-  const res  = await fetch(url);
+  const url = readUrl(`${colName}/${docId}`);
+  const res  = await fetch(url, { headers: authHeaders() });
   if (!res.ok) return null;
   return docToObject(await res.json());
 };
 
 export const addDocument = async (colName, data) => {
-  const url = `${BASE_URL}/${colName}?key=${FIREBASE_API_KEY}`;
+  const url = `${writeUrl(colName)}?key=${FIREBASE_API_KEY}`;
   const res  = await fetch(url, {
     method:  'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body:    JSON.stringify(toFields(data)),
   });
   if (!res.ok) throw new Error(`addDocument(${colName}) → ${res.status}`);
@@ -106,10 +124,10 @@ export const addDocument = async (colName, data) => {
 };
 
 export const setDocument = async (colName, docId, data) => {
-  const url = `${BASE_URL}/${colName}/${docId}?key=${FIREBASE_API_KEY}`;
+  const url = `${writeUrl(`${colName}/${docId}`)}?key=${FIREBASE_API_KEY}`;
   const res  = await fetch(url, {
     method:  'PATCH',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body:    JSON.stringify(toFields(data)),
   });
   return res.ok;
@@ -117,22 +135,22 @@ export const setDocument = async (colName, docId, data) => {
 
 export const updateDocument = async (colName, docId, data) => {
   const fields = Object.keys(data).join(',');
-  const url = `${BASE_URL}/${colName}/${docId}?key=${FIREBASE_API_KEY}&updateMask.fieldPaths=${fields}`;
+  const url = `${writeUrl(`${colName}/${docId}`)}?key=${FIREBASE_API_KEY}&updateMask.fieldPaths=${fields}`;
   const res  = await fetch(url, {
     method:  'PATCH',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body:    JSON.stringify(toFields(data)),
   });
   return res.ok;
 };
 
 export const deleteDocument = async (colName, docId) => {
-  const url = `${BASE_URL}/${colName}/${docId}?key=${FIREBASE_API_KEY}`;
-  const res  = await fetch(url, { method: 'DELETE' });
+  const url = `${writeUrl(`${colName}/${docId}`)}?key=${FIREBASE_API_KEY}`;
+  const res  = await fetch(url, { method: 'DELETE', headers: authHeaders() });
   return res.ok;
 };
 
-// ─── AUTENTICACIÓN (Firebase Auth REST) ────────────────────────────────────────
+// ─── AUTENTICACIÓN ────────────────────────────────────────────────────────────
 
 const AUTH_URL = `https://identitytoolkit.googleapis.com/v1/accounts`;
 
@@ -144,7 +162,9 @@ export const registerUser = async (email, password) => {
   });
   const json = await res.json();
   if (!res.ok) throw new Error(json.error?.message || 'Error al registrar');
-  return { uid: json.localId, email: json.email, token: json.idToken };
+  const user = { uid: json.localId, email: json.email, token: json.idToken };
+  setAuthToken(json.idToken);
+  return user;
 };
 
 export const loginUser = async (email, password) => {
@@ -155,7 +175,9 @@ export const loginUser = async (email, password) => {
   });
   const json = await res.json();
   if (!res.ok) throw new Error(json.error?.message || 'Email o contraseña incorrectos');
-  return { uid: json.localId, email: json.email, token: json.idToken };
+  const user = { uid: json.localId, email: json.email, token: json.idToken };
+  setAuthToken(json.idToken);
+  return user;
 };
 
 export const resetPassword = async (email) => {

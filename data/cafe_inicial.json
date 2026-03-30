@@ -1,0 +1,61 @@
+{
+  "app_name": "Etiove",
+  "variedades_principales": [
+    {
+      "id": "v1",
+      "nombre": "Geisha",
+      "origen_historico": "Etiopía (Montaña Gesha)",
+      "perfil": "Extremadamente floral, notas de jazmín, melocotón y cítricos. Cuerpo ligero tipo té.",
+      "rareza": "Alta / Premium"
+    },
+    {
+      "id": "v2",
+      "nombre": "Bourbon",
+      "origen_historico": "Isla Reunión",
+      "perfil": "Dulce, notas de caramelo y chocolate. Acidez equilibrada y cuerpo denso.",
+      "rareza": "Común en especialidad"
+    },
+    {
+      "id": "v3",
+      "nombre": "Caturra",
+      "origen_historico": "Brasil",
+      "perfil": "Acidez brillante, notas cítricas y cuerpo medio. Muy popular en Colombia.",
+      "rareza": "Muy común"
+    }
+  ],
+  "metodos_preparacion": [
+    {
+      "nombre": "V60",
+      "tipo": "Goteo / Filtrado",
+      "molienda": "Fina-Media",
+      "ratio_recomendado": "1:15",
+      "descripcion": "Resalta la acidez y las notas frutales del café."
+    },
+    {
+      "nombre": "Prensa Francesa",
+      "tipo": "Inmersión",
+      "molienda": "Gruesa",
+      "ratio_recomendado": "1:12",
+      "descripcion": "Cuerpo pesado, aceites naturales preservados, sabor intenso."
+    },
+    {
+      "nombre": "Aeropress",
+      "tipo": "Presión / Híbrido",
+      "molienda": "Media",
+      "ratio_recomendado": "1:13",
+      "descripcion": "Versátil, permite extraer mucha dulzura y claridad."
+    }
+  ],
+  "regiones_etiopia": [
+    {
+      "nombre": "Yirgacheffe",
+      "perfil_tipico": "Cítrico y floral (limón y té). Muy limpio.",
+      "altitud": "1700 - 2200 msnm"
+    },
+    {
+      "nombre": "Sidamo",
+      "perfil_tipico": "Notas de bayas, chocolate y especias. Cuerpo complejo.",
+      "altitud": "1500 - 2200 msnm"
+    }
+  ]
+}

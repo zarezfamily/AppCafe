@@ -1238,7 +1238,7 @@ function MainScreen({ onLogout }) {
     setCargando(true);
     try {
       const cafes   = await getUserCafes(user.uid);
-      const ranking = await getCollection('cafes', 'puntuacion', 50);
+      const ranking = await getCollection('cafes', 'puntuacion', 100);
       const todos   = await getCollection('cafes', 'fecha', 100);
       // Ordenar mis cafés por fecha más reciente
       const cafesPorFecha = [...cafes].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
@@ -1282,8 +1282,11 @@ function MainScreen({ onLogout }) {
   const cafesFiltrados = filtrar(misCafes, busquedaMis);
   const topFiltrados   = filtrar(topCafes, busquedaTop);
   const topCafesPais   = topCafes.filter(c => normalize(c.pais) === normalize(perfil.pais || 'España'));
+  const topCafesVista  = topCafesPais.length > 0 ? topCafesPais : topCafes;
   // Últimos 10 de toda la BD: allCafes viene ordenado por fecha desc (ver cargarDatos)
   const ultimosGlobal = allCafes.slice(0, 10);
+  const ultimos100    = allCafes.slice(0, 100);
+  const top100        = topCafesVista.slice(0, 100);
 
   const flag = getFlagForPais(perfil.pais || 'España');
 
@@ -1361,7 +1364,7 @@ function MainScreen({ onLogout }) {
               : <>
                   <View style={s.sectionHeader}>
                     <Text style={s.sectionTitle}>Últimos añadidos</Text>
-                    <TouchableOpacity onPress={() => setActiveTab('Mis Cafés')}><Ionicons name="chevron-forward" size={20} color="#555" /></TouchableOpacity>
+                    <TouchableOpacity onPress={() => setActiveTab('Últimos añadidos')}><Ionicons name="chevron-forward" size={20} color="#555" /></TouchableOpacity>
                   </View>
                   <Text style={s.sectionSub}>Los 10 más recientes de la comunidad</Text>
                   {cargando ? <ActivityIndicator color="#e8590c" style={{ margin: 30 }} /> : (
@@ -1373,19 +1376,13 @@ function MainScreen({ onLogout }) {
 
                   <View style={[s.sectionHeader, { marginTop: 28 }]}>
                     <Text style={s.sectionTitle}>Top cafés en {perfil.pais || 'España'} {flag}</Text>
-                    <TouchableOpacity onPress={() => setActiveTab('Más')}><Ionicons name="chevron-forward" size={20} color="#555" /></TouchableOpacity>
+                    <TouchableOpacity onPress={() => setActiveTab('Top cafés')}><Ionicons name="chevron-forward" size={20} color="#555" /></TouchableOpacity>
                   </View>
                   <Text style={s.sectionSub}>Los mejor puntuados · filtrando por tu país</Text>
                   {cargando ? <ActivityIndicator color="#e8590c" style={{ margin: 30 }} /> : (
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingLeft: 16, paddingRight: 8, gap: 12 }}>
-                      {topCafesPais.slice(0, 10).map(item => <CardHorizontal key={item.id} item={item} badge={`${item.puntuacion}.0 ⭐`} onPress={setCafeDetalle} favs={favs} onToggleFav={toggleFav} />)}
-                      {topCafesPais.length === 0 && (
-                        <View style={{ paddingLeft: 0 }}>
-                          <Text style={[s.empty, { marginLeft: 0 }]}>Aún no hay cafés de {perfil.pais || 'España'}</Text>
-                          <Text style={{ color: '#bbb', fontSize: 12, marginTop: 4 }}>Mostrando top global</Text>
-                          {topCafes.slice(0, 10).map(item => <CardHorizontal key={item.id} item={item} badge={`${item.puntuacion}.0 ⭐`} onPress={setCafeDetalle} favs={favs} onToggleFav={toggleFav} />)}
-                        </View>
-                      )}
+                      {topCafesVista.slice(0, 10).map(item => <CardHorizontal key={item.id} item={item} badge={`${item.puntuacion}.0 ⭐`} onPress={setCafeDetalle} favs={favs} onToggleFav={toggleFav} />)}
+                      {topCafesVista.length === 0 && <Text style={[s.empty, { marginLeft: 0 }]}>Aún no hay cafés.</Text>}
                     </ScrollView>
                   )}
 
@@ -1414,6 +1411,46 @@ function MainScreen({ onLogout }) {
               <View style={{ paddingHorizontal: 16 }}>
                 {cafesFiltrados.map(item => <CardVertical key={item.id} item={item} onDelete={eliminarCafe} onPress={setCafeDetalle} favs={favs} onToggleFav={toggleFav} />)}
                 {cafesFiltrados.length === 0 && <Text style={s.empty}>{busquedaMis ? 'Sin resultados' : 'No has añadido cafés aún'}</Text>}
+              </View>
+            )}
+          </View>
+        )}
+
+        {/* ── ÚLTIMOS AÑADIDOS (100) ── */}
+        {activeTab === 'Últimos añadidos' && (
+          <View style={{ paddingTop: 20 }}>
+            <View style={{ paddingHorizontal: 16 }}>
+              <TouchableOpacity onPress={() => setActiveTab('Inicio')} style={s.backRow}>
+                <Ionicons name="chevron-back" size={20} color="#e8590c" />
+                <Text style={s.backText}>Volver</Text>
+              </TouchableOpacity>
+              <Text style={s.pageTitle}>Últimos añadidos</Text>
+              <Text style={s.sectionSub}>Mostrando los 100 más recientes de la comunidad</Text>
+            </View>
+            {cargando ? <ActivityIndicator color="#e8590c" style={{ margin: 30 }} /> : (
+              <View style={{ paddingHorizontal: 16, marginTop: 8 }}>
+                {ultimos100.map(item => <CardVertical key={item.id} item={item} onDelete={() => {}} onPress={setCafeDetalle} favs={favs} onToggleFav={toggleFav} />)}
+                {ultimos100.length === 0 && <Text style={s.empty}>Aún no hay cafés.</Text>}
+              </View>
+            )}
+          </View>
+        )}
+
+        {/* ── TOP CAFÉS (100) ── */}
+        {activeTab === 'Top cafés' && (
+          <View style={{ paddingTop: 20 }}>
+            <View style={{ paddingHorizontal: 16 }}>
+              <TouchableOpacity onPress={() => setActiveTab('Inicio')} style={s.backRow}>
+                <Ionicons name="chevron-back" size={20} color="#e8590c" />
+                <Text style={s.backText}>Volver</Text>
+              </TouchableOpacity>
+              <Text style={s.pageTitle}>Top cafés</Text>
+              <Text style={s.sectionSub}>Mostrando los 100 mejor puntuados ({perfil.pais || 'España'})</Text>
+            </View>
+            {cargando ? <ActivityIndicator color="#e8590c" style={{ margin: 30 }} /> : (
+              <View style={{ paddingHorizontal: 16, marginTop: 8 }}>
+                {top100.map(item => <CardVertical key={item.id} item={item} onDelete={() => {}} onPress={setCafeDetalle} favs={favs} onToggleFav={toggleFav} />)}
+                {top100.length === 0 && <Text style={s.empty}>Aún no hay cafés.</Text>}
               </View>
             )}
           </View>

@@ -6,7 +6,9 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "import:es:coffee:dry": "DRY_RUN=true node scripts/import_top_es_real.js",
+    "import:es:coffee": "node scripts/import_top_es_real.js"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.1.1",

@@ -34,6 +34,7 @@ import {
 
 const { width: W, height: H } = Dimensions.get('window');
 const APP_VERSION = '2.1.0';
+const GOOGLE_PLACES_KEY = 'AIzaSyDWW3lsdg7jgKYtVNcji-5gyDtv-QUWOpA';
 
 const KEY_EMAIL    = 'etiove_email';
 const KEY_PASSWORD = 'etiove_password';
@@ -42,7 +43,7 @@ const KEY_FAVS     = 'etiove_favorites';
 const KEY_PREFS    = 'etiove_preferences';
 const KEY_PROFILE  = 'etiove_profile';
 const KEY_VOTES    = 'etiove_votes'; // cafés ya votados por el usuario
-const handleAuth   = (userData) => { console.log('TOKEN COMPLETO:', userData.token); setUser(userData); };f
+
 const AuthContext = createContext(null);
 const useAuth = () => useContext(AuthContext);
 
@@ -568,48 +569,26 @@ function ProfileScreen({ onClose }) {
   );
 }
 
-// ─── CAFETERÍAS (OpenStreetMap) ───────────────────────────────────────────────
-// ─── HELPERS CAFETERÍAS ──────────────────────────────────────────────────────
-// Las fotos de cafeterías son del propio local — no usamos imágenes genéricas
-// para no engañar al usuario. Se muestra un placeholder con el nombre.
-
-const ESPECIALIDADES = [
-  ['Espresso · V60 · Chemex', 'Specialty coffee'],
-  ['Flat white · Cortado', 'Café de especialidad'],
-  ['Cold brew · Nitro', 'Café de origen único'],
-  ['Cappuccino · Latte art', 'Tercera ola'],
-  ['Aeropress · Sifón', 'Café de filtro'],
-  ['Pour over · Prensa francesa', 'Café artesanal'],
-  ['Espresso clásico · Tostado oscuro', 'Café tradicional'],
-  ['Latte · Macchiato', 'Café con leche'],
-];
-
-function parsearHorario(horario) {
-  if (!horario) return null;
-  // "Mo-Fr 08:00-20:00; Sa 09:00-18:00" → formato amigable
-  return horario.replace(/Mo/g,'Lun').replace(/Tu/g,'Mar').replace(/We/g,'Mié')
-    .replace(/Th/g,'Jue').replace(/Fr/g,'Vie').replace(/Sa/g,'Sáb').replace(/Su/g,'Dom')
-    .replace(/;/g,' · ');
-}
-
-function estaAbiertoAhora(horario) {
-  if (!horario) return null;
-  try {
-    const hora = new Date().getHours();
-    if (horario.includes('24/7')) return true;
-    // Heurística simple: si contiene la hora actual en el rango
-    const match = horario.match(/(\d{2}):00-(\d{2}):00/);
-    if (match) return hora >= parseInt(match[1]) && hora < parseInt(match[2]);
-  } catch {}
-  return null;
-}
+// ─── CAFETERÍAS (Google Places API) ─────────────────────────────────────────
 
 function calcDist(lat1, lon1, lat2, lon2) {
   const R = 6371000;
   const dLat = (lat2 - lat1) * Math.PI / 180;
   const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
   return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+}
+
+// Obtiene URL de foto real de Google Places
+function getGooglePhotoUrl(photoRef) {
+  if (!photoRef) return null;
+  return 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=' + photoRef + '&key=' + GOOGLE_PLACES_KEY;
+}
+
+// Convierte estado de apertura de Google a texto
+function estadoApertura(openingHours) {
+  if (!openingHours) return null;
+  return openingHours.open_now;
 }
 
 function CafeteriasScreen() {
@@ -624,51 +603,85 @@ function CafeteriasScreen() {
     setCargando(true); setError(null);
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') { setError('Activa la ubicación para ver cafeterías cerca de ti ☕'); setCargando(false); return; }
+      if (status !== 'granted') { setError('Activa la ubicacion para ver cafeterias cerca de ti'); setCargando(false); return; }
       const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
       const { latitude: lat, longitude: lon } = loc.coords;
 
-      const query = `[out:json][timeout:25];(node["amenity"="cafe"](around:2000,${lat},${lon});way["amenity"="cafe"](around:2000,${lat},${lon}););out center 25;`;
-      const res  = await fetch('https://overpass-api.de/api/interpreter', { method: 'POST', body: query });
-      const json = await res.json();
+      // Places API (New) - Nearby Search
+      const nearbyRes = await fetch('https://places.googleapis.com/v1/places:searchNearby', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Goog-Api-Key': GOOGLE_PLACES_KEY,
+          'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.rating,places.userRatingCount,places.currentOpeningHours,places.regularOpeningHours,places.internationalPhoneNumber,places.websiteUri,places.photos,places.editorialSummary,places.types',
+        },
+        body: JSON.stringify({
+          includedTypes: ['cafe', 'coffee_shop'],
+          maxResultCount: 10,
+          locationRestriction: {
+            circle: {
+              center: { latitude: lat, longitude: lon },
+              radius: 2000.0,
+            },
+          },
+          rankPreference: 'POPULARITY',
+        }),
+      });
 
-      const withDist = (json.elements || []).map((el, idx) => {
-        const elLat = el.lat || el.center?.lat;
-        const elLon = el.lon || el.center?.lon;
-        const tags  = el.tags || {};
-        const espec = ESPECIALIDADES[idx % ESPECIALIDADES.length];
-        const seed  = el.id % 100;
+      const nearbyJson = await nearbyRes.json();
+
+      if (nearbyJson.error) {
+        setError('Error Google Places: ' + (nearbyJson.error.message || 'API no disponible'));
+        setCargando(false); return;
+      }
+
+      const places = nearbyJson.places || [];
+
+      const result = places.map(function(p) {
+        const geo  = p.location || {};
+        const dist = calcDist(lat, lon, geo.latitude || lat, geo.longitude || lon);
+        const horarioTexto = (p.regularOpeningHours && p.regularOpeningHours.weekdayDescriptions)
+          ? p.regularOpeningHours.weekdayDescriptions.join(', ')
+          : null;
+        const abierto = (p.currentOpeningHours && p.currentOpeningHours.openNow !== undefined)
+          ? p.currentOpeningHours.openNow
+          : null;
+        const fotoUrl = (p.photos && p.photos[0] && p.photos[0].name)
+          ? 'https://places.googleapis.com/v1/' + p.photos[0].name + '/media?maxWidthPx=400&key=' + GOOGLE_PLACES_KEY
+          : null;
+        const fotosUrls = (p.photos || []).slice(0, 4).map(function(ph) {
+          return 'https://places.googleapis.com/v1/' + ph.name + '/media?maxWidthPx=400&key=' + GOOGLE_PLACES_KEY;
+        });
         return {
-          id:            el.id,
-          nombre:        tags.name || 'Cafetería',
-          lat: elLat, lon: elLon,
-          distancia:     calcDist(lat, lon, elLat, elLon),
-          direccion:     [tags['addr:street'], tags['addr:housenumber']].filter(Boolean).join(' ') || null,
-          barrio:        tags['addr:suburb'] || tags['addr:city'] || null,
-          horario:       parsearHorario(tags.opening_hours),
-          horarioRaw:    tags.opening_hours || null,
-          abierto:       estaAbiertoAhora(tags.opening_hours),
-          web:           tags.website || tags['contact:website'] || null,
-          telefono:      tags.phone   || tags['contact:phone']   || null,
-          wifi:          tags.internet_access === 'wlan' || tags.wifi === 'yes',
-          terraza:       tags.outdoor_seating === 'yes',
-          takeaway:      tags.takeaway === 'yes',
-          vegano:        tags.diet_vegan === 'yes' || tags['diet:vegan'] === 'yes',
-          especialidades: espec[0],
-          tipo:          espec[1],
-          rating:        (3.8 + (seed / 100) * 1.2).toFixed(1),
-          numReseñas:    50 + (seed * 7) % 400,
-          foto:          null, // Sin foto falsa — placeholder honesto
+          id:          p.id,
+          nombre:      (p.displayName && p.displayName.text) || 'Cafeteria',
+          lat:         geo.latitude  || lat,
+          lon:         geo.longitude || lon,
+          distancia:   dist,
+          direccion:   p.formattedAddress || null,
+          telefono:    p.internationalPhoneNumber || null,
+          web:         p.websiteUri || null,
+          abierto:     abierto,
+          horario:     horarioTexto,
+          rating:      p.rating ? p.rating.toFixed(1) : '--',
+          numResenas:  p.userRatingCount || 0,
+          resenas:     [],
+          descripcion: (p.editorialSummary && p.editorialSummary.text) || null,
+          foto:        fotoUrl,
+          fotos:       fotosUrls,
+          wifi:        false,
+          terraza:     false,
+          takeaway:    (p.types || []).indexOf('meal_takeaway') !== -1,
         };
-      })
-      .filter(c => c.distancia < 2000)
-      .sort((a, b) => a.distancia - b.distancia)
-      .slice(0, 10);
+      }).sort(function(a, b) { return parseFloat(b.rating) - parseFloat(a.rating); });
 
-      setCafeterias(withDist);
-      if (withDist.length === 0) setError('No encontramos cafeterías en 2km de radio. ¡Quizás hay pocas en esta zona!');
-    } catch { setError('Error al buscar cafeterías. Comprueba tu conexión.'); }
-    finally  { setCargando(false); }
+      setCafeterias(result);
+      if (result.length === 0) setError('No encontramos cafeterias cerca. Prueba en otra zona.');
+    } catch (e) {
+      setError('Error al buscar cafeterias: ' + e.message);
+    } finally {
+      setCargando(false);
+    }
   };
 
   const abrirMaps = (c) => {
@@ -706,11 +719,12 @@ function CafeteriasScreen() {
           <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
             <StatusBar barStyle="dark-content" />
             <ScrollView showsVerticalScrollIndicator={false}>
-              {/* HERO SIN FOTO FALSA — placeholder bonito */}
+              {/* HERO — foto real de Google Places o placeholder */}
               <View style={caf.detHero}>
-                <View style={caf.detPlaceholder}>
-                  <Text style={caf.detPlaceholderEmoji}>☕</Text>
-                </View>
+                {seleccionada.foto
+                  ? <Image source={{ uri: seleccionada.foto }} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
+                  : <View style={caf.detPlaceholder}><Text style={caf.detPlaceholderEmoji}>☕</Text></View>
+                }
                 <View style={caf.detHeroGrad} />
                 <TouchableOpacity style={caf.detBack} onPress={() => setSeleccionada(null)}>
                   <Ionicons name="chevron-back" size={24} color="#fff" />
@@ -733,7 +747,7 @@ function CafeteriasScreen() {
                       <Ionicons key={n} name={n <= Math.round(seleccionada.rating) ? 'star' : 'star-outline'} size={14} color="#FFD700" />
                     ))}
                     <Text style={caf.detRatingNum}>{seleccionada.rating}</Text>
-                    <Text style={caf.detReseñas}>({seleccionada.numReseñas} reseñas)</Text>
+                    <Text style={caf.detReseñas}>({seleccionada.numResenas} reseñas)</Text>
                   </View>
                 </View>
               </View>
@@ -756,6 +770,18 @@ function CafeteriasScreen() {
                   <Text style={caf.secTitulo}>☕ Especialidades</Text>
                   <Text style={caf.secTexto}>{seleccionada.especialidades}</Text>
                 </View>
+
+                {/* Galería de fotos */}
+                {seleccionada.fotos && seleccionada.fotos.length > 1 && (
+                  <View style={caf.seccion}>
+                    <Text style={caf.secTitulo}>📸 Fotos</Text>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 8 }}>
+                      {seleccionada.fotos.map((f, i) => f && (
+                        <Image key={i} source={{ uri: f }} style={{ width: 120, height: 90, borderRadius: 10, marginRight: 8 }} resizeMode="cover" />
+                      ))}
+                    </ScrollView>
+                  </View>
+                )}
 
                 {/* Horario */}
                 {seleccionada.horario && (
@@ -793,25 +819,24 @@ ${seleccionada.barrio}` : ''}</Text>
                   </View>
                 )}
 
-                {/* Reseñas simuladas */}
-                <View style={caf.seccion}>
-                  <Text style={caf.secTitulo}>💬 Lo que dicen los clientes</Text>
-                  {[
-                    { texto: 'El mejor café de especialidad de la zona. El barista es un crack.', autor: 'María G.', nota: 5 },
-                    { texto: 'Ambiente acogedor, música tranquila y un V60 espectacular.', autor: 'Carlos R.', nota: 4 },
-                    { texto: 'Los pasteles están buenísimos y el café está a la altura.', autor: 'Ana M.', nota: 5 },
-                  ].map((r, i) => (
-                    <View key={i} style={caf.resena}>
-                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
-                        <Text style={caf.resenaAutor}>{r.autor}</Text>
-                        <View style={{ flexDirection: 'row', gap: 2 }}>
+                {/* Reseñas reales de Google */}
+                {seleccionada.resenas && seleccionada.resenas.length > 0 && (
+                  <View style={caf.seccion}>
+                    <Text style={caf.secTitulo}>💬 Opiniones de Google</Text>
+                    {seleccionada.resenas.map((r, i) => (
+                      <View key={i} style={caf.resena}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
+                          <Text style={caf.resenaAutor}>{r.autor}</Text>
+                          <Text style={{ fontSize: 11, color: '#aaa' }}>{r.tiempo}</Text>
+                        </View>
+                        <View style={{ flexDirection: 'row', gap: 2, marginBottom: 4 }}>
                           {[1,2,3,4,5].map(n => <Ionicons key={n} name={n <= r.nota ? 'star' : 'star-outline'} size={11} color="#FFD700" />)}
                         </View>
+                        <Text style={caf.resenaTexto} numberOfLines={4}>{r.texto}</Text>
                       </View>
-                      <Text style={caf.resenaTexto}>{r.texto}</Text>
-                    </View>
-                  ))}
-                </View>
+                    ))}
+                  </View>
+                )}
 
                 <TouchableOpacity style={[s.redBtn, { marginTop: 8 }]} onPress={() => abrirMaps(seleccionada)}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
@@ -845,12 +870,15 @@ ${seleccionada.barrio}` : ''}</Text>
         showsVerticalScrollIndicator={false}
         renderItem={({ item, index }) => (
           <TouchableOpacity style={caf.card} onPress={() => setSeleccionada(item)} activeOpacity={0.88}>
-            {/* Placeholder café — sin foto falsa */}
+            {/* Foto real de Google Places o placeholder */}
             <View style={caf.cardImgWrap}>
-              <View style={caf.cardPlaceholder}>
-                <Text style={caf.cardPlaceholderEmoji}>☕</Text>
-                <Text style={caf.cardPlaceholderNombre} numberOfLines={2}>{item.nombre}</Text>
-              </View>
+              {item.foto
+                ? <Image source={{ uri: item.foto }} style={caf.cardImg} resizeMode="cover" />
+                : <View style={caf.cardPlaceholder}>
+                    <Text style={caf.cardPlaceholderEmoji}>☕</Text>
+                    <Text style={caf.cardPlaceholderNombre} numberOfLines={2}>{item.nombre}</Text>
+                  </View>
+              }
               <View style={caf.cardNum}><Text style={caf.cardNumText}>{index + 1}</Text></View>
               {item.abierto !== null && (
                 <View style={[caf.cardEstado, { backgroundColor: item.abierto ? '#27ae60' : '#e74c3c' }]}>
@@ -866,7 +894,7 @@ ${seleccionada.barrio}` : ''}</Text>
               <View style={caf.cardRatingRow}>
                 {[1,2,3,4,5].map(n => <Ionicons key={n} name={n <= Math.round(item.rating) ? 'star' : 'star-outline'} size={12} color="#FFD700" />)}
                 <Text style={caf.cardRatingNum}>{item.rating}</Text>
-                <Text style={caf.cardReseñas}>({item.numReseñas})</Text>
+                <Text style={caf.cardReseñas}>({item.numResenas})</Text>
               </View>
               {/* Tags */}
               <View style={caf.cardTags}>
@@ -1253,6 +1281,7 @@ function MainScreen({ onLogout }) {
   const favCafes       = allCafes.filter(c => favs.includes(c.id));
   const cafesFiltrados = filtrar(misCafes, busquedaMis);
   const topFiltrados   = filtrar(topCafes, busquedaTop);
+  const topCafesPais   = topCafes.filter(c => normalize(c.pais) === normalize(perfil.pais || 'España'));
   // Últimos 10 de toda la BD: allCafes viene ordenado por fecha desc (ver cargarDatos)
   const ultimosGlobal = allCafes.slice(0, 10);
 
@@ -1343,14 +1372,20 @@ function MainScreen({ onLogout }) {
                   )}
 
                   <View style={[s.sectionHeader, { marginTop: 28 }]}>
-                    <Text style={s.sectionTitle}>Top cafés globales</Text>
+                    <Text style={s.sectionTitle}>Top cafés en {perfil.pais || 'España'} {flag}</Text>
                     <TouchableOpacity onPress={() => setActiveTab('Más')}><Ionicons name="chevron-forward" size={20} color="#555" /></TouchableOpacity>
                   </View>
-                  <Text style={s.sectionSub}>Los mejor puntuados de la comunidad</Text>
+                  <Text style={s.sectionSub}>Los mejor puntuados · filtrando por tu país</Text>
                   {cargando ? <ActivityIndicator color="#e8590c" style={{ margin: 30 }} /> : (
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingLeft: 16, paddingRight: 8, gap: 12 }}>
-                      {topCafes.slice(0, 10).map(item => <CardHorizontal key={item.id} item={item} badge={`${item.puntuacion}.0 ⭐`} onPress={setCafeDetalle} favs={favs} onToggleFav={toggleFav} />)}
-                      {topCafes.length === 0 && <Text style={[s.empty, { marginLeft: 0 }]}>Aún no hay cafés</Text>}
+                      {topCafesPais.slice(0, 10).map(item => <CardHorizontal key={item.id} item={item} badge={`${item.puntuacion}.0 ⭐`} onPress={setCafeDetalle} favs={favs} onToggleFav={toggleFav} />)}
+                      {topCafesPais.length === 0 && (
+                        <View style={{ paddingLeft: 0 }}>
+                          <Text style={[s.empty, { marginLeft: 0 }]}>Aún no hay cafés de {perfil.pais || 'España'}</Text>
+                          <Text style={{ color: '#bbb', fontSize: 12, marginTop: 4 }}>Mostrando top global</Text>
+                          {topCafes.slice(0, 10).map(item => <CardHorizontal key={item.id} item={item} badge={`${item.puntuacion}.0 ⭐`} onPress={setCafeDetalle} favs={favs} onToggleFav={toggleFav} />)}
+                        </View>
+                      )}
                     </ScrollView>
                   )}
 

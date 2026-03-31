@@ -1,8 +1,14 @@
 // Configuración para API REST de Firestore
 // Usa Firebase Auth token (Bearer) para autenticar peticiones a Firestore
 
+import { Platform } from 'react-native';
+
+const appConfig = require('./app.json');
+
 export const FIREBASE_PROJECT_ID = process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID;
 export const FIREBASE_API_KEY    = process.env.EXPO_PUBLIC_FIREBASE_API_KEY;
+const IOS_BUNDLE_ID              = appConfig?.expo?.ios?.bundleIdentifier || null;
+const ANDROID_PACKAGE            = appConfig?.expo?.android?.package || null;
 
 if (!FIREBASE_PROJECT_ID || !FIREBASE_API_KEY) {
   console.warn('[Firebase] Faltan variables de entorno EXPO_PUBLIC_FIREBASE_PROJECT_ID y EXPO_PUBLIC_FIREBASE_API_KEY');
@@ -15,15 +21,32 @@ const BASE_URL = `https://europe-west1-firestore.googleapis.com/v1/projects/${FI
 
 let _authToken = null;
 
+const clientHeaders = () => {
+  const headers = {};
+
+  if (Platform.OS === 'ios' && IOS_BUNDLE_ID) {
+    headers['X-Ios-Bundle-Identifier'] = IOS_BUNDLE_ID;
+  }
+
+  if (Platform.OS === 'android' && ANDROID_PACKAGE) {
+    headers['X-Android-Package'] = ANDROID_PACKAGE;
+  }
+
+  return headers;
+};
+
 export const setAuthToken  = (token) => {
   _authToken = token;
-  console.log('[Firebase] Token establecido:', token ? token.substring(0, 30) + '...' : 'NULL');
+  console.log('[Firebase] Token completo:', token || 'NULL');
 };
 export const clearAuthToken = () => { _authToken = null; };
 export const getAuthToken   = () => _authToken;
 
 const authHeaders = () => {
-  const headers = { 'Content-Type': 'application/json' };
+  const headers = {
+    'Content-Type': 'application/json',
+    ...clientHeaders(),
+  };
   if (_authToken) headers['Authorization'] = `Bearer ${_authToken}`;
   return headers;
 };
@@ -68,6 +91,28 @@ const toFields = (obj) => {
     fields[key] = toFirestoreValue(val);
   }
   return { fields };
+};
+
+const mapAuthError = (errorMessage, fallbackMessage) => {
+  const rawMessage = String(errorMessage || '');
+
+  if (rawMessage.includes('REQUEST_BLOCKED') || rawMessage.includes('IOS CLIENT APPLICATION')) {
+    return 'La API key de Firebase esta bloqueando las peticiones de esta app iOS. Revisa las restricciones de la clave en Google Cloud o usa una clave sin restriccion por app para Firebase Auth.';
+  }
+
+  if (rawMessage === 'INVALID_LOGIN_CREDENTIALS' || rawMessage === 'EMAIL_NOT_FOUND' || rawMessage === 'INVALID_PASSWORD') {
+    return 'Email o contraseña incorrectos';
+  }
+
+  if (rawMessage === 'EMAIL_EXISTS') {
+    return 'Ese email ya esta registrado';
+  }
+
+  if (rawMessage === 'WEAK_PASSWORD : Password should be at least 6 characters') {
+    return 'La contraseña debe tener al menos 6 caracteres';
+  }
+
+  return rawMessage || fallbackMessage;
 };
 
 // ─── API ───────────────────────────────────────────────────────────────────────
@@ -158,11 +203,11 @@ const AUTH_URL = `https://identitytoolkit.googleapis.com/v1/accounts`;
 export const registerUser = async (email, password) => {
   const res  = await fetch(`${AUTH_URL}:signUp?key=${FIREBASE_API_KEY}`, {
     method:  'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body:    JSON.stringify({ email, password, returnSecureToken: true }),
   });
   const json = await res.json();
-  if (!res.ok) throw new Error(json.error?.message || 'Error al registrar');
+  if (!res.ok) throw new Error(mapAuthError(json.error?.message, 'Error al registrar'));
   setAuthToken(json.idToken);
   return { uid: json.localId, email: json.email, token: json.idToken };
 };
@@ -170,11 +215,11 @@ export const registerUser = async (email, password) => {
 export const loginUser = async (email, password) => {
   const res  = await fetch(`${AUTH_URL}:signInWithPassword?key=${FIREBASE_API_KEY}`, {
     method:  'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body:    JSON.stringify({ email, password, returnSecureToken: true }),
   });
   const json = await res.json();
-  if (!res.ok) throw new Error(json.error?.message || 'Email o contraseña incorrectos');
+  if (!res.ok) throw new Error(mapAuthError(json.error?.message, 'Email o contraseña incorrectos'));
   setAuthToken(json.idToken);
   return { uid: json.localId, email: json.email, token: json.idToken };
 };
@@ -182,7 +227,7 @@ export const loginUser = async (email, password) => {
 export const resetPassword = async (email) => {
   const res  = await fetch(`${AUTH_URL}:sendOobCode?key=${FIREBASE_API_KEY}`, {
     method:  'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body:    JSON.stringify({ requestType: 'PASSWORD_RESET', email }),
   });
   return res.ok;

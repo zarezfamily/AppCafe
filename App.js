@@ -4,6 +4,7 @@
 
 import { Ionicons } from '@expo/vector-icons';
 import { CameraView, useCameraPermissions } from 'expo-camera';
+import Constants from 'expo-constants';
 import * as ImagePicker from 'expo-image-picker';
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as Location from 'expo-location';
@@ -240,14 +241,14 @@ const normalizeGamification = (state) => {
 };
 
 const getAchievementDefs = () => ([
-  { id: 'primera_cata', icon: '🥇', title: 'Primera cata', desc: 'Valorar 3 cafés' },
-  { id: 'fotografo', icon: '📸', title: 'Fotógrafo', desc: 'Subir 12 fotos' },
-  { id: 'viajero', icon: '🌍', title: 'Viajero', desc: 'Probar cafés de 8 países distintos' },
-  { id: 'adicto', icon: '🔥', title: 'Adicto', desc: 'Valorar 30 cafés' },
-  { id: 'maestro_catador', icon: '👑', title: 'Maestro Catador', desc: 'Alcanzar nivel Maestro' },
-  { id: 'coleccionista', icon: '❤️', title: 'Coleccionista', desc: 'Marcar 25 favoritos' },
-  { id: 'critico', icon: '✍️', title: 'Crítico', desc: 'Escribir 12 reseñas' },
-  { id: 'origen_unico', icon: '🌱', title: 'Origen único', desc: 'Probar Geisha, Bourbon Pointu o Yemen' },
+  { id: 'primera_cata', icon: '🥇', title: 'Ritual de inicio', desc: 'Valora 3 cafes' },
+  { id: 'fotografo', icon: '📸', title: 'Ojo barista', desc: 'Sube 12 fotos de tus cafes' },
+  { id: 'viajero', icon: '🌍', title: 'Ruta de origen', desc: 'Prueba cafes de 8 paises distintos' },
+  { id: 'adicto', icon: '🔥', title: 'Tueste constante', desc: 'Valora 30 cafes' },
+  { id: 'maestro_catador', icon: '👑', title: 'Paladar Etiove', desc: 'Alcanza nivel Maestro' },
+  { id: 'coleccionista', icon: '❤️', title: 'Bodega signature', desc: 'Marca 25 favoritos' },
+  { id: 'critico', icon: '✍️', title: 'Cuaderno de cata', desc: 'Escribe 12 resenas' },
+  { id: 'origen_unico', icon: '🌱', title: 'Lote de autor', desc: 'Prueba Geisha, Bourbon Pointu o Yemen' },
 ]);
 
 function PackshotImage({ uri, frameStyle, imageStyle }) {
@@ -1331,6 +1332,21 @@ function AuthScreen({ onAuth }) {
 
   const handleFaceId = async () => {
     try {
+      if (Constants.appOwnership === 'expo' || Constants.executionEnvironment === 'storeClient') {
+        Alert.alert('Face ID en Expo Go', 'En Expo Go Face ID puede fallar. Usa un build de desarrollo/TestFlight para autenticación biométrica real.');
+        return;
+      }
+
+      const hasHardware = await LocalAuthentication.hasHardwareAsync();
+      const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+      const supportedTypes = await LocalAuthentication.supportedAuthenticationTypesAsync();
+      const hasFaceId = supportedTypes.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION);
+
+      if (!hasHardware || !isEnrolled || !hasFaceId) {
+        Alert.alert('Face ID no disponible', 'Este dispositivo/app no tiene Face ID listo para usar en este momento.');
+        return;
+      }
+
       const auth = await LocalAuthentication.authenticateAsync({
         promptMessage: 'Accede a Etiove',
         disableDeviceFallback: true,
@@ -1349,7 +1365,7 @@ function AuthScreen({ onAuth }) {
           user_fallback: 'Face ID no está disponible ahora mismo. Revisa su configuración.',
           invalid_context: 'No se pudo iniciar Face ID en este momento.',
         };
-        Alert.alert('Face ID', errorMap[auth.error] || 'No se pudo completar la autenticación biométrica.');
+        Alert.alert('Face ID', errorMap[auth.error] || `No se pudo completar la autenticación biométrica (${auth.error || 'desconocido'}).`);
         return;
       }
       const em = await SecureStore.getItemAsync(KEY_EMAIL); const pw = await SecureStore.getItemAsync(KEY_PASSWORD);
@@ -1569,6 +1585,9 @@ function MainScreen({ onLogout }) {
   const [forumReplyText, setForumReplyText] = useState('');
   const [forumReplyTo, setForumReplyTo] = useState(null);
   const [forumSendingReply, setForumSendingReply] = useState(false);
+  const [newsletterState, setNewsletterState] = useState({ subscribed: false, createdAt: '', subscribedAt: '', updatedAt: '' });
+  const [newsletterLoading, setNewsletterLoading] = useState(false);
+  const [newsletterSaving, setNewsletterSaving] = useState(false);
   const forumThreadScrollRef = useRef(null);
   const forumReplyInputRef = useRef(null);
   const [permission, requestPermission] = useCameraPermissions();
@@ -1666,6 +1685,32 @@ function MainScreen({ onLogout }) {
   useEffect(() => {
     cargarCafeteriasInicio();
   }, []);
+
+  const cargarNewsletter = async () => {
+    if (!user?.uid) return;
+    setNewsletterLoading(true);
+    try {
+      const doc = await getDocument('newsletter_subscribers', user.uid);
+      if (doc) {
+        setNewsletterState({
+          subscribed: !!doc.subscribed,
+          createdAt: doc.createdAt || '',
+          subscribedAt: doc.subscribedAt || '',
+          updatedAt: doc.updatedAt || '',
+        });
+      } else {
+        setNewsletterState({ subscribed: false, createdAt: '', subscribedAt: '', updatedAt: '' });
+      }
+    } catch {
+      setNewsletterState({ subscribed: false, createdAt: '', subscribedAt: '', updatedAt: '' });
+    } finally {
+      setNewsletterLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    cargarNewsletter();
+  }, [user?.uid]);
 
   const saveGamification = async (next) => {
     try { await SecureStore.setItemAsync(KEY_GAMIFICATION, JSON.stringify(next)); } catch {}
@@ -1997,12 +2042,27 @@ function MainScreen({ onLogout }) {
   const xpInLevel = nextLevel ? Math.max(0, gamification.xp - currentLevel.minXp) : gamification.xp;
   const xpRange = nextLevel ? Math.max(1, nextLevel.minXp - currentLevel.minXp) : Math.max(1, gamification.xp);
   const levelProgress = Math.min(1, xpInLevel / xpRange);
+  const achievementDefs = getAchievementDefs();
+  const unlockedAchievements = achievementDefs.filter(a => gamification.achievementIds.includes(a.id));
+  const pendingAchievements = achievementDefs.filter(a => !gamification.achievementIds.includes(a.id));
+  const achievementTotal = achievementDefs.length;
+  const unlockedCount = unlockedAchievements.length;
+  const achievementProgress = achievementTotal > 0 ? unlockedCount / achievementTotal : 0;
+  const memberStatus = unlockedCount >= achievementTotal
+    ? { icon: '👑', label: 'LEYENDA ETIOVE' }
+    : unlockedCount >= Math.max(1, Math.ceil(achievementTotal * 0.75))
+      ? { icon: '🏆', label: 'MAESTRO DE ORIGEN' }
+      : unlockedCount >= Math.max(1, Math.ceil(achievementTotal * 0.4))
+        ? { icon: '⭐', label: 'EXPLORADOR DE FINCA' }
+        : { icon: '🌱', label: 'APRENDIZ DE TUESTE' };
   const brandCardTranslateY = brandCardAnim.interpolate({ inputRange: [0, 1], outputRange: [14, 0] });
   const brandCardScale = brandCardAnim.interpolate({ inputRange: [0, 1], outputRange: [0.985, 1] });
   const brandProgressWidth = brandProgressAnim.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] });
   const profileAlias = (perfil.alias || perfil.nombre || user?.email?.split('@')[0] || 'Catador').trim();
   const profileName = `${perfil.nombre || ''} ${perfil.apellidos || ''}`.trim() || user?.email || 'Miembro Etiove';
   const profileInitial = (profileAlias || '?')[0].toUpperCase();
+  const newsletterEmail = (perfil.email || user?.email || '').trim();
+  const newsletterHasEmail = !!newsletterEmail;
   const forumAuthorName = (perfil.alias || perfil.nombre || user?.email?.split('@')[0] || 'Catador').trim();
   const voteWeight = currentLevel.name === 'Maestro' ? 2 : 1;
 
@@ -2057,6 +2117,53 @@ function MainScreen({ onLogout }) {
       cargarForo();
     }
   }, [activeTab]);
+
+  const guardarNewsletter = async (nextSubscribed) => {
+    if (!user?.uid) return;
+    if (!newsletterHasEmail) {
+      Alert.alert('Falta tu email', 'Completa tu perfil antes de suscribirte a la newsletter.');
+      return;
+    }
+
+    setNewsletterSaving(true);
+    try {
+      const now = new Date().toISOString();
+      const payload = {
+        uid: user.uid,
+        email: newsletterEmail,
+        emailLower: newsletterEmail.toLowerCase(),
+        alias: perfil.alias || '',
+        nombre: perfil.nombre || '',
+        apellidos: perfil.apellidos || '',
+        subscribed: nextSubscribed,
+        source: 'app_mas',
+        createdAt: newsletterState.createdAt || now,
+        subscribedAt: nextSubscribed ? (newsletterState.subscribedAt || now) : '',
+        unsubscribedAt: nextSubscribed ? '' : now,
+        updatedAt: now,
+      };
+
+      const ok = await setDocument('newsletter_subscribers', user.uid, payload);
+      if (!ok) throw new Error('save_newsletter_failed');
+
+      setNewsletterState({
+        subscribed: nextSubscribed,
+        createdAt: payload.createdAt,
+        subscribedAt: payload.subscribedAt,
+        updatedAt: payload.updatedAt,
+      });
+      Alert.alert(
+        nextSubscribed ? 'Newsletter activada' : 'Newsletter pausada',
+        nextSubscribed
+          ? 'Te avisaremos por email de novedades, lanzamientos y selecciones especiales.'
+          : 'Has dejado de recibir emails. Podrás activarlos otra vez cuando quieras.'
+      );
+    } catch {
+      Alert.alert('Error', 'No se pudo guardar tu preferencia de newsletter.');
+    } finally {
+      setNewsletterSaving(false);
+    }
+  };
 
   const seleccionarFotoForo = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -2520,42 +2627,48 @@ function MainScreen({ onLogout }) {
           )}
 
           <Modal visible={forumCreateOpen} animationType="slide" transparent onRequestClose={() => setForumCreateOpen(false)}>
-            <View style={s.forumModalOverlay}>
-              <View style={s.forumModalCard}>
-                <Text style={s.sectionTitle}>Nuevo hilo</Text>
-                <Text style={s.sectionSub}>{forumCategory?.label || 'Comunidad'}</Text>
-                <Text style={[s.label, { marginTop: 4 }]}>Título</Text>
-                <TextInput
-                  style={s.input}
-                  value={forumTitle}
-                  onChangeText={(v) => setForumTitle(v.slice(0, 120))}
-                  placeholder="Máximo 120 caracteres"
-                  placeholderTextColor="#b3a9a0"
-                />
-                <Text style={[s.label, { marginTop: -6 }]}>Contenido</Text>
-                <TextInput
-                  style={[s.input, { minHeight: 120, textAlignVertical: 'top' }]}
-                  value={forumBody}
-                  onChangeText={(v) => setForumBody(v.slice(0, 1000))}
-                  placeholder="Comparte tu experiencia cafetera..."
-                  placeholderTextColor="#b3a9a0"
-                  multiline
-                />
-                <Text style={s.forumCountText}>{forumTitle.length}/120 · {forumBody.length}/1000</Text>
-                <TouchableOpacity style={s.faceIdBtn} onPress={seleccionarFotoForo}>
-                  <Ionicons name="image-outline" size={18} color={THEME.brand.accentDeep} />
-                  <Text style={s.faceIdText}>{forumPhoto ? 'Cambiar foto' : 'Añadir foto opcional'}</Text>
-                </TouchableOpacity>
-                <View style={{ flexDirection: 'row', gap: 10, marginTop: 14 }}>
-                  <TouchableOpacity style={[s.authSecondaryBtn, { flex: 1, marginTop: 0 }]} onPress={() => setForumCreateOpen(false)}>
-                    <Text style={s.authSecondaryBtnText}>Cancelar</Text>
+            <KeyboardAvoidingView
+              style={s.forumModalOverlay}
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+              keyboardVerticalOffset={Platform.OS === 'ios' ? 20 : 0}
+            >
+              <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end' }}>
+                <View style={s.forumModalCard}>
+                  <Text style={s.sectionTitle}>Nuevo hilo</Text>
+                  <Text style={s.sectionSub}>{forumCategory?.label || 'Comunidad'}</Text>
+                  <Text style={[s.label, { marginTop: 4 }]}>Título</Text>
+                  <TextInput
+                    style={s.input}
+                    value={forumTitle}
+                    onChangeText={(v) => setForumTitle(v.slice(0, 120))}
+                    placeholder="Máximo 120 caracteres"
+                    placeholderTextColor="#b3a9a0"
+                  />
+                  <Text style={[s.label, { marginTop: -6 }]}>Contenido</Text>
+                  <TextInput
+                    style={[s.input, { minHeight: 120, textAlignVertical: 'top' }]}
+                    value={forumBody}
+                    onChangeText={(v) => setForumBody(v.slice(0, 1000))}
+                    placeholder="Comparte tu experiencia cafetera..."
+                    placeholderTextColor="#b3a9a0"
+                    multiline
+                  />
+                  <Text style={s.forumCountText}>{forumTitle.length}/120 · {forumBody.length}/1000</Text>
+                  <TouchableOpacity style={s.faceIdBtn} onPress={seleccionarFotoForo}>
+                    <Ionicons name="image-outline" size={18} color={THEME.brand.accentDeep} />
+                    <Text style={s.faceIdText}>{forumPhoto ? 'Cambiar foto' : 'Añadir foto opcional'}</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={[s.redBtn, { flex: 1, marginTop: 0 }]} onPress={crearHiloForo} disabled={forumSaving}>
-                    {forumSaving ? <ActivityIndicator color="#fff" /> : <Text style={s.redBtnText}>Publicar</Text>}
-                  </TouchableOpacity>
+                  <View style={{ flexDirection: 'row', gap: 10, marginTop: 14, paddingBottom: Platform.OS === 'ios' ? 8 : 14 }}>
+                    <TouchableOpacity style={[s.authSecondaryBtn, { flex: 1, marginTop: 0 }]} onPress={() => setForumCreateOpen(false)}>
+                      <Text style={s.authSecondaryBtnText}>Cancelar</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[s.redBtn, { flex: 1, marginTop: 0 }]} onPress={crearHiloForo} disabled={forumSaving}>
+                      {forumSaving ? <ActivityIndicator color="#fff" /> : <Text style={s.redBtnText}>Publicar</Text>}
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </View>
-            </View>
+              </ScrollView>
+            </KeyboardAvoidingView>
           </Modal>
 
           <Modal visible={forumEditOpen} animationType="slide" transparent onRequestClose={() => setForumEditOpen(false)}>
@@ -2906,48 +3019,132 @@ function MainScreen({ onLogout }) {
 
               <View style={mas.premiumCard}>
                 <View style={mas.premiumGlow} />
+                <View style={mas.premiumGlowTwo} />
+                <Text style={mas.clubTag}>ETIOVE MEMBER STATUS</Text>
                 <View style={mas.premiumTopRow}>
                   <View style={mas.premiumIdentity}>
                     {perfil.foto
                       ? <Image source={{ uri: perfil.foto }} style={mas.premiumAvatar} />
                       : <View style={mas.premiumAvatarFallback}><Text style={mas.premiumAvatarText}>{profileInitial}</Text></View>
                     }
-                    <View>
+                    <View style={{ flex: 1 }}>
                       <Text style={mas.premiumAlias}>@{profileAlias.replace(/^@+/, '')}</Text>
                       <Text style={mas.premiumName} numberOfLines={1}>{profileName}</Text>
                     </View>
                   </View>
                   <View style={mas.premiumLevelBadge}>
-                    <Text style={mas.premiumLevelText}>{currentLevel.icon} {currentLevel.name}</Text>
+                    <Text style={mas.premiumLevelText}>{memberStatus.icon} {memberStatus.label}</Text>
                   </View>
                 </View>
 
                 <View style={mas.premiumStatsRow}>
                   <View style={mas.premiumStatCard}>
-                    <Text style={mas.premiumStatValue}>{misCafes.length}</Text>
-                    <Text style={mas.premiumStatLabel}>Colección</Text>
+                    <Text style={mas.premiumStatValue}>{unlockedCount}</Text>
+                    <Text style={mas.premiumStatLabel}>LOGROS</Text>
                   </View>
                   <View style={mas.premiumStatCard}>
-                    <Text style={mas.premiumStatValue}>{favs.length}</Text>
-                    <Text style={mas.premiumStatLabel}>Favoritos</Text>
+                    <Text style={mas.premiumStatValue}>{achievementTotal}</Text>
+                    <Text style={mas.premiumStatLabel}>OBJETIVOS</Text>
                   </View>
                   <View style={mas.premiumStatCard}>
-                    <Text style={mas.premiumStatValue}>{votes.length}</Text>
-                    <Text style={mas.premiumStatLabel}>Valoraciones</Text>
+                    <Text style={mas.premiumStatValue}>{pendingAchievements.length}</Text>
+                    <Text style={mas.premiumStatLabel}>PENDIENTES</Text>
                   </View>
                 </View>
+
+                <View style={mas.memberProgressRow}>
+                  <Text style={mas.memberProgressText}>{unlockedCount}/{achievementTotal} LOGROS</Text>
+                  <Text style={mas.memberProgressText}>{pendingAchievements[0] ? `SIGUIENTE: ${pendingAchievements[0].title.toUpperCase()}` : 'STATUS COMPLETO'}</Text>
+                </View>
+                <View style={mas.memberProgressBar}><View style={[mas.memberProgressFill, { width: `${achievementProgress * 100}%` }]} /></View>
               </View>
 
-              <Text style={mas.blockTitle}>Cuenta</Text>
-              <MasItem icon="person-circle-outline" label="Mi perfil" sub="Editar foto, alias y datos personales" onPress={() => setShowProfile(true)} />
-              <MasItem icon="shield-checkmark-outline" label="Privacidad y seguridad" sub="Protección de cuenta y acceso" onPress={() => Alert.alert('Privacidad y seguridad', 'Tus datos se gestionan desde tu perfil y tu sesión activa.')} />
+              <Text style={mas.blockTitle}>Accesos</Text>
+              <View style={mas.quickGrid}>
+                <TouchableOpacity style={[mas.quickCard, mas.quickCardDark]} onPress={() => setShowProfile(true)}>
+                  <Ionicons name="person-circle-outline" size={20} color="#f8e7d5" />
+                  <Text style={mas.quickTitleDark}>Mi Perfil</Text>
+                  <Text style={mas.quickSubDark}>Editar datos y foto</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[mas.quickCard, mas.quickCardSoft]} onPress={() => setActiveTab('Mis Cafés')}>
+                  <Ionicons name="heart-outline" size={20} color={PREMIUM_ACCENT_DEEP} />
+                  <Text style={mas.quickTitle}>Mis Cafés</Text>
+                  <Text style={mas.quickSub}>Tu colección personal</Text>
+                </TouchableOpacity>
+              </View>
+
+              <Text style={mas.blockTitle}>Logros conseguidos</Text>
+              <View style={mas.achievementsCard}>
+                {unlockedAchievements.length > 0 ? unlockedAchievements.slice(0, 4).map((a) => (
+                  <View key={a.id} style={mas.achievementOn}>
+                    <Text style={mas.achievementIcon}>{a.icon}</Text>
+                    <View style={{ flex: 1 }}>
+                      <Text style={mas.achievementTitle}>{a.title}</Text>
+                      <Text style={mas.achievementDesc}>{a.desc}</Text>
+                    </View>
+                  </View>
+                )) : <Text style={mas.emptyAchText}>Aún no has desbloqueado logros. Empieza a catar y guardar cafés.</Text>}
+              </View>
+
+              <Text style={mas.blockTitle}>Siguiente por conseguir</Text>
+              <View style={mas.achievementsCard}>
+                {pendingAchievements.slice(0, 3).map((a) => (
+                  <View key={a.id} style={mas.achievementOff}>
+                    <Text style={mas.achievementIconOff}>🔒</Text>
+                    <View style={{ flex: 1 }}>
+                      <Text style={mas.achievementTitleOff}>{a.title}</Text>
+                      <Text style={mas.achievementDesc}>{a.desc}</Text>
+                    </View>
+                  </View>
+                ))}
+              </View>
+
+              <Text style={mas.blockTitle}>NEWSLETTER</Text>
+              <View style={mas.newsletterCard}>
+                <View style={mas.newsletterTopRow}>
+                  <View style={mas.newsletterTitleWrap}>
+                    <Text style={mas.newsletterTitle}>BE ETIOVE BY EMAIL</Text>
+                    <Text style={mas.newsletterSub}>recibe lanzamientos, cafes destacados y novedades de la comunidad.</Text>
+                  </View>
+                  <Switch
+                    value={newsletterState.subscribed}
+                    onValueChange={guardarNewsletter}
+                    disabled={newsletterLoading || newsletterSaving || !newsletterHasEmail}
+                    trackColor={{ false: '#d8cbbf', true: '#6b4a37' }}
+                    thumbColor="#fffdf8"
+                  />
+                </View>
+
+                <View style={mas.newsletterMetaRow}>
+                  <View style={[mas.newsletterStatusPill, newsletterState.subscribed ? mas.newsletterStatusOn : mas.newsletterStatusOff]}>
+                    <Text style={[mas.newsletterStatusText, newsletterState.subscribed ? mas.newsletterStatusTextOn : mas.newsletterStatusTextOff]}>
+                      {newsletterLoading ? 'CARGANDO' : newsletterState.subscribed ? 'SUSCRIPCION ACTIVA' : 'NO SUSCRITO'}
+                    </Text>
+                  </View>
+                  <Text style={mas.newsletterEmail}>{newsletterHasEmail ? newsletterEmail.toUpperCase() : 'ANADE UN EMAIL EN TU PERFIL PARA ACTIVAR LA NEWSLETTER.'}</Text>
+                </View>
+
+                <Text style={mas.newsletterNote}>guardamos tu consentimiento en base de datos para poder incluirte despues en envios a todos los suscritos.</Text>
+
+                <TouchableOpacity
+                  style={[mas.newsletterBtn, (!newsletterHasEmail || newsletterSaving) && mas.newsletterBtnDisabled]}
+                  onPress={() => guardarNewsletter(!newsletterState.subscribed)}
+                  disabled={!newsletterHasEmail || newsletterSaving}
+                >
+                  {newsletterSaving
+                    ? <ActivityIndicator color="#fff" />
+                    : <Text style={mas.newsletterBtnText}>{newsletterState.subscribed ? 'DARME DE BAJA' : 'SUSCRIBIRME AHORA'}</Text>
+                  }
+                </TouchableOpacity>
+              </View>
 
               <Text style={mas.blockTitle}>Aplicación</Text>
-              <MasItem icon="information-circle-outline" label="Versión" sub={`Etiove v${APP_VERSION}`} onPress={() => Alert.alert('Etiove', `Versión ${APP_VERSION}\n\nReact Native + Expo\nFirebase Firestore`)} />
+              <View style={mas.listCard}>
+                <MasItem icon="information-circle-outline" label="Versión" sub={`Etiove v${APP_VERSION}`} onPress={() => Alert.alert('Etiove', `Versión ${APP_VERSION}\n\nReact Native + Expo\nFirebase Firestore`)} />
+              </View>
 
-              <View style={[det.divider, { marginVertical: 18 }]} />
               <TouchableOpacity style={mas.logoutBtn} onPress={() => Alert.alert('Cerrar sesión', '¿Seguro?', [{ text: 'Cancelar', style: 'cancel' }, { text: 'Salir', style: 'destructive', onPress: onLogout }])}>
-                <Ionicons name="log-out-outline" size={20} color={THEME.status.danger} />
+                <Ionicons name="log-out-outline" size={20} color="#fff" />
                 <Text style={mas.logoutText}>Cerrar sesión</Text>
               </TouchableOpacity>
             </View>
@@ -3307,6 +3504,8 @@ const pick = StyleSheet.create({
 const mas = StyleSheet.create({
   premiumCard:  { position: 'relative', overflow: 'hidden', marginTop: 8, marginBottom: 18, backgroundColor: '#1f140f', borderRadius: 20, padding: 16, borderWidth: 1, borderColor: '#4a3022' },
   premiumGlow:  { position: 'absolute', width: 170, height: 170, borderRadius: 85, right: -44, top: -68, backgroundColor: 'rgba(209, 139, 74, 0.2)' },
+  premiumGlowTwo:{ position: 'absolute', width: 120, height: 120, borderRadius: 60, left: -30, bottom: -24, backgroundColor: 'rgba(255, 233, 210, 0.08)' },
+  clubTag:      { color: '#caa487', fontSize: 10, fontWeight: '800', letterSpacing: 1.5, marginBottom: 8 },
   premiumTopRow:{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 },
   premiumIdentity:{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 },
   premiumAvatar:{ width: 44, height: 44, borderRadius: 22, borderWidth: 1.2, borderColor: 'rgba(255, 232, 212, 0.28)' },
@@ -3316,17 +3515,57 @@ const mas = StyleSheet.create({
   premiumName:  { color: '#d8c0ad', fontSize: 12, marginTop: 1 },
   premiumLevelBadge:{ borderRadius: 999, paddingHorizontal: 10, paddingVertical: 6, borderWidth: 1, borderColor: 'rgba(250, 229, 206, 0.32)', backgroundColor: 'rgba(255, 248, 241, 0.1)' },
   premiumLevelText:{ color: '#fff4ea', fontSize: 11, fontWeight: '700' },
+  premiumExplain:{ color: '#d8c0ad', fontSize: 12, lineHeight: 18, marginTop: 10 },
   premiumStatsRow:{ flexDirection: 'row', gap: 8, marginTop: 14 },
   premiumStatCard:{ flex: 1, borderRadius: 12, backgroundColor: 'rgba(255, 248, 241, 0.08)', borderWidth: 1, borderColor: 'rgba(250, 229, 206, 0.12)', paddingVertical: 8, alignItems: 'center' },
   premiumStatValue:{ color: '#fff4ea', fontSize: 16, fontWeight: '800' },
   premiumStatLabel:{ color: '#d0b8a4', fontSize: 10, marginTop: 2 },
-  blockTitle:   { fontSize: 12, fontWeight: '800', color: '#876a56', textTransform: 'uppercase', letterSpacing: 0.9, marginTop: 8, marginBottom: 6 },
+  memberProgressRow:{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 14, marginBottom: 8 },
+  memberProgressText:{ color: '#edd8c5', fontSize: 11, fontWeight: '700' },
+  memberProgressBar:{ height: 8, borderRadius: 999, backgroundColor: 'rgba(255, 248, 241, 0.12)', overflow: 'hidden' },
+  memberProgressFill:{ height: '100%', borderRadius: 999, backgroundColor: '#d18b4a' },
+  quickGrid:    { flexDirection: 'row', gap: 10, marginBottom: 14 },
+  quickCard:    { flex: 1, borderRadius: 16, padding: 14, borderWidth: 1 },
+  quickCardDark:{ backgroundColor: '#2a1a12', borderColor: '#4d3222' },
+  quickCardSoft:{ backgroundColor: '#f8efe6', borderColor: '#e9d8c7' },
+  quickTitleDark:{ marginTop: 8, color: '#fff3e8', fontSize: 14, fontWeight: '800' },
+  quickSubDark: { marginTop: 3, color: '#d8bcaa', fontSize: 11 },
+  quickTitle:   { marginTop: 8, color: '#2d1d13', fontSize: 14, fontWeight: '800' },
+  quickSub:     { marginTop: 3, color: '#7d6a5f', fontSize: 11 },
+  blockTitle:   { fontSize: 12, fontWeight: '800', color: '#876a56', textTransform: 'uppercase', letterSpacing: 0.9, marginTop: 4, marginBottom: 8 },
+  listCard:     { backgroundColor: '#fffaf6', borderRadius: 16, borderWidth: 1, borderColor: '#eadbce', paddingHorizontal: 14, marginBottom: 16 },
+  achievementsCard:{ backgroundColor: '#fffaf6', borderRadius: 16, borderWidth: 1, borderColor: '#eadbce', padding: 12, gap: 8, marginBottom: 14 },
+  newsletterCard:{ backgroundColor: '#fffaf6', borderRadius: 18, borderWidth: 1, borderColor: '#eadbce', padding: 14, marginBottom: 14 },
+  newsletterTopRow:{ flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
+  newsletterTitleWrap:{ flex: 1, paddingRight: 4 },
+  newsletterTitle:{ color: '#2c1c14', fontSize: 15, fontWeight: '800' },
+  newsletterSub:{ color: '#7d6a5f', fontSize: 12, lineHeight: 18, marginTop: 3 },
+  newsletterMetaRow:{ gap: 8, marginTop: 12 },
+  newsletterStatusPill:{ alignSelf: 'flex-start', borderRadius: 999, paddingHorizontal: 10, paddingVertical: 6, borderWidth: 1 },
+  newsletterStatusOn:{ backgroundColor: '#f3e8db', borderColor: '#d6b798' },
+  newsletterStatusOff:{ backgroundColor: '#f6f1eb', borderColor: '#e6d8c9' },
+  newsletterStatusText:{ fontSize: 11, fontWeight: '800' },
+  newsletterStatusTextOn:{ color: '#6b4a37' },
+  newsletterStatusTextOff:{ color: '#8d7a6c' },
+  newsletterEmail:{ color: '#3a2a20', fontSize: 13, fontWeight: '600' },
+  newsletterNote:{ color: '#8c847d', fontSize: 12, lineHeight: 18, marginTop: 10 },
+  newsletterBtn:{ alignItems: 'center', justifyContent: 'center', minHeight: 46, borderRadius: 14, backgroundColor: '#2f1d14', marginTop: 14 },
+  newsletterBtnDisabled:{ opacity: 0.45 },
+  newsletterBtnText:{ color: '#fff5eb', fontSize: 14, fontWeight: '800' },
   item:         { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 14, borderBottomWidth: 0.5, borderBottomColor: '#efe6dd' },
   iconWrap:     { width: 40, height: 40, borderRadius: 12, backgroundColor: PREMIUM_SURFACE_SOFT, alignItems: 'center', justifyContent: 'center' },
   label:        { fontSize: 15, fontWeight: '700', color: '#111' },
   sub:          { fontSize: 12, color: '#8c847d', marginTop: 2 },
-  logoutBtn:    { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 14 },
-  logoutText:   { fontSize: 15, fontWeight: '700', color: THEME.status.danger },
+  achievementOn: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#f0e5d9', padding: 10 },
+  achievementOff:{ flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: '#f8f3ee', borderRadius: 12, borderWidth: 1, borderColor: '#efe4d7', padding: 10 },
+  achievementIcon:{ fontSize: 22 },
+  achievementIconOff:{ fontSize: 20, opacity: 0.75 },
+  achievementTitle:{ fontSize: 13, fontWeight: '700', color: '#222' },
+  achievementTitleOff:{ fontSize: 13, fontWeight: '700', color: '#8f7e70' },
+  achievementDesc:{ fontSize: 12, color: '#777', marginTop: 1 },
+  emptyAchText: { color: '#8c847d', fontSize: 13, lineHeight: 19 },
+  logoutBtn:    { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, borderRadius: 30, paddingVertical: 14, backgroundColor: '#2f1d14', borderWidth: 1, borderColor: '#513728', marginBottom: 4 },
+  logoutText:   { fontSize: 15, fontWeight: '800', color: '#fff5eb' },
 });
 
 const caf = StyleSheet.create({

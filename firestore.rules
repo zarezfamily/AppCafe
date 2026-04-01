@@ -52,5 +52,16 @@ service cloud.firestore {
         && request.resource.data.authorUid == resource.data.authorUid;
       allow delete: if isSignedIn() && resource.data.authorUid == request.auth.uid;
     }
+
+    match /newsletter_subscribers/{subscriberId} {
+      allow read: if isSignedIn() && subscriberId == request.auth.uid;
+      allow create, update: if isSignedIn()
+        && subscriberId == request.auth.uid
+        && request.resource.data.uid is string
+        && request.resource.data.uid == request.auth.uid
+        && hasString('email', 5, 200)
+        && request.resource.data.subscribed is bool;
+      allow delete: if false;
+    }
   }
 }

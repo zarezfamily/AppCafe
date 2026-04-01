@@ -10,6 +10,8 @@ App móvil para registrar, puntuar y gestionar tu colección de cafés. Escanea 
 - 📸 **Foto del café** (guardada localmente)
 - 🏆 **Ranking global** — los 5 cafés más votados en tiempo real
 - 📦 **Mi Bodega** — tu colección personal con opción de eliminar entradas
+- 💬 **Comunidad / foro** — hilos, respuestas, imágenes y acciones de autor
+- ✉️ **Newsletter** — suscripción desde la pestaña Más guardada en Firestore
 
 ## 🛠️ Tecnologías
 
@@ -74,11 +76,11 @@ service cloud.firestore {
 }
 ```
 
-## 🔧 Foro listo (Firestore + Storage)
+## 🔧 Firebase listo (Firestore + Storage)
 
 El proyecto ya incluye:
 
-- `firestore.rules` (incluye reglas para `foro_hilos` y `foro_respuestas`)
+- `firestore.rules` (incluye reglas para `foro_hilos`, `foro_respuestas` y `newsletter_subscribers`)
 - `storage.rules` (subida de imágenes del foro en `foro_hilos/**`)
 - `firebase.json` (apunta a ambos archivos de reglas)
 - `.env.example` (variables mínimas para arrancar)
@@ -90,6 +92,18 @@ firebase login
 firebase use <tu_project_id>
 firebase deploy --only firestore:rules,storage
 ```
+
+Estado actual en este proyecto:
+
+- `firestore.rules` ya se desplegó correctamente en `miappdecafe`.
+- `storage.rules` no puede desplegarse hasta activar Firebase Storage una vez en la consola del proyecto.
+
+Para activarlo:
+
+1. Abre Firebase Console para `miappdecafe`.
+2. Entra en `Storage`.
+3. Pulsa `Get Started` y completa la inicialización.
+4. Después ejecuta `npx firebase-tools deploy --only storage --project miappdecafe`.
 
 Variables mínimas en `.env` para que la subida de fotos funcione:
 

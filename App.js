@@ -8,9 +8,10 @@ import * as ImagePicker from 'expo-image-picker';
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as Location from 'expo-location';
 import * as SecureStore from 'expo-secure-store';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import {
-  ActivityIndicator, Alert, Dimensions,
+  ActivityIndicator, Alert, Animated, Dimensions,
+  Easing,
   FlatList,
   Image,
   KeyboardAvoidingView,
@@ -29,12 +30,60 @@ import {
   addDocument, deleteDocument, getCollection, getDocument,
   getUserCafes,
   loginUser, registerUser, resetPassword,
-  setDocument, updateDocument,
+  setDocument, updateDocument, uploadImageToStorage,
 } from './firebaseConfig';
 
 const { width: W, height: H } = Dimensions.get('window');
 const APP_VERSION = '2.1.0';
 const GOOGLE_PLACES_KEY = 'AIzaSyDWW3lsdg7jgKYtVNcji-5gyDtv-QUWOpA';
+const CLEAN_COFFEE_IMAGE = 'https://images.openfoodfacts.org/images/products/761/303/656/9927/front_en.44.400.jpg';
+const PREMIUM_ACCENT = '#8f5e3b';
+const PREMIUM_ACCENT_DEEP = '#5d4030';
+const PREMIUM_SURFACE_SOFT = '#f6ede3';
+const PREMIUM_SURFACE_TINT = '#fbf5ee';
+const PREMIUM_BORDER_SOFT = '#e4d3c2';
+const THEME = {
+  brand: {
+    accent: PREMIUM_ACCENT,
+    accentDeep: PREMIUM_ACCENT_DEEP,
+    primary: '#2f1d14',
+    primaryBorder: '#4f3425',
+    primaryBorderStrong: '#5a3c2a',
+    onPrimary: '#fff9f1',
+    soft: PREMIUM_SURFACE_SOFT,
+    tint: PREMIUM_SURFACE_TINT,
+    borderSoft: PREMIUM_BORDER_SOFT,
+  },
+  status: {
+    success: '#5f8f61',
+    successSoft: '#eaf3ea',
+    danger: '#a44f45',
+    favorite: '#d0a646',
+  },
+  text: {
+    primary: '#111',
+    secondary: '#888',
+    muted: '#aaa',
+    tertiary: '#555',
+    inverse: '#fff',
+  },
+  surface: {
+    base: '#fff',
+    subtle: '#f9f9f9',
+    soft: '#f5f5f5',
+    softAlt: '#f8f7f4',
+  },
+  border: {
+    soft: '#eee',
+    subtle: '#f0f0f0',
+    muted: '#ddd4cb',
+  },
+  icon: {
+    inactive: '#888',
+    muted: '#aaa',
+    faint: '#ccc',
+  },
+};
 
 const KEY_EMAIL    = 'etiove_email';
 const KEY_PASSWORD = 'etiove_password';
@@ -43,6 +92,26 @@ const KEY_FAVS     = 'etiove_favorites';
 const KEY_PREFS    = 'etiove_preferences';
 const KEY_PROFILE  = 'etiove_profile';
 const KEY_VOTES    = 'etiove_votes'; // cafés ya votados por el usuario
+const KEY_OFFERS_CACHE = 'etiove_offers_cache';
+const KEY_GAMIFICATION = 'etiove_gamification';
+const KEY_HAS_ACCOUNT = 'etiove_has_account';
+const OFFERS_CACHE_TTL_MS = 1000 * 60 * 60 * 8;
+
+const XP_RULES = {
+  vote: 8,
+  photo: 15,
+  review: 14,
+  addCafe: 18,
+  favorite: 3,
+};
+
+const LEVELS = [
+  { name: 'Novato', icon: '🌱', minXp: 0 },
+  { name: 'Aficionado', icon: '☕', minXp: 220 },
+  { name: 'Catador', icon: '🎯', minXp: 700 },
+  { name: 'Experto', icon: '⭐', minXp: 1700 },
+  { name: 'Maestro', icon: '👑', minXp: 3400 },
+];
 
 const AuthContext = createContext(null);
 const useAuth = () => useContext(AuthContext);
@@ -86,9 +155,110 @@ const PAISES = [
 
 const getFlagForPais = (pais) => PAISES.find(p => p.value === pais)?.flag || '🌍';
 
+const FORUM_CATEGORIES = [
+  { id: 'general', emoji: '💬', label: 'General', desc: 'Todo lo demás relacionado con café' },
+  { id: 'metodos', emoji: '☕', label: 'Métodos de preparación', desc: 'V60, espresso, prensa francesa...' },
+  { id: 'compras', emoji: '🛒', label: 'Compras y tostadores', desc: 'Recomendaciones y dónde comprar' },
+  { id: 'novedades', emoji: '🆕', label: 'Novedades', desc: 'Cafés nuevos, eventos y ferias' },
+  { id: 'aprende', emoji: '🎓', label: 'Aprende', desc: 'Dudas de novatos, técnica, agua y molienda' },
+];
+
 // ─── UTILIDADES ───────────────────────────────────────────────────────────────
 const normalize = (str) =>
   (str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+const csvToSet = (value) => new Set(String(value || '').split('|').map(v => v.trim()).filter(Boolean));
+const setToCsv = (set) => Array.from(set).join('|');
+
+const formatRelativeTime = (value) => {
+  if (!value) return 'ahora';
+  const date = new Date(value);
+  const diff = Date.now() - date.getTime();
+  const min = Math.floor(diff / 60000);
+  const h = Math.floor(min / 60);
+  const d = Math.floor(h / 24);
+  if (min < 60) return `${Math.max(1, min)}m`;
+  if (h < 24) return `${h}h`;
+  if (d < 7) return `${d}d`;
+  return `${Math.floor(d / 7)} sem`;
+};
+
+const getCleanCoffeePhoto = (foto) => foto || CLEAN_COFFEE_IMAGE;
+
+const defaultGamification = () => ({
+  xp: 0,
+  votesCount: 0,
+  photosCount: 0,
+  reviewsCount: 0,
+  cafesAddedCount: 0,
+  favoritesMarkedCount: 0,
+  countriesRated: [],
+  specialOriginsTasted: [],
+  achievementIds: [],
+  updatedAt: Date.now(),
+});
+
+const getLevelFromXp = (xp) => {
+  let current = LEVELS[0];
+  LEVELS.forEach((lvl) => { if (xp >= lvl.minXp) current = lvl; });
+  return current;
+};
+
+const computeXp = (state) => (
+  state.votesCount * XP_RULES.vote +
+  state.photosCount * XP_RULES.photo +
+  state.reviewsCount * XP_RULES.review +
+  state.cafesAddedCount * XP_RULES.addCafe +
+  state.favoritesMarkedCount * XP_RULES.favorite
+);
+
+const computeAchievements = (state) => {
+  const lvl = getLevelFromXp(state.xp);
+  const out = [];
+  if (state.votesCount >= 3) out.push('primera_cata');
+  if (state.photosCount >= 12) out.push('fotografo');
+  if (state.countriesRated.length >= 8) out.push('viajero');
+  if (state.votesCount >= 30) out.push('adicto');
+  if (lvl.name === 'Maestro') out.push('maestro_catador');
+  if (state.favoritesMarkedCount >= 25) out.push('coleccionista');
+  if (state.reviewsCount >= 12) out.push('critico');
+  if (state.specialOriginsTasted.length >= 1) out.push('origen_unico');
+  return out;
+};
+
+const normalizeGamification = (state) => {
+  const next = {
+    ...defaultGamification(),
+    ...state,
+    countriesRated: Array.from(new Set((state.countriesRated || []).filter(Boolean))),
+    specialOriginsTasted: Array.from(new Set((state.specialOriginsTasted || []).filter(Boolean))),
+  };
+  next.xp = computeXp(next);
+  next.achievementIds = computeAchievements(next);
+  next.updatedAt = Date.now();
+  return next;
+};
+
+const getAchievementDefs = () => ([
+  { id: 'primera_cata', icon: '🥇', title: 'Primera cata', desc: 'Valorar 3 cafés' },
+  { id: 'fotografo', icon: '📸', title: 'Fotógrafo', desc: 'Subir 12 fotos' },
+  { id: 'viajero', icon: '🌍', title: 'Viajero', desc: 'Probar cafés de 8 países distintos' },
+  { id: 'adicto', icon: '🔥', title: 'Adicto', desc: 'Valorar 30 cafés' },
+  { id: 'maestro_catador', icon: '👑', title: 'Maestro Catador', desc: 'Alcanzar nivel Maestro' },
+  { id: 'coleccionista', icon: '❤️', title: 'Coleccionista', desc: 'Marcar 25 favoritos' },
+  { id: 'critico', icon: '✍️', title: 'Crítico', desc: 'Escribir 12 reseñas' },
+  { id: 'origen_unico', icon: '🌱', title: 'Origen único', desc: 'Probar Geisha, Bourbon Pointu o Yemen' },
+]);
+
+function PackshotImage({ uri, frameStyle, imageStyle }) {
+  return (
+    <View style={[s.packshotFrame, frameStyle]}>
+      <View style={s.packshotInner}>
+        <Image source={{ uri: getCleanCoffeePhoto(uri) }} style={[s.packshotImage, imageStyle]} resizeMode="contain" />
+      </View>
+    </View>
+  );
+}
 
 // ─── CUESTIONARIO ─────────────────────────────────────────────────────────────
 const QUIZ = [
@@ -226,7 +396,7 @@ function SearchInput({ value, onChangeText, onSearch, allCafes, placeholder }) {
         <View style={srch.dropdown}>
           {suggestions.map((sg, i) => (
             <TouchableOpacity key={i} style={srch.suggItem} onPress={() => selectSuggestion(sg)}>
-              <Ionicons name="search-outline" size={14} color="#aaa" />
+              <Ionicons name="search-outline" size={14} color={THEME.icon.muted} />
               <Text style={srch.suggText}>{sg}</Text>
               <Ionicons name="arrow-up-outline" size={12} color="#ddd" style={{ marginLeft: 'auto', transform: [{ rotate: '45deg' }] }} />
             </TouchableOpacity>
@@ -238,7 +408,7 @@ function SearchInput({ value, onChangeText, onSearch, allCafes, placeholder }) {
 }
 
 // ─── QUIZ ─────────────────────────────────────────────────────────────────────
-function QuizSection({ allCafes }) {
+function QuizSection({ allCafes, onGamifyEvent }) {
   const [step, setStep]           = useState(0);
   const [prefs, setPrefs]         = useState({});
   const [resultados, setResultados] = useState([]);
@@ -270,9 +440,11 @@ function QuizSection({ allCafes }) {
   };
 
   const toggleFav = async (cafe) => {
-    const nf = favs.includes(cafe.id) ? favs.filter(f => f !== cafe.id) : [...favs, cafe.id];
+    const wasFav = favs.includes(cafe.id);
+    const nf = wasFav ? favs.filter(f => f !== cafe.id) : [...favs, cafe.id];
     setFavs(nf);
     await SecureStore.setItemAsync(KEY_FAVS, JSON.stringify(nf)).catch(() => {});
+    if (!wasFav) onGamifyEvent?.('favorite_mark', { cafe });
   };
 
   const reiniciar = () => { setStep(0); setPrefs({}); setResultados([]); SecureStore.deleteItemAsync(KEY_PREFS).catch(() => {}); };
@@ -304,18 +476,18 @@ function QuizSection({ allCafes }) {
             </TouchableOpacity>
           ))}
         </View>
-        {step > 1 && <TouchableOpacity onPress={() => setStep(step - 1)} style={{ alignItems: 'center', marginTop: 8 }}><Text style={{ color: '#aaa', fontSize: 13 }}>← Anterior</Text></TouchableOpacity>}
+        {step > 1 && <TouchableOpacity onPress={() => setStep(step - 1)} style={{ alignItems: 'center', marginTop: 8 }}><Text style={{ color: THEME.text.muted, fontSize: 13 }}>← Anterior</Text></TouchableOpacity>}
       </View>
     );
   }
 
   return (
     <View>
-      {cafeDetalle && <CafeDetailScreen cafe={cafeDetalle} onClose={() => setCafeDetalle(null)} favs={favs} onToggleFav={toggleFav} votes={votes} setVotes={setVotes} />}
+      {cafeDetalle && <CafeDetailScreen cafe={cafeDetalle} onClose={() => setCafeDetalle(null)} favs={favs} onToggleFav={toggleFav} votes={votes} setVotes={setVotes} onVote={(c) => onGamifyEvent?.('vote', { cafe: c })} />}
       <View style={q.resultsHeader}>
         <View><Text style={q.resultsTitle}>Cafés para ti ✨</Text><Text style={q.resultsSub}>Basado en tus preferencias</Text></View>
         <TouchableOpacity onPress={reiniciar} style={q.resetBtn}>
-          <Ionicons name="refresh-outline" size={16} color="#e8590c" />
+          <Ionicons name="refresh-outline" size={16} color={PREMIUM_ACCENT_DEEP} />
           <Text style={q.resetText}>Repetir</Text>
         </TouchableOpacity>
       </View>
@@ -330,7 +502,7 @@ function QuizSection({ allCafes }) {
 }
 
 // ─── DETALLE CAFÉ ─────────────────────────────────────────────────────────────
-function CafeDetailScreen({ cafe, onClose, onDelete, favs = [], onToggleFav, votes = [], setVotes }) {
+function CafeDetailScreen({ cafe, onClose, onDelete, favs = [], onToggleFav, votes = [], setVotes, onVote }) {
   if (!cafe) return null;
   const isFav        = favs.includes(cafe.id);
   const yaVotado     = votes.includes(cafe.id);
@@ -354,6 +526,7 @@ function CafeDetailScreen({ cafe, onClose, onDelete, favs = [], onToggleFav, vot
       const newVotes = [...votes, cafe.id];
       setVotes?.(newVotes);
       await SecureStore.setItemAsync(KEY_VOTES, JSON.stringify(newVotes)).catch(() => {});
+      onVote?.(cafe);
       Alert.alert('¡Gracias!', `Has valorado este café con ${estrellas} ⭐\nNueva puntuación media: ${nuevaPuntuacion}.0`);
     } catch { Alert.alert('Error', 'No se pudo guardar tu voto'); setMiVoto(0); }
     finally { setVotando(false); }
@@ -365,15 +538,12 @@ function CafeDetailScreen({ cafe, onClose, onDelete, favs = [], onToggleFav, vot
         <StatusBar barStyle="dark-content" />
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={det.hero}>
-            {cafe.foto
-              ? <Image source={{ uri: cafe.foto }} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
-              : <View style={[StyleSheet.absoluteFillObject, { backgroundColor: '#f5f0eb', alignItems: 'center', justifyContent: 'center' }]}>
-                  <Ionicons name="cafe" size={80} color="#e8590c" />
-                </View>
-            }
+            <View style={[StyleSheet.absoluteFillObject, { backgroundColor: '#f7f4ef', alignItems: 'center', justifyContent: 'center' }]}> 
+              <PackshotImage uri={cafe.foto} frameStyle={s.packshotHeroFrame} imageStyle={s.packshotHeroImage} />
+            </View>
             <View style={det.heroGrad} />
             <TouchableOpacity style={det.backBtn} onPress={onClose}><Ionicons name="chevron-back" size={24} color="#fff" /></TouchableOpacity>
-            {onToggleFav && <TouchableOpacity style={det.favBtn} onPress={() => onToggleFav(cafe)}><Ionicons name={isFav ? 'star' : 'star-outline'} size={22} color={isFav ? '#FFD700' : '#fff'} /></TouchableOpacity>}
+            {onToggleFav && <TouchableOpacity style={det.favBtn} onPress={() => onToggleFav(cafe)}><Ionicons name={isFav ? 'star' : 'star-outline'} size={22} color={isFav ? THEME.status.favorite : THEME.text.inverse} /></TouchableOpacity>}
             {onDelete && <TouchableOpacity style={det.deleteBtn} onPress={() => onDelete(cafe)}><Ionicons name="trash-outline" size={20} color="#fff" /></TouchableOpacity>}
             <View style={det.scoreBox}>
               <Text style={det.scoreNum}>{puntuacionActual}.0</Text>
@@ -402,11 +572,11 @@ function CafeDetailScreen({ cafe, onClose, onDelete, favs = [], onToggleFav, vot
               <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
                 {[1,2,3,4,5].map(n => (
                   <TouchableOpacity key={n} onPress={() => votar(n)} disabled={yaVotado || miVoto > 0 || votando}>
-                    <Ionicons name={n <= (miVoto || (yaVotado ? puntuacionActual : 0)) ? 'star' : 'star-outline'} size={36} color={n <= (miVoto || (yaVotado ? puntuacionActual : 0)) ? '#e8590c' : '#ddd'} />
+                    <Ionicons name={n <= (miVoto || (yaVotado ? puntuacionActual : 0)) ? 'star' : 'star-outline'} size={36} color={n <= (miVoto || (yaVotado ? puntuacionActual : 0)) ? PREMIUM_ACCENT : '#ddd'} />
                   </TouchableOpacity>
                 ))}
               </View>
-              {votando && <ActivityIndicator color="#e8590c" style={{ marginTop: 8 }} />}
+              {votando && <ActivityIndicator color={PREMIUM_ACCENT} style={{ marginTop: 8 }} />}
             </View>
 
             <View style={det.divider} />
@@ -442,7 +612,7 @@ function CafeDetailScreen({ cafe, onClose, onDelete, favs = [], onToggleFav, vot
             <InfoRow icon="flame-outline"    label="Nivel"        value={cafe.tueste} />
             <InfoRow icon="calendar-outline" label="Fecha tueste" value={cafe.fechaTueste} />
 
-            {cafe.preparacion && <><View style={det.divider} /><Text style={det.sectionTitle}>Preparación recomendada</Text><View style={det.prepBox}><Ionicons name="cafe-outline" size={20} color="#e8590c" /><Text style={det.prepText}>{cafe.preparacion}</Text></View></>}
+            {cafe.preparacion && <><View style={det.divider} /><Text style={det.sectionTitle}>Preparación recomendada</Text><View style={det.prepBox}><Ionicons name="cafe-outline" size={20} color={PREMIUM_ACCENT} /><Text style={det.prepText}>{cafe.preparacion}</Text></View></>}
             {cafe.certificaciones && <><View style={det.divider} /><Text style={det.sectionTitle}>Certificaciones</Text><Text style={det.certText}>{cafe.certificaciones}</Text></>}
             {cafe.precio && <View style={det.precioBox}><Text style={det.precioLabel}>Precio orientativo</Text><Text style={det.precioVal}>{cafe.precio}€ / 100g</Text></View>}
             <View style={{ height: 40 }} />
@@ -461,7 +631,7 @@ function PaisPicklist({ value, onChange }) {
     <>
       <TouchableOpacity style={pick.trigger} onPress={() => setOpen(true)}>
         <Text style={pick.triggerText}>{selected.label}</Text>
-        <Ionicons name="chevron-down" size={18} color="#888" />
+        <Ionicons name="chevron-down" size={18} color={THEME.icon.inactive} />
       </TouchableOpacity>
       <Modal visible={open} animationType="slide" transparent onRequestClose={() => setOpen(false)}>
         <View style={pick.overlay}>
@@ -476,7 +646,7 @@ function PaisPicklist({ value, onChange }) {
               renderItem={({ item }) => (
                 <TouchableOpacity style={[pick.item, item.value === value && pick.itemActive]} onPress={() => { onChange(item.value); setOpen(false); }}>
                   <Text style={pick.itemText}>{item.label}</Text>
-                  {item.value === value && <Ionicons name="checkmark" size={20} color="#e8590c" />}
+                  {item.value === value && <Ionicons name="checkmark" size={20} color={PREMIUM_ACCENT} />}
                 </TouchableOpacity>
               )}
             />
@@ -498,6 +668,8 @@ function ProfileScreen({ onClose }) {
   const [pais,      setPais]      = useState('España');
   const [foto,      setFoto]      = useState(null);
   const [guardando, setGuardando] = useState(false);
+  const emailValido = /^\S+@\S+\.\S+$/.test(String(email || '').trim());
+  const camposObligatoriosCompletos = !!nombre.trim() && !!apellidos.trim() && !!alias.trim() && !!email.trim();
 
   useEffect(() => {
     SecureStore.getItemAsync(KEY_PROFILE).then(v => {
@@ -518,9 +690,24 @@ function ProfileScreen({ onClose }) {
   };
 
   const guardar = async () => {
+    if (!camposObligatoriosCompletos) {
+      return Alert.alert('Campos obligatorios', 'Nombre, apellidos, alias y email son obligatorios.');
+    }
+    if (!emailValido) {
+      return Alert.alert('Email inválido', 'Introduce un email válido para continuar.');
+    }
+
     setGuardando(true);
     try {
-      await SecureStore.setItemAsync(KEY_PROFILE, JSON.stringify({ nombre, alias, apellidos, email, telefono, pais, foto }));
+      await SecureStore.setItemAsync(KEY_PROFILE, JSON.stringify({
+        nombre: nombre.trim(),
+        alias: alias.trim(),
+        apellidos: apellidos.trim(),
+        email: email.trim(),
+        telefono,
+        pais,
+        foto,
+      }));
       Alert.alert('✅ Guardado', 'Tu perfil ha sido actualizado');
       onClose();
     } catch { Alert.alert('Error', 'No se pudo guardar el perfil'); }
@@ -544,23 +731,23 @@ function ProfileScreen({ onClose }) {
             }
             <View style={prf.avatarBadge}><Ionicons name="camera" size={14} color="#fff" /></View>
             <Text style={prf.avatarEmail}>{user?.email}</Text>
-            <Text style={{ fontSize: 12, color: '#aaa' }}>Toca para cambiar foto</Text>
+            <Text style={{ fontSize: 12, color: THEME.text.muted }}>Toca para cambiar foto</Text>
           </TouchableOpacity>
 
-          <Text style={s.label}>Nombre</Text>
+          <Text style={s.label}>Nombre *</Text>
           <TextInput style={s.input} placeholder="Tu nombre" placeholderTextColor="#bbb" value={nombre} onChangeText={setNombre} />
-          <Text style={s.label}>Apellidos</Text>
+          <Text style={s.label}>Apellidos *</Text>
           <TextInput style={s.input} placeholder="Tus apellidos" placeholderTextColor="#bbb" value={apellidos} onChangeText={setApellidos} />
-          <Text style={s.label}>Alias</Text>
+          <Text style={s.label}>Alias *</Text>
           <TextInput style={s.input} placeholder="@tu_alias" placeholderTextColor="#bbb" value={alias} onChangeText={setAlias} autoCapitalize="none" />
-          <Text style={s.label}>Email</Text>
+          <Text style={s.label}>Email *</Text>
           <TextInput style={s.input} placeholder="tu@email.com" placeholderTextColor="#bbb" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" />
           <Text style={s.label}>Teléfono</Text>
           <TextInput style={s.input} placeholder="+34 600 000 000" placeholderTextColor="#bbb" value={telefono} onChangeText={setTelefono} keyboardType="phone-pad" />
           <Text style={s.label}>País</Text>
           <PaisPicklist value={pais} onChange={setPais} />
 
-          <TouchableOpacity style={[s.redBtn, { marginTop: 24 }]} onPress={guardar} disabled={guardando}>
+          <TouchableOpacity style={[s.redBtn, { marginTop: 24, opacity: guardando || !camposObligatoriosCompletos ? 0.8 : 1 }]} onPress={guardar} disabled={guardando}>
             {guardando ? <ActivityIndicator color="#fff" /> : <Text style={s.redBtnText}>Guardar cambios</Text>}
           </TouchableOpacity>
         </ScrollView>
@@ -694,7 +881,7 @@ function CafeteriasScreen() {
   if (cargando) return (
     <View style={caf.loadBox}>
       <Text style={caf.loadEmoji}>☕</Text>
-      <ActivityIndicator color="#e8590c" size="large" />
+      <ActivityIndicator color={PREMIUM_ACCENT} size="large" />
       <Text style={caf.loadTitle}>Buscando cafeterías</Text>
       <Text style={caf.loadSub}>Localizando las mejores cerca de ti...</Text>
     </View>
@@ -734,7 +921,7 @@ function CafeteriasScreen() {
                 </TouchableOpacity>
                 {/* Badge abierto/cerrado */}
                 {seleccionada.abierto !== null && (
-                  <View style={[caf.badgeEstado, { backgroundColor: seleccionada.abierto ? '#27ae60' : '#e74c3c' }]}>
+                  <View style={[caf.badgeEstado, { backgroundColor: seleccionada.abierto ? THEME.status.success : THEME.status.danger }]}>
                     <Text style={caf.badgeEstadoText}>{seleccionada.abierto ? '🟢 Abierto ahora' : '🔴 Cerrado'}</Text>
                   </View>
                 )}
@@ -744,7 +931,7 @@ function CafeteriasScreen() {
                   <Text style={caf.detTipo}>{seleccionada.tipo}</Text>
                   <View style={caf.detRatingRow}>
                     {[1,2,3,4,5].map(n => (
-                      <Ionicons key={n} name={n <= Math.round(seleccionada.rating) ? 'star' : 'star-outline'} size={14} color="#FFD700" />
+                      <Ionicons key={n} name={n <= Math.round(seleccionada.rating) ? 'star' : 'star-outline'} size={14} color={THEME.status.favorite} />
                     ))}
                     <Text style={caf.detRatingNum}>{seleccionada.rating}</Text>
                     <Text style={caf.detReseñas}>({seleccionada.numResenas} reseñas)</Text>
@@ -756,13 +943,13 @@ function CafeteriasScreen() {
                 {/* Distancia y dirección */}
                 <View style={caf.detInfoRow}>
                   <View style={caf.detInfoItem}>
-                    <Ionicons name="location" size={20} color="#e8590c" />
+                    <Ionicons name="location" size={20} color={PREMIUM_ACCENT} />
                     <Text style={caf.detInfoLabel}>{seleccionada.distancia < 1000 ? `${seleccionada.distancia}m` : `${(seleccionada.distancia/1000).toFixed(1)}km`}</Text>
                   </View>
-                  {seleccionada.wifi && <View style={caf.detInfoItem}><Ionicons name="wifi" size={20} color="#e8590c" /><Text style={caf.detInfoLabel}>WiFi</Text></View>}
-                  {seleccionada.terraza && <View style={caf.detInfoItem}><Ionicons name="sunny" size={20} color="#e8590c" /><Text style={caf.detInfoLabel}>Terraza</Text></View>}
-                  {seleccionada.takeaway && <View style={caf.detInfoItem}><Ionicons name="bag-handle" size={20} color="#e8590c" /><Text style={caf.detInfoLabel}>Para llevar</Text></View>}
-                  {seleccionada.vegano && <View style={caf.detInfoItem}><Ionicons name="leaf" size={20} color="#27ae60" /><Text style={[caf.detInfoLabel, { color: '#27ae60' }]}>Vegano</Text></View>}
+                  {seleccionada.wifi && <View style={caf.detInfoItem}><Ionicons name="wifi" size={20} color={PREMIUM_ACCENT} /><Text style={caf.detInfoLabel}>WiFi</Text></View>}
+                  {seleccionada.terraza && <View style={caf.detInfoItem}><Ionicons name="sunny" size={20} color={PREMIUM_ACCENT} /><Text style={caf.detInfoLabel}>Terraza</Text></View>}
+                  {seleccionada.takeaway && <View style={caf.detInfoItem}><Ionicons name="bag-handle" size={20} color={PREMIUM_ACCENT} /><Text style={caf.detInfoLabel}>Para llevar</Text></View>}
+                  {seleccionada.vegano && <View style={caf.detInfoItem}><Ionicons name="leaf" size={20} color={THEME.status.success} /><Text style={[caf.detInfoLabel, { color: THEME.status.success }]}>Vegano</Text></View>}
                 </View>
 
                 {/* Especialidades */}
@@ -806,13 +993,13 @@ ${seleccionada.barrio}` : ''}</Text>
                     <Text style={caf.secTitulo}>📞 Contacto</Text>
                     {seleccionada.telefono && (
                       <TouchableOpacity onPress={() => Linking.openURL(`tel:${seleccionada.telefono}`)} style={caf.contactBtn}>
-                        <Ionicons name="call-outline" size={16} color="#e8590c" />
+                        <Ionicons name="call-outline" size={16} color={PREMIUM_ACCENT} />
                         <Text style={caf.contactText}>{seleccionada.telefono}</Text>
                       </TouchableOpacity>
                     )}
                     {seleccionada.web && (
                       <TouchableOpacity onPress={() => Linking.openURL(seleccionada.web.startsWith('http') ? seleccionada.web : `https://${seleccionada.web}`)} style={caf.contactBtn}>
-                        <Ionicons name="globe-outline" size={16} color="#e8590c" />
+                        <Ionicons name="globe-outline" size={16} color={PREMIUM_ACCENT} />
                         <Text style={caf.contactText}>{seleccionada.web.replace('https://','').replace('http://','').split('/')[0]}</Text>
                       </TouchableOpacity>
                     )}
@@ -827,10 +1014,10 @@ ${seleccionada.barrio}` : ''}</Text>
                       <View key={i} style={caf.resena}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
                           <Text style={caf.resenaAutor}>{r.autor}</Text>
-                          <Text style={{ fontSize: 11, color: '#aaa' }}>{r.tiempo}</Text>
+                          <Text style={{ fontSize: 11, color: THEME.text.muted }}>{r.tiempo}</Text>
                         </View>
                         <View style={{ flexDirection: 'row', gap: 2, marginBottom: 4 }}>
-                          {[1,2,3,4,5].map(n => <Ionicons key={n} name={n <= r.nota ? 'star' : 'star-outline'} size={11} color="#FFD700" />)}
+                          {[1,2,3,4,5].map(n => <Ionicons key={n} name={n <= r.nota ? 'star' : 'star-outline'} size={11} color={THEME.status.favorite} />)}
                         </View>
                         <Text style={caf.resenaTexto} numberOfLines={4}>{r.texto}</Text>
                       </View>
@@ -855,10 +1042,10 @@ ${seleccionada.barrio}` : ''}</Text>
       <View style={caf.headerBox}>
         <View>
           <Text style={s.pageTitle}>Cafeterías ☕</Text>
-          <Text style={{ fontSize: 13, color: '#888' }}>{cafeterias.length} cerca de ti · ordenadas por distancia</Text>
+          <Text style={{ fontSize: 13, color: THEME.text.secondary }}>{cafeterias.length} cerca de ti · ordenadas por distancia</Text>
         </View>
         <TouchableOpacity onPress={cargarCafeterias} style={caf.refreshBtn}>
-          <Ionicons name="refresh-outline" size={18} color="#e8590c" />
+          <Ionicons name="refresh-outline" size={18} color={PREMIUM_ACCENT_DEEP} />
         </TouchableOpacity>
       </View>
 
@@ -881,7 +1068,7 @@ ${seleccionada.barrio}` : ''}</Text>
               }
               <View style={caf.cardNum}><Text style={caf.cardNumText}>{index + 1}</Text></View>
               {item.abierto !== null && (
-                <View style={[caf.cardEstado, { backgroundColor: item.abierto ? '#27ae60' : '#e74c3c' }]}>
+                <View style={[caf.cardEstado, { backgroundColor: item.abierto ? THEME.status.success : THEME.status.danger }]}>
                   <Text style={caf.cardEstadoText}>{item.abierto ? 'Abierto' : 'Cerrado'}</Text>
                 </View>
               )}
@@ -892,16 +1079,16 @@ ${seleccionada.barrio}` : ''}</Text>
               <Text style={caf.cardTipo}>{item.tipo}</Text>
               {/* Rating */}
               <View style={caf.cardRatingRow}>
-                {[1,2,3,4,5].map(n => <Ionicons key={n} name={n <= Math.round(item.rating) ? 'star' : 'star-outline'} size={12} color="#FFD700" />)}
+                {[1,2,3,4,5].map(n => <Ionicons key={n} name={n <= Math.round(item.rating) ? 'star' : 'star-outline'} size={12} color={THEME.status.favorite} />)}
                 <Text style={caf.cardRatingNum}>{item.rating}</Text>
                 <Text style={caf.cardReseñas}>({item.numResenas})</Text>
               </View>
               {/* Tags */}
               <View style={caf.cardTags}>
-                <View style={caf.cardTag}><Ionicons name="location-outline" size={11} color="#e8590c" /><Text style={caf.cardTagText}>{item.distancia < 1000 ? `${item.distancia}m` : `${(item.distancia/1000).toFixed(1)}km`}</Text></View>
-                {item.wifi     && <View style={caf.cardTag}><Ionicons name="wifi-outline"       size={11} color="#555" /><Text style={caf.cardTagText}>WiFi</Text></View>}
-                {item.terraza  && <View style={caf.cardTag}><Ionicons name="sunny-outline"      size={11} color="#555" /><Text style={caf.cardTagText}>Terraza</Text></View>}
-                {item.takeaway && <View style={caf.cardTag}><Ionicons name="bag-handle-outline" size={11} color="#555" /><Text style={caf.cardTagText}>Para llevar</Text></View>}
+                <View style={caf.cardTag}><Ionicons name="location-outline" size={11} color={PREMIUM_ACCENT} /><Text style={caf.cardTagText}>{item.distancia < 1000 ? `${item.distancia}m` : `${(item.distancia/1000).toFixed(1)}km`}</Text></View>
+                {item.wifi     && <View style={caf.cardTag}><Ionicons name="wifi-outline"       size={11} color={THEME.text.tertiary} /><Text style={caf.cardTagText}>WiFi</Text></View>}
+                {item.terraza  && <View style={caf.cardTag}><Ionicons name="sunny-outline"      size={11} color={THEME.text.tertiary} /><Text style={caf.cardTagText}>Terraza</Text></View>}
+                {item.takeaway && <View style={caf.cardTag}><Ionicons name="bag-handle-outline" size={11} color={THEME.text.tertiary} /><Text style={caf.cardTagText}>Para llevar</Text></View>}
               </View>
               {/* Especialidades */}
               <Text style={caf.cardEspec} numberOfLines={1}>{item.especialidades}</Text>
@@ -919,7 +1106,7 @@ function Stars({ value, onPress, size = 14 }) {
     <View style={{ flexDirection: 'row', gap: 2 }}>
       {[1,2,3,4,5].map(n => (
         <TouchableOpacity key={n} onPress={() => onPress?.(n)} disabled={!onPress}>
-          <Ionicons name={n <= value ? 'star' : 'star-outline'} size={size} color={n <= value ? '#e8590c' : '#ccc'} />
+          <Ionicons name={n <= value ? 'star' : 'star-outline'} size={size} color={n <= value ? THEME.brand.accent : THEME.icon.faint} />
         </TouchableOpacity>
       ))}
     </View>
@@ -929,7 +1116,7 @@ function Stars({ value, onPress, size = 14 }) {
 function Chip({ label, icon }) {
   return (
     <View style={det.chip}>
-      <Ionicons name={icon} size={12} color="#e8590c" />
+      <Ionicons name={icon} size={12} color={PREMIUM_ACCENT} />
       <Text style={det.chipText}>{label}</Text>
     </View>
   );
@@ -938,7 +1125,7 @@ function Chip({ label, icon }) {
 function SensItem({ label, value, icon }) {
   return (
     <View style={det.sensItem}>
-      <Ionicons name={icon} size={18} color="#e8590c" />
+      <Ionicons name={icon} size={18} color={PREMIUM_ACCENT} />
       <Text style={det.sensLabel}>{label}</Text>
       <Text style={det.sensVal}>{value}</Text>
     </View>
@@ -949,7 +1136,7 @@ function InfoRow({ icon, label, value }) {
   if (!value) return null;
   return (
     <View style={det.infoRow}>
-      <Ionicons name={icon} size={16} color="#e8590c" style={{ width: 22 }} />
+      <Ionicons name={icon} size={16} color={PREMIUM_ACCENT} style={{ width: 22 }} />
       <Text style={det.infoLabel}>{label}</Text>
       <Text style={det.infoVal}>{value}</Text>
     </View>
@@ -960,19 +1147,19 @@ function CardHorizontal({ item, badge, onPress, favs = [], onToggleFav }) {
   const isFav = favs.includes(item.id);
   return (
     <TouchableOpacity style={s.cardH} onPress={() => onPress?.(item)} activeOpacity={0.85}>
-      <View style={s.cardHImg}>
-        {item.foto ? <Image source={{ uri: item.foto }} style={StyleSheet.absoluteFillObject} borderRadius={10} resizeMode="cover" /> : <Ionicons name="cafe" size={36} color="#ccc" />}
+      <View style={s.cardHImg}> 
+        <PackshotImage uri={item.foto} frameStyle={s.packshotCardFrame} imageStyle={s.packshotCardImage} />
         <View style={s.badgeRed}><Text style={s.badgeText}>{badge}</Text></View>
         {onToggleFav && (
           <TouchableOpacity style={q.favBtnCard} onPress={() => onToggleFav(item)}>
-            <Ionicons name={isFav ? 'star' : 'star-outline'} size={16} color={isFav ? '#FFD700' : '#fff'} />
+            <Ionicons name={isFav ? 'star' : 'star-outline'} size={16} color={isFav ? THEME.status.favorite : THEME.text.inverse} />
           </TouchableOpacity>
         )}
       </View>
       <Text style={s.cardHOrigin} numberOfLines={1}>{item.region || item.pais || item.origen || 'Sin origen'}</Text>
       <Text style={s.cardHName} numberOfLines={2}>{item.nombre}</Text>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 }}>
-        <Ionicons name="star" size={13} color="#e8590c" />
+        <Ionicons name="star" size={13} color={PREMIUM_ACCENT} />
         <Text style={s.cardHRating}>{item.puntuacion}.0</Text>
         <Text style={s.cardHVotos}>({item.votos || 1})</Text>
       </View>
@@ -984,12 +1171,12 @@ function CardVertical({ item, onDelete, onPress, favs = [], onToggleFav }) {
   const isFav = favs.includes(item.id);
   return (
     <TouchableOpacity style={s.cardV} onPress={() => onPress?.(item)} activeOpacity={0.85}>
-      <View style={s.cardVImg}>
-        {item.foto ? <Image source={{ uri: item.foto }} style={{ width: '100%', height: '100%', borderRadius: 10 }} resizeMode="cover" /> : <Ionicons name="cafe" size={32} color="#ccc" />}
+      <View style={s.cardVImg}> 
+        <PackshotImage uri={item.foto} frameStyle={s.packshotListFrame} imageStyle={s.packshotListImage} />
         <View style={s.badgeRed}><Text style={s.badgeText}>{item.puntuacion}.0</Text></View>
         {onToggleFav && (
           <TouchableOpacity style={[q.favBtnCard, { top: 'auto', bottom: 6, right: 6 }]} onPress={() => onToggleFav(item)}>
-            <Ionicons name={isFav ? 'star' : 'star-outline'} size={14} color={isFav ? '#FFD700' : '#fff'} />
+            <Ionicons name={isFav ? 'star' : 'star-outline'} size={14} color={isFav ? THEME.status.favorite : THEME.text.inverse} />
           </TouchableOpacity>
         )}
       </View>
@@ -1000,7 +1187,7 @@ function CardVertical({ item, onDelete, onPress, favs = [], onToggleFav }) {
         {item.notas ? <Text style={s.cardVNotas} numberOfLines={2}>{item.notas}</Text> : null}
       </View>
       <TouchableOpacity onPress={() => onDelete(item)} style={{ padding: 4 }}>
-        <Ionicons name="trash-outline" size={18} color="#ccc" />
+        <Ionicons name="trash-outline" size={18} color={THEME.icon.faint} />
       </TouchableOpacity>
     </TouchableOpacity>
   );
@@ -1011,10 +1198,10 @@ function TabBtn({ icon, label, tab, active, onPress, badge }) {
   return (
     <TouchableOpacity style={s.tabBtn} onPress={() => onPress(tab)}>
       <View>
-        <Ionicons name={isActive ? icon : `${icon}-outline`} size={22} color={isActive ? '#e8590c' : '#888'} />
+        <Ionicons name={isActive ? icon : `${icon}-outline`} size={22} color={isActive ? THEME.brand.accent : THEME.icon.inactive} />
         {badge > 0 && <View style={s.tabBadge}><Text style={s.tabBadgeText}>{badge}</Text></View>}
       </View>
-      <Text style={[s.tabLabel, isActive && { color: '#e8590c' }]}>{label}</Text>
+      <Text style={[s.tabLabel, isActive && { color: PREMIUM_ACCENT }]}>{label}</Text>
     </TouchableOpacity>
   );
 }
@@ -1022,24 +1209,66 @@ function TabBtn({ icon, label, tab, active, onPress, badge }) {
 function MasItem({ icon, label, sub, onPress }) {
   return (
     <TouchableOpacity style={mas.item} onPress={onPress} activeOpacity={0.7}>
-      <View style={mas.iconWrap}><Ionicons name={icon} size={22} color="#e8590c" /></View>
+      <View style={mas.iconWrap}><Ionicons name={icon} size={22} color={PREMIUM_ACCENT} /></View>
       <View style={{ flex: 1 }}>
         <Text style={mas.label}>{label}</Text>
         {sub && <Text style={mas.sub}>{sub}</Text>}
       </View>
-      <Ionicons name="chevron-forward" size={18} color="#ccc" />
+      <Ionicons name="chevron-forward" size={18} color={THEME.icon.faint} />
     </TouchableOpacity>
   );
 }
 
 // ─── WELCOME ──────────────────────────────────────────────────────────────────
 function WelcomeScreen() {
+  const targetText = 'WELCOME TO\nETIOVE';
+  const [typedCount, setTypedCount] = useState(0);
+  const [cursorOn, setCursorOn] = useState(true);
+  const floatAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const typingTimer = setInterval(() => {
+      setTypedCount((prev) => {
+        if (prev >= targetText.length) return prev;
+        return prev + 1;
+      });
+    }, 95);
+    return () => clearInterval(typingTimer);
+  }, []);
+
+  useEffect(() => {
+    const cursorTimer = setInterval(() => setCursorOn((v) => !v), 430);
+    return () => clearInterval(cursorTimer);
+  }, []);
+
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(floatAnim, { toValue: 1, duration: 1300, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+        Animated.timing(floatAnim, { toValue: 0, duration: 1300, easing: Easing.inOut(Easing.ease), useNativeDriver: true }),
+      ])
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [floatAnim]);
+
+  const typed = targetText.slice(0, typedCount);
+  const [topRaw = '', bottomRaw = ''] = typed.split('\n');
+  const showCursorTop = cursorOn && !typed.includes('\n');
+  const showCursorBottom = cursorOn && typed.includes('\n');
+  const floatTranslateY = floatAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -5] });
+
   return (
     <SafeAreaView style={s.welcomeScreen}>
-      <StatusBar barStyle="light-content" backgroundColor="#1a0a00" />
-      <Ionicons name="cafe" size={80} color="#e8590c" />
-      <Text style={s.welcomeTitle}>Etiove</Text>
-      <Text style={s.welcomeSub}>Tu colección de cafés</Text>
+      <StatusBar barStyle="dark-content" backgroundColor="#f6efe7" />
+      <View style={s.welcomeAuraOne} />
+      <View style={s.welcomeAuraTwo} />
+      <Animated.View style={[s.welcomeCard, { transform: [{ translateY: floatTranslateY }] }]}> 
+        <View style={s.welcomeTypeBox}>
+          <Text style={s.welcomeLineTop}>{topRaw}{showCursorTop ? '|' : ' '}</Text>
+          <Text style={s.welcomeLineBottom}>{bottomRaw}{showCursorBottom ? '|' : ' '}</Text>
+        </View>
+      </Animated.View>
     </SafeAreaView>
   );
 }
@@ -1053,30 +1282,48 @@ function AuthScreen({ onAuth }) {
   const [cargando, setCargando] = useState(false);
   const [faceIdDisponible, setFID] = useState(false);
   const [faceIdGuardado, setFIG]   = useState(false);
+  const [hasAccount, setHasAccount] = useState(false);
 
   useEffect(() => {
     (async () => {
       try {
-        const ok = await LocalAuthentication.hasHardwareAsync() && await LocalAuthentication.isEnrolledAsync();
-        setFID(ok);
+        const hasHardware = await LocalAuthentication.hasHardwareAsync();
+        const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+        const supportedTypes = await LocalAuthentication.supportedAuthenticationTypesAsync();
+        const hasFaceId = supportedTypes.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION);
+        setFID(hasHardware && isEnrolled && hasFaceId);
         if (await SecureStore.getItemAsync(KEY_REMEMBER) === 'true') {
           const em = await SecureStore.getItemAsync(KEY_EMAIL);
           const pw = await SecureStore.getItemAsync(KEY_PASSWORD);
           if (em && pw) { setEmail(em); setPassword(pw); setRecordar(true); setFIG(true); }
         }
+        setHasAccount((await SecureStore.getItemAsync(KEY_HAS_ACCOUNT)) === 'true');
       } catch {}
     })();
   }, []);
 
   const guardarCreds = async (em, pw) => { await SecureStore.setItemAsync(KEY_EMAIL, em); await SecureStore.setItemAsync(KEY_PASSWORD, pw); await SecureStore.setItemAsync(KEY_REMEMBER, 'true'); };
   const borrarCreds  = async () => { await SecureStore.deleteItemAsync(KEY_EMAIL); await SecureStore.deleteItemAsync(KEY_PASSWORD); await SecureStore.setItemAsync(KEY_REMEMBER, 'false'); setFIG(false); };
+  const marcarCuenta = async () => {
+    await SecureStore.setItemAsync(KEY_HAS_ACCOUNT, 'true').catch(() => {});
+    setHasAccount(true);
+  };
 
   const handleSubmit = async () => {
     if (!email.trim() || (!password.trim() && modo !== 'reset')) return Alert.alert('Aviso', 'Rellena todos los campos');
     setCargando(true);
     try {
-      if (modo === 'login') { const user = await loginUser(email.trim(), password); if (recordar) await guardarCreds(email.trim(), password); else await borrarCreds(); onAuth(user); }
-      else if (modo === 'register') { onAuth(await registerUser(email.trim(), password)); }
+      if (modo === 'login') {
+        const user = await loginUser(email.trim(), password);
+        await marcarCuenta();
+        if (recordar) await guardarCreds(email.trim(), password); else await borrarCreds();
+        onAuth(user);
+      }
+      else if (modo === 'register') {
+        const user = await registerUser(email.trim(), password);
+        await marcarCuenta();
+        onAuth(user);
+      }
       else { await resetPassword(email.trim()); Alert.alert('✅ Email enviado', 'Revisa tu bandeja de entrada'); setModo('login'); }
     } catch (e) { Alert.alert('Error', e.message || 'Algo salió mal'); }
     finally { setCargando(false); }
@@ -1084,7 +1331,27 @@ function AuthScreen({ onAuth }) {
 
   const handleFaceId = async () => {
     try {
-      if (!(await LocalAuthentication.authenticateAsync({ promptMessage: 'Accede a Etiove' })).success) return;
+      const auth = await LocalAuthentication.authenticateAsync({
+        promptMessage: 'Accede a Etiove',
+        disableDeviceFallback: true,
+        fallbackLabel: '',
+      });
+      if (!auth.success) {
+        const errorMap = {
+          user_cancel: 'Cancelaste la autenticación.',
+          app_cancel: 'La app canceló la autenticación.',
+          system_cancel: 'iOS interrumpió la autenticación. Inténtalo de nuevo.',
+          not_enrolled: 'Face ID no está configurado en este iPhone.',
+          passcode_not_set: 'Debes configurar un código de desbloqueo para usar Face ID.',
+          lockout: 'Face ID está bloqueado temporalmente. Desbloquea el iPhone con tu código y vuelve a intentarlo.',
+          not_available: 'Face ID no está disponible ahora mismo en este dispositivo.',
+          authentication_failed: 'No se pudo verificar tu rostro. Vuelve a intentarlo.',
+          user_fallback: 'Face ID no está disponible ahora mismo. Revisa su configuración.',
+          invalid_context: 'No se pudo iniciar Face ID en este momento.',
+        };
+        Alert.alert('Face ID', errorMap[auth.error] || 'No se pudo completar la autenticación biométrica.');
+        return;
+      }
       const em = await SecureStore.getItemAsync(KEY_EMAIL); const pw = await SecureStore.getItemAsync(KEY_PASSWORD);
       if (!em || !pw) return Alert.alert('Aviso', 'Primero inicia sesión y activa "Recordarme"');
       setCargando(true); onAuth(await loginUser(em, pw));
@@ -1097,20 +1364,59 @@ function AuthScreen({ onAuth }) {
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={s.authScroll}>
-          <Ionicons name="cafe" size={64} color="#e8590c" style={{ marginBottom: 8 }} />
-          <Text style={s.authTitle}>Etiove ☕</Text>
-          <Text style={s.authSub}>{modo === 'login' ? 'Inicia sesión para continuar' : modo === 'register' ? 'Crea tu cuenta gratuita' : 'Recupera tu contraseña'}</Text>
-          <Text style={s.label}>Email</Text>
-          <TextInput style={s.input} placeholder="tu@email.com" placeholderTextColor="#bbb" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" />
-          {modo !== 'reset' && <><Text style={s.label}>Contraseña</Text><TextInput style={s.input} placeholder="Mínimo 6 caracteres" placeholderTextColor="#bbb" value={password} onChangeText={setPassword} secureTextEntry /></>}
-          {modo === 'login' && <View style={s.rememberRow}><Switch value={recordar} onValueChange={v => { setRecordar(v); if (!v) borrarCreds(); }} trackColor={{ false: '#ddd', true: '#e8590c' }} thumbColor="#fff" /><Text style={s.rememberText}>Recordar contraseña</Text></View>}
-          <TouchableOpacity style={s.redBtn} onPress={handleSubmit} disabled={cargando}>
-            {cargando ? <ActivityIndicator color="#fff" /> : <Text style={s.redBtnText}>{modo === 'login' ? 'Entrar' : modo === 'register' ? 'Crear cuenta' : 'Enviar enlace'}</Text>}
-          </TouchableOpacity>
-          {modo === 'login' && faceIdDisponible && faceIdGuardado && <TouchableOpacity style={s.faceIdBtn} onPress={handleFaceId} disabled={cargando}><Ionicons name="scan-outline" size={22} color="#e8590c" /><Text style={s.faceIdText}>Entrar con Face ID</Text></TouchableOpacity>}
-          <View style={s.authLinks}>
-            {modo === 'login' && <><TouchableOpacity onPress={() => setModo('register')}><Text style={s.authLink}>¿Sin cuenta? Regístrate</Text></TouchableOpacity><TouchableOpacity onPress={() => setModo('reset')}><Text style={[s.authLink, { color: '#888' }]}>¿Olvidaste la contraseña?</Text></TouchableOpacity></>}
-            {modo !== 'login' && <TouchableOpacity onPress={() => setModo('login')}><Text style={s.authLink}>← Volver</Text></TouchableOpacity>}
+          <View style={s.authShell}>
+            <View style={s.authAuraOne} />
+            <View style={s.authAuraTwo} />
+
+            <View style={s.authBrandBlock}>
+              <View style={s.wordmarkWrap}>
+                <View style={s.wordmarkCrest}>
+                  <View style={s.wordmarkMiniLabelWrap}>
+                    <Text style={s.wordmarkMiniLabel}>SPECIALTY</Text>
+                  </View>
+                  <View style={s.wordmarkSealOuter}>
+                    <View style={s.wordmarkSealMiddle}>
+                      <View style={s.wordmarkSeal}>
+                        <Text style={s.wordmarkSealText}>E</Text>
+                      </View>
+                    </View>
+                  </View>
+                  <View style={s.wordmarkMiniLabelWrap}>
+                    <Text style={s.wordmarkMiniLabel}>ROASTERS</Text>
+                  </View>
+                </View>
+                <Text style={s.wordmark}>ETIOVE</Text>
+                <Text style={[s.wordmarkSub, s.authWordmarkSub]}>COFFEE ATELIER</Text>
+                <Text style={[s.wordmarkTag, s.authWordmarkTag]}>DONDE EL ORIGEN SE CONVIERTE EN RITUAL</Text>
+              </View>
+            </View>
+
+            <View style={s.authCard}>
+              <Text style={s.authKicker}>{modo === 'login' ? (hasAccount ? 'BIENVENIDO DE NUEVO' : 'BIENVENIDO') : modo === 'register' ? 'NUEVA MEMBRESÍA' : 'RECUPERACIÓN SEGURA'}</Text>
+              <Text style={s.authTitle}>{modo === 'login' ? 'Accede a tu cuenta' : modo === 'register' ? 'Crea tu cuenta' : 'Recupera tu acceso'}</Text>
+              <Text style={s.authSub}>{modo === 'login' ? 'Entra para seguir tu colección, nivel y ritual de cata.' : modo === 'register' ? 'Únete a Etiove y empieza a construir tu perfil de catador.' : 'Te enviaremos un enlace para restaurar tu contraseña.'}</Text>
+
+              <Text style={[s.label, s.authLabel]}>Email</Text>
+              <TextInput style={[s.input, s.authInput]} placeholder="tu@email.com" placeholderTextColor="#9f9388" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" />
+              {modo !== 'reset' && <><Text style={[s.label, s.authLabel]}>Contraseña</Text><TextInput style={[s.input, s.authInput]} placeholder="Mínimo 6 caracteres" placeholderTextColor="#9f9388" value={password} onChangeText={setPassword} secureTextEntry /></>}
+              {modo === 'login' && <View style={s.rememberRow}><Switch value={recordar} onValueChange={v => { setRecordar(v); if (!v) borrarCreds(); }} trackColor={{ false: THEME.border.muted, true: THEME.brand.accentDeep }} thumbColor="#fffdf8" /><Text style={[s.rememberText, s.authRememberText]}>Recordar contraseña</Text></View>}
+
+              <TouchableOpacity style={s.authPrimaryBtn} onPress={handleSubmit} disabled={cargando}>
+                {cargando ? <ActivityIndicator color="#fffaf4" /> : <Text style={s.authPrimaryBtnText}>{modo === 'login' ? 'Entrar' : modo === 'register' ? 'Crear cuenta' : 'Enviar enlace'}</Text>}
+              </TouchableOpacity>
+
+              {modo === 'login' && faceIdDisponible && faceIdGuardado && (
+                <TouchableOpacity style={s.authSecondaryBtn} onPress={handleFaceId} disabled={cargando}>
+                  <Ionicons name="scan-outline" size={22} color={THEME.brand.accentDeep} />
+                  <Text style={s.authSecondaryBtnText}>Entrar con Face ID</Text>
+                </TouchableOpacity>
+              )}
+
+              <View style={s.authLinks}>
+                {modo === 'login' && <><TouchableOpacity onPress={() => setModo('register')}><Text style={s.authLink}>¿Sin cuenta? Regístrate</Text></TouchableOpacity><TouchableOpacity onPress={() => setModo('reset')}><Text style={s.authLinkMuted}>¿Olvidaste la contraseña?</Text></TouchableOpacity></>}
+                {modo !== 'login' && <TouchableOpacity onPress={() => setModo('login')}><Text style={s.authLink}>← Volver</Text></TouchableOpacity>}
+              </View>
+            </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -1151,7 +1457,7 @@ function ScannerScreen({ onScanned, onSkip, onBack }) {
 }
 
 // ─── FORMULARIO ───────────────────────────────────────────────────────────────
-function FormScreen({ onSave, onBack }) {
+function FormScreen({ onSave, onBack, onCafeAdded }) {
   const { user } = useAuth();
   const [nombreCafe, setNombreCafe] = useState('');
   const [origen, setOrigen]         = useState('');
@@ -1176,6 +1482,14 @@ function FormScreen({ onSave, onBack }) {
       const ex = await getDocument('ranking', rankId);
       if (ex) await updateDocument('ranking', rankId, { votos: (ex.votos||0)+1 });
       else await setDocument('ranking', rankId, { nombre: nombreCafe.trim(), votos: 1 });
+      onCafeAdded?.({
+        nombre: nombreCafe.trim(),
+        pais: '',
+        origen: origen.trim(),
+        variedad: '',
+        foto: foto || '',
+        notas: notas || '',
+      });
       Alert.alert('✅ Guardado', 'Café añadido a tu colección');
       onSave();
     } catch { Alert.alert('Error', 'No se pudo conectar con Firebase'); }
@@ -1186,10 +1500,10 @@ function FormScreen({ onSave, onBack }) {
     <SafeAreaView style={s.screen}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <ScrollView contentContainerStyle={s.formScroll}>
-        <TouchableOpacity onPress={onBack} style={s.backRow}><Ionicons name="chevron-back" size={20} color="#e8590c" /><Text style={s.backText}>Volver</Text></TouchableOpacity>
+        <TouchableOpacity onPress={onBack} style={s.backRow}><Ionicons name="chevron-back" size={20} color={PREMIUM_ACCENT} /><Text style={s.backText}>Volver</Text></TouchableOpacity>
         <Text style={s.formTitle}>Nuevo café</Text>
         <TouchableOpacity style={foto ? {} : s.fotoEmpty} onPress={hacerFoto}>
-          {foto ? <Image source={{ uri: foto }} style={s.fotoFull} /> : <><Ionicons name="camera-outline" size={32} color="#aaa" /><Text style={s.fotoEmptyText}>Añadir foto</Text></>}
+          {foto ? <Image source={{ uri: foto }} style={s.fotoFull} /> : <><Ionicons name="camera-outline" size={32} color={THEME.text.muted} /><Text style={s.fotoEmptyText}>Añadir foto</Text></>}
         </TouchableOpacity>
         {foto && <TouchableOpacity onPress={hacerFoto}><Text style={s.retake}>Cambiar foto</Text></TouchableOpacity>}
         <Text style={s.label}>Nombre del café</Text>
@@ -1226,13 +1540,177 @@ function MainScreen({ onLogout }) {
   const [favs, setFavs]           = useState([]);
   const [votes, setVotes]         = useState([]);
   const [perfil, setPerfil]       = useState({ pais: 'España' });
+  const [ofertasPorCafe, setOfertasPorCafe] = useState({});
+  const [buscandoOfertaId, setBuscandoOfertaId] = useState(null);
+  const [openOfferCafeId, setOpenOfferCafeId] = useState(null);
+  const [errorOfertas, setErrorOfertas] = useState(null);
+  const [gamification, setGamification] = useState(defaultGamification());
+  const [cafeteriasInicio, setCafeteriasInicio] = useState([]);
+  const [cargandoCafInicio, setCargandoCafInicio] = useState(false);
+  const [errorCafInicio, setErrorCafInicio] = useState(null);
+  const [forumCategory, setForumCategory] = useState(null);
+  const [forumThread, setForumThread] = useState(null);
+  const [forumSort, setForumSort] = useState('top');
+  const [forumThreads, setForumThreads] = useState([]);
+  const [forumReplies, setForumReplies] = useState([]);
+  const [forumLoading, setForumLoading] = useState(false);
+  const [forumError, setForumError] = useState(null);
+  const [forumCreateOpen, setForumCreateOpen] = useState(false);
+  const [forumSaving, setForumSaving] = useState(false);
+  const [forumTitle, setForumTitle] = useState('');
+  const [forumBody, setForumBody] = useState('');
+  const [forumPhoto, setForumPhoto] = useState(null);
+  const [forumEditOpen, setForumEditOpen] = useState(false);
+  const [forumEditing, setForumEditing] = useState(false);
+  const [forumEditTarget, setForumEditTarget] = useState(null);
+  const [forumEditCollection, setForumEditCollection] = useState('');
+  const [forumEditTitle, setForumEditTitle] = useState('');
+  const [forumEditBody, setForumEditBody] = useState('');
+  const [forumReplyText, setForumReplyText] = useState('');
+  const [forumReplyTo, setForumReplyTo] = useState(null);
+  const [forumSendingReply, setForumSendingReply] = useState(false);
+  const forumThreadScrollRef = useRef(null);
+  const forumReplyInputRef = useRef(null);
   const [permission, requestPermission] = useCameraPermissions();
+  const brandCardAnim = useRef(new Animated.Value(0)).current;
+  const brandProgressAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     SecureStore.getItemAsync(KEY_FAVS).then(v => v && setFavs(JSON.parse(v))).catch(() => {});
     SecureStore.getItemAsync(KEY_VOTES).then(v => v && setVotes(JSON.parse(v))).catch(() => {});
     SecureStore.getItemAsync(KEY_PROFILE).then(v => v && setPerfil(JSON.parse(v))).catch(() => {});
+    SecureStore.getItemAsync(KEY_GAMIFICATION).then((v) => {
+      if (!v) return;
+      try { setGamification(normalizeGamification(JSON.parse(v))); } catch {}
+    }).catch(() => {});
+    SecureStore.getItemAsync(KEY_OFFERS_CACHE)
+      .then((v) => {
+        if (!v) return;
+        const parsed = JSON.parse(v);
+        const cache = parsed?.byCafe || {};
+        const now = Date.now();
+        const fresh = {};
+        Object.entries(cache).forEach(([cafeId, entry]) => {
+          if (!entry?.updatedAt || !Array.isArray(entry?.offers)) return;
+          if ((now - entry.updatedAt) <= OFFERS_CACHE_TTL_MS) fresh[cafeId] = entry;
+        });
+        setOfertasPorCafe(fresh);
+      })
+      .catch(() => {});
   }, []);
+
+  const cargarCafeteriasInicio = async () => {
+    setCargandoCafInicio(true);
+    setErrorCafInicio(null);
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorCafInicio('Activa la ubicación para ver cafeterías cercanas.');
+        setCafeteriasInicio([]);
+        return;
+      }
+
+      const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+      const { latitude: lat, longitude: lon } = loc.coords;
+
+      const res = await fetch('https://places.googleapis.com/v1/places:searchNearby', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Goog-Api-Key': GOOGLE_PLACES_KEY,
+          'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.rating,places.userRatingCount,places.currentOpeningHours,places.photos,places.types',
+        },
+        body: JSON.stringify({
+          includedTypes: ['cafe', 'coffee_shop'],
+          maxResultCount: 6,
+          locationRestriction: {
+            circle: {
+              center: { latitude: lat, longitude: lon },
+              radius: 2000.0,
+            },
+          },
+          rankPreference: 'POPULARITY',
+        }),
+      });
+
+      const json = await res.json();
+      if (json.error) throw new Error(json.error.message || 'Google Places no disponible');
+
+      const places = json.places || [];
+      const mapped = places.map((p) => {
+        const geo = p.location || {};
+        const dist = calcDist(lat, lon, geo.latitude || lat, geo.longitude || lon);
+        return {
+          id: p.id,
+          nombre: (p.displayName && p.displayName.text) || 'Cafetería',
+          rating: Number(p.rating || 0).toFixed(1),
+          numResenas: p.userRatingCount || 0,
+          distancia: dist,
+          abierto: (p.currentOpeningHours && p.currentOpeningHours.openNow !== undefined) ? p.currentOpeningHours.openNow : null,
+          foto: (p.photos && p.photos[0] && p.photos[0].name)
+            ? 'https://places.googleapis.com/v1/' + p.photos[0].name + '/media?maxWidthPx=400&key=' + GOOGLE_PLACES_KEY
+            : null,
+        };
+      });
+
+      setCafeteriasInicio(mapped);
+      if (mapped.length === 0) setErrorCafInicio('No encontramos cafeterías cerca ahora mismo.');
+    } catch (e) {
+      setErrorCafInicio('No se pudieron cargar cafeterías cercanas.');
+      setCafeteriasInicio([]);
+    } finally {
+      setCargandoCafInicio(false);
+    }
+  };
+
+  useEffect(() => {
+    cargarCafeteriasInicio();
+  }, []);
+
+  const saveGamification = async (next) => {
+    try { await SecureStore.setItemAsync(KEY_GAMIFICATION, JSON.stringify(next)); } catch {}
+  };
+
+  const registrarEventoGamificacion = (type, payload = {}) => {
+    setGamification((prev) => {
+      const base = { ...defaultGamification(), ...prev };
+      const next = {
+        ...base,
+        countriesRated: [...(base.countriesRated || [])],
+        specialOriginsTasted: [...(base.specialOriginsTasted || [])],
+      };
+
+      if (type === 'vote') {
+        next.votesCount += 1;
+        const p = payload?.cafe?.pais;
+        if (p) next.countriesRated.push(p);
+        const sig = normalize(`${payload?.cafe?.nombre || ''} ${payload?.cafe?.variedad || ''} ${payload?.cafe?.pais || ''}`);
+        if (sig.includes('geisha')) next.specialOriginsTasted.push('geisha');
+        if (sig.includes('bourbon pointu')) next.specialOriginsTasted.push('bourbon_pointu');
+        if (sig.includes('yemen')) next.specialOriginsTasted.push('yemen');
+      }
+
+      if (type === 'favorite_mark') {
+        next.favoritesMarkedCount += 1;
+      }
+
+      if (type === 'add_cafe') {
+        next.cafesAddedCount += 1;
+        if (payload?.hasPhoto) next.photosCount += 1;
+        if (payload?.hasReview) next.reviewsCount += 1;
+      }
+
+      const normalized = normalizeGamification(next);
+      saveGamification(normalized);
+      return normalized;
+    });
+  };
+
+  const guardarCacheOfertas = async (nextByCafe) => {
+    try {
+      await SecureStore.setItemAsync(KEY_OFFERS_CACHE, JSON.stringify({ byCafe: nextByCafe, savedAt: Date.now() }));
+    } catch {}
+  };
 
   const cargarDatos = async () => {
     setCargando(true);
@@ -1249,12 +1727,220 @@ function MainScreen({ onLogout }) {
     finally { setCargando(false); }
   };
 
-  useEffect(() => { cargarDatos(); }, []);
+  const parsePrecio = (value) => {
+    if (typeof value === 'number') return value;
+    if (!value) return Number.POSITIVE_INFINITY;
+    const n = Number(String(value).replace(',', '.').replace(/[^\d.]/g, ''));
+    return Number.isFinite(n) && n > 0 ? n : Number.POSITIVE_INFINITY;
+  };
+
+  const decodeHtmlText = (value) => String(value || '')
+    .replace(/\\u003d/g, '=')
+    .replace(/\\u0026/g, '&')
+    .replace(/\\u003c/g, '<')
+    .replace(/\\u003e/g, '>')
+    .replace(/\\u00a0/g, ' ')
+    .replace(/\\u20ac/g, '€')
+    .replace(/\\\//g, '/')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .trim();
+
+  const stripHtmlTags = (value) => decodeHtmlText(String(value || '').replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ').trim();
+
+  const normalizarGoogleLink = (rawLink) => {
+    const clean = decodeHtmlText(rawLink);
+    if (!clean) return null;
+    if (clean.startsWith('http://') || clean.startsWith('https://')) return clean;
+    if (clean.startsWith('/url?')) {
+      try {
+        const params = new URLSearchParams(clean.split('?')[1] || '');
+        return decodeURIComponent(params.get('q') || params.get('url') || '');
+      } catch {
+        return null;
+      }
+    }
+    if (clean.startsWith('/')) return `https://www.google.com${clean}`;
+    return null;
+  };
+
+  const inferTiendaFromLink = (link) => {
+    try {
+      const url = new URL(link);
+      return url.hostname.replace(/^www\./, '');
+    } catch {
+      return 'Google';
+    }
+  };
+
+  const normalizarOfertaGoogle = (raw) => {
+    const precio = parsePrecio(raw.price);
+    const link = normalizarGoogleLink(raw.link);
+    const tienda = decodeHtmlText(raw.store || raw.merchant || (link ? inferTiendaFromLink(link) : 'Google Shopping'));
+    const titulo = stripHtmlTags(raw.title || 'Oferta de café');
+    const priceText = decodeHtmlText(raw.price || 'Precio no visible');
+    if (!titulo || !link) return null;
+    return {
+      id: `${titulo}-${tienda}-${priceText}`,
+      titulo,
+      tienda,
+      precio,
+      precioTexto: Number.isFinite(precio) ? `${precio.toFixed(2)}€` : priceText,
+      link,
+      fuente: 'Google',
+    };
+  };
+
+  const extraerOfertasGoogleBusqueda = (html) => {
+    const cards = html.split(/<a\s+href="\/url\?q=/i).slice(1);
+    const offers = [];
+
+    cards.forEach((fragment) => {
+      const block = `/url?q=${fragment.slice(0, 1800)}`;
+      const linkMatch = block.match(/^\/url\?q=([^&"]+)/i);
+      const titleMatch = block.match(/<h3[^>]*>(.*?)<\/h3>/i) || block.match(/aria-label="([^"]{8,160})"/i);
+      const priceMatch = block.match(/(\d{1,4}(?:[\.,]\d{2})\s?€)/i);
+      if (!linkMatch || !titleMatch || !priceMatch) return;
+
+      const link = decodeURIComponent(linkMatch[1]);
+      const title = stripHtmlTags(titleMatch[1]);
+      const store = inferTiendaFromLink(link);
+
+      offers.push({
+        title,
+        price: priceMatch[1],
+        merchant: store,
+        link,
+      });
+    });
+
+    return offers;
+  };
+
+  const extraerOfertasGoogle = (html) => {
+    if (/trouble accessing Google Search|unusual traffic|SG_SS|detected unusual traffic/i.test(html)) {
+      throw new Error('Google ha bloqueado temporalmente la consulta de ofertas');
+    }
+
+    const candidates = [];
+    const patterns = [
+      /"title":"([^\"]+?)".*?"price":"([^\"]+?)".*?"merchantName":"([^\"]+?)".*?"url":"([^\"]+?)"/g,
+      /"fullTitle":"([^\"]+?)".*?"price":"([^\"]+?)".*?"merchantName":"([^\"]+?)".*?"url":"([^\"]+?)"/g,
+      /"title":"([^\"]+?)".*?"merchantName":"([^\"]+?)".*?"price":"([^\"]+?)".*?"url":"([^\"]+?)"/g,
+      /"name":"([^\"]+?)".*?"price":"([^\"]+?)".*?"sellerName":"([^\"]+?)".*?"url":"([^\"]+?)"/g,
+      /"title":"([^\"]+?)".*?"formattedPrice":"([^\"]+?)".*?"merchantName":"([^\"]+?)".*?"url":"([^\"]+?)"/g,
+      /"productTitle":"([^\"]+?)".*?"price":"([^\"]+?)".*?"storeName":"([^\"]+?)".*?"url":"([^\"]+?)"/g,
+      /"title":"([^\"]+?)".*?"priceAmount":"([^\"]+?)".*?"merchantName":"([^\"]+?)".*?"url":"([^\"]+?)"/g,
+    ];
+
+    patterns.forEach((pattern, index) => {
+      for (const match of html.matchAll(pattern)) {
+        if (index === 2) {
+          candidates.push({ title: match[1], merchant: match[2], price: match[3], link: match[4] });
+        } else {
+          candidates.push({ title: match[1], price: match[2], merchant: match[3], link: match[4] });
+        }
+      }
+    });
+
+    extraerOfertasGoogleBusqueda(html).forEach((offer) => candidates.push(offer));
+
+    const seen = new Set();
+    const ofertas = candidates
+      .map(normalizarOfertaGoogle)
+      .filter(o => {
+        if (!o?.id || seen.has(o.id)) return false;
+        seen.add(o.id);
+        return Number.isFinite(o.precio) && !!o.link;
+      })
+      .sort((a, b) => a.precio - b.precio)
+      .slice(0, 3);
+
+    return ofertas;
+  };
+
+  const buscarOfertasCafe = async (cafe, forceRefresh = false) => {
+    if (!cafe?.id || !cafe?.nombre) return;
+    const now = Date.now();
+    const cached = ofertasPorCafe[cafe.id];
+    if (!forceRefresh && cached?.updatedAt && Array.isArray(cached?.offers) && (now - cached.updatedAt) <= OFFERS_CACHE_TTL_MS) {
+      return;
+    }
+
+    setBuscandoOfertaId(cafe.id);
+    setErrorOfertas(null);
+
+    try {
+      const query = encodeURIComponent(`${cafe.nombre} café comprar precio`);
+      const endpoints = [
+        `https://www.google.com/search?tbm=shop&hl=es&gl=es&q=${query}`,
+        `https://www.google.com/search?tbm=shop&gbv=1&hl=es&gl=es&q=${query}`,
+        `https://www.google.com/search?hl=es&gl=es&q=${query}`,
+      ];
+
+      let ofertas = [];
+      let lastError = null;
+
+      for (const url of endpoints) {
+        try {
+          const res = await fetch(url, {
+            headers: {
+              'Accept-Language': 'es-ES,es;q=0.9',
+            },
+          });
+          if (!res.ok) {
+            lastError = new Error(`Google respondió con ${res.status}`);
+            continue;
+          }
+          const html = await res.text();
+          ofertas = extraerOfertasGoogle(html);
+          if (ofertas.length > 0) break;
+        } catch (error) {
+          lastError = error;
+        }
+      }
+
+      if (ofertas.length === 0 && lastError) throw lastError;
+
+      setOfertasPorCafe(prev => {
+        const next = {
+          ...prev,
+          [cafe.id]: {
+            updatedAt: Date.now(),
+            offers: ofertas,
+          },
+        };
+        guardarCacheOfertas(next);
+        return next;
+      });
+      if (ofertas.length === 0) setErrorOfertas(`No encontramos ofertas en Google para ${cafe.nombre}.`);
+    } catch (e) {
+      setErrorOfertas('No se pudieron cargar ofertas de Google: ' + e.message);
+    } finally {
+      setBuscandoOfertaId(null);
+    }
+  };
+
+  const abrirOfertasCafe = async (cafe, options = {}) => {
+    if (!cafe?.id) return;
+    setOpenOfferCafeId(cafe.id);
+    if (options.navigate) setActiveTab('Ofertas');
+    await buscarOfertasCafe(cafe, !!options.forceRefresh);
+  };
+
+  useEffect(() => {
+    cargarDatos();
+  }, []);
 
   const toggleFav = async (cafe) => {
-    const nf = favs.includes(cafe.id) ? favs.filter(f => f !== cafe.id) : [...favs, cafe.id];
+    const wasFav = favs.includes(cafe.id);
+    const nf = wasFav ? favs.filter(f => f !== cafe.id) : [...favs, cafe.id];
     setFavs(nf);
     await SecureStore.setItemAsync(KEY_FAVS, JSON.stringify(nf)).catch(() => {});
+    if (!wasFav) registrarEventoGamificacion('favorite_mark', { cafe });
   };
 
   const eliminarCafe = (item) => {
@@ -1287,13 +1973,296 @@ function MainScreen({ onLogout }) {
   const ultimosGlobal = allCafes.slice(0, 10);
   const ultimos100    = allCafes.slice(0, 100);
   const top100        = topCafesVista.slice(0, 100);
+  const cafesParaOfertas = allCafes.slice(0, 30);
+  const forumThreadsByCategory = forumCategory
+    ? forumThreads
+        .filter((t) => t.categoryId === forumCategory.id)
+        .sort((a, b) => {
+          if (forumSort === 'recent') return new Date(b.createdAt) - new Date(a.createdAt);
+          return (b.upvotes || 0) - (a.upvotes || 0);
+        })
+    : [];
+  const forumRepliesByThread = forumThread
+    ? forumReplies.filter((r) => r.threadId === forumThread.id).sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+    : [];
+  const forumTopReplies = forumRepliesByThread.filter((r) => !r.parentId);
+
+  const abrirOfertaWeb = (oferta) => {
+    if (!oferta?.link) return;
+    Linking.openURL(oferta.link).catch(() => {});
+  };
+
+  const currentLevel = getLevelFromXp(gamification.xp);
+  const nextLevel = LEVELS.find(l => l.minXp > gamification.xp) || null;
+  const xpInLevel = nextLevel ? Math.max(0, gamification.xp - currentLevel.minXp) : gamification.xp;
+  const xpRange = nextLevel ? Math.max(1, nextLevel.minXp - currentLevel.minXp) : Math.max(1, gamification.xp);
+  const levelProgress = Math.min(1, xpInLevel / xpRange);
+  const brandCardTranslateY = brandCardAnim.interpolate({ inputRange: [0, 1], outputRange: [14, 0] });
+  const brandCardScale = brandCardAnim.interpolate({ inputRange: [0, 1], outputRange: [0.985, 1] });
+  const brandProgressWidth = brandProgressAnim.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] });
+  const profileAlias = (perfil.alias || perfil.nombre || user?.email?.split('@')[0] || 'Catador').trim();
+  const profileName = `${perfil.nombre || ''} ${perfil.apellidos || ''}`.trim() || user?.email || 'Miembro Etiove';
+  const profileInitial = (profileAlias || '?')[0].toUpperCase();
+  const forumAuthorName = (perfil.alias || perfil.nombre || user?.email?.split('@')[0] || 'Catador').trim();
+  const voteWeight = currentLevel.name === 'Maestro' ? 2 : 1;
 
   const flag = getFlagForPais(perfil.pais || 'España');
+
+  useEffect(() => {
+    Animated.timing(brandCardAnim, {
+      toValue: 1,
+      duration: 650,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start();
+  }, [brandCardAnim]);
+
+  useEffect(() => {
+    Animated.timing(brandProgressAnim, {
+      toValue: levelProgress,
+      duration: 700,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: false,
+    }).start();
+  }, [brandProgressAnim, levelProgress]);
+
+  const cargarForo = async () => {
+    setForumLoading(true);
+    setForumError(null);
+    try {
+      const [hilos, respuestas] = await Promise.all([
+        getCollection('foro_hilos', 'createdAt', 300),
+        getCollection('foro_respuestas', 'createdAt', 1200),
+      ]);
+      setForumThreads(hilos || []);
+      setForumReplies(respuestas || []);
+      setForumThread((prev) => {
+        if (!prev?.id) return prev;
+        const updated = (hilos || []).find((t) => t.id === prev.id);
+        return updated || prev;
+      });
+    } catch (e) {
+      setForumError('No se pudo cargar la comunidad.');
+    } finally {
+      setForumLoading(false);
+    }
+  };
+
+  const hasUserVotedForoItem = (item) => !!user?.uid && csvToSet(item?.voterUids).has(user.uid);
+  const hasUserReportedForoItem = (item) => !!user?.uid && csvToSet(item?.reporterUids).has(user.uid);
+  const isForumOwner = (item) => !!user?.uid && item?.authorUid === user.uid;
+
+  useEffect(() => {
+    if (activeTab === 'Comunidad' && forumThreads.length === 0 && !forumLoading) {
+      cargarForo();
+    }
+  }, [activeTab]);
+
+  const seleccionarFotoForo = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') return Alert.alert('Permiso denegado', 'Necesitas permitir acceso a galería.');
+    const res = await ImagePicker.launchImageLibraryAsync({ allowsEditing: true, quality: 0.7 });
+    if (!res.canceled) setForumPhoto(res.assets[0].uri);
+  };
+
+  const crearHiloForo = async () => {
+    const title = forumTitle.trim();
+    const body = forumBody.trim();
+    if (!forumCategory) return Alert.alert('Categoría', 'Selecciona una categoría.');
+    if (!title || !body) return Alert.alert('Completa el hilo', 'Añade título y contenido.');
+    if (title.length > 120) return Alert.alert('Título demasiado largo', 'Máximo 120 caracteres.');
+    if (body.length > 1000) return Alert.alert('Contenido demasiado largo', 'Máximo 1000 caracteres.');
+
+    setForumSaving(true);
+    try {
+      const uploadedImage = forumPhoto ? await uploadImageToStorage(forumPhoto, 'foro_hilos') : '';
+      await addDocument('foro_hilos', {
+        categoryId: forumCategory.id,
+        categoryLabel: forumCategory.label,
+        title,
+        body,
+        image: uploadedImage,
+        authorUid: user.uid,
+        authorName: forumAuthorName,
+        authorLevel: currentLevel.name,
+        createdAt: new Date().toISOString(),
+        upvotes: 0,
+        voterUids: '',
+        replyCount: 0,
+        reportedCount: 0,
+        reporterUids: '',
+      });
+      setForumCreateOpen(false);
+      setForumTitle('');
+      setForumBody('');
+      setForumPhoto(null);
+      await cargarForo();
+    } catch {
+      Alert.alert('Error', 'No se pudo crear el hilo.');
+    } finally {
+      setForumSaving(false);
+    }
+  };
+
+  const votarEnForo = async (collection, item) => {
+    if (!item?.id || !user?.uid) return;
+    if (hasUserReportedForoItem(item)) return Alert.alert('Acción no permitida', 'Ya reportaste este contenido. No puedes votarlo.');
+    const voters = csvToSet(item.voterUids);
+    if (voters.has(user.uid)) return Alert.alert('Voto registrado', 'Ya votaste este contenido.');
+    voters.add(user.uid);
+    const ok = await updateDocument(collection, item.id, {
+      upvotes: Number(item.upvotes || 0) + voteWeight,
+      voterUids: setToCsv(voters),
+    });
+    if (!ok) return Alert.alert('Error', 'No se pudo guardar tu voto. Inténtalo de nuevo.');
+    await cargarForo();
+  };
+
+  const reportarForo = async (collection, item) => {
+    if (!item?.id || !user?.uid) return;
+    if (hasUserVotedForoItem(item)) return Alert.alert('Acción no permitida', 'Ya votaste este contenido. No puedes reportarlo.');
+    const reporters = csvToSet(item.reporterUids);
+    if (reporters.has(user.uid)) return Alert.alert('Reporte enviado', 'Ya reportaste este contenido.');
+    reporters.add(user.uid);
+    const ok = await updateDocument(collection, item.id, {
+      reportedCount: Number(item.reportedCount || 0) + 1,
+      reporterUids: setToCsv(reporters),
+    });
+    if (!ok) return Alert.alert('Error', 'No se pudo guardar tu reporte. Inténtalo de nuevo.');
+    Alert.alert('Gracias', 'Reporte enviado a moderación.');
+    await cargarForo();
+  };
+
+  const enviarRespuestaForo = async () => {
+    if (!forumThread?.id) return;
+    const text = forumReplyText.trim();
+    if (!text) return;
+    if (text.length > 1000) return Alert.alert('Respuesta demasiado larga', 'Máximo 1000 caracteres.');
+
+    setForumSendingReply(true);
+    try {
+      await addDocument('foro_respuestas', {
+        threadId: forumThread.id,
+        parentId: forumReplyTo?.id || '',
+        body: text,
+        authorUid: user.uid,
+        authorName: forumAuthorName,
+        authorLevel: currentLevel.name,
+        createdAt: new Date().toISOString(),
+        upvotes: 0,
+        voterUids: '',
+        reportedCount: 0,
+        reporterUids: '',
+      });
+      await updateDocument('foro_hilos', forumThread.id, {
+        replyCount: Number(forumThread.replyCount || 0) + 1,
+      });
+      setForumReplyText('');
+      setForumReplyTo(null);
+      await cargarForo();
+    } catch {
+      Alert.alert('Error', 'No se pudo enviar tu respuesta.');
+    } finally {
+      setForumSendingReply(false);
+    }
+  };
+
+  const prepararRespuestaForo = (targetReply = null) => {
+    setForumReplyTo(targetReply);
+    requestAnimationFrame(() => {
+      forumThreadScrollRef.current?.scrollToEnd({ animated: true });
+      setTimeout(() => forumReplyInputRef.current?.focus?.(), 120);
+    });
+  };
+
+  const abrirEditorForo = (collection, item) => {
+    if (!isForumOwner(item)) return;
+    setForumEditCollection(collection);
+    setForumEditTarget(item);
+    setForumEditTitle(collection === 'foro_hilos' ? String(item.title || '') : '');
+    setForumEditBody(String(item.body || ''));
+    setForumEditOpen(true);
+  };
+
+  const guardarEdicionForo = async () => {
+    if (!forumEditTarget?.id || !forumEditCollection) return;
+    const body = forumEditBody.trim();
+    if (!body) return Alert.alert('Contenido vacío', 'Escribe contenido para guardar.');
+    if (body.length > 1000) return Alert.alert('Contenido demasiado largo', 'Máximo 1000 caracteres.');
+
+    let payload = { body };
+    if (forumEditCollection === 'foro_hilos') {
+      const title = forumEditTitle.trim();
+      if (!title) return Alert.alert('Título vacío', 'Escribe un título para el hilo.');
+      if (title.length > 120) return Alert.alert('Título demasiado largo', 'Máximo 120 caracteres.');
+      payload = { title, body };
+    }
+
+    setForumEditing(true);
+    try {
+      const ok = await updateDocument(forumEditCollection, forumEditTarget.id, payload);
+      if (!ok) return Alert.alert('Error', 'No se pudo guardar la edición.');
+      setForumEditOpen(false);
+      setForumEditTarget(null);
+      setForumEditCollection('');
+      await cargarForo();
+    } finally {
+      setForumEditing(false);
+    }
+  };
+
+  const eliminarItemForo = (collection, item) => {
+    if (!item?.id || !isForumOwner(item)) return;
+    Alert.alert('Eliminar', 'Esta acción no se puede deshacer. ¿Deseas continuar?', [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Eliminar',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            if (collection === 'foro_hilos') {
+              const relatedReplies = forumReplies.filter((r) => r.threadId === item.id);
+              if (relatedReplies.length > 0) {
+                await Promise.allSettled(relatedReplies.map((r) => deleteDocument('foro_respuestas', r.id)));
+              }
+              await deleteDocument('foro_hilos', item.id);
+              if (forumThread?.id === item.id) setForumThread(null);
+            } else {
+              const repliesToDelete = [item.id];
+              if (!item.parentId) {
+                forumReplies
+                  .filter((r) => r.parentId === item.id)
+                  .forEach((r) => repliesToDelete.push(r.id));
+              }
+              await Promise.allSettled(repliesToDelete.map((id) => deleteDocument('foro_respuestas', id)));
+              if (forumThread?.id === item.threadId) {
+                await updateDocument('foro_hilos', item.threadId, {
+                  replyCount: Math.max(0, Number(forumThread.replyCount || 0) - repliesToDelete.length),
+                });
+              }
+            }
+            await cargarForo();
+          } catch {
+            Alert.alert('Error', 'No se pudo eliminar el contenido.');
+          }
+        },
+      },
+    ]);
+  };
+
+  const abrirMenuAutorForo = (collection, item) => {
+    if (!isForumOwner(item)) return;
+    Alert.alert('Opciones', 'Elige una acción', [
+      { text: 'Editar', onPress: () => abrirEditorForo(collection, item) },
+      { text: 'Eliminar', style: 'destructive', onPress: () => eliminarItemForo(collection, item) },
+      { text: 'Cancelar', style: 'cancel' },
+    ]);
+  };
 
   if (!permission?.granted) {
     return (
       <SafeAreaView style={s.permScreen}>
-        <Ionicons name="cafe" size={72} color="#e8590c" />
+        <Ionicons name="cafe" size={72} color={PREMIUM_ACCENT} />
         <Text style={s.permTitle}>Etiove necesita la cámara</Text>
         <Text style={s.permSub}>Para escanear paquetes de café</Text>
         <TouchableOpacity style={s.redBtn} onPress={requestPermission}><Text style={s.redBtnText}>Activar cámara</Text></TouchableOpacity>
@@ -1302,7 +2271,7 @@ function MainScreen({ onLogout }) {
   }
 
   if (scanning) return <ScannerScreen onScanned={() => { setScanning(false); setShowForm(true); }} onSkip={() => { setScanning(false); setShowForm(true); }} onBack={() => setScanning(false)} />;
-  if (showForm) return <FormScreen onBack={() => setShowForm(false)} onSave={() => { setShowForm(false); setActiveTab('Mis Cafés'); cargarDatos(); }} />;
+  if (showForm) return <FormScreen onBack={() => setShowForm(false)} onSave={() => { setShowForm(false); setActiveTab('Mis Cafés'); cargarDatos(); }} onCafeAdded={(cafe) => registrarEventoGamificacion('add_cafe', { hasPhoto: !!cafe?.foto, hasReview: !!String(cafe?.notas || '').trim() })} />;
 
   return (
     <SafeAreaView style={s.screen}>
@@ -1315,6 +2284,7 @@ function MainScreen({ onLogout }) {
           onDelete={cafeDetalle.uid === user.uid ? eliminarCafe : null}
           favs={favs} onToggleFav={toggleFav}
           votes={votes} setVotes={setVotes}
+          onVote={(cafe) => registrarEventoGamificacion('vote', { cafe })}
         />
       )}
       {showProfile && (
@@ -1328,21 +2298,385 @@ function MainScreen({ onLogout }) {
         </View>
       )}
 
-      {activeTab !== 'Cafeterías' && (
+      {activeTab === 'Comunidad' && (
+        <View style={{ flex: 1 }}>
+          {!forumCategory && (
+            <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
+              <View style={{ paddingHorizontal: 16, paddingTop: 18 }}>
+                <Text style={s.pageTitle}>Comunidad</Text>
+                <Text style={s.sectionSub}>Comparte, aprende y debate con otros coffee lovers</Text>
+              </View>
+              <View style={{ paddingHorizontal: 16, gap: 10 }}>
+                {FORUM_CATEGORIES.map((cat) => (
+                  <TouchableOpacity key={cat.id} style={s.forumCatCard} activeOpacity={0.9} onPress={() => setForumCategory(cat)}>
+                    <Text style={s.forumCatEmoji}>{cat.emoji}</Text>
+                    <View style={{ flex: 1 }}>
+                      <Text style={s.forumCatTitle}>{cat.label}</Text>
+                      <Text style={s.forumCatDesc}>{cat.desc}</Text>
+                    </View>
+                    <Ionicons name="chevron-forward" size={18} color={THEME.icon.inactive} />
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </ScrollView>
+          )}
+
+          {forumCategory && !forumThread && (
+            <View style={{ flex: 1 }}>
+              <View style={s.forumHeaderRow}>
+                <TouchableOpacity onPress={() => setForumCategory(null)} style={s.backRow}>
+                  <Ionicons name="chevron-back" size={20} color={PREMIUM_ACCENT} />
+                  <Text style={s.backText}>Categorías</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={s.forumNewBtn} onPress={() => setForumCreateOpen(true)}>
+                  <Text style={s.forumNewBtnText}>Nuevo</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={{ paddingHorizontal: 16, paddingBottom: 8 }}>
+                <Text style={s.sectionTitle}>{forumCategory.emoji} {forumCategory.label}</Text>
+                <View style={s.forumSortRow}>
+                  <TouchableOpacity style={[s.forumSortChip, forumSort === 'top' && s.forumSortChipActive]} onPress={() => setForumSort('top')}>
+                    <Text style={[s.forumSortText, forumSort === 'top' && s.forumSortTextActive]}>Más votados</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[s.forumSortChip, forumSort === 'recent' && s.forumSortChipActive]} onPress={() => setForumSort('recent')}>
+                    <Text style={[s.forumSortText, forumSort === 'recent' && s.forumSortTextActive]}>Más recientes</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              {forumLoading ? (
+                <ActivityIndicator color={PREMIUM_ACCENT} style={{ marginTop: 24 }} />
+              ) : (
+                <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 110, gap: 10 }}>
+                  {forumThreadsByCategory.map((thread) => (
+                    <TouchableOpacity key={thread.id} style={s.forumThreadCard} activeOpacity={0.9} onPress={() => setForumThread(thread)}>
+                      <Text style={s.forumThreadTitle} numberOfLines={2}>{thread.title}</Text>
+                      <Text style={s.forumThreadBody} numberOfLines={2}>{thread.body}</Text>
+                      <View style={s.forumMetaRow}>
+                        <View style={s.forumAuthorRow}>
+                          <View style={s.forumAvatar}><Text style={s.forumAvatarText}>{(thread.authorName || '?')[0]?.toUpperCase() || '?'}</Text></View>
+                          <View>
+                            <Text style={s.forumAuthorName}>{thread.authorName || 'Usuario'}</Text>
+                            <Text style={s.forumAuthorLevel}>{thread.authorLevel || 'Novato'}</Text>
+                          </View>
+                        </View>
+                        <Text style={s.forumMetaText}>{formatRelativeTime(thread.createdAt)}</Text>
+                      </View>
+                      <View style={s.forumCountersRow}>
+                        <Text style={s.forumCounter}>💬 {thread.replyCount || 0}</Text>
+                        <Text style={s.forumCounter}>❤️ {thread.upvotes || 0}</Text>
+                        <Text style={s.forumCounter}>💔 {thread.reportedCount || 0}</Text>
+                      </View>
+                    </TouchableOpacity>
+                  ))}
+                  {!forumLoading && forumThreadsByCategory.length === 0 && <Text style={s.empty}>Todavía no hay hilos en esta categoría.</Text>}
+                  {!!forumError && <Text style={s.empty}>{forumError}</Text>}
+                </ScrollView>
+              )}
+            </View>
+          )}
+
+          {forumCategory && forumThread && (
+            <KeyboardAvoidingView
+              style={{ flex: 1 }}
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+              keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 12}
+            >
+              <View style={s.forumHeaderRow}>
+                <TouchableOpacity onPress={() => { setForumThread(null); setForumReplyTo(null); }} style={s.backRow}>
+                  <Ionicons name="chevron-back" size={20} color={PREMIUM_ACCENT} />
+                  <Text style={s.backText}>Hilos</Text>
+                </TouchableOpacity>
+              </View>
+
+              <ScrollView
+                ref={forumThreadScrollRef}
+                style={{ flex: 1 }}
+                keyboardShouldPersistTaps="handled"
+                contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 130 }}
+              >
+                {(() => {
+                  const threadUserVoted = hasUserVotedForoItem(forumThread);
+                  const threadUserReported = hasUserReportedForoItem(forumThread);
+                  return (
+                <View style={s.forumMainPost}>
+                  <View style={s.forumMainPostHead}>
+                    <Text style={s.forumThreadTitle}>{forumThread.title}</Text>
+                    {isForumOwner(forumThread) && (
+                      <TouchableOpacity style={s.forumDotsBtn} onPress={() => abrirMenuAutorForo('foro_hilos', forumThread)}>
+                        <Ionicons name="ellipsis-vertical" size={18} color={THEME.brand.accentDeep} />
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                  <Text style={s.forumThreadBody}>{forumThread.body}</Text>
+                  {!!forumThread.image && <Image source={{ uri: forumThread.image }} style={s.forumMainPostImage} resizeMode="cover" />}
+                  <View style={s.forumCountersRow}>
+                    <Text style={s.forumCounter}>❤️ {forumThread.upvotes || 0}</Text>
+                    <Text style={s.forumCounter}>💬 {forumThread.replyCount || 0}</Text>
+                    <Text style={s.forumCounter}>💔 {forumThread.reportedCount || 0}</Text>
+                    <Text style={s.forumMetaText}>{formatRelativeTime(forumThread.createdAt)}</Text>
+                  </View>
+                  <View style={{ flexDirection: 'row', gap: 10, marginTop: 8 }}>
+                    <TouchableOpacity
+                      style={[s.forumActionBtn, (threadUserVoted || threadUserReported) && s.forumActionBtnDisabled]}
+                      onPress={() => votarEnForo('foro_hilos', forumThread)}
+                      disabled={threadUserVoted || threadUserReported}
+                    >
+                      <Text style={[s.forumActionText, (threadUserVoted || threadUserReported) && s.forumActionTextDisabled]}>❤️ INTERESANTE</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[s.forumActionBtn, (threadUserReported || threadUserVoted) && s.forumActionBtnDisabled]}
+                      onPress={() => reportarForo('foro_hilos', forumThread)}
+                      disabled={threadUserReported || threadUserVoted}
+                    >
+                      <Text style={[s.forumActionText, (threadUserReported || threadUserVoted) && s.forumActionTextDisabled]}>💔 NI FÚ NI FÁ</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                  );
+                })()}
+
+                <Text style={[s.sectionTitle, { marginTop: 14, marginBottom: 10 }]}>Respuestas</Text>
+                {forumTopReplies.map((reply) => {
+                  const childReplies = forumRepliesByThread.filter((r) => r.parentId === reply.id).slice(0, 50);
+                  const replyUserReported = hasUserReportedForoItem(reply);
+                  return (
+                    <View key={reply.id} style={s.forumReplyCard}>
+                      <View style={s.forumMetaRow}>
+                        <View style={s.forumAuthorRow}>
+                          <View style={s.forumAvatar}><Text style={s.forumAvatarText}>{(reply.authorName || '?')[0]?.toUpperCase() || '?'}</Text></View>
+                          <View>
+                            <Text style={s.forumAuthorName}>{reply.authorName || 'Usuario'}</Text>
+                            <Text style={s.forumAuthorLevel}>{reply.authorLevel || 'Novato'}</Text>
+                          </View>
+                        </View>
+                        <View style={s.forumMetaActions}>
+                          <Text style={s.forumMetaText}>{formatRelativeTime(reply.createdAt)}</Text>
+                          {isForumOwner(reply) && (
+                            <TouchableOpacity style={s.forumDotsBtn} onPress={() => abrirMenuAutorForo('foro_respuestas', reply)}>
+                              <Ionicons name="ellipsis-vertical" size={16} color={THEME.brand.accentDeep} />
+                            </TouchableOpacity>
+                          )}
+                        </View>
+                      </View>
+                      <Text style={s.forumThreadBody}>{reply.body}</Text>
+                      <View style={{ flexDirection: 'row', gap: 10, marginTop: 8 }}>
+                        <TouchableOpacity onPress={() => prepararRespuestaForo(reply)}><Text style={s.forumActionText}>↩ Responder</Text></TouchableOpacity>
+                        <TouchableOpacity onPress={() => reportarForo('foro_respuestas', reply)} disabled={replyUserReported}><Text style={[s.forumActionText, replyUserReported && s.forumActionTextDisabled]}>💔 NI FÚ NI FÁ {reply.reportedCount || 0}</Text></TouchableOpacity>
+                      </View>
+
+                      {childReplies.map((child) => (
+                        <View key={child.id} style={s.forumChildReplyCard}>
+                          <View style={s.forumMetaRow}>
+                            <Text style={s.forumAuthorName}>{child.authorName || 'Usuario'}</Text>
+                            <View style={s.forumMetaActions}>
+                              <Text style={s.forumMetaText}>{formatRelativeTime(child.createdAt)}</Text>
+                              {isForumOwner(child) && (
+                                <TouchableOpacity style={s.forumDotsBtn} onPress={() => abrirMenuAutorForo('foro_respuestas', child)}>
+                                  <Ionicons name="ellipsis-vertical" size={15} color={THEME.brand.accentDeep} />
+                                </TouchableOpacity>
+                              )}
+                            </View>
+                          </View>
+                          <Text style={s.forumThreadBody}>{child.body}</Text>
+                          {(() => {
+                            const childUserReported = hasUserReportedForoItem(child);
+                            return (
+                          <View style={{ flexDirection: 'row', gap: 10, marginTop: 6 }}>
+                            <TouchableOpacity onPress={() => reportarForo('foro_respuestas', child)} disabled={childUserReported}><Text style={[s.forumActionText, childUserReported && s.forumActionTextDisabled]}>💔 NI FÚ NI FÁ {child.reportedCount || 0}</Text></TouchableOpacity>
+                          </View>
+                            );
+                          })()}
+                        </View>
+                      ))}
+                    </View>
+                  );
+                })}
+                {forumTopReplies.length === 0 && <Text style={s.empty}>Sé el primero en responder.</Text>}
+              </ScrollView>
+
+              <View style={s.forumComposerWrap}>
+                {!!forumReplyTo && (
+                  <View style={s.forumReplyingTag}>
+                    <Text style={s.forumReplyingText}>Respondiendo a {forumReplyTo.authorName}</Text>
+                    <TouchableOpacity onPress={() => setForumReplyTo(null)}><Ionicons name="close" size={16} color={THEME.icon.inactive} /></TouchableOpacity>
+                  </View>
+                )}
+                <View style={s.forumComposerRow}>
+                  <TextInput
+                    ref={forumReplyInputRef}
+                    style={s.forumComposerInput}
+                    placeholder="Escribe tu respuesta..."
+                    placeholderTextColor="#9e958d"
+                    value={forumReplyText}
+                    onChangeText={setForumReplyText}
+                    multiline
+                  />
+                  <TouchableOpacity style={s.forumSendBtn} onPress={enviarRespuestaForo} disabled={forumSendingReply}>
+                    {forumSendingReply ? <ActivityIndicator color="#fff" /> : <Ionicons name="send" size={16} color="#fff" />}
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </KeyboardAvoidingView>
+          )}
+
+          <Modal visible={forumCreateOpen} animationType="slide" transparent onRequestClose={() => setForumCreateOpen(false)}>
+            <View style={s.forumModalOverlay}>
+              <View style={s.forumModalCard}>
+                <Text style={s.sectionTitle}>Nuevo hilo</Text>
+                <Text style={s.sectionSub}>{forumCategory?.label || 'Comunidad'}</Text>
+                <Text style={[s.label, { marginTop: 4 }]}>Título</Text>
+                <TextInput
+                  style={s.input}
+                  value={forumTitle}
+                  onChangeText={(v) => setForumTitle(v.slice(0, 120))}
+                  placeholder="Máximo 120 caracteres"
+                  placeholderTextColor="#b3a9a0"
+                />
+                <Text style={[s.label, { marginTop: -6 }]}>Contenido</Text>
+                <TextInput
+                  style={[s.input, { minHeight: 120, textAlignVertical: 'top' }]}
+                  value={forumBody}
+                  onChangeText={(v) => setForumBody(v.slice(0, 1000))}
+                  placeholder="Comparte tu experiencia cafetera..."
+                  placeholderTextColor="#b3a9a0"
+                  multiline
+                />
+                <Text style={s.forumCountText}>{forumTitle.length}/120 · {forumBody.length}/1000</Text>
+                <TouchableOpacity style={s.faceIdBtn} onPress={seleccionarFotoForo}>
+                  <Ionicons name="image-outline" size={18} color={THEME.brand.accentDeep} />
+                  <Text style={s.faceIdText}>{forumPhoto ? 'Cambiar foto' : 'Añadir foto opcional'}</Text>
+                </TouchableOpacity>
+                <View style={{ flexDirection: 'row', gap: 10, marginTop: 14 }}>
+                  <TouchableOpacity style={[s.authSecondaryBtn, { flex: 1, marginTop: 0 }]} onPress={() => setForumCreateOpen(false)}>
+                    <Text style={s.authSecondaryBtnText}>Cancelar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[s.redBtn, { flex: 1, marginTop: 0 }]} onPress={crearHiloForo} disabled={forumSaving}>
+                    {forumSaving ? <ActivityIndicator color="#fff" /> : <Text style={s.redBtnText}>Publicar</Text>}
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+
+          <Modal visible={forumEditOpen} animationType="slide" transparent onRequestClose={() => setForumEditOpen(false)}>
+            <KeyboardAvoidingView
+              style={s.forumModalOverlay}
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+              keyboardVerticalOffset={Platform.OS === 'ios' ? 20 : 0}
+            >
+              <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end' }}>
+                <View style={s.forumModalCard}>
+                  <Text style={s.sectionTitle}>{forumEditCollection === 'foro_hilos' ? 'Editar hilo' : 'Editar respuesta'}</Text>
+                  {forumEditCollection === 'foro_hilos' && (
+                    <>
+                      <Text style={[s.label, { marginTop: 4 }]}>Título</Text>
+                      <TextInput
+                        style={s.input}
+                        value={forumEditTitle}
+                        onChangeText={(v) => setForumEditTitle(v.slice(0, 120))}
+                        placeholder="Máximo 120 caracteres"
+                        placeholderTextColor="#b3a9a0"
+                      />
+                    </>
+                  )}
+                  <Text style={[s.label, { marginTop: forumEditCollection === 'foro_hilos' ? -6 : 4 }]}>Contenido</Text>
+                  <TextInput
+                    style={[s.input, { minHeight: 120, textAlignVertical: 'top' }]}
+                    value={forumEditBody}
+                    onChangeText={(v) => setForumEditBody(v.slice(0, 1000))}
+                    placeholder="Escribe aquí..."
+                    placeholderTextColor="#b3a9a0"
+                    multiline
+                  />
+                  <Text style={s.forumCountText}>{forumEditCollection === 'foro_hilos' ? `${forumEditTitle.length}/120 · ` : ''}{forumEditBody.length}/1000</Text>
+                  <View style={{ flexDirection: 'row', gap: 10, marginTop: 14, paddingBottom: Platform.OS === 'ios' ? 8 : 14 }}>
+                    <TouchableOpacity style={[s.authSecondaryBtn, { flex: 1, marginTop: 0 }]} onPress={() => setForumEditOpen(false)}>
+                      <Text style={s.authSecondaryBtnText}>Cancelar</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[s.redBtn, { flex: 1, marginTop: 0 }]} onPress={guardarEdicionForo} disabled={forumEditing}>
+                      {forumEditing ? <ActivityIndicator color="#fff" /> : <Text style={s.redBtnText}>Guardar</Text>}
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </ScrollView>
+            </KeyboardAvoidingView>
+          </Modal>
+        </View>
+      )}
+
+      {activeTab !== 'Cafeterías' && activeTab !== 'Comunidad' && (
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
 
         {/* ── INICIO ── */}
         {activeTab === 'Inicio' && (
           <View>
             <View style={s.topBar}>
+              <View style={s.homeBrandWrap}>
+                <Text style={s.homeWordmark}>ETIOVE</Text>
+                <View style={s.homeLoverRow}>
+                  <Text style={s.homeLoverText}>SPECIALTY</Text>
+                  <View style={s.homeMiniSealOuter}>
+                    <View style={s.homeMiniSealMiddle}>
+                      <View style={s.homeMiniSealInner}>
+                        <Text style={s.homeMiniSealText}>E</Text>
+                      </View>
+                    </View>
+                  </View>
+                  <Text style={s.homeLoverText}>COFFEE</Text>
+                </View>
+              </View>
               <TouchableOpacity style={s.locationPill} onPress={() => setShowProfile(true)}>
-                <Text style={s.locationText}>{flag}  Etiove</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => setShowProfile(true)} style={s.profileBtn}>
-                {perfil.foto
-                  ? <Image source={{ uri: perfil.foto }} style={s.profileAvatar} />
-                  : <View style={s.profileAvatar}><Text style={s.profileAvatarText}>{(perfil.nombre || user?.email || '?')[0].toUpperCase()}</Text></View>
-                }
+                <View style={s.brandDecorOne} />
+                <View style={s.brandDecorTwo} />
+                <View style={s.brandTopRule} />
+                <Animated.View style={[s.brandPillContent, { opacity: brandCardAnim, transform: [{ translateY: brandCardTranslateY }, { scale: brandCardScale }] }]}>
+                  <Text style={s.brandEyebrow}>Member Roast Card</Text>
+                  <View style={s.brandMemberRow}>
+                    <View style={s.brandMemberIdentity}>
+                      {perfil.foto
+                        ? <Image source={{ uri: perfil.foto }} style={s.brandMemberAvatar} />
+                        : <View style={s.brandMemberAvatarFallback}><Text style={s.brandMemberAvatarText}>{profileInitial}</Text></View>
+                      }
+                      <View style={s.brandMemberCopy}>
+                        <Text style={s.brandAlias}>@{profileAlias.replace(/^@+/, '')}</Text>
+                        <Text style={s.brandName} numberOfLines={1}>{profileName}</Text>
+                      </View>
+                    </View>
+                    <View style={s.brandLevelBadge}>
+                      <Text style={s.brandLevelText}>{currentLevel.icon} {currentLevel.name}</Text>
+                    </View>
+                  </View>
+                  <View style={s.brandRow}>
+                    <View style={s.brandTitleWrap}>
+                      <Text style={s.brandXpText}>{gamification.xp} XP acumulados</Text>
+                    </View>
+                  </View>
+                  <View style={s.brandMetaRow}>
+                    <Text style={s.brandMetaText}>{nextLevel ? `Próximo nivel: ${nextLevel.name}` : 'Nivel máximo alcanzado'}</Text>
+                    {nextLevel && <Text style={s.brandMetaText}>{nextLevel.minXp} XP</Text>}
+                  </View>
+                  <View style={s.brandProgressTrack}>
+                    <Animated.View style={[s.brandProgressFill, { width: brandProgressWidth }]} />
+                  </View>
+                  <View style={s.brandStatsRow}>
+                    <View style={s.brandStatCard}>
+                      <Text style={s.brandStatValue}>{gamification.votesCount}</Text>
+                      <Text style={s.brandStatLabel}>Votos</Text>
+                    </View>
+                    <View style={s.brandStatCard}>
+                      <Text style={s.brandStatValue}>{gamification.photosCount}</Text>
+                      <Text style={s.brandStatLabel}>Fotos</Text>
+                    </View>
+                    <View style={s.brandStatCard}>
+                      <Text style={s.brandStatValue}>{gamification.reviewsCount}</Text>
+                      <Text style={s.brandStatLabel}>Reseñas</Text>
+                    </View>
+                    <View style={s.brandStatCard}>
+                      <Text style={s.brandStatValue}>{gamification.favoritesMarkedCount}</Text>
+                      <Text style={s.brandStatLabel}>Favoritos</Text>
+                    </View>
+                  </View>
+                </Animated.View>
               </TouchableOpacity>
             </View>
 
@@ -1367,7 +2701,7 @@ function MainScreen({ onLogout }) {
                     <TouchableOpacity onPress={() => setActiveTab('Últimos añadidos')}><Ionicons name="chevron-forward" size={20} color="#555" /></TouchableOpacity>
                   </View>
                   <Text style={s.sectionSub}>Los 10 más recientes de la comunidad</Text>
-                  {cargando ? <ActivityIndicator color="#e8590c" style={{ margin: 30 }} /> : (
+                  {cargando ? <ActivityIndicator color={PREMIUM_ACCENT} style={{ margin: 30 }} /> : (
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingLeft: 16, paddingRight: 8, gap: 12 }}>
                       {ultimosGlobal.map(item => <CardHorizontal key={item.id} item={item} badge={`${item.puntuacion}.0`} onPress={setCafeDetalle} favs={favs} onToggleFav={toggleFav} />)}
                       {ultimosGlobal.length === 0 && <Text style={[s.empty, { marginLeft: 0 }]}>Aún no hay cafés.</Text>}
@@ -1379,20 +2713,67 @@ function MainScreen({ onLogout }) {
                     <TouchableOpacity onPress={() => setActiveTab('Top cafés')}><Ionicons name="chevron-forward" size={20} color="#555" /></TouchableOpacity>
                   </View>
                   <Text style={s.sectionSub}>Los mejor puntuados · filtrando por tu país</Text>
-                  {cargando ? <ActivityIndicator color="#e8590c" style={{ margin: 30 }} /> : (
+                  {cargando ? <ActivityIndicator color={PREMIUM_ACCENT} style={{ margin: 30 }} /> : (
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingLeft: 16, paddingRight: 8, gap: 12 }}>
                       {topCafesVista.slice(0, 10).map(item => <CardHorizontal key={item.id} item={item} badge={`${item.puntuacion}.0 ⭐`} onPress={setCafeDetalle} favs={favs} onToggleFav={toggleFav} />)}
                       {topCafesVista.length === 0 && <Text style={[s.empty, { marginLeft: 0 }]}>Aún no hay cafés.</Text>}
                     </ScrollView>
                   )}
 
-                  {favCafes.length > 0 && <>
-                    <View style={[s.sectionHeader, { marginTop: 28 }]}><Text style={s.sectionTitle}>⭐ Mis favoritos</Text></View>
-                    <Text style={s.sectionSub}>{favCafes.length} cafés guardados</Text>
+                  <View style={[s.sectionHeader, { marginTop: 28 }]}>
+                    <Text style={s.sectionTitle}>Cafeterías cerca de ti</Text>
+                    <TouchableOpacity onPress={() => setActiveTab('Cafeterías')}><Ionicons name="chevron-forward" size={20} color="#555" /></TouchableOpacity>
+                  </View>
+                  <Text style={s.sectionSub}>Se cargan automáticamente al entrar en Inicio</Text>
+                  {cargandoCafInicio ? (
+                    <ActivityIndicator color={PREMIUM_ACCENT} style={{ margin: 18 }} />
+                  ) : errorCafInicio ? (
+                    <View style={{ paddingHorizontal: 16 }}>
+                      <Text style={[s.empty, { marginTop: 6 }]}>{errorCafInicio}</Text>
+                    </View>
+                  ) : (
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingLeft: 16, paddingRight: 8, gap: 12 }}>
-                      {favCafes.map(item => <CardHorizontal key={item.id} item={item} badge={`${item.puntuacion}.0`} onPress={setCafeDetalle} favs={favs} onToggleFav={toggleFav} />)}
+                      {cafeteriasInicio.map((cafItem) => (
+                        <TouchableOpacity key={cafItem.id} style={s.cardH} onPress={() => setActiveTab('Cafeterías')} activeOpacity={0.88}>
+                          <View style={s.cardHImg}>
+                            {cafItem.foto
+                              ? <Image source={{ uri: cafItem.foto }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+                              : <View style={[StyleSheet.absoluteFillObject, { alignItems: 'center', justifyContent: 'center', backgroundColor: '#f2ece5' }]}><Text style={{ fontSize: 30 }}>☕</Text></View>
+                            }
+                            <View style={[s.badgeRed, { right: 8, left: 'auto' }]}>
+                              <Text style={s.badgeText}>{cafItem.abierto === null ? '—' : cafItem.abierto ? 'Abierto' : 'Cerrado'}</Text>
+                            </View>
+                          </View>
+                          <Text style={s.cardHName} numberOfLines={2}>{cafItem.nombre}</Text>
+                          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 4 }}>
+                            <Ionicons name="star" size={12} color={THEME.status.favorite} />
+                            <Text style={s.cardHRating}>{cafItem.rating}</Text>
+                            <Text style={s.cardHVotos}>({cafItem.numResenas})</Text>
+                          </View>
+                          <Text style={s.cardHOrigin}>{cafItem.distancia < 1000 ? `${cafItem.distancia}m` : `${(cafItem.distancia / 1000).toFixed(1)}km`}</Text>
+                        </TouchableOpacity>
+                      ))}
                     </ScrollView>
-                  </>}
+                  )}
+
+                  <View style={[s.sectionHeader, { marginTop: 28 }]}>
+                    <Text style={s.sectionTitle}>Ofertas de cafés (web)</Text>
+                    <TouchableOpacity onPress={() => setActiveTab('Ofertas')}><Ionicons name="chevron-forward" size={20} color="#555" /></TouchableOpacity>
+                  </View>
+                  <Text style={s.sectionSub}>Pulsa un café y te mostramos las 3 ofertas más baratas encontradas en Google</Text>
+                  {cargando ? <ActivityIndicator color={PREMIUM_ACCENT} style={{ margin: 20 }} /> : (
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingLeft: 16, paddingRight: 8, gap: 12 }}>
+                      {cafesParaOfertas.slice(0, 10).map(cafe => (
+                        <TouchableOpacity key={cafe.id} style={s.cardH} onPress={() => abrirOfertasCafe(cafe, { navigate: true })} activeOpacity={0.88}>
+                          <View style={s.cardHImg}><PackshotImage uri={cafe.foto} frameStyle={s.packshotCardFrame} imageStyle={s.packshotCardImage} /></View>
+                          <Text style={s.cardHOrigin} numberOfLines={1}>{cafe.pais || 'Sin país'}</Text>
+                          <Text style={s.cardHName} numberOfLines={2}>{cafe.nombre}</Text>
+                          <Text style={s.cardHVotos} numberOfLines={2}>Pulsa para ver 3 ofertas en Google</Text>
+                        </TouchableOpacity>
+                      ))}
+                      {cafesParaOfertas.length === 0 && <Text style={[s.empty, { marginLeft: 0 }]}>No hay cafés en base de datos.</Text>}
+                    </ScrollView>
+                  )}
                 </>
             }
           </View>
@@ -1402,12 +2783,23 @@ function MainScreen({ onLogout }) {
         {activeTab === 'Mis Cafés' && (
           <View style={{ paddingTop: 20 }}>
             <View style={{ paddingHorizontal: 16 }}><Text style={s.pageTitle}>Mis Cafés</Text></View>
-            {!cargando && <QuizSection allCafes={allCafes} />}
+            {!cargando && <QuizSection allCafes={allCafes} onGamifyEvent={registrarEventoGamificacion} />}
+
+            {favCafes.length > 0 && (
+              <>
+                <View style={[s.sectionHeader, { marginTop: 24 }]}><Text style={s.sectionTitle}>⭐ Mis favoritos</Text></View>
+                <Text style={s.sectionSub}>{favCafes.length} cafés guardados</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingLeft: 16, paddingRight: 8, gap: 12 }}>
+                  {favCafes.map(item => <CardHorizontal key={item.id} item={item} badge={`${item.puntuacion}.0`} onPress={setCafeDetalle} favs={favs} onToggleFav={toggleFav} />)}
+                </ScrollView>
+              </>
+            )}
+
             <View style={{ paddingHorizontal: 16, marginTop: 24 }}>
               <Text style={[s.sectionTitle, { marginBottom: 12 }]}>Mi colección</Text>
               <SearchInput value={busquedaMis} onChangeText={setBusquedaMis} onSearch={setBusquedaMis} allCafes={misCafes} placeholder="Buscar en tu colección" />
             </View>
-            {cargando ? <ActivityIndicator color="#e8590c" style={{ margin: 30 }} /> : (
+            {cargando ? <ActivityIndicator color={PREMIUM_ACCENT} style={{ margin: 30 }} /> : (
               <View style={{ paddingHorizontal: 16 }}>
                 {cafesFiltrados.map(item => <CardVertical key={item.id} item={item} onDelete={eliminarCafe} onPress={setCafeDetalle} favs={favs} onToggleFav={toggleFav} />)}
                 {cafesFiltrados.length === 0 && <Text style={s.empty}>{busquedaMis ? 'Sin resultados' : 'No has añadido cafés aún'}</Text>}
@@ -1421,13 +2813,13 @@ function MainScreen({ onLogout }) {
           <View style={{ paddingTop: 20 }}>
             <View style={{ paddingHorizontal: 16 }}>
               <TouchableOpacity onPress={() => setActiveTab('Inicio')} style={s.backRow}>
-                <Ionicons name="chevron-back" size={20} color="#e8590c" />
+                <Ionicons name="chevron-back" size={20} color={PREMIUM_ACCENT} />
                 <Text style={s.backText}>Volver</Text>
               </TouchableOpacity>
               <Text style={s.pageTitle}>Últimos añadidos</Text>
               <Text style={s.sectionSub}>Mostrando los 100 más recientes de la comunidad</Text>
             </View>
-            {cargando ? <ActivityIndicator color="#e8590c" style={{ margin: 30 }} /> : (
+            {cargando ? <ActivityIndicator color={PREMIUM_ACCENT} style={{ margin: 30 }} /> : (
               <View style={{ paddingHorizontal: 16, marginTop: 8 }}>
                 {ultimos100.map(item => <CardVertical key={item.id} item={item} onDelete={() => {}} onPress={setCafeDetalle} favs={favs} onToggleFav={toggleFav} />)}
                 {ultimos100.length === 0 && <Text style={s.empty}>Aún no hay cafés.</Text>}
@@ -1441,13 +2833,13 @@ function MainScreen({ onLogout }) {
           <View style={{ paddingTop: 20 }}>
             <View style={{ paddingHorizontal: 16 }}>
               <TouchableOpacity onPress={() => setActiveTab('Inicio')} style={s.backRow}>
-                <Ionicons name="chevron-back" size={20} color="#e8590c" />
+                <Ionicons name="chevron-back" size={20} color={PREMIUM_ACCENT} />
                 <Text style={s.backText}>Volver</Text>
               </TouchableOpacity>
               <Text style={s.pageTitle}>Top cafés</Text>
               <Text style={s.sectionSub}>Mostrando los 100 mejor puntuados ({perfil.pais || 'España'})</Text>
             </View>
-            {cargando ? <ActivityIndicator color="#e8590c" style={{ margin: 30 }} /> : (
+            {cargando ? <ActivityIndicator color={PREMIUM_ACCENT} style={{ margin: 30 }} /> : (
               <View style={{ paddingHorizontal: 16, marginTop: 8 }}>
                 {top100.map(item => <CardVertical key={item.id} item={item} onDelete={() => {}} onPress={setCafeDetalle} favs={favs} onToggleFav={toggleFav} />)}
                 {top100.length === 0 && <Text style={s.empty}>Aún no hay cafés.</Text>}
@@ -1456,26 +2848,106 @@ function MainScreen({ onLogout }) {
           </View>
         )}
 
+        {/* ── OFERTAS WEB ── */}
+        {activeTab === 'Ofertas' && (
+          <View style={{ paddingTop: 20 }}>
+            <View style={{ paddingHorizontal: 16 }}>
+              <TouchableOpacity onPress={() => setActiveTab('Inicio')} style={s.backRow}>
+                <Ionicons name="chevron-back" size={20} color={PREMIUM_ACCENT} />
+                <Text style={s.backText}>Volver</Text>
+              </TouchableOpacity>
+              <Text style={s.pageTitle}>Ofertas de cafés</Text>
+              <Text style={s.sectionSub}>Pulsa cualquier café para cargar sus 3 ofertas más baratas encontradas en Google</Text>
+            </View>
+            <View style={{ paddingHorizontal: 16, marginTop: 8 }}>
+              {cafesParaOfertas.map(cafe => {
+                const ofertas = ofertasPorCafe[cafe.id]?.offers || [];
+                const buscando = buscandoOfertaId === cafe.id;
+                const expanded = openOfferCafeId === cafe.id;
+                return (
+                  <TouchableOpacity key={cafe.id} style={[s.cardV, { borderBottomColor: '#f2f2f2', marginBottom: 18 }]} activeOpacity={0.9} onPress={() => abrirOfertasCafe(cafe, { forceRefresh: expanded })}> 
+                    <View style={s.cardVImg}><PackshotImage uri={cafe.foto} frameStyle={s.packshotListFrame} imageStyle={s.packshotListImage} /></View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={s.cardVName}>{cafe.nombre}</Text>
+                      <Text style={s.cardVOrigin}>{cafe.pais || 'Sin país'} {cafe.marca ? `· ${cafe.marca}` : ''}</Text>
+                      <Text style={s.offerHint}>{buscando ? 'Buscando ofertas en Google...' : expanded ? 'Pulsa de nuevo para refrescar resultados' : 'Pulsa para ver las 3 ofertas más baratas en Google'}</Text>
+
+                      {buscando && <ActivityIndicator color={PREMIUM_ACCENT} style={{ marginTop: 12, alignSelf: 'flex-start' }} />}
+
+                      {expanded && ofertas.length > 0 && (
+                        <View style={{ marginTop: 10, gap: 8 }}>
+                          {ofertas.map((of) => (
+                            <TouchableOpacity key={of.id} onPress={() => abrirOfertaWeb(of)} style={{ backgroundColor: THEME.surface.subtle, borderRadius: 10, padding: 10, borderWidth: 1, borderColor: THEME.border.soft }}>
+                              <View style={s.offerMetaRow}>
+                                <Text style={{ fontSize: 12, color: '#777', flex: 1 }}>{of.tienda}</Text>
+                                <Text style={s.offerSourceBadge}>Google</Text>
+                              </View>
+                              <Text style={{ fontSize: 13, fontWeight: '700', color: THEME.text.primary }} numberOfLines={2}>{of.titulo}</Text>
+                              <Text style={{ fontSize: 13, color: PREMIUM_ACCENT_DEEP, fontWeight: '700' }}>{of.precioTexto} · Ver oferta</Text>
+                            </TouchableOpacity>
+                          ))}
+                        </View>
+                      )}
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+              {cafesParaOfertas.length === 0 && <Text style={s.empty}>No hay cafés en base de datos.</Text>}
+              {!!errorOfertas && <Text style={[s.empty, { marginTop: 8 }]}>{errorOfertas}</Text>}
+            </View>
+          </View>
+        )}
+
         {/* ── MÁS ── */}
         {activeTab === 'Más' && (
           <View style={{ paddingTop: 20 }}>
             <View style={{ paddingHorizontal: 16 }}>
               <Text style={s.pageTitle}>Más</Text>
-              <Text style={[s.sectionTitle, { marginBottom: 16, marginTop: 8 }]}>Mi cuenta</Text>
-              <MasItem icon="person-circle-outline" label="Mi perfil" sub={`${perfil.nombre || ''} ${perfil.apellidos || ''}`.trim() || 'Configura tu perfil'} onPress={() => setShowProfile(true)} />
-              <MasItem icon="heart-outline"         label="Mis favoritos"    sub={`${favs.length} cafés guardados`} onPress={() => {}} />
-              <MasItem icon="stats-chart-outline"   label="Mis estadísticas" sub={`${misCafes.length} cafés en tu colección`} onPress={() => Alert.alert('Estadísticas', `☕ Cafés añadidos: ${misCafes.length}\n⭐ Favoritos: ${favs.length}\n🗳️ Votos emitidos: ${votes.length}`)} />
 
-              <View style={[det.divider, { marginVertical: 16 }]} />
-              <Text style={[s.sectionTitle, { marginBottom: 16 }]}>Sobre Etiove</Text>
-              <MasItem icon="information-circle-outline" label="Versión" sub={`Etiove v${APP_VERSION}`} onPress={() => Alert.alert('Etiove', `Versión ${APP_VERSION}\n\nReact Native + Expo\nFirebase Firestore\nOpenStreetMap\n\n☕ Hecha con amor por los amantes del café.`)} />
-              <MasItem icon="book-outline"               label="Guía de cata"          sub="Aprende a identificar sabores" onPress={() => Alert.alert('Guía de cata ☕', '🌸 Floral: jazmín, rosa, bergamota\n🍒 Frutal: cereza, naranja, fresa\n🍫 Chocolate: cacao, caramelo\n🌿 Herbal: té, hierbas\n⚡ Acidez brillante: limón, pomelo\n🌊 Acidez suave: manzana, melocotón\n\nEspecialty > 80 puntos SCA.')} />
-              <MasItem icon="globe-outline"              label="Orígenes del café"      sub="Conoce los países productores" onPress={() => Alert.alert('Top orígenes', '🇪🇹 Etiopía — el origen del café\n🇰🇪 Kenia — acidez brillante\n🇨🇴 Colombia — equilibrio perfecto\n🇵🇦 Panamá — la Geisha más famosa\n🇾🇪 Yemen — el más histórico\n🇯🇲 Jamaica — Blue Mountain legendario')} />
-              <MasItem icon="cafe-outline"               label="Métodos de preparación" sub="V60, Chemex, Espresso y más" onPress={() => Alert.alert('Métodos', '☕ Espresso: 25-30s, concentrado\n🫧 V60: filtro limpio y floral\n🧪 Chemex: cuerpo ligero\n🔵 Aeropress: versátil y rápido\n🫙 Prensa francesa: cuerpo denso\n❄️ Cold brew: 12h, suave')} />
+              <View style={mas.premiumCard}>
+                <View style={mas.premiumGlow} />
+                <View style={mas.premiumTopRow}>
+                  <View style={mas.premiumIdentity}>
+                    {perfil.foto
+                      ? <Image source={{ uri: perfil.foto }} style={mas.premiumAvatar} />
+                      : <View style={mas.premiumAvatarFallback}><Text style={mas.premiumAvatarText}>{profileInitial}</Text></View>
+                    }
+                    <View>
+                      <Text style={mas.premiumAlias}>@{profileAlias.replace(/^@+/, '')}</Text>
+                      <Text style={mas.premiumName} numberOfLines={1}>{profileName}</Text>
+                    </View>
+                  </View>
+                  <View style={mas.premiumLevelBadge}>
+                    <Text style={mas.premiumLevelText}>{currentLevel.icon} {currentLevel.name}</Text>
+                  </View>
+                </View>
 
-              <View style={[det.divider, { marginVertical: 16 }]} />
+                <View style={mas.premiumStatsRow}>
+                  <View style={mas.premiumStatCard}>
+                    <Text style={mas.premiumStatValue}>{misCafes.length}</Text>
+                    <Text style={mas.premiumStatLabel}>Colección</Text>
+                  </View>
+                  <View style={mas.premiumStatCard}>
+                    <Text style={mas.premiumStatValue}>{favs.length}</Text>
+                    <Text style={mas.premiumStatLabel}>Favoritos</Text>
+                  </View>
+                  <View style={mas.premiumStatCard}>
+                    <Text style={mas.premiumStatValue}>{votes.length}</Text>
+                    <Text style={mas.premiumStatLabel}>Valoraciones</Text>
+                  </View>
+                </View>
+              </View>
+
+              <Text style={mas.blockTitle}>Cuenta</Text>
+              <MasItem icon="person-circle-outline" label="Mi perfil" sub="Editar foto, alias y datos personales" onPress={() => setShowProfile(true)} />
+              <MasItem icon="shield-checkmark-outline" label="Privacidad y seguridad" sub="Protección de cuenta y acceso" onPress={() => Alert.alert('Privacidad y seguridad', 'Tus datos se gestionan desde tu perfil y tu sesión activa.')} />
+
+              <Text style={mas.blockTitle}>Aplicación</Text>
+              <MasItem icon="information-circle-outline" label="Versión" sub={`Etiove v${APP_VERSION}`} onPress={() => Alert.alert('Etiove', `Versión ${APP_VERSION}\n\nReact Native + Expo\nFirebase Firestore`)} />
+
+              <View style={[det.divider, { marginVertical: 18 }]} />
               <TouchableOpacity style={mas.logoutBtn} onPress={() => Alert.alert('Cerrar sesión', '¿Seguro?', [{ text: 'Cancelar', style: 'cancel' }, { text: 'Salir', style: 'destructive', onPress: onLogout }])}>
-                <Ionicons name="log-out-outline" size={20} color="#e74c3c" />
+                <Ionicons name="log-out-outline" size={20} color={THEME.status.danger} />
                 <Text style={mas.logoutText}>Cerrar sesión</Text>
               </TouchableOpacity>
             </View>
@@ -1485,15 +2957,17 @@ function MainScreen({ onLogout }) {
       </ScrollView>
       )}
 
-      <View style={s.bottomBar}>
-        <TabBtn icon="home"           label="Inicio"      tab="Inicio"      active={activeTab} onPress={setActiveTab} />
-        <TabBtn icon="storefront"     label="Cafeterías"  tab="Cafeterías"  active={activeTab} onPress={setActiveTab} />
-        <TouchableOpacity style={s.camBtn} onPress={() => setScanning(true)}>
-          <Ionicons name="camera" size={28} color="#fff" />
-        </TouchableOpacity>
-        <TabBtn icon="cafe"           label="Mis Cafés"   tab="Mis Cafés"   active={activeTab} onPress={setActiveTab} />
-        <TabBtn icon="ellipsis-horizontal" label="Más"   tab="Más"         active={activeTab} onPress={setActiveTab} badge={favs.length} />
-      </View>
+      {!(activeTab === 'Comunidad' && !!forumThread) && (
+        <View style={s.bottomBar}>
+          <TabBtn icon="home"           label="Inicio"      tab="Inicio"      active={activeTab} onPress={setActiveTab} />
+          <TabBtn icon="people"         label="Comunidad"   tab="Comunidad"   active={activeTab} onPress={setActiveTab} />
+          <TouchableOpacity style={s.camBtn} onPress={() => setScanning(true)}>
+            <Ionicons name="camera" size={28} color="#fff" />
+          </TouchableOpacity>
+          <TabBtn icon="cafe"           label="Mis Cafés"   tab="Mis Cafés"   active={activeTab} onPress={setActiveTab} />
+          <TabBtn icon="ellipsis-horizontal" label="Más"   tab="Más"         active={activeTab} onPress={setActiveTab} badge={favs.length} />
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -1502,7 +2976,7 @@ function MainScreen({ onLogout }) {
 export default function App() {
   const [user, setUser]               = useState(null);
   const [showWelcome, setShowWelcome] = useState(true);
-  useEffect(() => { const t = setTimeout(() => setShowWelcome(false), 2000); return () => clearTimeout(t); }, []);
+  useEffect(() => { const t = setTimeout(() => setShowWelcome(false), 4000); return () => clearTimeout(t); }, []);
   if (showWelcome) return <WelcomeScreen />;
   return (
     <AuthContext.Provider value={{ user }}>
@@ -1514,69 +2988,193 @@ export default function App() {
 // ─── ESTILOS ──────────────────────────────────────────────────────────────────
 const s = StyleSheet.create({
   screen:           { flex: 1, backgroundColor: '#fff' },
-  welcomeScreen:    { flex: 1, backgroundColor: '#1a0a00', alignItems: 'center', justifyContent: 'center', gap: 16 },
-  welcomeTitle:     { fontSize: 48, fontWeight: '800', color: '#fff', letterSpacing: 2 },
-  welcomeSub:       { fontSize: 16, color: '#e8590c', fontWeight: '500', letterSpacing: 1 },
+  welcomeScreen:    { flex: 1, backgroundColor: '#f6efe7', alignItems: 'center', justifyContent: 'center', padding: 24 },
+  welcomeAuraOne:   { position: 'absolute', top: 90, right: -20, width: 180, height: 180, borderRadius: 90, backgroundColor: 'rgba(119, 82, 57, 0.08)' },
+  welcomeAuraTwo:   { position: 'absolute', bottom: 80, left: -40, width: 220, height: 220, borderRadius: 110, backgroundColor: 'rgba(255, 248, 241, 0.76)' },
+  welcomeCard:      { width: '100%', borderRadius: 30, backgroundColor: '#fffaf5', borderWidth: 1, borderColor: '#eadbce', paddingVertical: 34, paddingHorizontal: 22, alignItems: 'center', shadowColor: '#3a2416', shadowOpacity: 0.12, shadowRadius: 18, shadowOffset: { width: 0, height: 10 }, elevation: 4 },
+  welcomeTypeBox:   { width: '100%', alignItems: 'center', justifyContent: 'center', minHeight: 130, gap: 6 },
+  welcomeLineTop:   { fontSize: 24, fontWeight: '900', letterSpacing: 4.1, color: '#5e4332' },
+  welcomeLineBottom:{ fontSize: 44, fontWeight: '900', letterSpacing: 5.8, color: '#1c120d' },
+  welcomeTitle:     { fontSize: 44, fontWeight: '900', letterSpacing: 5.8, color: '#1c120d' },
+  welcomeSub:       { fontSize: 10, color: '#6f5444', fontWeight: '800', letterSpacing: 2.1, textAlign: 'center', marginTop: 2 },
+  welcomeCaption:   { marginTop: 18, fontSize: 13, color: '#8a6d5b', fontWeight: '600', letterSpacing: 0.4, textAlign: 'center' },
   permScreen:       { flex: 1, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', padding: 32, gap: 16 },
   permTitle:        { fontSize: 22, fontWeight: '700', color: '#111', textAlign: 'center' },
-  permSub:          { fontSize: 15, color: '#888', textAlign: 'center' },
-  authScroll:       { padding: 32, paddingTop: 60, flexGrow: 1, justifyContent: 'center' },
-  authTitle:        { fontSize: 32, fontWeight: '800', color: '#111', marginBottom: 6 },
-  authSub:          { fontSize: 15, color: '#888', marginBottom: 32 },
+  permSub:          { fontSize: 15, color: THEME.text.secondary, textAlign: 'center' },
+  authScroll:       { padding: 24, paddingTop: 36, paddingBottom: 40, flexGrow: 1, justifyContent: 'center', backgroundColor: '#f6efe7' },
+  authShell:        { position: 'relative', gap: 22 },
+  authAuraOne:      { position: 'absolute', top: -28, right: -18, width: 150, height: 150, borderRadius: 75, backgroundColor: 'rgba(119, 82, 57, 0.09)' },
+  authAuraTwo:      { position: 'absolute', bottom: 90, left: -36, width: 180, height: 180, borderRadius: 90, backgroundColor: 'rgba(255, 248, 241, 0.72)' },
+  authBrandBlock:   { paddingTop: 8, paddingBottom: 2 },
+  authTitle:        { fontSize: 30, fontWeight: '800', color: '#1f140f', marginBottom: 8 },
+  authSub:          { fontSize: 15, color: '#7e6b5f', marginBottom: 24, lineHeight: 22 },
+  authKicker:       { fontSize: 11, fontWeight: '800', color: '#8d6d58', textTransform: 'uppercase', letterSpacing: 1.4, marginBottom: 10 },
+  authCard:         { backgroundColor: '#fffaf5', borderRadius: 28, padding: 22, borderWidth: 1, borderColor: '#eadbce', shadowColor: '#3a2416', shadowOpacity: 0.1, shadowRadius: 18, shadowOffset: { width: 0, height: 10 }, elevation: 4 },
   authLinks:        { marginTop: 20, gap: 12, alignItems: 'center' },
-  authLink:         { color: '#e8590c', fontSize: 14, fontWeight: '500' },
+  authLink:         { color: THEME.brand.accentDeep, fontSize: 14, fontWeight: '700' },
+  authLinkMuted:    { color: '#8f837a', fontSize: 14, fontWeight: '600' },
   rememberRow:      { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 16 },
-  rememberText:     { fontSize: 14, color: '#555' },
-  faceIdBtn:        { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 16, padding: 14, borderWidth: 1.5, borderColor: '#e8590c', borderRadius: 30 },
-  faceIdText:       { color: '#e8590c', fontWeight: '600', fontSize: 15 },
-  topBar:           { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingTop: 12, paddingBottom: 8 },
-  locationPill:     { borderWidth: 1, borderColor: '#ddd', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6 },
-  locationText:     { fontSize: 14, fontWeight: '500', color: '#222' },
+  rememberText:     { fontSize: 14, color: THEME.text.tertiary },
+  authRememberText: { color: '#5f534b' },
+  faceIdBtn:        { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 16, padding: 14, borderWidth: 1.5, borderColor: THEME.brand.accentDeep, borderRadius: 30, backgroundColor: '#f9f2ea' },
+  faceIdText:       { color: THEME.brand.accentDeep, fontWeight: '700', fontSize: 15 },
+  authLabel:        { color: '#836e61' },
+  authInput:        { backgroundColor: '#f8f1ea', borderWidth: 1, borderColor: '#e8dacd', color: '#221610' },
+  authPrimaryBtn:   { backgroundColor: THEME.brand.primary, borderRadius: 30, padding: 16, alignItems: 'center', marginTop: 8, shadowColor: THEME.brand.primary, shadowOpacity: 0.18, shadowRadius: 12, shadowOffset: { width: 0, height: 8 }, elevation: 3 },
+  authPrimaryBtnText:{ color: THEME.brand.onPrimary, fontWeight: '800', fontSize: 15, letterSpacing: 0.3 },
+  authSecondaryBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 14, padding: 14, borderWidth: 1.2, borderColor: '#dcc8b7', borderRadius: 30, backgroundColor: '#f9f2ea' },
+  authSecondaryBtnText:{ color: THEME.brand.accentDeep, fontWeight: '700', fontSize: 15 },
+  topBar:           { paddingHorizontal: 16, paddingTop: 10, paddingBottom: 8, gap: 10 },
+  homeBrandWrap:    { alignItems: 'center', justifyContent: 'center', gap: 5, paddingTop: 2, paddingBottom: 2 },
+  homeWordmark:     { fontSize: 42, fontWeight: '900', letterSpacing: 6, color: '#1c120d', textShadowColor: 'rgba(111, 84, 68, 0.08)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 8 },
+  homeLoverRow:     { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  homeLoverText:    { fontSize: 10, fontWeight: '800', color: '#6f5444', letterSpacing: 2.2 },
+  homeMiniSealOuter:{ width: 24, height: 24, borderRadius: 12, borderWidth: 1, borderColor: '#c4a18a', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fcf7f1' },
+  homeMiniSealMiddle:{ width: 18, height: 18, borderRadius: 9, borderWidth: 1, borderColor: 'rgba(154, 121, 99, 0.4)', alignItems: 'center', justifyContent: 'center' },
+  homeMiniSealInner:{ width: 12, height: 12, borderRadius: 6, borderWidth: 1, borderColor: '#8f6a53', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f2e7dc' },
+  homeMiniSealText: { fontSize: 8, fontWeight: '900', color: '#6f5444', letterSpacing: 0.5 },
+  wordmarkWrap:     { alignItems: 'center', justifyContent: 'center', gap: 4, paddingHorizontal: 2, paddingTop: 4 },
+  wordmarkCrest:    { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 3 },
+  wordmarkMiniLabelWrap:{ minWidth: 78, alignItems: 'center' },
+  wordmarkMiniLabel:{ fontSize: 9, fontWeight: '800', color: '#9a7963', letterSpacing: 2.2 },
+  wordmarkSealOuter:{ width: 38, height: 38, borderRadius: 19, borderWidth: 1, borderColor: '#c4a18a', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fcf7f1' },
+  wordmarkSealMiddle:{ width: 30, height: 30, borderRadius: 15, borderWidth: 1, borderColor: 'rgba(154, 121, 99, 0.38)', alignItems: 'center', justifyContent: 'center' },
+  wordmarkSeal:     { width: 22, height: 22, borderRadius: 11, borderWidth: 1, borderColor: '#8f6a53', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f2e7dc' },
+  wordmarkSealText: { fontSize: 11, fontWeight: '900', color: '#6f5444', letterSpacing: 1.1 },
+  wordmark:         { fontSize: 40, fontWeight: '900', letterSpacing: 5.8, color: '#1c120d', textShadowColor: 'rgba(111, 84, 68, 0.08)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 8 },
+  wordmarkSub:      { fontSize: 10, color: '#8a6b57', fontWeight: '800', letterSpacing: 3.2, marginTop: -2 },
+  wordmarkTag:      { fontSize: 10, color: '#6f5444', fontWeight: '800', letterSpacing: 2.1, textAlign: 'center', marginTop: 2 },
+  authWordmarkSub:  { marginBottom: 10 },
+  authWordmarkTag:  { marginTop: 0 },
+  locationPill:     { position: 'relative', overflow: 'hidden', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 10, minWidth: 210, backgroundColor: '#1f140f', borderWidth: 1, borderColor: '#4e3426', shadowColor: '#170d08', shadowOpacity: 0.24, shadowRadius: 14, shadowOffset: { width: 0, height: 8 }, elevation: 5 },
+  locationText:     { fontSize: 15, fontWeight: '800', color: '#f8ead9', letterSpacing: 0.2 },
+  brandPillContent: { gap: 6 },
+  brandEyebrow:     { fontSize: 9, fontWeight: '700', color: '#d6b89b', textTransform: 'uppercase', letterSpacing: 1.1 },
+  brandRow:         { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 },
+  brandMemberRow:   { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 },
+  brandMemberIdentity: { flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 },
+  brandMemberAvatar:{ width: 40, height: 40, borderRadius: 20, borderWidth: 1.2, borderColor: 'rgba(255, 236, 220, 0.2)' },
+  brandMemberAvatarFallback:{ width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255, 248, 241, 0.1)', borderWidth: 1.2, borderColor: 'rgba(255, 236, 220, 0.14)', alignItems: 'center', justifyContent: 'center' },
+  brandMemberAvatarText:{ color: '#fff1e4', fontSize: 15, fontWeight: '800' },
+  brandMemberCopy:  { flex: 1, gap: 2 },
+  brandAlias:       { fontSize: 14, fontWeight: '800', color: '#fff4ea' },
+  brandName:        { fontSize: 10, color: '#d2bead' },
+  brandTitleWrap:   { flex: 1, gap: 3 },
+  brandLevelBadge:  { backgroundColor: 'rgba(248, 225, 198, 0.12)', borderRadius: 999, paddingHorizontal: 8, paddingVertical: 4, alignSelf: 'flex-start', borderWidth: 1, borderColor: 'rgba(248, 225, 198, 0.18)' },
+  brandLevelText:   { fontSize: 10, fontWeight: '800', color: '#fff4ea' },
+  brandXpText:      { fontSize: 11, color: '#d4c1b1', fontWeight: '600' },
+  brandMetaRow:     { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
+  brandMetaText:    { fontSize: 10, color: '#c9ab90' },
+  brandProgressTrack:{ height: 6, borderRadius: 999, backgroundColor: 'rgba(255, 244, 234, 0.12)', overflow: 'hidden' },
+  brandProgressFill:{ height: '100%', borderRadius: 999, backgroundColor: '#d18b4a' },
+  brandStatsRow:    { flexDirection: 'row', gap: 6 },
+  brandStatCard:    { flex: 1, backgroundColor: 'rgba(255, 248, 241, 0.06)', borderRadius: 12, paddingVertical: 6, paddingHorizontal: 4, borderWidth: 1, borderColor: 'rgba(255, 234, 214, 0.08)', alignItems: 'center' },
+  brandStatValue:   { fontSize: 13, fontWeight: '800', color: '#fff1e4' },
+  brandStatLabel:   { fontSize: 9, color: '#cfb39a', marginTop: 1 },
+  brandDecorOne:    { position: 'absolute', top: -30, right: -20, width: 94, height: 94, borderRadius: 47, backgroundColor: 'rgba(209, 139, 74, 0.13)' },
+  brandDecorTwo:    { position: 'absolute', bottom: -48, left: -26, width: 98, height: 98, borderRadius: 49, backgroundColor: 'rgba(255, 244, 234, 0.06)' },
+  brandTopRule:     { position: 'absolute', top: 0, left: 14, right: 14, height: 1, backgroundColor: 'rgba(255, 238, 220, 0.18)' },
   profileBtn:       { padding: 2 },
-  profileAvatar:    { width: 36, height: 36, borderRadius: 18, backgroundColor: '#e8590c', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
-  profileAvatarText:{ color: '#fff', fontWeight: '700', fontSize: 16 },
+  profileAvatar:    { width: 36, height: 36, borderRadius: 18, backgroundColor: PREMIUM_ACCENT, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  profileAvatarText:{ color: THEME.text.inverse, fontWeight: '700', fontSize: 16 },
   searchWrap:       { flexDirection: 'row', alignItems: 'center', marginHorizontal: 16, marginVertical: 10, backgroundColor: '#f5f5f5', borderRadius: 25, paddingHorizontal: 14, height: 44 },
   searchInput:      { flex: 1, fontSize: 15, color: '#222', marginLeft: 8 },
   sectionHeader:    { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, marginTop: 20, marginBottom: 2 },
   sectionTitle:     { fontSize: 20, fontWeight: '700', color: '#111' },
-  sectionSub:       { fontSize: 13, color: '#888', paddingHorizontal: 16, marginBottom: 14 },
+  sectionSub:       { fontSize: 13, color: THEME.text.secondary, paddingHorizontal: 16, marginBottom: 14 },
   pageTitle:        { fontSize: 24, fontWeight: '700', color: '#111', marginBottom: 12 },
-  empty:            { color: '#aaa', textAlign: 'center', marginTop: 40, fontSize: 14 },
+  empty:            { color: THEME.text.muted, textAlign: 'center', marginTop: 40, fontSize: 14 },
+  packshotFrame:    { backgroundColor: '#ffffff', borderRadius: 18, borderWidth: 1, borderColor: '#f1ece4', shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 2, alignItems: 'center', justifyContent: 'center' },
+  packshotInner:    { width: '100%', height: '100%', backgroundColor: '#fff', borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
+  packshotImage:    { width: '84%', height: '84%' },
+  packshotHeroFrame:{ width: '68%', height: '72%', borderRadius: 28, padding: 14 },
+  packshotHeroImage:{ width: '88%', height: '88%' },
+  packshotCardFrame:{ width: 132, height: 172, marginTop: 14, borderRadius: 18, padding: 10 },
+  packshotCardImage:{ width: '86%', height: '86%' },
+  packshotListFrame:{ width: 68, height: 88, borderRadius: 14, padding: 8 },
+  packshotListImage:{ width: '88%', height: '88%' },
   cardH:            { width: 160, marginRight: 4 },
-  cardHImg:         { width: 160, height: 200, borderRadius: 10, backgroundColor: '#f5f5f5', alignItems: 'center', justifyContent: 'center', marginBottom: 8, overflow: 'hidden' },
-  cardHOrigin:      { fontSize: 12, color: '#888', marginBottom: 2 },
+  cardHImg:         { width: 160, height: 200, borderRadius: 10, backgroundColor: '#f8f7f4', alignItems: 'center', justifyContent: 'center', marginBottom: 8, overflow: 'hidden' },
+  cardHOrigin:      { fontSize: 12, color: THEME.text.secondary, marginBottom: 2 },
   cardHName:        { fontSize: 14, fontWeight: '700', color: '#111', lineHeight: 19 },
-  cardHRating:      { fontSize: 13, fontWeight: '600', color: '#e8590c' },
-  cardHVotos:       { fontSize: 12, color: '#888' },
-  cardV:            { flexDirection: 'row', gap: 12, alignItems: 'flex-start', marginBottom: 16, paddingBottom: 16, borderBottomWidth: 0.5, borderBottomColor: '#eee' },
-  cardVImg:         { width: 80, height: 100, borderRadius: 10, backgroundColor: '#f5f5f5', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' },
-  cardVOrigin:      { fontSize: 12, color: '#888', marginBottom: 2 },
-  cardVName:        { fontSize: 15, fontWeight: '700', color: '#111', marginBottom: 5 },
-  cardVNotas:       { fontSize: 12, color: '#aaa', marginTop: 5, lineHeight: 17 },
-  badgeRed:         { position: 'absolute', top: 8, left: 8, backgroundColor: '#e8590c', borderRadius: 12, paddingHorizontal: 7, paddingVertical: 3 },
+  cardHRating:      { fontSize: 13, fontWeight: '600', color: PREMIUM_ACCENT },
+  cardHVotos:       { fontSize: 12, color: THEME.text.secondary },
+  cardV:            { flexDirection: 'row', gap: 12, alignItems: 'flex-start', marginBottom: 16, paddingBottom: 16, borderBottomWidth: 0.5, borderBottomColor: THEME.border.soft },
+  cardVImg:         { width: 80, height: 100, borderRadius: 10, backgroundColor: '#f8f7f4', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' },
+  cardVOrigin:      { fontSize: 12, color: THEME.text.secondary, marginBottom: 2 },
+  cardVName:        { fontSize: 15, fontWeight: '700', color: THEME.text.primary, marginBottom: 5 },
+  cardVNotas:       { fontSize: 12, color: THEME.text.muted, marginTop: 5, lineHeight: 17 },
+  offerHint:        { fontSize: 12, color: '#666', marginTop: 8 },
+  offerMetaRow:     { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 3 },
+  offerSourceBadge: { fontSize: 10, fontWeight: '800', color: '#fff', backgroundColor: '#111', borderRadius: 999, paddingHorizontal: 6, paddingVertical: 3 },
+  badgeRed:         { position: 'absolute', top: 8, left: 8, backgroundColor: PREMIUM_ACCENT, borderRadius: 12, paddingHorizontal: 7, paddingVertical: 3 },
   badgeText:        { color: '#fff', fontSize: 11, fontWeight: '700' },
-  rankRow:          { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, paddingHorizontal: 16, borderBottomWidth: 0.5, borderBottomColor: '#eee' },
+  rankRow:          { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, paddingHorizontal: 16, borderBottomWidth: 0.5, borderBottomColor: THEME.border.soft },
   rankNum:          { fontSize: 22, fontWeight: '700', color: '#ccc', width: 28 },
   rankName:         { fontSize: 15, fontWeight: '600', color: '#111' },
-  rankVotos:        { fontSize: 12, color: '#888', marginTop: 2 },
-  redBtn:           { backgroundColor: '#e8590c', borderRadius: 30, padding: 16, alignItems: 'center', marginTop: 8 },
-  redBtnText:       { color: '#fff', fontWeight: '700', fontSize: 15 },
-  bottomBar:        { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#fff', borderTopWidth: 0.5, borderTopColor: '#eee', flexDirection: 'row', alignItems: 'center', paddingBottom: 20, paddingTop: 10 },
+  rankVotos:        { fontSize: 12, color: THEME.text.secondary, marginTop: 2 },
+  redBtn:           { backgroundColor: THEME.brand.primary, borderRadius: 30, padding: 16, alignItems: 'center', marginTop: 8, borderWidth: 1, borderColor: THEME.brand.primaryBorder, shadowColor: THEME.brand.primary, shadowOpacity: 0.18, shadowRadius: 12, shadowOffset: { width: 0, height: 8 }, elevation: 3 },
+  redBtnText:       { color: THEME.brand.onPrimary, fontWeight: '800', fontSize: 15, letterSpacing: 0.3 },
+  bottomBar:        { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: THEME.surface.base, borderTopWidth: 0.5, borderTopColor: THEME.border.soft, flexDirection: 'row', alignItems: 'center', paddingBottom: 20, paddingTop: 10 },
   tabBtn:           { flex: 1, alignItems: 'center', gap: 3 },
-  tabLabel:         { fontSize: 10, color: '#888' },
-  tabBadge:         { position: 'absolute', top: -4, right: -8, width: 16, height: 16, borderRadius: 8, backgroundColor: '#e8590c', alignItems: 'center', justifyContent: 'center' },
-  tabBadgeText:     { color: '#fff', fontSize: 9, fontWeight: '700' },
-  camBtn:           { width: 60, height: 60, borderRadius: 30, backgroundColor: '#e8590c', alignItems: 'center', justifyContent: 'center', marginTop: -20, shadowColor: '#e8590c', shadowOpacity: 0.4, shadowRadius: 8, shadowOffset: { width: 0, height: 4 }, elevation: 8 },
+  tabLabel:         { fontSize: 10, color: THEME.text.secondary },
+  tabBadge:         { position: 'absolute', top: -4, right: -8, width: 16, height: 16, borderRadius: 8, backgroundColor: THEME.brand.accent, alignItems: 'center', justifyContent: 'center' },
+  tabBadgeText:     { color: THEME.text.inverse, fontSize: 9, fontWeight: '700' },
+  camBtn:           { width: 60, height: 60, borderRadius: 30, backgroundColor: THEME.brand.primary, borderWidth: 1.5, borderColor: THEME.brand.primaryBorderStrong, alignItems: 'center', justifyContent: 'center', marginTop: -20, shadowColor: THEME.brand.primary, shadowOpacity: 0.34, shadowRadius: 10, shadowOffset: { width: 0, height: 6 }, elevation: 8 },
   formScroll:       { padding: 20, paddingTop: 52, paddingBottom: 50 },
   backRow:          { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 20 },
-  backText:         { color: '#e8590c', fontSize: 15 },
+  backText:         { color: PREMIUM_ACCENT_DEEP, fontSize: 15 },
   formTitle:        { fontSize: 26, fontWeight: '700', color: '#111', marginBottom: 20 },
   fotoEmpty:        { backgroundColor: '#f5f5f5', borderRadius: 14, height: 140, alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 20 },
-  fotoEmptyText:    { color: '#aaa', fontSize: 14 },
+  fotoEmptyText:    { color: THEME.text.muted, fontSize: 14 },
   fotoFull:         { width: '100%', height: 200, borderRadius: 14, marginBottom: 8 },
-  retake:           { color: '#e8590c', fontSize: 13, textAlign: 'right', marginBottom: 20 },
-  label:            { fontSize: 12, fontWeight: '600', color: '#888', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 8 },
+  retake:           { color: PREMIUM_ACCENT_DEEP, fontSize: 13, textAlign: 'right', marginBottom: 20 },
+  label:            { fontSize: 12, fontWeight: '600', color: THEME.text.secondary, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 8 },
   input:            { backgroundColor: '#f5f5f5', borderRadius: 12, padding: 14, fontSize: 15, color: '#111', marginBottom: 18 },
+  forumCatCard:     { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#fff', borderRadius: 14, borderWidth: 1, borderColor: '#ece2d8', padding: 14 },
+  forumCatEmoji:    { fontSize: 22 },
+  forumCatTitle:    { fontSize: 15, fontWeight: '800', color: THEME.text.primary },
+  forumCatDesc:     { fontSize: 12, color: THEME.text.secondary, marginTop: 2 },
+  forumHeaderRow:   { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingTop: 14, paddingBottom: 8 },
+  forumNewBtn:      { backgroundColor: THEME.brand.primary, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8 },
+  forumNewBtnText:  { color: THEME.brand.onPrimary, fontWeight: '700', fontSize: 12 },
+  forumSortRow:     { flexDirection: 'row', gap: 8, marginTop: 8 },
+  forumSortChip:    { borderRadius: 999, borderWidth: 1, borderColor: '#e0d0c1', paddingHorizontal: 10, paddingVertical: 6, backgroundColor: '#fff' },
+  forumSortChipActive:{ backgroundColor: '#2f1d14', borderColor: '#2f1d14' },
+  forumSortText:    { fontSize: 12, color: THEME.brand.accentDeep, fontWeight: '700' },
+  forumSortTextActive:{ color: '#fff' },
+  forumThreadCard:  { backgroundColor: '#fff', borderRadius: 14, borderWidth: 1, borderColor: '#ece2d8', padding: 12 },
+  forumThreadTitle: { fontSize: 15, fontWeight: '800', color: THEME.text.primary, marginBottom: 4 },
+  forumThreadBody:  { fontSize: 13, color: '#4a3f36', lineHeight: 20 },
+  forumMetaRow:     { marginTop: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  forumAuthorRow:   { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  forumAvatar:      { width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: '#e9ddcf' },
+  forumAvatarText:  { fontSize: 12, fontWeight: '800', color: THEME.brand.accentDeep },
+  forumAuthorName:  { fontSize: 12, fontWeight: '700', color: THEME.text.primary },
+  forumAuthorLevel: { fontSize: 10, color: THEME.brand.accentDeep, fontWeight: '700' },
+  forumMetaText:    { fontSize: 11, color: THEME.text.secondary },
+  forumCountersRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 8 },
+  forumCounter:     { fontSize: 12, color: THEME.text.tertiary, fontWeight: '600' },
+  forumMainPost:    { marginTop: 4, backgroundColor: PREMIUM_SURFACE_SOFT, borderRadius: 14, borderWidth: 1, borderColor: PREMIUM_BORDER_SOFT, padding: 14 },
+  forumMainPostHead:{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 },
+  forumMainPostImage:{ marginTop: 8, width: '100%', height: 160, borderRadius: 10 },
+  forumReplyCard:   { marginBottom: 10, backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#efe6dc', padding: 10 },
+  forumChildReplyCard:{ marginTop: 8, marginLeft: 14, backgroundColor: '#faf6f1', borderRadius: 10, borderWidth: 1, borderColor: '#f0e6db', padding: 9 },
+  forumActionBtn:   { backgroundColor: '#f7efe6', borderWidth: 1, borderColor: '#e6d5c4', borderRadius: 999, paddingHorizontal: 10, paddingVertical: 6 },
+  forumActionText:  { fontSize: 12, color: THEME.brand.accentDeep, fontWeight: '700' },
+  forumActionBtnDisabled:{ backgroundColor: '#f3f0eb', borderColor: '#e3ddd6' },
+  forumActionTextDisabled:{ color: '#a39a90' },
+  forumMetaActions: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  forumDotsBtn:     { width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center', backgroundColor: '#f7efe6', borderWidth: 1, borderColor: '#e6d5c4' },
+  forumComposerWrap:{ borderTopWidth: 1, borderTopColor: '#e8ddd2', backgroundColor: '#fff', paddingHorizontal: 12, paddingTop: 10, paddingBottom: Platform.OS === 'ios' ? 34 : 86 },
+  forumReplyingTag: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#f5ece2', borderRadius: 10, paddingHorizontal: 10, paddingVertical: 7, marginBottom: 8 },
+  forumReplyingText:{ fontSize: 12, color: THEME.brand.accentDeep, fontWeight: '600' },
+  forumComposerRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 8 },
+  forumComposerInput:{ flex: 1, minHeight: 42, maxHeight: 110, backgroundColor: '#f5f0e9', borderRadius: 12, borderWidth: 1, borderColor: '#e3d8cc', paddingHorizontal: 12, paddingVertical: 10, fontSize: 14, color: '#2a1d14' },
+  forumSendBtn:     { width: 42, height: 42, borderRadius: 21, backgroundColor: THEME.brand.primary, alignItems: 'center', justifyContent: 'center' },
+  forumModalOverlay:{ flex: 1, backgroundColor: 'rgba(0,0,0,0.35)', justifyContent: 'flex-end' },
+  forumModalCard:   { backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 18, borderWidth: 1, borderColor: '#ebdfd3' },
+  forumCountText:   { fontSize: 12, color: THEME.text.secondary, textAlign: 'right', marginTop: -8, marginBottom: 10 },
 });
 
 const srch = StyleSheet.create({
@@ -1586,28 +3184,28 @@ const srch = StyleSheet.create({
 });
 
 const q = StyleSheet.create({
-  introBox:          { margin: 16, backgroundColor: '#fff5f0', borderRadius: 20, padding: 24, alignItems: 'center', gap: 10 },
+  introBox:          { margin: 16, backgroundColor: PREMIUM_SURFACE_SOFT, borderRadius: 20, padding: 24, alignItems: 'center', gap: 10 },
   introEmoji:        { fontSize: 40 },
   introTitle:        { fontSize: 22, fontWeight: '800', color: '#111', textAlign: 'center' },
   introSub:          { fontSize: 14, color: '#666', textAlign: 'center', lineHeight: 20 },
-  startBtn:          { backgroundColor: '#e8590c', borderRadius: 30, paddingHorizontal: 32, paddingVertical: 14, marginTop: 8 },
+  startBtn:          { backgroundColor: PREMIUM_ACCENT_DEEP, borderRadius: 30, paddingHorizontal: 32, paddingVertical: 14, marginTop: 8 },
   startBtnText:      { color: '#fff', fontWeight: '700', fontSize: 16 },
   quizBox:           { margin: 16, backgroundColor: '#fff', borderRadius: 20, padding: 20, gap: 16, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 12, shadowOffset: { width: 0, height: 4 }, elevation: 3 },
   progressRow:       { flexDirection: 'row', gap: 6, justifyContent: 'center' },
-  progressDot:       { width: 8, height: 8, borderRadius: 4, backgroundColor: '#eee' },
-  progressDotActive: { backgroundColor: '#e8590c', width: 24 },
+  progressDot:       { width: 8, height: 8, borderRadius: 4, backgroundColor: THEME.border.soft },
+  progressDotActive: { backgroundColor: PREMIUM_ACCENT, width: 24 },
   quizEmoji:         { fontSize: 36, textAlign: 'center' },
   quizPregunta:      { fontSize: 20, fontWeight: '700', color: '#111', textAlign: 'center' },
   opcionesGrid:      { flexDirection: 'row', flexWrap: 'wrap', gap: 10, justifyContent: 'center' },
   opcion:            { width: (W-80)/2, backgroundColor: '#f9f9f9', borderRadius: 16, padding: 14, alignItems: 'center', gap: 4, borderWidth: 1.5, borderColor: '#f0f0f0' },
   opcionIcon:        { fontSize: 28 },
   opcionLabel:       { fontSize: 15, fontWeight: '700', color: '#111' },
-  opcionDesc:        { fontSize: 11, color: '#888', textAlign: 'center' },
+  opcionDesc:        { fontSize: 11, color: THEME.text.secondary, textAlign: 'center' },
   resultsHeader:     { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, marginBottom: 12, marginTop: 16 },
   resultsTitle:      { fontSize: 20, fontWeight: '700', color: '#111' },
-  resultsSub:        { fontSize: 13, color: '#888' },
-  resetBtn:          { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: '#fff5f0', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6 },
-  resetText:         { color: '#e8590c', fontSize: 13, fontWeight: '600' },
+  resultsSub:        { fontSize: 13, color: THEME.text.secondary },
+  resetBtn:          { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: PREMIUM_SURFACE_SOFT, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6 },
+  resetText:         { color: PREMIUM_ACCENT_DEEP, fontSize: 13, fontWeight: '600' },
   favBtnCard:        { position: 'absolute', top: 6, right: 6, width: 28, height: 28, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.4)', alignItems: 'center', justifyContent: 'center' },
 });
 
@@ -1624,38 +3222,38 @@ const det = StyleSheet.create({
   nombre:       { fontSize: 26, fontWeight: '800', color: '#111', marginBottom: 4 },
   finca:        { fontSize: 15, color: '#555', marginBottom: 4 },
   originRow:    { marginBottom: 14 },
-  originText:   { fontSize: 14, color: '#888' },
+  originText:   { fontSize: 14, color: THEME.text.secondary },
   chipsWrap:    { marginBottom: 20 },
-  chip:         { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: '#fff5f0', borderWidth: 1, borderColor: '#fdd', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, marginRight: 8 },
-  chipText:     { fontSize: 12, color: '#e8590c', fontWeight: '600' },
-  votarBox:     { backgroundColor: '#fff5f0', borderRadius: 16, padding: 18, alignItems: 'center', gap: 4, marginBottom: 4 },
+  chip:         { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: PREMIUM_SURFACE_SOFT, borderWidth: 1, borderColor: PREMIUM_BORDER_SOFT, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, marginRight: 8 },
+  chipText:     { fontSize: 12, color: PREMIUM_ACCENT_DEEP, fontWeight: '600' },
+  votarBox:     { backgroundColor: PREMIUM_SURFACE_TINT, borderRadius: 16, padding: 18, alignItems: 'center', gap: 4, marginBottom: 4 },
   votarTitle:   { fontSize: 17, fontWeight: '700', color: '#111' },
-  votarSub:     { fontSize: 13, color: '#888' },
+  votarSub:     { fontSize: 13, color: THEME.text.secondary },
   scaBox:       { backgroundColor: '#f9f9f9', borderRadius: 16, padding: 16, marginBottom: 4, gap: 8 },
   scaLeft:      { flexDirection: 'row', alignItems: 'baseline', gap: 8 },
   scaScore:     { fontSize: 36, fontWeight: '800', color: '#111' },
-  scaLabel:     { fontSize: 13, color: '#888' },
-  scaBar:       { height: 8, backgroundColor: '#eee', borderRadius: 4, overflow: 'hidden' },
-  scaFill:      { height: '100%', backgroundColor: '#e8590c', borderRadius: 4 },
+  scaLabel:     { fontSize: 13, color: THEME.text.secondary },
+  scaBar:       { height: 8, backgroundColor: THEME.border.soft, borderRadius: 4, overflow: 'hidden' },
+  scaFill:      { height: '100%', backgroundColor: PREMIUM_ACCENT, borderRadius: 4 },
   scaCat:       { fontSize: 13, color: '#555', fontWeight: '600' },
-  divider:      { height: 0.5, backgroundColor: '#eee', marginVertical: 20 },
+  divider:      { height: 0.5, backgroundColor: THEME.border.soft, marginVertical: 20 },
   sectionTitle: { fontSize: 18, fontWeight: '700', color: '#111', marginBottom: 14 },
-  notasBox:     { backgroundColor: '#fff5f0', borderRadius: 12, padding: 14, marginBottom: 14 },
-  notasLabel:   { fontSize: 11, fontWeight: '700', color: '#e8590c', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 6 },
+  notasBox:     { backgroundColor: PREMIUM_SURFACE_TINT, borderRadius: 12, padding: 14, marginBottom: 14 },
+  notasLabel:   { fontSize: 11, fontWeight: '700', color: PREMIUM_ACCENT_DEEP, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 6 },
   notasText:    { fontSize: 15, color: '#333', lineHeight: 22 },
   sensRow:      { flexDirection: 'row', gap: 10 },
   sensItem:     { flex: 1, backgroundColor: '#f9f9f9', borderRadius: 12, padding: 12, alignItems: 'center', gap: 4 },
-  sensLabel:    { fontSize: 11, color: '#888', fontWeight: '600' },
+  sensLabel:    { fontSize: 11, color: THEME.text.secondary, fontWeight: '600' },
   sensVal:      { fontSize: 12, color: '#333', textAlign: 'center' },
   infoRow:      { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8, borderBottomWidth: 0.5, borderBottomColor: '#f0f0f0' },
-  infoLabel:    { fontSize: 14, color: '#888', flex: 1 },
+  infoLabel:    { fontSize: 14, color: THEME.text.secondary, flex: 1 },
   infoVal:      { fontSize: 14, color: '#111', fontWeight: '500', flex: 2, textAlign: 'right' },
-  prepBox:      { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: '#fff5f0', borderRadius: 12, padding: 14 },
+  prepBox:      { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: PREMIUM_SURFACE_TINT, borderRadius: 12, padding: 14 },
   prepText:     { fontSize: 14, color: '#333', flex: 1 },
   certText:     { fontSize: 14, color: '#555', lineHeight: 22 },
   precioBox:    { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f9f9f9', borderRadius: 12, padding: 16, marginTop: 20 },
-  precioLabel:  { fontSize: 14, color: '#888' },
-  precioVal:    { fontSize: 20, fontWeight: '800', color: '#e8590c' },
+  precioLabel:  { fontSize: 14, color: THEME.text.secondary },
+  precioVal:    { fontSize: 20, fontWeight: '800', color: PREMIUM_ACCENT },
 });
 
 const scan = StyleSheet.create({
@@ -1671,27 +3269,27 @@ const scan = StyleSheet.create({
   tabInactive:     { paddingHorizontal: 20, paddingVertical: 10 },
   tabTextActive:   { color: '#111', fontWeight: '700', fontSize: 14 },
   tabTextInactive: { color: 'rgba(255,255,255,0.7)', fontSize: 14 },
-  corner:          { position: 'absolute', width: 24, height: 24, borderColor: '#e8590c', borderWidth: 3 },
+  corner:          { position: 'absolute', width: 24, height: 24, borderColor: PREMIUM_ACCENT, borderWidth: 3 },
   tl:              { top: 0, left: 0, borderBottomWidth: 0, borderRightWidth: 0 },
   tr:              { top: 0, right: 0, borderBottomWidth: 0, borderLeftWidth: 0 },
   bl:              { bottom: 0, left: 0, borderTopWidth: 0, borderRightWidth: 0 },
   br:              { bottom: 0, right: 0, borderTopWidth: 0, borderLeftWidth: 0 },
-  scanLine:        { position: 'absolute', top: '50%', left: 0, right: 0, height: 2, backgroundColor: '#e8590c', opacity: 0.8 },
+  scanLine:        { position: 'absolute', top: '50%', left: 0, right: 0, height: 2, backgroundColor: PREMIUM_ACCENT, opacity: 0.8 },
   backBtn:         { position: 'absolute', top: 52, left: 16, width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center' },
   galleryBtn:      { position: 'absolute', bottom: 60, left: 40, width: 52, height: 52, borderRadius: 26, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' },
 });
 
 const prf = StyleSheet.create({
-  header:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 0.5, borderBottomColor: '#eee' },
+  header:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 0.5, borderBottomColor: THEME.border.soft },
   closeBtn:    { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   title:       { fontSize: 18, fontWeight: '700', color: '#111' },
   body:        { padding: 24 },
   avatarWrap:  { alignItems: 'center', marginBottom: 32, gap: 6 },
-  avatar:      { width: 90, height: 90, borderRadius: 45, backgroundColor: '#e8590c', alignItems: 'center', justifyContent: 'center' },
+  avatar:      { width: 90, height: 90, borderRadius: 45, backgroundColor: PREMIUM_ACCENT, alignItems: 'center', justifyContent: 'center' },
   avatarImg:   { width: 90, height: 90, borderRadius: 45 },
   avatarText:  { fontSize: 40, fontWeight: '800', color: '#fff' },
-  avatarEmail: { fontSize: 13, color: '#888' },
-  avatarBadge: { position: 'absolute', bottom: 52, right: W/2 - 55, width: 26, height: 26, borderRadius: 13, backgroundColor: '#e8590c', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#fff' },
+  avatarEmail: { fontSize: 13, color: THEME.text.secondary },
+  avatarBadge: { position: 'absolute', bottom: 52, right: W/2 - 55, width: 26, height: 26, borderRadius: 13, backgroundColor: PREMIUM_ACCENT, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#fff' },
 });
 
 const pick = StyleSheet.create({
@@ -1699,20 +3297,36 @@ const pick = StyleSheet.create({
   triggerText: { fontSize: 15, color: '#111' },
   overlay:     { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
   sheet:       { backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: H * 0.7 },
-  sheetHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 0.5, borderBottomColor: '#eee' },
+  sheetHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 0.5, borderBottomColor: THEME.border.soft },
   sheetTitle:  { fontSize: 17, fontWeight: '700', color: '#111' },
   item:        { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 14, borderBottomWidth: 0.5, borderBottomColor: '#f5f5f5' },
-  itemActive:  { backgroundColor: '#fff5f0' },
+  itemActive:  { backgroundColor: PREMIUM_SURFACE_SOFT },
   itemText:    { fontSize: 15, color: '#111' },
 });
 
 const mas = StyleSheet.create({
-  item:        { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 14, borderBottomWidth: 0.5, borderBottomColor: '#f5f5f5' },
-  iconWrap:    { width: 40, height: 40, borderRadius: 10, backgroundColor: '#fff5f0', alignItems: 'center', justifyContent: 'center' },
-  label:       { fontSize: 15, fontWeight: '600', color: '#111' },
-  sub:         { fontSize: 12, color: '#aaa', marginTop: 2 },
-  logoutBtn:   { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 14 },
-  logoutText:  { fontSize: 15, fontWeight: '600', color: '#e74c3c' },
+  premiumCard:  { position: 'relative', overflow: 'hidden', marginTop: 8, marginBottom: 18, backgroundColor: '#1f140f', borderRadius: 20, padding: 16, borderWidth: 1, borderColor: '#4a3022' },
+  premiumGlow:  { position: 'absolute', width: 170, height: 170, borderRadius: 85, right: -44, top: -68, backgroundColor: 'rgba(209, 139, 74, 0.2)' },
+  premiumTopRow:{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 },
+  premiumIdentity:{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 },
+  premiumAvatar:{ width: 44, height: 44, borderRadius: 22, borderWidth: 1.2, borderColor: 'rgba(255, 232, 212, 0.28)' },
+  premiumAvatarFallback:{ width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255, 248, 241, 0.13)', borderWidth: 1.2, borderColor: 'rgba(255, 232, 212, 0.22)' },
+  premiumAvatarText:{ color: '#fff3e8', fontSize: 16, fontWeight: '800' },
+  premiumAlias: { color: '#fff4ea', fontSize: 14, fontWeight: '800' },
+  premiumName:  { color: '#d8c0ad', fontSize: 12, marginTop: 1 },
+  premiumLevelBadge:{ borderRadius: 999, paddingHorizontal: 10, paddingVertical: 6, borderWidth: 1, borderColor: 'rgba(250, 229, 206, 0.32)', backgroundColor: 'rgba(255, 248, 241, 0.1)' },
+  premiumLevelText:{ color: '#fff4ea', fontSize: 11, fontWeight: '700' },
+  premiumStatsRow:{ flexDirection: 'row', gap: 8, marginTop: 14 },
+  premiumStatCard:{ flex: 1, borderRadius: 12, backgroundColor: 'rgba(255, 248, 241, 0.08)', borderWidth: 1, borderColor: 'rgba(250, 229, 206, 0.12)', paddingVertical: 8, alignItems: 'center' },
+  premiumStatValue:{ color: '#fff4ea', fontSize: 16, fontWeight: '800' },
+  premiumStatLabel:{ color: '#d0b8a4', fontSize: 10, marginTop: 2 },
+  blockTitle:   { fontSize: 12, fontWeight: '800', color: '#876a56', textTransform: 'uppercase', letterSpacing: 0.9, marginTop: 8, marginBottom: 6 },
+  item:         { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 14, borderBottomWidth: 0.5, borderBottomColor: '#efe6dd' },
+  iconWrap:     { width: 40, height: 40, borderRadius: 12, backgroundColor: PREMIUM_SURFACE_SOFT, alignItems: 'center', justifyContent: 'center' },
+  label:        { fontSize: 15, fontWeight: '700', color: '#111' },
+  sub:          { fontSize: 12, color: '#8c847d', marginTop: 2 },
+  logoutBtn:    { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 14 },
+  logoutText:   { fontSize: 15, fontWeight: '700', color: THEME.status.danger },
 });
 
 const caf = StyleSheet.create({
@@ -1720,13 +3334,13 @@ const caf = StyleSheet.create({
   loadBox:         { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, paddingTop: 60 },
   loadEmoji:       { fontSize: 48 },
   loadTitle:       { fontSize: 20, fontWeight: '700', color: '#111' },
-  loadSub:         { fontSize: 14, color: '#888', textAlign: 'center' },
+  loadSub:         { fontSize: 14, color: THEME.text.secondary, textAlign: 'center' },
   errorBox:        { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 16 },
   errorTitle:      { fontSize: 22, fontWeight: '700', color: '#111' },
-  errorText:       { fontSize: 15, color: '#888', textAlign: 'center', lineHeight: 22 },
+  errorText:       { fontSize: 15, color: THEME.text.secondary, textAlign: 'center', lineHeight: 22 },
   // Header
   headerBox:       { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingTop: 20, paddingBottom: 12 },
-  refreshBtn:      { width: 36, height: 36, borderRadius: 18, backgroundColor: '#fff5f0', alignItems: 'center', justifyContent: 'center' },
+  refreshBtn:      { width: 36, height: 36, borderRadius: 18, backgroundColor: PREMIUM_SURFACE_SOFT, alignItems: 'center', justifyContent: 'center' },
   // Card lista
   card:            { marginHorizontal: 16, marginBottom: 16, backgroundColor: '#fff', borderRadius: 16, overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.07, shadowRadius: 8, shadowOffset: { width: 0, height: 3 }, elevation: 3 },
   cardImgWrap:     { position: 'relative', height: 140 },
@@ -1737,14 +3351,14 @@ const caf = StyleSheet.create({
   cardEstadoText:  { color: '#fff', fontSize: 11, fontWeight: '700' },
   cardInfo:        { padding: 12, gap: 4 },
   cardNombre:      { fontSize: 17, fontWeight: '800', color: '#111' },
-  cardTipo:        { fontSize: 12, color: '#e8590c', fontWeight: '600', marginBottom: 2 },
+  cardTipo:        { fontSize: 12, color: PREMIUM_ACCENT, fontWeight: '600', marginBottom: 2 },
   cardRatingRow:   { flexDirection: 'row', alignItems: 'center', gap: 3 },
   cardRatingNum:   { fontSize: 13, fontWeight: '700', color: '#333', marginLeft: 4 },
-  cardReseñas:     { fontSize: 12, color: '#aaa' },
+  cardReseñas:     { fontSize: 12, color: THEME.text.muted },
   cardTags:        { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 4 },
   cardTag:         { flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: '#f5f5f5', borderRadius: 8, paddingHorizontal: 7, paddingVertical: 3 },
   cardTagText:     { fontSize: 11, color: '#555' },
-  cardEspec:       { fontSize: 12, color: '#888', marginTop: 4, fontStyle: 'italic' },
+  cardEspec:       { fontSize: 12, color: THEME.text.secondary, marginTop: 4, fontStyle: 'italic' },
   // Detalle hero
   detHero:         { height: H * 0.38, position: 'relative' },
   detHeroGrad:     { position: 'absolute', bottom: 0, left: 0, right: 0, height: 160, backgroundColor: 'rgba(0,0,0,0.55)' },
@@ -1754,14 +3368,14 @@ const caf = StyleSheet.create({
   cardPlaceholderEmoji: { fontSize: 32, opacity: 0.5, marginBottom: 6 },
   cardPlaceholderNombre: { fontSize: 13, fontWeight: '700', color: 'rgba(255,255,255,0.7)', textAlign: 'center', lineHeight: 18 },
   detBack:         { position: 'absolute', top: 52, left: 16, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.4)', alignItems: 'center', justifyContent: 'center' },
-  detNavBtn:       { position: 'absolute', top: 52, right: 16, width: 40, height: 40, borderRadius: 20, backgroundColor: '#e8590c', alignItems: 'center', justifyContent: 'center' },
+  detNavBtn:       { position: 'absolute', top: 52, right: 16, width: 40, height: 40, borderRadius: 20, backgroundColor: PREMIUM_ACCENT_DEEP, alignItems: 'center', justifyContent: 'center' },
   badgeEstado:     { position: 'absolute', top: 52, left: 70, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 5 },
   badgeEstadoText: { color: '#fff', fontSize: 12, fontWeight: '700' },
   detOverlay:      { position: 'absolute', bottom: 16, left: 16, right: 16 },
   detNombre:       { fontSize: 24, fontWeight: '800', color: '#fff', marginBottom: 2 },
   detTipo:         { fontSize: 13, color: 'rgba(255,255,255,0.8)', marginBottom: 6 },
   detRatingRow:    { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  detRatingNum:    { fontSize: 15, fontWeight: '700', color: '#FFD700', marginLeft: 4 },
+  detRatingNum:    { fontSize: 15, fontWeight: '700', color: THEME.status.favorite, marginLeft: 4 },
   detReseñas:      { fontSize: 12, color: 'rgba(255,255,255,0.7)' },
   // Detalle body
   detBody:         { padding: 20 },
@@ -1773,17 +3387,17 @@ const caf = StyleSheet.create({
   secTitulo:       { fontSize: 15, fontWeight: '700', color: '#111', marginBottom: 8 },
   secTexto:        { fontSize: 14, color: '#555', lineHeight: 22 },
   contactBtn:      { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 6 },
-  contactText:     { fontSize: 14, color: '#e8590c', fontWeight: '500' },
+  contactText:     { fontSize: 14, color: PREMIUM_ACCENT_DEEP, fontWeight: '500' },
   // Reseñas
   resena:          { backgroundColor: '#f9f9f9', borderRadius: 12, padding: 12, marginBottom: 8 },
   resenaAutor:     { fontSize: 13, fontWeight: '700', color: '#111' },
   resenaTexto:     { fontSize: 13, color: '#555', marginTop: 4, lineHeight: 19 },
 
-  item:    { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14, borderBottomWidth: 0.5, borderBottomColor: '#eee' },
-  rank:    { width: 32, height: 32, borderRadius: 16, backgroundColor: '#fff5f0', alignItems: 'center', justifyContent: 'center' },
-  rankNum: { fontSize: 14, fontWeight: '700', color: '#e8590c' },
+  item:    { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14, borderBottomWidth: 0.5, borderBottomColor: THEME.border.soft },
+  rank:    { width: 32, height: 32, borderRadius: 16, backgroundColor: PREMIUM_SURFACE_SOFT, alignItems: 'center', justifyContent: 'center' },
+  rankNum: { fontSize: 14, fontWeight: '700', color: PREMIUM_ACCENT_DEEP },
   nombre:  { fontSize: 15, fontWeight: '600', color: '#111' },
-  dir:     { fontSize: 12, color: '#888', marginTop: 2 },
+  dir:     { fontSize: 12, color: THEME.text.secondary, marginTop: 2 },
   navBtn:  { padding: 8 },
   mapBox:  { marginBottom: 16 },
 });

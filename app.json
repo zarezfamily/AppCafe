@@ -17,7 +17,8 @@
       "bundleIdentifier": "com.zarezfamily.etiove",
       "infoPlist": {
         "NSCameraUsageDescription": "La app necesita acceso a la cámara para escanear paquetes de café y hacer fotos.",
-        "NSPhotoLibraryUsageDescription": "La app necesita acceso a la galería para seleccionar fotos de café."
+        "NSPhotoLibraryUsageDescription": "La app necesita acceso a la galería para seleccionar fotos de café.",
+        "NSFaceIDUsageDescription": "La app usa Face ID para iniciar sesión de forma segura."
       }
     },
     "android": {
@@ -45,6 +46,12 @@
         {
           "cameraPermission": "La app necesita acceso a la cámara para hacer fotos de café.",
           "photosPermission": "La app necesita acceso a la galería para seleccionar fotos."
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "La app usa Face ID para iniciar sesión de forma segura."
         }
       ]
     ]

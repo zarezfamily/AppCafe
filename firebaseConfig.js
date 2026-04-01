@@ -7,6 +7,7 @@ const appConfig = require('./app.json');
 
 export const FIREBASE_PROJECT_ID = process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID;
 export const FIREBASE_API_KEY    = process.env.EXPO_PUBLIC_FIREBASE_API_KEY;
+export const FIREBASE_STORAGE_BUCKET = process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET || (FIREBASE_PROJECT_ID ? `${FIREBASE_PROJECT_ID}.appspot.com` : null);
 const IOS_BUNDLE_ID              = appConfig?.expo?.ios?.bundleIdentifier || null;
 const ANDROID_PACKAGE            = appConfig?.expo?.android?.package || null;
 
@@ -180,8 +181,9 @@ export const setDocument = async (colName, docId, data) => {
 };
 
 export const updateDocument = async (colName, docId, data) => {
-  const fields = Object.keys(data).join(',');
-  const url = `${BASE_URL}/${colName}/${docId}?key=${FIREBASE_API_KEY}&updateMask.fieldPaths=${fields}`;
+  const params = new URLSearchParams({ key: FIREBASE_API_KEY });
+  Object.keys(data).forEach((field) => params.append('updateMask.fieldPaths', field));
+  const url = `${BASE_URL}/${colName}/${docId}?${params.toString()}`;
   const res  = await fetch(url, {
     method:  'PATCH',
     headers: authHeaders(),
@@ -194,6 +196,43 @@ export const deleteDocument = async (colName, docId) => {
   const url = `${BASE_URL}/${colName}/${docId}?key=${FIREBASE_API_KEY}`;
   const res  = await fetch(url, { method: 'DELETE', headers: authHeaders() });
   return res.ok;
+};
+
+export const uploadImageToStorage = async (uri, folder = 'uploads') => {
+  if (!uri) throw new Error('URI de imagen no válida');
+  if (!FIREBASE_STORAGE_BUCKET) throw new Error('Falta EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET');
+
+  const imgRes = await fetch(uri);
+  if (!imgRes.ok) throw new Error('No se pudo leer la imagen local');
+  const blob = await imgRes.blob();
+
+  const safeFolder = String(folder || 'uploads').replace(/[^a-zA-Z0-9_\-/]/g, '');
+  const fileName = `${safeFolder}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`;
+  const uploadUrl = `https://firebasestorage.googleapis.com/v0/b/${FIREBASE_STORAGE_BUCKET}/o?uploadType=media&name=${encodeURIComponent(fileName)}&key=${FIREBASE_API_KEY}`;
+
+  const headers = {
+    'Content-Type': 'image/jpeg',
+    ...clientHeaders(),
+  };
+  if (_authToken) headers['Authorization'] = `Bearer ${_authToken}`;
+
+  const upRes = await fetch(uploadUrl, {
+    method: 'POST',
+    headers,
+    body: blob,
+  });
+
+  const upJson = await upRes.json().catch(() => ({}));
+  if (!upRes.ok) {
+    throw new Error(upJson?.error?.message || 'No se pudo subir imagen a Firebase Storage');
+  }
+
+  const objectName = upJson.name || fileName;
+  const encodedName = encodeURIComponent(objectName);
+  const token = upJson.downloadTokens || upJson.metadata?.downloadTokens || '';
+  return token
+    ? `https://firebasestorage.googleapis.com/v0/b/${FIREBASE_STORAGE_BUCKET}/o/${encodedName}?alt=media&token=${token}`
+    : `https://firebasestorage.googleapis.com/v0/b/${FIREBASE_STORAGE_BUCKET}/o/${encodedName}?alt=media`;
 };
 
 // ─── AUTENTICACIÓN ────────────────────────────────────────────────────────────

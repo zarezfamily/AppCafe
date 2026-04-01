@@ -50,7 +50,7 @@ Edita `.env` con tus datos de Firebase:
 EXPO_PUBLIC_FIREBASE_API_KEY=tu_api_key
 EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=tu_proyecto.firebaseapp.com
 EXPO_PUBLIC_FIREBASE_PROJECT_ID=tu_proyecto_id
-EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=tu_proyecto.firebasestorage.app
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=tu_proyecto.appspot.com
 EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=tu_sender_id
 EXPO_PUBLIC_FIREBASE_APP_ID=tu_app_id
 ```
@@ -72,6 +72,31 @@ service cloud.firestore {
     }
   }
 }
+```
+
+## 🔧 Foro listo (Firestore + Storage)
+
+El proyecto ya incluye:
+
+- `firestore.rules` (incluye reglas para `foro_hilos` y `foro_respuestas`)
+- `storage.rules` (subida de imágenes del foro en `foro_hilos/**`)
+- `firebase.json` (apunta a ambos archivos de reglas)
+- `.env.example` (variables mínimas para arrancar)
+
+Para desplegar reglas automáticamente con Firebase CLI:
+
+```bash
+firebase login
+firebase use <tu_project_id>
+firebase deploy --only firestore:rules,storage
+```
+
+Variables mínimas en `.env` para que la subida de fotos funcione:
+
+```bash
+EXPO_PUBLIC_FIREBASE_API_KEY=...
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=...
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=<tu_project_id>.appspot.com
 ```
 
 ### 5. Arranca la app

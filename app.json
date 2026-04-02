@@ -53,6 +53,13 @@
         {
           "faceIDPermission": "La app usa Face ID para iniciar sesión de forma segura."
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#8f5e3b"
+        }
       ]
     ]
   }

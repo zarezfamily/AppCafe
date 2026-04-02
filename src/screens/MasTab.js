@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { ActivityIndicator, Alert, Image, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, Linking, Switch, Text, TouchableOpacity, View } from 'react-native';
 
 function MasItem({ icon, label, sub, onPress, mas, premiumAccent, iconFaint }) {
   return (
@@ -137,7 +137,7 @@ export default function MasTab({
           <View style={mas.newsletterTopRow}>
             <View style={mas.newsletterTitleWrap}>
               <Text style={mas.newsletterTitle}>BE ETIOVE BY EMAIL</Text>
-              <Text style={mas.newsletterSub}>recibe lanzamientos, cafes destacados y novedades de la comunidad.</Text>
+              <Text style={mas.newsletterSub}>Recibe lanzamientos, cafes y novedades</Text>
             </View>
             <Switch
               value={newsletterState.subscribed}
@@ -157,7 +157,7 @@ export default function MasTab({
             <Text style={mas.newsletterEmail}>{newsletterHasEmail ? newsletterEmail.toUpperCase() : 'ANADE UN EMAIL EN TU PERFIL PARA ACTIVAR LA NEWSLETTER.'}</Text>
           </View>
 
-          <Text style={mas.newsletterNote}>guardamos tu consentimiento en base de datos para poder incluirte despues en envios a todos los suscritos.</Text>
+          <Text style={mas.newsletterNote}>Guardamos tus consentimientos para que seas un ETIOVER</Text>
 
           <TouchableOpacity
             style={[mas.newsletterBtn, (!newsletterHasEmail || newsletterSaving) && mas.newsletterBtnDisabled]}
@@ -227,6 +227,40 @@ export default function MasTab({
             premiumAccent={premiumAccent}
             iconFaint={iconFaint}
           />
+        </View>
+
+        {/* ─── DONDE ESTAMOS ─── */}
+        <Text style={mas.blockTitle}>Donde Estamos</Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-around', paddingHorizontal: 16, paddingVertical: 20, gap: 12 }}>
+          <TouchableOpacity
+            style={{ flexDirection: 'column', alignItems: 'center', gap: 8, paddingVertical: 12, paddingHorizontal: 16, borderRadius: 14, backgroundColor: '#faf8f5', borderWidth: 1, borderColor: '#e8dcc8', flex: 1 }}
+            onPress={() => Linking.openURL('https://instagram.com/etiove')}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="logo-instagram" size={32} color="#E4405F" />
+            <Text style={{ fontSize: 12, fontWeight: '700', color: '#1f140f', textAlign: 'center' }}>Instagram</Text>
+            <Text style={{ fontSize: 10, color: '#8b7355', textAlign: 'center' }}>@etiove</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={{ flexDirection: 'column', alignItems: 'center', gap: 8, paddingVertical: 12, paddingHorizontal: 16, borderRadius: 14, backgroundColor: '#faf8f5', borderWidth: 1, borderColor: '#e8dcc8', flex: 1 }}
+            onPress={() => Linking.openURL('https://twitter.com/etiove')}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="logo-x" size={32} color="#1DA1F2" />
+            <Text style={{ fontSize: 12, fontWeight: '700', color: '#1f140f', textAlign: 'center' }}>X</Text>
+            <Text style={{ fontSize: 10, color: '#8b7355', textAlign: 'center' }}>@etiove</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={{ flexDirection: 'column', alignItems: 'center', gap: 8, paddingVertical: 12, paddingHorizontal: 16, borderRadius: 14, backgroundColor: '#faf8f5', borderWidth: 1, borderColor: '#e8dcc8', flex: 1 }}
+            onPress={() => Linking.openURL('https://tiktok.com/@etiove')}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="logo-tiktok" size={32} color="#000000" />
+            <Text style={{ fontSize: 12, fontWeight: '700', color: '#1f140f', textAlign: 'center' }}>TikTok</Text>
+            <Text style={{ fontSize: 10, color: '#8b7355', textAlign: 'center' }}>@etiove</Text>
+          </TouchableOpacity>
         </View>
 
         <TouchableOpacity style={mas.logoutBtn} onPress={() => Alert.alert('Cerrar sesión', '¿Seguro?', [{ text: 'Cancelar', style: 'cancel' }, { text: 'Salir', style: 'destructive', onPress: onLogout }])}>

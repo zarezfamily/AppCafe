@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
-import { ActivityIndicator, Animated, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Animated, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import HorizontalCardRow from '../components/HorizontalCardRow';
 import SectionHeaderNav from '../components/SectionHeaderNav';
+import { XP_RULES } from '../core/gamification';
 
 export default function InicioTab({
   s,
@@ -46,6 +47,22 @@ export default function InicioTab({
   openOfferCafeId,
   errorOfertas,
 }) {
+  const handleMemberRoastLongPress = () => {
+    Alert.alert(
+      'Cómo sube tu Member Roast Card',
+      [
+        `Votos: +${XP_RULES.vote} XP cada uno`,
+        `Fotos: +${XP_RULES.photo} XP cada una`,
+        `Reseñas: +${XP_RULES.review} XP cada una`,
+        `Cafés añadidos: +${XP_RULES.addCafe} XP cada uno`,
+        `Favoritos: +${XP_RULES.favorite} XP cada uno`,
+        '',
+        'Ahora mismo los posts y respuestas del foro no suman XP todavía.',
+      ].join('\n'),
+      [{ text: 'Cerrar', style: 'default' }]
+    );
+  };
+
   return (
     <View>
       <View style={s.topBar}>
@@ -63,7 +80,7 @@ export default function InicioTab({
             <Text style={s.homeLoverText}>COFFEE</Text>
           </View>
         </View>
-        <TouchableOpacity style={s.locationPill} onPress={() => setShowProfile(true)}>
+        <TouchableOpacity style={s.locationPill} onPress={() => setShowProfile(true)} onLongPress={handleMemberRoastLongPress} delayLongPress={280}>
           <View style={s.brandDecorOne} />
           <View style={s.brandDecorTwo} />
           <View style={s.brandTopRule} />
@@ -198,24 +215,28 @@ export default function InicioTab({
               />
             )}
 
-            <SectionHeaderNav s={s} title="Ofertas de cafés (web)" onPress={() => setActiveTab('Ofertas')} marginTop={28} />
-            <Text style={s.sectionSub}>Pulsa un café y te mostramos las 3 ofertas más baratas encontradas en Google</Text>
-            <HorizontalCardRow
-              s={s}
-              loading={cargando}
-              loadingColor={premiumAccent}
-              loadingMargin={20}
-              items={cafesParaOfertas.slice(0, 10)}
-              renderItem={(cafe) => (
-                <TouchableOpacity key={cafe.id} style={s.cardH} onPress={() => abrirOfertasCafe(cafe, { navigate: true })} activeOpacity={0.88}>
-                  <View style={s.cardHImg}><PackshotImage uri={cafe.foto} frameStyle={s.packshotCardFrame} imageStyle={s.packshotCardImage} /></View>
-                  <Text style={s.cardHOrigin} numberOfLines={1}>{cafe.pais || 'Sin país'}</Text>
-                  <Text style={s.cardHName} numberOfLines={2}>{cafe.nombre}</Text>
-                  <Text style={s.cardHVotos} numberOfLines={2}>Pulsa para ver 3 ofertas en Google</Text>
-                </TouchableOpacity>
-              )}
-              emptyText="No hay cafés en base de datos."
-            />
+            {false && (
+              <>
+                <SectionHeaderNav s={s} title="Ofertas de cafés (web)" onPress={() => setActiveTab('Ofertas')} marginTop={28} />
+                <Text style={s.sectionSub}>Pulsa un café y te mostramos las 3 ofertas más baratas encontradas en Google</Text>
+                <HorizontalCardRow
+                  s={s}
+                  loading={cargando}
+                  loadingColor={premiumAccent}
+                  loadingMargin={20}
+                  items={cafesParaOfertas.slice(0, 10)}
+                  renderItem={(cafe) => (
+                    <TouchableOpacity key={cafe.id} style={s.cardH} onPress={() => abrirOfertasCafe(cafe, { navigate: true })} activeOpacity={0.88}>
+                      <View style={s.cardHImg}><PackshotImage uri={cafe.foto} frameStyle={s.packshotCardFrame} imageStyle={s.packshotCardImage} /></View>
+                      <Text style={s.cardHOrigin} numberOfLines={1}>{cafe.pais || 'Sin país'}</Text>
+                      <Text style={s.cardHName} numberOfLines={2}>{cafe.nombre}</Text>
+                      <Text style={s.cardHVotos} numberOfLines={2}>Pulsa para ver 3 ofertas en Google</Text>
+                    </TouchableOpacity>
+                  )}
+                  emptyText="No hay cafés en base de datos."
+                />
+              </>
+            )}
           </>
       }
     </View>

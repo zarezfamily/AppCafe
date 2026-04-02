@@ -115,7 +115,7 @@ export default function CataFormModal({
           bottom: 0,
           left: 0,
           right: 0,
-          maxHeight: '95%',
+          height: '90%',
           backgroundColor: '#fff',
           borderTopLeftRadius: 20,
           borderTopRightRadius: 20,
@@ -123,7 +123,12 @@ export default function CataFormModal({
         }}
       >
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
-          <ScrollView contentContainerStyle={{ paddingBottom: 40, paddingHorizontal: 16, paddingTop: 12 }}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
+            contentContainerStyle={{ paddingBottom: 110, paddingHorizontal: 16, paddingTop: 12 }}
+          >
             {/* Header */}
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <Text style={s.sectionTitle}>{isEditing ? 'Editar Cata' : 'Nueva Cata'}</Text>
@@ -410,7 +415,10 @@ export default function CataFormModal({
               {notas.length}/500
             </Text>
 
-            {/* Botones */}
+          </ScrollView>
+
+          {/* Botones fijos */}
+          <View style={{ paddingHorizontal: 16, paddingTop: 10, paddingBottom: 18, borderTopWidth: 1, borderTopColor: '#eee', backgroundColor: '#fff' }}>
             <View style={{ flexDirection: 'row', gap: 10 }}>
               <TouchableOpacity
                 onPress={onClose}
@@ -437,7 +445,7 @@ export default function CataFormModal({
                 )}
               </TouchableOpacity>
             </View>
-          </ScrollView>
+          </View>
         </KeyboardAvoidingView>
       </Animated.View>
     </Modal>

@@ -68,6 +68,11 @@ export default function CommunityTab({
   forumEditing,
   interactionFeedbackEnabled,
   interactionFeedbackMode,
+  // Gamificación
+  gamification,
+  getUserLevel,
+  getAchievementDefs,
+  LEVELS,
 }) {
   const communityHeroAnim = useRef(new Animated.Value(0)).current;
   const categoryRowAnimsRef = useRef([]);
@@ -277,13 +282,114 @@ export default function CommunityTab({
     <View style={{ flex: 1 }}>
       {!forumCategory && (
         <View style={{ flex: 1 }}>
-          <Animated.View style={{ opacity: communityHeroAnim, paddingHorizontal: 16, paddingTop: 16, paddingBottom: 10 }}>
-            <Text style={s.sectionSub}>SALON ETIOVE</Text>
-            <Text style={s.sectionTitle}>Comunidad cafetera</Text>
-            <Text style={s.forumThreadBody}>Comparte recetas, descubre tostadores y conversa con amantes del café de especialidad.</Text>
-          </Animated.View>
-          <Animated.View style={{ opacity: categoryListEnterAnim, flex: 1 }}>
-            <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 110, gap: 10 }}>
+          <Animated.View style={{ opacity: communityHeroAnim }}>
+            <ScrollView contentContainerStyle={{ paddingBottom: 110, gap: 0 }}>
+              
+              {/* ─── PREMIUM HEADER ─── */}
+              <View style={{ backgroundColor: '#1f140f', paddingVertical: 24, paddingHorizontal: 16, gap: 16, overflow: 'hidden' }}>
+                <View style={{ position: 'absolute', width: 170, height: 170, borderRadius: 85, right: -44, top: -68, backgroundColor: 'rgba(209, 139, 74, 0.2)' }} />
+                <View style={{ position: 'absolute', width: 120, height: 120, borderRadius: 60, left: -30, bottom: -24, backgroundColor: 'rgba(255, 233, 210, 0.08)' }} />
+                {/* Logo + Eslogan */}
+                <View style={{ alignItems: 'center', gap: 4 }}>
+                  <Text style={{ fontSize: 36, fontWeight: '900', letterSpacing: 2.4, color: '#fff8f0' }}>ETIOVE</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <View style={s.homeMiniSealOuter}>
+                      <View style={s.homeMiniSealMiddle}>
+                        <View style={s.homeMiniSealInner}>
+                          <Text style={s.homeMiniSealText}>E</Text>
+                        </View>
+                      </View>
+                    </View>
+                    <Text style={{ fontSize: 10, fontWeight: '800', letterSpacing: 1.8, color: '#d4a574' }}>SPECIALTY COFFEE COMMUNITY</Text>
+                  </View>
+                </View>
+
+                {/* User Rank Section */}
+                {gamification && (
+                  <View style={{ backgroundColor: '#faf8f5', borderRadius: 16, padding: 14, gap: 10, borderWidth: 1, borderColor: '#e8dcc8' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                      <Text style={{ fontSize: 32 }}>{getUserLevel(gamification.xp).icon}</Text>
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ fontSize: 12, fontWeight: '700', color: '#d4a574', textTransform: 'uppercase', letterSpacing: 0.5 }}>Tu Rango</Text>
+                        <Text style={{ fontSize: 18, fontWeight: '900', color: '#1f140f' }}>{getUserLevel(gamification.xp).name}</Text>
+                      </View>
+                      <Text style={{ fontSize: 20, fontWeight: '800', color: '#1f140f' }}>{gamification.xp}</Text>
+                      <Text style={{ fontSize: 10, fontWeight: '600', color: '#d4a574' }}>XP</Text>
+                    </View>
+
+                    {/* XP Progress Bar */}
+                    <View style={{ gap: 6 }}>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 2 }}>
+                        <Text style={{ fontSize: 10, fontWeight: '600', color: '#d4a574' }}>Siguiente Nivel</Text>
+                        {__getNextLevelXp(gamification.xp, LEVELS) && (
+                          <Text style={{ fontSize: 10, fontWeight: '700', color: '#1f140f' }}>
+                            {__getNextLevelXp(gamification.xp, LEVELS) - gamification.xp} XP restantes
+                          </Text>
+                        )}
+                      </View>
+                      <View style={{ height: 6, backgroundColor: '#e8dcc8', borderRadius: 3, overflow: 'hidden' }}>
+                        <View style={{ 
+                          height: '100%', 
+                          backgroundColor: '#d4a574',
+                          borderRadius: 3,
+                          width: `${__getXpProgressPercent(gamification.xp, LEVELS)}%`
+                        }} />
+                      </View>
+                    </View>
+                  </View>
+                )}
+              </View>
+
+              {/* ─── ACHIEVEMENTS SECTION ─── */}
+              {gamification && (
+                <View style={{ paddingHorizontal: 16, paddingVertical: 20, gap: 12 }}>
+                  <View>
+                    <Text style={{ fontSize: 16, fontWeight: '800', color: '#1f140f', marginBottom: 8 }}>🏆 Logros Desbloqueados</Text>
+                    <Text style={{ fontSize: 12, color: '#8b7355', marginBottom: 10 }}>
+                      {gamification.achievementIds.length > 0 
+                        ? `${gamification.achievementIds.length} de ${getAchievementDefs().length} logros`
+                        : 'Desbloquea logros interactuando en la comunidad'
+                      }
+                    </Text>
+                  </View>
+
+                  {gamification.achievementIds.length > 0 ? (
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+                      {gamification.achievementIds.map((achId) => {
+                        const ach = getAchievementDefs().find(a => a.id === achId);
+                        return ach ? (
+                          <View key={achId} style={{ flex: 1, minWidth: 90 }}>
+                            <View style={{ backgroundColor: '#faf8f5', borderRadius: 14, padding: 12, alignItems: 'center', gap: 8, borderWidth: 1.5, borderColor: '#d4a574' }}>
+                              <Text style={{ fontSize: 24 }}>{ach.icon}</Text>
+                              <Text style={{ fontSize: 11, fontWeight: '700', color: '#1f140f', textAlign: 'center', lineHeight: 14 }}>{ach.title}</Text>
+                            </View>
+                          </View>
+                        ) : null;
+                      })}
+                    </View>
+                  ) : (
+                    <View style={{ backgroundColor: '#faf8f5', borderRadius: 14, padding: 16, alignItems: 'center', gap: 8, borderWidth: 1, borderColor: '#e8dcc8' }}>
+                      <Text style={{ fontSize: 28 }}>🎯</Text>
+                      <Text style={{ fontSize: 13, fontWeight: '600', color: '#1f140f', textAlign: 'center' }}>Empieza a interactuar para desbloquear logros</Text>
+                    </View>
+                  )}
+                </View>
+              )}
+
+              {/* ─── MOTIVATION CARDS ─── */}
+              <View style={{ paddingHorizontal: 16, paddingBottom: 20, gap: 10 }}>
+                <Text style={{ fontSize: 14, fontWeight: '800', color: '#1f140f', marginBottom: 4 }}>⚡ Gana Puntos</Text>
+                <View style={{ flexDirection: 'row', gap: 10 }}>
+                  <MotivationCard icon="💬" label="Responder" xp="+14 XP" />
+                  <MotivationCard icon="🆕" label="Crear Tema" xp="+18 XP" />
+                  <MotivationCard icon="👍" label="Votar" xp="+8 XP" />
+                </View>
+              </View>
+
+              {/* ─── CATEGORIES ─── */}
+              <View style={{ paddingHorizontal: 16, paddingBottom: 20 }}>
+                <Text style={{ fontSize: 14, fontWeight: '800', color: '#1f140f', marginBottom: 12 }}>Categorías</Text>
+                <View style={{ gap: 10 }}>
               {forumCategories.map((cat, idx) => {
                 const rowAnim = categoryRowAnimsRef.current[idx] || new Animated.Value(1);
                 const pressAnim = getPressAnim(categoryPressAnimsRef, idx);
@@ -310,11 +416,13 @@ export default function CommunityTab({
                         <Text style={s.forumCatTitle}>{cat.label}</Text>
                         {!!cat.desc && <Text style={s.forumCatDesc}>{cat.desc}</Text>}
                       </View>
-                      <Ionicons name="chevron-forward" size={16} color={premiumAccent} />
+                      <Ionicons name="chevron-forward" size={16} color="#d4a574" />
                     </TouchableOpacity>
                   </Animated.View>
                 );
               })}
+                </View>
+              </View>
             </ScrollView>
           </Animated.View>
         </View>
@@ -337,7 +445,7 @@ export default function CommunityTab({
         >
           <View style={s.forumHeaderRow}>
             <TouchableOpacity onPress={() => setForumCategory(null)} style={s.backRow}>
-              <Ionicons name="chevron-back" size={20} color={premiumAccent} />
+              <Ionicons name="chevron-back" size={20} color="#d4a574" />
               <Text style={s.backText}>Categorías</Text>
             </TouchableOpacity>
             <TouchableOpacity style={s.forumNewBtn} onPress={handleOpenCreate}>
@@ -450,7 +558,7 @@ export default function CommunityTab({
         >
           <View style={s.forumHeaderRow}>
             <TouchableOpacity onPress={() => { setForumThread(null); setForumReplyTo(null); }} style={s.backRow}>
-              <Ionicons name="chevron-back" size={20} color={premiumAccent} />
+              <Ionicons name="chevron-back" size={20} color="#d4a574" />
               <Text style={s.backText}>Hilos</Text>
             </TouchableOpacity>
           </View>
@@ -765,6 +873,40 @@ export default function CommunityTab({
           </ScrollView>
         </KeyboardAvoidingView>
       </Modal>
+    </View>
+  );
+}
+
+// ─── HELPERS & COMPONENTS ───────────────────────────────────────────────────────
+
+// Calcula el porcentaje de progreso hacia el siguiente nivel
+function __getXpProgressPercent(currentXp, levels = LEVELS) {
+  const currentLevel = levels.find(l => l.minXp <= currentXp) || levels[0];
+  const nextLevel = levels.find(l => l.minXp > currentXp);
+  
+  if (!nextLevel) return 100; // Ya está en el último nivel
+  
+  const currentLevelXp = currentLevel.minXp;
+  const nextLevelXp = nextLevel.minXp;
+  const progressXp = currentXp - currentLevelXp;
+  const totalXpForLevel = nextLevelXp - currentLevelXp;
+  
+  return Math.min(100, Math.max(0, (progressXp / totalXpForLevel) * 100));
+}
+
+// Retorna el XP necesario para el siguiente nivel
+function __getNextLevelXp(currentXp, levels = LEVELS) {
+  const nextLevel = levels.find(l => l.minXp > currentXp);
+  return nextLevel ? nextLevel.minXp : null;
+}
+
+// Componente para cards de motivación
+function MotivationCard({ icon, label, xp }) {
+  return (
+    <View style={{ flex: 1, alignItems: 'center', gap: 6, backgroundColor: '#faf8f5', borderRadius: 12, paddingVertical: 12, paddingHorizontal: 8, borderWidth: 1, borderColor: '#e8dcc8' }}>
+      <Text style={{ fontSize: 20 }}>{icon}</Text>
+      <Text style={{ fontSize: 10, fontWeight: '700', color: '#1f140f' }}>{label}</Text>
+      <Text style={{ fontSize: 10, fontWeight: '800', color: '#d4a574' }}>{xp}</Text>
     </View>
   );
 }

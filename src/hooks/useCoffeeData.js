@@ -3,6 +3,7 @@ import * as SecureStore from 'expo-secure-store';
 import { useEffect, useMemo, useState } from 'react';
 import { Alert } from 'react-native';
 
+import { loadCollectionOfflineCache, saveCollectionOfflineCache } from '../core/offlineCache';
 import { buildPlacesPhotoUrl, calcDistanceMeters, fetchNearbyPlaces, isGooglePlacesConfigured } from '../core/places';
 import { normalize } from '../core/utils';
 
@@ -33,6 +34,12 @@ export default function useCoffeeData({
   const cargarDatos = async () => {
     if (!user?.uid) return;
     setCargando(true);
+    const cached = await loadCollectionOfflineCache(user.uid);
+    if (cached) {
+      setMisCafes(Array.isArray(cached.misCafes) ? cached.misCafes : []);
+      setTopCafes(Array.isArray(cached.topCafes) ? cached.topCafes : []);
+      setAllCafes(Array.isArray(cached.allCafes) ? cached.allCafes : []);
+    }
     try {
       const cafes = await getUserCafes(user.uid);
       const ranking = await getCollection('cafes', 'puntuacion', 100);
@@ -41,6 +48,11 @@ export default function useCoffeeData({
       setMisCafes(cafesPorFecha);
       setTopCafes(ranking);
       setAllCafes(todos);
+      await saveCollectionOfflineCache(user.uid, {
+        misCafes: cafesPorFecha,
+        topCafes: ranking,
+        allCafes: todos,
+      });
     } catch {}
     setCargando(false);
   };
@@ -68,7 +80,9 @@ export default function useCoffeeData({
         apiKey: googlePlacesKey,
         lat,
         lon,
-        maxResultCount: 6,
+        maxResultCount: 12,
+        radiusMeters: 5000,
+        rankPreference: 'DISTANCE',
         fieldMask: 'places.id,places.displayName,places.formattedAddress,places.location,places.rating,places.userRatingCount,places.currentOpeningHours,places.photos,places.types',
       });
 

@@ -20,7 +20,15 @@ export const buildPlacesPhotoUrl = (photoName, apiKey, maxWidthPx = 400) => {
   return `https://places.googleapis.com/v1/${photoName}/media?maxWidthPx=${maxWidthPx}&key=${apiKey}`;
 };
 
-export const fetchNearbyPlaces = async ({ apiKey, lat, lon, maxResultCount = 6, fieldMask }) => {
+export const fetchNearbyPlaces = async ({
+  apiKey,
+  lat,
+  lon,
+  maxResultCount = 20,
+  radiusMeters = 5000,
+  rankPreference = 'DISTANCE',
+  fieldMask,
+}) => {
   if (!isGooglePlacesConfigured(apiKey)) {
     throw new Error('GOOGLE_PLACES_KEY_NOT_CONFIGURED');
   }
@@ -38,10 +46,10 @@ export const fetchNearbyPlaces = async ({ apiKey, lat, lon, maxResultCount = 6, 
       locationRestriction: {
         circle: {
           center: { latitude: lat, longitude: lon },
-          radius: 2000.0,
+          radius: radiusMeters,
         },
       },
-      rankPreference: 'POPULARITY',
+      rankPreference,
     }),
   });
 

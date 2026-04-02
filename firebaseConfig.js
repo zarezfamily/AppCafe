@@ -1,6 +1,7 @@
 // Configuración para API REST de Firestore
 // Usa Firebase Auth token (Bearer) para autenticar peticiones a Firestore
 
+import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
 const appConfig = require('./app.json');
@@ -42,6 +43,33 @@ export const setAuthToken  = (token) => {
 };
 export const clearAuthToken = () => { _authToken = null; };
 export const getAuthToken   = () => _authToken;
+
+// Guardar token en SecureStore
+export const saveAuthTokenToSecureStore = async (token) => {
+  try {
+    if (token) {
+      await SecureStore.setItemAsync('authToken', token);
+    } else {
+      await SecureStore.deleteItemAsync('authToken');
+    }
+  } catch (e) {
+    console.warn('[SecureStore] Error saving token:', e);
+  }
+};
+
+// Restaurar token desde SecureStore
+export const restoreAuthTokenFromSecureStore = async () => {
+  try {
+    const token = await SecureStore.getItemAsync('authToken');
+    if (token) {
+      setAuthToken(token);
+      return token;
+    }
+  } catch (e) {
+    console.warn('[SecureStore] Error restoring token:', e);
+  }
+  return null;
+};
 
 const authHeaders = () => {
   const headers = {
@@ -120,7 +148,7 @@ const mapAuthError = (errorMessage, fallbackMessage) => {
 
 // Consulta con filtro WHERE field == value (usa runQuery para respetar reglas de Firestore)
 export const queryCollection = async (colName, field, value, orderByField = null) => {
-  const url = `${BASE_URL.replace('/documents', '')}:runQuery?key=${FIREBASE_API_KEY}`;
+  const url = `${BASE_URL}:runQuery?key=${FIREBASE_API_KEY}`;
   const body = {
     structuredQuery: {
       from: [{ collectionId: colName }],
@@ -238,7 +266,11 @@ export const uploadImageToStorage = async (uri, folder = 'uploads') => {
 
   const safeFolder = String(folder || 'uploads').replace(/[^a-zA-Z0-9_\-/]/g, '');
   const fileName = `${safeFolder}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`;
-  const uploadUrl = `https://firebasestorage.googleapis.com/v0/b/${FIREBASE_STORAGE_BUCKET}/o?uploadType=media&name=${encodeURIComponent(fileName)}&key=${FIREBASE_API_KEY}`;
+  const bucketCandidates = Array.from(new Set([
+    FIREBASE_STORAGE_BUCKET,
+    FIREBASE_PROJECT_ID ? `${FIREBASE_PROJECT_ID}.appspot.com` : null,
+    FIREBASE_PROJECT_ID ? `${FIREBASE_PROJECT_ID}.firebasestorage.app` : null,
+  ].filter(Boolean)));
 
   const headers = {
     'Content-Type': 'image/jpeg',
@@ -246,23 +278,32 @@ export const uploadImageToStorage = async (uri, folder = 'uploads') => {
   };
   if (_authToken) headers['Authorization'] = `Bearer ${_authToken}`;
 
-  const upRes = await fetch(uploadUrl, {
-    method: 'POST',
-    headers,
-    body: blob,
-  });
+  let lastError = null;
+  for (const bucketName of bucketCandidates) {
+    const uploadUrl = `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o?uploadType=media&name=${encodeURIComponent(fileName)}&key=${FIREBASE_API_KEY}`;
+    const upRes = await fetch(uploadUrl, {
+      method: 'POST',
+      headers,
+      body: blob,
+    });
 
-  const upJson = await upRes.json().catch(() => ({}));
-  if (!upRes.ok) {
-    throw new Error(upJson?.error?.message || 'No se pudo subir imagen a Firebase Storage');
+    const upJson = await upRes.json().catch(() => ({}));
+    if (upRes.ok) {
+      const objectName = upJson.name || fileName;
+      const encodedName = encodeURIComponent(objectName);
+      const token = upJson.downloadTokens || upJson.metadata?.downloadTokens || '';
+      return token
+        ? `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodedName}?alt=media&token=${token}`
+        : `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodedName}?alt=media`;
+    }
+
+    lastError = upJson?.error?.message || `No se pudo subir imagen a Firebase Storage (${upRes.status})`;
+    if (upRes.status !== 404) {
+      break;
+    }
   }
 
-  const objectName = upJson.name || fileName;
-  const encodedName = encodeURIComponent(objectName);
-  const token = upJson.downloadTokens || upJson.metadata?.downloadTokens || '';
-  return token
-    ? `https://firebasestorage.googleapis.com/v0/b/${FIREBASE_STORAGE_BUCKET}/o/${encodedName}?alt=media&token=${token}`
-    : `https://firebasestorage.googleapis.com/v0/b/${FIREBASE_STORAGE_BUCKET}/o/${encodedName}?alt=media`;
+  throw new Error(lastError || 'No se pudo subir imagen a Firebase Storage');
 };
 
 // ─── AUTENTICACIÓN ────────────────────────────────────────────────────────────
@@ -278,6 +319,7 @@ export const registerUser = async (email, password) => {
   const json = await res.json();
   if (!res.ok) throw new Error(mapAuthError(json.error?.message, 'Error al registrar'));
   setAuthToken(json.idToken);
+  await saveAuthTokenToSecureStore(json.idToken);
   return { uid: json.localId, email: json.email, token: json.idToken };
 };
 
@@ -290,6 +332,7 @@ export const loginUser = async (email, password) => {
   const json = await res.json();
   if (!res.ok) throw new Error(mapAuthError(json.error?.message, 'Email o contraseña incorrectos'));
   setAuthToken(json.idToken);
+  await saveAuthTokenToSecureStore(json.idToken);
   return { uid: json.localId, email: json.email, token: json.idToken };
 };
 

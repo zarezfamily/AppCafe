@@ -64,13 +64,22 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    match /push_subscriptions/{subscriberId} {
+      allow read: if isSignedIn() && subscriberId == request.auth.uid;
+      allow create, update: if isSignedIn()
+        && subscriberId == request.auth.uid
+        && request.resource.data.uid is string
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.expoPushToken is string
+        && request.resource.data.notificationsEnabled is bool;
+      allow delete: if isSignedIn() && subscriberId == request.auth.uid;
+    }
+
     // Diario de catas: privado (solo el usuario ve el suyo)
     match /diario_catas/{cataId} {
-      allow read, delete: if isSignedIn() && resource.data.uid == request.auth.uid;
+      allow read: if isSignedIn();
       allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
-      allow update: if isSignedIn()
-        && resource.data.uid == request.auth.uid
-        && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if isSignedIn() && resource.data.uid == request.auth.uid;
     }
   }
 }

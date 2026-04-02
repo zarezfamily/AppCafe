@@ -8,45 +8,57 @@ import Constants from 'expo-constants';
 import * as ImagePicker from 'expo-image-picker';
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as Location from 'expo-location';
+import * as Notifications from 'expo-notifications';
 import * as SecureStore from 'expo-secure-store';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import {
-  ActivityIndicator, Alert, Animated, Dimensions,
-  Easing,
-  FlatList,
-  Image,
-  KeyboardAvoidingView,
-  Linking,
-  Modal,
-  Platform,
-  SafeAreaView,
-  ScrollView,
-  StatusBar, StyleSheet,
-  Switch,
-  Text, TextInput, TouchableOpacity,
-  View,
+    ActivityIndicator, Alert, Animated, Dimensions,
+    Easing,
+    FlatList,
+    Image,
+    KeyboardAvoidingView,
+    Linking,
+    Modal,
+    Platform,
+    SafeAreaView,
+    ScrollView,
+    StatusBar, StyleSheet,
+    Switch,
+    Text, TextInput, TouchableOpacity,
+    View,
 } from 'react-native';
 
 import {
-  addDocument, deleteDocument, getCollection, getDocument, queryCollection,
-  getUserCafes,
-  loginUser, registerUser, resetPassword,
-  setDocument, updateDocument, uploadImageToStorage,
+    addDocument,
+    clearAuthToken,
+    deleteDocument,
+    getCollection,
+    getDocument,
+    getUserCafes,
+    loginUser,
+    queryCollection,
+    registerUser,
+    resetPassword,
+    restoreAuthTokenFromSecureStore,
+    setDocument,
+    updateDocument,
+    uploadImageToStorage
 } from './firebaseConfig';
 import OnboardingModal from './src/components/OnboardingModal';
 import {
-  LEVELS,
-  getAchievementDefs,
-  getLevelFromXp,
+    LEVELS,
+    getAchievementDefs,
+    getLevelFromXp,
 } from './src/core/gamification';
+import { registerForPushNotificationsAsync, scheduleEtioveNotification } from './src/core/notifications';
 import { PAISES, getFlagForPais } from './src/core/paises';
 import { buildPlacesPhotoUrl, calcDistanceMeters, fetchNearbyPlaces, isGooglePlacesConfigured } from './src/core/places';
 import {
-  csvToSet,
-  formatRelativeTime,
-  getCleanCoffeePhoto,
-  normalize,
-  setToCsv,
+    csvToSet,
+    formatRelativeTime,
+    getCleanCoffeePhoto,
+    normalize,
+    setToCsv,
 } from './src/core/utils';
 import useCoffeeData from './src/hooks/useCoffeeData';
 import useForumState from './src/hooks/useForumState';
@@ -128,6 +140,9 @@ const KEY_HAS_ACCOUNT = 'etiove_has_account';
 const KEY_ONBOARDING_DONE = 'etiove_onboarding_done';
 const KEY_INTERACTION_FEEDBACK = 'etiove_interaction_feedback';
 const KEY_INTERACTION_FEEDBACK_SETTINGS = 'etiove_interaction_feedback_settings';
+const KEY_NOTIFY_COMMUNITY_SNAPSHOT = 'etiove_notify_community_snapshot';
+const KEY_NOTIFY_FORUM_SNAPSHOT = 'etiove_notify_forum_snapshot';
+const KEY_NOTIFY_FAVORITES_SNAPSHOT = 'etiove_notify_favorites_snapshot';
 const OFFERS_CACHE_TTL_MS = 1000 * 60 * 60 * 8;
 
 const AuthContext = createContext(null);
@@ -651,10 +666,27 @@ function CafeteriasScreen() {
   const [cargando, setCargando]         = useState(false);
   const [error, setError]               = useState(null);
   const [seleccionada, setSeleccionada] = useState(null);
+  const [radioKm, setRadioKm]           = useState(5);
+  const [soloAbiertas, setSoloAbiertas] = useState(false);
 
-  useEffect(() => { cargarCafeterias(); }, []);
+  const radiosDisponibles = [2, 5, 10];
 
-  const cargarCafeterias = async () => {
+  useEffect(() => { cargarCafeterias(radioKm); }, [radioKm]);
+
+  const formatearTipo = (types = []) => {
+    if (types.includes('coffee_shop') || types.includes('cafe')) return 'Coffee Shop';
+    return 'Cafeteria';
+  };
+
+  const formatearCategorias = (types = []) => (
+    types
+      .filter((t) => t !== 'point_of_interest' && t !== 'establishment')
+      .slice(0, 4)
+      .map((t) => t.replace(/_/g, ' '))
+      .join(' · ')
+  );
+
+  const cargarCafeterias = async (radiusKm = radioKm) => {
     setCargando(true); setError(null);
     try {
       if (!isGooglePlacesConfigured(GOOGLE_PLACES_KEY)) {
@@ -671,7 +703,9 @@ function CafeteriasScreen() {
         apiKey: GOOGLE_PLACES_KEY,
         lat,
         lon,
-        maxResultCount: 10,
+        maxResultCount: 20,
+        radiusMeters: radiusKm * 1000,
+        rankPreference: 'DISTANCE',
         fieldMask: 'places.id,places.displayName,places.formattedAddress,places.location,places.rating,places.userRatingCount,places.currentOpeningHours,places.regularOpeningHours,places.internationalPhoneNumber,places.websiteUri,places.photos,places.editorialSummary,places.types',
       });
 
@@ -690,6 +724,8 @@ function CafeteriasScreen() {
         const fotosUrls = (p.photos || []).slice(0, 4).map(function(ph) {
           return buildPlacesPhotoUrl(ph.name, GOOGLE_PLACES_KEY);
         });
+        const placeTypes = p.types || [];
+        const descripcion = (p.editorialSummary && p.editorialSummary.text) || null;
         return {
           id:          p.id,
           nombre:      (p.displayName && p.displayName.text) || 'Cafeteria',
@@ -704,14 +740,20 @@ function CafeteriasScreen() {
           rating:      p.rating ? p.rating.toFixed(1) : '--',
           numResenas:  p.userRatingCount || 0,
           resenas:     [],
-          descripcion: (p.editorialSummary && p.editorialSummary.text) || null,
+          descripcion,
           foto:        fotoUrl,
           fotos:       fotosUrls,
+          tipo:        formatearTipo(placeTypes),
+          categorias:  formatearCategorias(placeTypes),
+          especialidades: descripcion || 'Cafe de especialidad, espresso y metodos de filtro',
           wifi:        false,
           terraza:     false,
-          takeaway:    (p.types || []).indexOf('meal_takeaway') !== -1,
+          takeaway:    placeTypes.indexOf('meal_takeaway') !== -1,
         };
-      }).sort(function(a, b) { return parseFloat(b.rating) - parseFloat(a.rating); });
+      }).sort(function(a, b) {
+        if (a.distancia !== b.distancia) return a.distancia - b.distancia;
+        return parseFloat(b.rating) - parseFloat(a.rating);
+      });
 
       setCafeterias(result);
       if (result.length === 0) setError('No encontramos cafeterias cerca. Prueba en otra zona.');
@@ -735,6 +777,10 @@ function CafeteriasScreen() {
       : `geo:${c.lat},${c.lon}?q=${encodeURIComponent(c.nombre)}`;
     Linking.openURL(url).catch(() => {});
   };
+
+  const cafeteriasVisibles = soloAbiertas
+    ? cafeterias.filter((c) => c.abierto === true)
+    : cafeterias;
 
   if (cargando) return (
     <View style={caf.loadBox}>
@@ -804,11 +850,29 @@ function CafeteriasScreen() {
                     <Ionicons name="location" size={20} color={PREMIUM_ACCENT} />
                     <Text style={caf.detInfoLabel}>{seleccionada.distancia < 1000 ? `${seleccionada.distancia}m` : `${(seleccionada.distancia/1000).toFixed(1)}km`}</Text>
                   </View>
+                  <View style={caf.detInfoItem}>
+                    <Ionicons name="star" size={20} color={THEME.status.favorite} />
+                    <Text style={caf.detInfoLabel}>{seleccionada.rating} ({seleccionada.numResenas})</Text>
+                  </View>
                   {seleccionada.wifi && <View style={caf.detInfoItem}><Ionicons name="wifi" size={20} color={PREMIUM_ACCENT} /><Text style={caf.detInfoLabel}>WiFi</Text></View>}
                   {seleccionada.terraza && <View style={caf.detInfoItem}><Ionicons name="sunny" size={20} color={PREMIUM_ACCENT} /><Text style={caf.detInfoLabel}>Terraza</Text></View>}
                   {seleccionada.takeaway && <View style={caf.detInfoItem}><Ionicons name="bag-handle" size={20} color={PREMIUM_ACCENT} /><Text style={caf.detInfoLabel}>Para llevar</Text></View>}
                   {seleccionada.vegano && <View style={caf.detInfoItem}><Ionicons name="leaf" size={20} color={THEME.status.success} /><Text style={[caf.detInfoLabel, { color: THEME.status.success }]}>Vegano</Text></View>}
                 </View>
+
+                {seleccionada.descripcion && (
+                  <View style={caf.seccion}>
+                    <Text style={caf.secTitulo}>📝 Sobre esta cafetería</Text>
+                    <Text style={caf.secTexto}>{seleccionada.descripcion}</Text>
+                  </View>
+                )}
+
+                {seleccionada.categorias && (
+                  <View style={caf.seccion}>
+                    <Text style={caf.secTitulo}>🏷️ Categorías</Text>
+                    <Text style={caf.secTexto}>{seleccionada.categorias}</Text>
+                  </View>
+                )}
 
                 {/* Especialidades */}
                 <View style={caf.seccion}>
@@ -842,6 +906,7 @@ function CafeteriasScreen() {
                     <Text style={caf.secTitulo}>📍 Dirección</Text>
                     <Text style={caf.secTexto}>{seleccionada.direccion}{seleccionada.barrio ? `
 ${seleccionada.barrio}` : ''}</Text>
+                    <Text style={[caf.secTexto, { marginTop: 6 }]}>Coordenadas: {Number(seleccionada.lat).toFixed(5)}, {Number(seleccionada.lon).toFixed(5)}</Text>
                   </View>
                 )}
 
@@ -900,19 +965,48 @@ ${seleccionada.barrio}` : ''}</Text>
       <View style={caf.headerBox}>
         <View>
           <Text style={s.pageTitle}>Cafeterías ☕</Text>
-          <Text style={{ fontSize: 13, color: THEME.text.secondary }}>{cafeterias.length} cerca de ti · ordenadas por distancia</Text>
+          <Text style={{ fontSize: 13, color: THEME.text.secondary }}>{cafeteriasVisibles.length} cerca de ti · radio {radioKm} km · ordenadas por distancia</Text>
         </View>
-        <TouchableOpacity onPress={cargarCafeterias} style={caf.refreshBtn}>
+        <TouchableOpacity onPress={() => cargarCafeterias(radioKm)} style={caf.refreshBtn}>
           <Ionicons name="refresh-outline" size={18} color={PREMIUM_ACCENT_DEEP} />
+        </TouchableOpacity>
+      </View>
+
+      <View style={caf.radiusRow}>
+        {radiosDisponibles.map((km) => {
+          const activo = radioKm === km;
+          return (
+            <TouchableOpacity
+              key={String(km)}
+              onPress={() => setRadioKm(km)}
+              activeOpacity={0.85}
+              style={[caf.radiusChip, activo && caf.radiusChipActive]}
+            >
+              <Text style={[caf.radiusChipText, activo && caf.radiusChipTextActive]}>Hasta {km} km</Text>
+            </TouchableOpacity>
+          );
+        })}
+        <TouchableOpacity
+          onPress={() => setSoloAbiertas((prev) => !prev)}
+          activeOpacity={0.85}
+          style={[caf.radiusChip, soloAbiertas && caf.radiusChipActive]}
+        >
+          <Text style={[caf.radiusChipText, soloAbiertas && caf.radiusChipTextActive]}>Solo abiertas</Text>
         </TouchableOpacity>
       </View>
 
       {/* LISTA */}
       <FlatList
-        data={cafeterias}
+        data={cafeteriasVisibles}
         keyExtractor={item => String(item.id)}
         contentContainerStyle={{ paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
+        ListEmptyComponent={() => (
+          <View style={caf.emptyBox}>
+            <Text style={caf.emptyTitle}>No hay cafeterías abiertas en este radio</Text>
+            <Text style={caf.emptySub}>Prueba ampliar el radio o desactivar el filtro.</Text>
+          </View>
+        )}
         renderItem={({ item, index }) => (
           <TouchableOpacity style={caf.card} onPress={() => setSeleccionada(item)} activeOpacity={0.88}>
             {/* Foto real de Google Places o placeholder */}
@@ -1392,8 +1486,12 @@ function MainScreen({ onLogout }) {
   const [newsletterSaving, setNewsletterSaving] = useState(false);
   const [interactionFeedbackSettings, setInteractionFeedbackSettings] = useState({ enabled: true, mode: 'haptic' });
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [notificationsReady, setNotificationsReady] = useState(false);
   const forumThreadScrollRef = useRef(null);
   const forumReplyInputRef = useRef(null);
+  const communityNotificationBootRef = useRef(false);
+  const forumNotificationBootRef = useRef(false);
+  const favoriteNotificationBootRef = useRef(false);
   const [permission, requestPermission] = useCameraPermissions();
   const brandCardAnim = useRef(new Animated.Value(0)).current;
   const brandProgressAnim = useRef(new Animated.Value(0)).current;
@@ -1532,7 +1630,30 @@ function MainScreen({ onLogout }) {
         setInteractionFeedbackSettings((prev) => ({ ...prev, enabled: v === 'true' }));
       })
       .catch(() => {});
+
+    const notificationSubscription = Notifications.addNotificationResponseReceivedListener(() => {});
+    return () => {
+      notificationSubscription.remove();
+    };
   }, []);
+
+  useEffect(() => {
+    if (!user?.uid) return;
+    registerForPushNotificationsAsync()
+      .then(async ({ status, token }) => {
+        setNotificationsReady(status === 'granted');
+        if (!token) return;
+        await setDocument('push_subscriptions', user.uid, {
+          uid: user.uid,
+          expoPushToken: token,
+          platform: Platform.OS,
+          appVersion: APP_VERSION,
+          notificationsEnabled: true,
+          updatedAt: new Date().toISOString(),
+        });
+      })
+      .catch(() => setNotificationsReady(false));
+  }, [user?.uid]);
 
   const guardarFeedbackInteracciones = async (nextValue) => {
     const next = {
@@ -1593,6 +1714,127 @@ function MainScreen({ onLogout }) {
   useEffect(() => {
     cargarNewsletter();
   }, [user?.uid]);
+
+  useEffect(() => {
+    if (!user?.uid || allCafes.length === 0 || !notificationsReady) return;
+    const key = `${KEY_NOTIFY_COMMUNITY_SNAPSHOT}_${user.uid}`;
+    const nextSnapshot = {
+      latestCafeId: allCafes[0]?.id || '',
+      latestCafeName: allCafes[0]?.nombre || '',
+      latestCafeUid: allCafes[0]?.uid || '',
+    };
+
+    const syncSnapshot = async () => {
+      const stored = await SecureStore.getItemAsync(key).catch(() => null);
+      const prev = stored ? JSON.parse(stored) : null;
+      const shouldNotify = communityNotificationBootRef.current
+        && prev?.latestCafeId
+        && prev.latestCafeId !== nextSnapshot.latestCafeId
+        && nextSnapshot.latestCafeUid
+        && nextSnapshot.latestCafeUid !== user.uid;
+
+      if (shouldNotify) {
+        await scheduleEtioveNotification({
+          title: 'Nuevo café en la comunidad',
+          body: `${nextSnapshot.latestCafeName || 'Un café nuevo'} ya está disponible en Etiove.`,
+          data: { type: 'community_new_cafe' },
+        });
+      }
+
+      communityNotificationBootRef.current = true;
+      await SecureStore.setItemAsync(key, JSON.stringify(nextSnapshot)).catch(() => {});
+    };
+
+    syncSnapshot();
+  }, [allCafes, notificationsReady, user?.uid]);
+
+  useEffect(() => {
+    if (!user?.uid || forumThreads.length === 0 || !notificationsReady) return;
+    const ownThreads = forumThreads.filter((thread) => thread.authorUid === user.uid);
+    const key = `${KEY_NOTIFY_FORUM_SNAPSHOT}_${user.uid}`;
+    const nextSnapshot = ownThreads.reduce((acc, thread) => {
+      acc[thread.id] = {
+        replyCount: Number(thread.replyCount || 0),
+        title: thread.title || 'Tu hilo',
+      };
+      return acc;
+    }, {});
+
+    const syncSnapshot = async () => {
+      const stored = await SecureStore.getItemAsync(key).catch(() => null);
+      const prev = stored ? JSON.parse(stored) : {};
+      let changedThread = null;
+
+      if (forumNotificationBootRef.current) {
+        ownThreads.some((thread) => {
+          const prevCount = Number(prev?.[thread.id]?.replyCount || 0);
+          const nextCount = Number(thread.replyCount || 0);
+          if (nextCount > prevCount) {
+            changedThread = thread;
+            return true;
+          }
+          return false;
+        });
+      }
+
+      if (changedThread) {
+        await scheduleEtioveNotification({
+          title: 'Nueva respuesta en tu hilo',
+          body: `Han respondido en "${changedThread.title || 'tu hilo'}".`,
+          data: { type: 'forum_reply', threadId: changedThread.id },
+        });
+      }
+
+      forumNotificationBootRef.current = true;
+      await SecureStore.setItemAsync(key, JSON.stringify(nextSnapshot)).catch(() => {});
+    };
+
+    syncSnapshot();
+  }, [forumThreads, notificationsReady, user?.uid]);
+
+  useEffect(() => {
+    if (!user?.uid || allCafes.length === 0 || favs.length === 0 || !notificationsReady) return;
+    const favoriteMap = allCafes
+      .filter((cafe) => favs.includes(cafe.id))
+      .reduce((acc, cafe) => {
+        acc[cafe.id] = {
+          nombre: cafe.nombre || 'Tu café favorito',
+          puntuacion: Number(cafe.puntuacion || 0),
+        };
+        return acc;
+      }, {});
+    const key = `${KEY_NOTIFY_FAVORITES_SNAPSHOT}_${user.uid}`;
+
+    const syncSnapshot = async () => {
+      const stored = await SecureStore.getItemAsync(key).catch(() => null);
+      const prev = stored ? JSON.parse(stored) : {};
+      let changedFavorite = null;
+
+      if (favoriteNotificationBootRef.current) {
+        Object.entries(favoriteMap).some(([cafeId, cafe]) => {
+          const previousScore = Number(prev?.[cafeId]?.puntuacion || 0);
+          if (previousScore > 0 && previousScore !== Number(cafe.puntuacion || 0)) {
+            changedFavorite = cafe;
+            return true;
+          }
+          return false;
+        });
+      }
+
+      if (changedFavorite) {
+        await scheduleEtioveNotification({
+          title: 'Cambió la puntuación de un favorito',
+          body: `${changedFavorite.nombre} ahora tiene ${changedFavorite.puntuacion.toFixed(1)} puntos.`,
+          data: { type: 'favorite_score_changed' },
+        });
+      }
+
+      favoriteNotificationBootRef.current = true;
+      await SecureStore.setItemAsync(key, JSON.stringify(favoriteMap)).catch(() => {});
+    };
+
+    syncSnapshot();
+  }, [allCafes, favs, notificationsReady, user?.uid]);
 
   const guardarCacheOfertas = async (nextByCafe) => {
     try {
@@ -1888,8 +2130,12 @@ function MainScreen({ onLogout }) {
       if (!user?.uid) return;
       notebook.setCargando(true);
       try {
-        const mias = await queryCollection('diario_catas', 'uid', user.uid, 'fechaHora');
-        notebook.setCatas(mias);
+        // Consultar solo catas del usuario autenticado
+        const mias = await queryCollection('diario_catas', 'uid', user.uid);
+        const ordenadas = (mias || []).sort((a, b) => 
+          new Date(b.fechaHora) - new Date(a.fechaHora)
+        );
+        notebook.setCatas(ordenadas);
       } catch (e) {
         console.error('Error cargar catas:', e);
       } finally {
@@ -1905,8 +2151,19 @@ function MainScreen({ onLogout }) {
       notebook.setGuardando(true);
       try {
         let fotoUrl = notebook.foto;
+        let fotoOmitidaPorPermisos = false;
         if (notebook.foto && !notebook.foto.startsWith('http')) {
-          fotoUrl = await uploadImageToStorage(notebook.foto, 'diario_catas');
+          try {
+            fotoUrl = await uploadImageToStorage(notebook.foto, 'diario_catas');
+          } catch (uploadError) {
+            const uploadMessage = String(uploadError?.message || '');
+            if (uploadMessage.toLowerCase().includes('permission denied')) {
+              fotoUrl = '';
+              fotoOmitidaPorPermisos = true;
+            } else {
+              throw uploadError;
+            }
+          }
         }
         await addDocument('diario_catas', {
           uid: user.uid,
@@ -1925,6 +2182,9 @@ function MainScreen({ onLogout }) {
           createdAt: new Date().toISOString(),
         });
         await cargarCatas();
+        if (fotoOmitidaPorPermisos) {
+          Alert.alert('Cata guardada', 'La cata se guardó sin foto porque Firebase Storage rechazó la subida.');
+        }
         notebook.irCerrarModal();
       } catch (e) {
         Alert.alert('Error', 'No se pudo guardar la cata');
@@ -1954,15 +2214,21 @@ function MainScreen({ onLogout }) {
     };
   const isForumOwner = (item) => !!user?.uid && item?.authorUid === user.uid;
 
+  // Restaurar el token de autenticación y cargar catas cuando el usuario esté listo
+  useEffect(() => {
+    if (!user?.uid) return;
+    restoreAuthTokenFromSecureStore()
+      .then(() => {
+        setTimeout(() => cargarCatas(), 120);
+      })
+      .catch(e => console.warn('[Auth Token] Error:', e));
+  }, [user?.uid]);
+
   useEffect(() => {
     if (activeTab === 'Comunidad' && forumThreads.length === 0 && !forumLoading) {
       cargarForo();
     }
   }, [activeTab]);
-
-    useEffect(() => {
-      cargarCatas();
-    }, [user?.uid]);
 
   const guardarNewsletter = async (nextSubscribed) => {
     if (!user?.uid) return;
@@ -2279,6 +2545,11 @@ function MainScreen({ onLogout }) {
     forumEditing,
     interactionFeedbackEnabled: interactionFeedbackSettings.enabled,
     interactionFeedbackMode: interactionFeedbackSettings.mode,
+    // Gamificación para comunidad
+    gamification,
+    getUserLevel: getLevelFromXp,
+    getAchievementDefs,
+    LEVELS,
   };
 
   const inicioTabProps = {
@@ -2609,7 +2880,17 @@ export default function App() {
   if (showWelcome) return <WelcomeScreen />;
   return (
     <AuthContext.Provider value={{ user }}>
-      {user ? <MainScreen onLogout={() => setUser(null)} /> : <AuthScreen onAuth={setUser} />}
+      {user ? (
+        <MainScreen
+          onLogout={() => {
+            clearAuthToken();
+            SecureStore.deleteItemAsync('authToken').catch(() => {});
+            setUser(null);
+          }}
+        />
+      ) : (
+        <AuthScreen onAuth={setUser} />
+      )}
     </AuthContext.Provider>
   );
 }
@@ -2752,7 +3033,7 @@ const s = StyleSheet.create({
   camBtn:           { width: 60, height: 60, borderRadius: 30, backgroundColor: THEME.brand.primary, borderWidth: 1.5, borderColor: THEME.brand.primaryBorderStrong, alignItems: 'center', justifyContent: 'center', marginTop: -20, shadowColor: THEME.brand.primary, shadowOpacity: 0.34, shadowRadius: 10, shadowOffset: { width: 0, height: 6 }, elevation: 8 },
   formScroll:       { padding: 20, paddingTop: 52, paddingBottom: 50 },
   backRow:          { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 20 },
-  backText:         { color: PREMIUM_ACCENT_DEEP, fontSize: 15 },
+  backText:         { color: '#d4a574', fontSize: 15 },
   formTitle:        { fontSize: 26, fontWeight: '700', color: '#111', marginBottom: 20 },
   fotoEmpty:        { backgroundColor: '#f5f5f5', borderRadius: 14, height: 140, alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 20 },
   fotoEmptyText:    { color: THEME.text.muted, fontSize: 14 },
@@ -2760,10 +3041,10 @@ const s = StyleSheet.create({
   retake:           { color: PREMIUM_ACCENT_DEEP, fontSize: 13, textAlign: 'right', marginBottom: 20 },
   label:            { fontSize: 12, fontWeight: '600', color: THEME.text.secondary, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 8 },
   input:            { backgroundColor: '#f5f5f5', borderRadius: 12, padding: 14, fontSize: 15, color: '#111', marginBottom: 18 },
-  forumCatCard:     { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#fff', borderRadius: 14, borderWidth: 1, borderColor: '#ece2d8', padding: 14 },
+  forumCatCard:     { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#faf8f5', borderRadius: 14, borderWidth: 1, borderColor: '#d4a574', padding: 14 },
   forumCatEmoji:    { fontSize: 22 },
-  forumCatTitle:    { fontSize: 15, fontWeight: '800', color: THEME.text.primary },
-  forumCatDesc:     { fontSize: 12, color: THEME.text.secondary, marginTop: 2 },
+  forumCatTitle:    { fontSize: 15, fontWeight: '800', color: '#1f140f' },
+  forumCatDesc:     { fontSize: 12, color: '#8b7355', marginTop: 2 },
   forumHeaderRow:   { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingTop: 14, paddingBottom: 8 },
   forumNewBtn:      { backgroundColor: THEME.brand.primary, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8 },
   forumNewBtnText:  { color: THEME.brand.onPrimary, fontWeight: '700', fontSize: 12 },
@@ -3021,6 +3302,14 @@ const caf = StyleSheet.create({
   // Header
   headerBox:       { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingTop: 20, paddingBottom: 12 },
   refreshBtn:      { width: 36, height: 36, borderRadius: 18, backgroundColor: PREMIUM_SURFACE_SOFT, alignItems: 'center', justifyContent: 'center' },
+  radiusRow:       { flexDirection: 'row', gap: 8, paddingHorizontal: 16, paddingBottom: 12 },
+  radiusChip:      { borderWidth: 1, borderColor: PREMIUM_BORDER_SOFT, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 7, backgroundColor: '#fff' },
+  radiusChipActive:{ backgroundColor: PREMIUM_ACCENT_DEEP, borderColor: PREMIUM_ACCENT_DEEP },
+  radiusChipText:  { fontSize: 12, fontWeight: '700', color: THEME.text.secondary },
+  radiusChipTextActive: { color: '#fff' },
+  emptyBox:        { marginHorizontal: 16, marginTop: 18, backgroundColor: '#fff', borderWidth: 1, borderColor: PREMIUM_BORDER_SOFT, borderRadius: 14, padding: 14 },
+  emptyTitle:      { fontSize: 14, fontWeight: '800', color: '#1f140f' },
+  emptySub:        { fontSize: 12, color: THEME.text.secondary, marginTop: 4 },
   // Card lista
   card:            { marginHorizontal: 16, marginBottom: 16, backgroundColor: '#fff', borderRadius: 16, overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.07, shadowRadius: 8, shadowOffset: { width: 0, height: 3 }, elevation: 3 },
   cardImgWrap:     { position: 'relative', height: 140 },

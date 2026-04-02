@@ -33,14 +33,14 @@ import {
   loginUser, registerUser, resetPassword,
   setDocument, updateDocument, uploadImageToStorage,
 } from './firebaseConfig';
+import OnboardingModal from './src/components/OnboardingModal';
 import {
   LEVELS,
-  defaultGamification,
   getAchievementDefs,
   getLevelFromXp,
-  normalizeGamification,
 } from './src/core/gamification';
 import { PAISES, getFlagForPais } from './src/core/paises';
+import { buildPlacesPhotoUrl, calcDistanceMeters, fetchNearbyPlaces, isGooglePlacesConfigured } from './src/core/places';
 import {
   csvToSet,
   formatRelativeTime,
@@ -48,6 +48,9 @@ import {
   normalize,
   setToCsv,
 } from './src/core/utils';
+import useCoffeeData from './src/hooks/useCoffeeData';
+import useForumState from './src/hooks/useForumState';
+import useGamification from './src/hooks/useGamification';
 import BottomBarNav from './src/screens/BottomBarNav';
 import CommunityTab from './src/screens/CommunityTab';
 import InicioTab from './src/screens/InicioTab';
@@ -118,6 +121,9 @@ const KEY_VOTES    = 'etiove_votes'; // cafés ya votados por el usuario
 const KEY_OFFERS_CACHE = 'etiove_offers_cache';
 const KEY_GAMIFICATION = 'etiove_gamification';
 const KEY_HAS_ACCOUNT = 'etiove_has_account';
+const KEY_ONBOARDING_DONE = 'etiove_onboarding_done';
+const KEY_INTERACTION_FEEDBACK = 'etiove_interaction_feedback';
+const KEY_INTERACTION_FEEDBACK_SETTINGS = 'etiove_interaction_feedback_settings';
 const OFFERS_CACHE_TTL_MS = 1000 * 60 * 60 * 8;
 
 const AuthContext = createContext(null);
@@ -636,26 +642,6 @@ function ProfileScreen({ onClose }) {
 
 // ─── CAFETERÍAS (Google Places API) ─────────────────────────────────────────
 
-function calcDist(lat1, lon1, lat2, lon2) {
-  const R = 6371000;
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
-  return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
-}
-
-// Obtiene URL de foto real de Google Places
-function getGooglePhotoUrl(photoRef) {
-  if (!photoRef) return null;
-  return 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=' + photoRef + '&key=' + GOOGLE_PLACES_KEY;
-}
-
-// Convierte estado de apertura de Google a texto
-function estadoApertura(openingHours) {
-  if (!openingHours) return null;
-  return openingHours.open_now;
-}
-
 function CafeteriasScreen() {
   const [cafeterias, setCafeterias]     = useState([]);
   const [cargando, setCargando]         = useState(false);
@@ -667,44 +653,27 @@ function CafeteriasScreen() {
   const cargarCafeterias = async () => {
     setCargando(true); setError(null);
     try {
+      if (!isGooglePlacesConfigured(GOOGLE_PLACES_KEY)) {
+        setError('Configura una Google Places API key valida para habilitar cafeterias cercanas.');
+        setCargando(false);
+        return;
+      }
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') { setError('Activa la ubicacion para ver cafeterias cerca de ti'); setCargando(false); return; }
       const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
       const { latitude: lat, longitude: lon } = loc.coords;
 
-      // Places API (New) - Nearby Search
-      const nearbyRes = await fetch('https://places.googleapis.com/v1/places:searchNearby', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Goog-Api-Key': GOOGLE_PLACES_KEY,
-          'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.rating,places.userRatingCount,places.currentOpeningHours,places.regularOpeningHours,places.internationalPhoneNumber,places.websiteUri,places.photos,places.editorialSummary,places.types',
-        },
-        body: JSON.stringify({
-          includedTypes: ['cafe', 'coffee_shop'],
-          maxResultCount: 10,
-          locationRestriction: {
-            circle: {
-              center: { latitude: lat, longitude: lon },
-              radius: 2000.0,
-            },
-          },
-          rankPreference: 'POPULARITY',
-        }),
+      const places = await fetchNearbyPlaces({
+        apiKey: GOOGLE_PLACES_KEY,
+        lat,
+        lon,
+        maxResultCount: 10,
+        fieldMask: 'places.id,places.displayName,places.formattedAddress,places.location,places.rating,places.userRatingCount,places.currentOpeningHours,places.regularOpeningHours,places.internationalPhoneNumber,places.websiteUri,places.photos,places.editorialSummary,places.types',
       });
-
-      const nearbyJson = await nearbyRes.json();
-
-      if (nearbyJson.error) {
-        setError('Error Google Places: ' + (nearbyJson.error.message || 'API no disponible'));
-        setCargando(false); return;
-      }
-
-      const places = nearbyJson.places || [];
 
       const result = places.map(function(p) {
         const geo  = p.location || {};
-        const dist = calcDist(lat, lon, geo.latitude || lat, geo.longitude || lon);
+        const dist = calcDistanceMeters(lat, lon, geo.latitude || lat, geo.longitude || lon);
         const horarioTexto = (p.regularOpeningHours && p.regularOpeningHours.weekdayDescriptions)
           ? p.regularOpeningHours.weekdayDescriptions.join(', ')
           : null;
@@ -712,10 +681,10 @@ function CafeteriasScreen() {
           ? p.currentOpeningHours.openNow
           : null;
         const fotoUrl = (p.photos && p.photos[0] && p.photos[0].name)
-          ? 'https://places.googleapis.com/v1/' + p.photos[0].name + '/media?maxWidthPx=400&key=' + GOOGLE_PLACES_KEY
+          ? buildPlacesPhotoUrl(p.photos[0].name, GOOGLE_PLACES_KEY)
           : null;
         const fotosUrls = (p.photos || []).slice(0, 4).map(function(ph) {
-          return 'https://places.googleapis.com/v1/' + ph.name + '/media?maxWidthPx=400&key=' + GOOGLE_PLACES_KEY;
+          return buildPlacesPhotoUrl(ph.name, GOOGLE_PLACES_KEY);
         });
         return {
           id:          p.id,
@@ -743,7 +712,14 @@ function CafeteriasScreen() {
       setCafeterias(result);
       if (result.length === 0) setError('No encontramos cafeterias cerca. Prueba en otra zona.');
     } catch (e) {
-      setError('Error al buscar cafeterias: ' + e.message);
+      const msg = String(e?.message || '');
+      if (msg.includes('GOOGLE_PLACES_KEY_NOT_CONFIGURED')) {
+        setError('Configura una Google Places API key valida para habilitar cafeterias cercanas.');
+      } else if (msg.includes('GOOGLE_PLACES_API_ERROR')) {
+        setError('Google Places no esta disponible: revisa permisos de API key y facturacion en Google Cloud.');
+      } else {
+        setError('Error al buscar cafeterias: ' + msg);
+      }
     } finally {
       setCargando(false);
     }
@@ -1396,10 +1372,6 @@ function MainScreen({ onLogout }) {
   const [scanning, setScanning]   = useState(false);
   const [showForm, setShowForm]   = useState(false);
   const [showProfile, setShowProfile] = useState(false);
-  const [misCafes, setMisCafes]   = useState([]);
-  const [topCafes, setTopCafes]   = useState([]);
-  const [allCafes, setAllCafes]   = useState([]);
-  const [cargando, setCargando]   = useState(true);
   const [busqueda, setBusqueda]   = useState('');
   const [busquedaTop, setBusquedaTop] = useState('');
   const [busquedaMis, setBusquedaMis] = useState('');
@@ -1411,48 +1383,114 @@ function MainScreen({ onLogout }) {
   const [buscandoOfertaId, setBuscandoOfertaId] = useState(null);
   const [openOfferCafeId, setOpenOfferCafeId] = useState(null);
   const [errorOfertas, setErrorOfertas] = useState(null);
-  const [gamification, setGamification] = useState(defaultGamification());
-  const [cafeteriasInicio, setCafeteriasInicio] = useState([]);
-  const [cargandoCafInicio, setCargandoCafInicio] = useState(false);
-  const [errorCafInicio, setErrorCafInicio] = useState(null);
-  const [forumCategory, setForumCategory] = useState(null);
-  const [forumThread, setForumThread] = useState(null);
-  const [forumSort, setForumSort] = useState('top');
-  const [forumThreads, setForumThreads] = useState([]);
-  const [forumReplies, setForumReplies] = useState([]);
-  const [forumLoading, setForumLoading] = useState(false);
-  const [forumError, setForumError] = useState(null);
-  const [forumCreateOpen, setForumCreateOpen] = useState(false);
-  const [forumSaving, setForumSaving] = useState(false);
-  const [forumTitle, setForumTitle] = useState('');
-  const [forumBody, setForumBody] = useState('');
-  const [forumPhoto, setForumPhoto] = useState(null);
-  const [forumEditOpen, setForumEditOpen] = useState(false);
-  const [forumEditing, setForumEditing] = useState(false);
-  const [forumEditTarget, setForumEditTarget] = useState(null);
-  const [forumEditCollection, setForumEditCollection] = useState('');
-  const [forumEditTitle, setForumEditTitle] = useState('');
-  const [forumEditBody, setForumEditBody] = useState('');
-  const [forumReplyText, setForumReplyText] = useState('');
-  const [forumReplyTo, setForumReplyTo] = useState(null);
-  const [forumSendingReply, setForumSendingReply] = useState(false);
   const [newsletterState, setNewsletterState] = useState({ subscribed: false, createdAt: '', subscribedAt: '', updatedAt: '' });
   const [newsletterLoading, setNewsletterLoading] = useState(false);
   const [newsletterSaving, setNewsletterSaving] = useState(false);
+  const [interactionFeedbackSettings, setInteractionFeedbackSettings] = useState({ enabled: true, mode: 'haptic' });
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const forumThreadScrollRef = useRef(null);
   const forumReplyInputRef = useRef(null);
   const [permission, requestPermission] = useCameraPermissions();
   const brandCardAnim = useRef(new Animated.Value(0)).current;
   const brandProgressAnim = useRef(new Animated.Value(0)).current;
+  const {
+    gamification,
+    registrarEventoGamificacion,
+    achievementToast,
+    closeAchievementToast,
+    achievementToastOpacity,
+    achievementToastTranslateY,
+  } = useGamification({ storageKey: KEY_GAMIFICATION });
+
+  const {
+    misCafes,
+    topCafes,
+    allCafes,
+    cargando,
+    cafeteriasInicio,
+    cargandoCafInicio,
+    errorCafInicio,
+    cargarDatos,
+    toggleFav,
+    eliminarCafe,
+    filtrar,
+    favCafes,
+    cafesFiltrados,
+    topFiltrados,
+    topCafesVista,
+    ultimosGlobal,
+    ultimos100,
+    top100,
+    cafesParaOfertas,
+  } = useCoffeeData({
+    user,
+    perfil,
+    favs,
+    setFavs,
+    setCafeDetalle,
+    registrarEventoGamificacion,
+    busquedaMis,
+    busquedaTop,
+    googlePlacesKey: GOOGLE_PLACES_KEY,
+    offersCacheTtlMs: OFFERS_CACHE_TTL_MS,
+    keyFavs: KEY_FAVS,
+    getUserCafes,
+    getCollection,
+    deleteDocument,
+  });
+
+  const {
+    forumCategory,
+    setForumCategory,
+    forumThread,
+    setForumThread,
+    forumSort,
+    setForumSort,
+    forumThreads,
+    setForumThreads,
+    forumReplies,
+    setForumReplies,
+    forumLoading,
+    setForumLoading,
+    forumError,
+    setForumError,
+    forumCreateOpen,
+    setForumCreateOpen,
+    forumSaving,
+    setForumSaving,
+    forumTitle,
+    setForumTitle,
+    forumBody,
+    setForumBody,
+    forumPhoto,
+    setForumPhoto,
+    forumEditOpen,
+    setForumEditOpen,
+    forumEditing,
+    setForumEditing,
+    forumEditTarget,
+    setForumEditTarget,
+    forumEditCollection,
+    setForumEditCollection,
+    forumEditTitle,
+    setForumEditTitle,
+    forumEditBody,
+    setForumEditBody,
+    forumReplyText,
+    setForumReplyText,
+    forumReplyTo,
+    setForumReplyTo,
+    forumSendingReply,
+    setForumSendingReply,
+    forumThreadsByCategory,
+    forumRepliesByThread,
+    forumTopReplies,
+  } = useForumState();
 
   useEffect(() => {
     SecureStore.getItemAsync(KEY_FAVS).then(v => v && setFavs(JSON.parse(v))).catch(() => {});
     SecureStore.getItemAsync(KEY_VOTES).then(v => v && setVotes(JSON.parse(v))).catch(() => {});
     SecureStore.getItemAsync(KEY_PROFILE).then(v => v && setPerfil(JSON.parse(v))).catch(() => {});
-    SecureStore.getItemAsync(KEY_GAMIFICATION).then((v) => {
-      if (!v) return;
-      try { setGamification(normalizeGamification(JSON.parse(v))); } catch {}
-    }).catch(() => {});
     SecureStore.getItemAsync(KEY_OFFERS_CACHE)
       .then((v) => {
         if (!v) return;
@@ -1467,75 +1505,62 @@ function MainScreen({ onLogout }) {
         setOfertasPorCafe(fresh);
       })
       .catch(() => {});
+    SecureStore.getItemAsync(KEY_ONBOARDING_DONE)
+      .then((v) => {
+        if (v !== 'true') setShowOnboarding(true);
+      })
+      .catch(() => setShowOnboarding(true));
+    SecureStore.getItemAsync(KEY_INTERACTION_FEEDBACK_SETTINGS)
+      .then((v) => {
+        if (!v) return;
+        const parsed = JSON.parse(v);
+        setInteractionFeedbackSettings({
+          enabled: !!parsed?.enabled,
+          mode: parsed?.mode === 'sound' ? 'sound' : 'haptic',
+        });
+      })
+      .catch(() => {});
+    SecureStore.getItemAsync(KEY_INTERACTION_FEEDBACK)
+      .then((v) => {
+        if (v === null) return;
+        setInteractionFeedbackSettings((prev) => ({ ...prev, enabled: v === 'true' }));
+      })
+      .catch(() => {});
   }, []);
 
-  const cargarCafeteriasInicio = async () => {
-    setCargandoCafInicio(true);
-    setErrorCafInicio(null);
+  const guardarFeedbackInteracciones = async (nextValue) => {
+    const next = {
+      ...interactionFeedbackSettings,
+      enabled: !!nextValue,
+    };
+    setInteractionFeedbackSettings(next);
     try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorCafInicio('Activa la ubicación para ver cafeterías cercanas.');
-        setCafeteriasInicio([]);
-        return;
-      }
-
-      const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-      const { latitude: lat, longitude: lon } = loc.coords;
-
-      const res = await fetch('https://places.googleapis.com/v1/places:searchNearby', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Goog-Api-Key': GOOGLE_PLACES_KEY,
-          'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.rating,places.userRatingCount,places.currentOpeningHours,places.photos,places.types',
-        },
-        body: JSON.stringify({
-          includedTypes: ['cafe', 'coffee_shop'],
-          maxResultCount: 6,
-          locationRestriction: {
-            circle: {
-              center: { latitude: lat, longitude: lon },
-              radius: 2000.0,
-            },
-          },
-          rankPreference: 'POPULARITY',
-        }),
-      });
-
-      const json = await res.json();
-      if (json.error) throw new Error(json.error.message || 'Google Places no disponible');
-
-      const places = json.places || [];
-      const mapped = places.map((p) => {
-        const geo = p.location || {};
-        const dist = calcDist(lat, lon, geo.latitude || lat, geo.longitude || lon);
-        return {
-          id: p.id,
-          nombre: (p.displayName && p.displayName.text) || 'Cafetería',
-          rating: Number(p.rating || 0).toFixed(1),
-          numResenas: p.userRatingCount || 0,
-          distancia: dist,
-          abierto: (p.currentOpeningHours && p.currentOpeningHours.openNow !== undefined) ? p.currentOpeningHours.openNow : null,
-          foto: (p.photos && p.photos[0] && p.photos[0].name)
-            ? 'https://places.googleapis.com/v1/' + p.photos[0].name + '/media?maxWidthPx=400&key=' + GOOGLE_PLACES_KEY
-            : null,
-        };
-      });
-
-      setCafeteriasInicio(mapped);
-      if (mapped.length === 0) setErrorCafInicio('No encontramos cafeterías cerca ahora mismo.');
-    } catch (e) {
-      setErrorCafInicio('No se pudieron cargar cafeterías cercanas.');
-      setCafeteriasInicio([]);
-    } finally {
-      setCargandoCafInicio(false);
-    }
+      await SecureStore.setItemAsync(KEY_INTERACTION_FEEDBACK_SETTINGS, JSON.stringify(next));
+      await SecureStore.setItemAsync(KEY_INTERACTION_FEEDBACK, nextValue ? 'true' : 'false');
+    } catch {}
   };
 
-  useEffect(() => {
-    cargarCafeteriasInicio();
-  }, []);
+  const guardarModoFeedbackInteracciones = async (nextMode) => {
+    const safeMode = nextMode === 'sound' ? 'sound' : 'haptic';
+    const next = {
+      ...interactionFeedbackSettings,
+      mode: safeMode,
+    };
+    setInteractionFeedbackSettings(next);
+    try {
+      await SecureStore.setItemAsync(KEY_INTERACTION_FEEDBACK_SETTINGS, JSON.stringify(next));
+    } catch {}
+  };
+
+  const completeOnboarding = async () => {
+    setShowOnboarding(false);
+    try { await SecureStore.setItemAsync(KEY_ONBOARDING_DONE, 'true'); } catch {}
+  };
+
+  const startQuizFromOnboarding = async () => {
+    setActiveTab('Mis Cafés');
+    await completeOnboarding();
+  };
 
   const cargarNewsletter = async () => {
     if (!user?.uid) return;
@@ -1563,64 +1588,10 @@ function MainScreen({ onLogout }) {
     cargarNewsletter();
   }, [user?.uid]);
 
-  const saveGamification = async (next) => {
-    try { await SecureStore.setItemAsync(KEY_GAMIFICATION, JSON.stringify(next)); } catch {}
-  };
-
-  const registrarEventoGamificacion = (type, payload = {}) => {
-    setGamification((prev) => {
-      const base = { ...defaultGamification(), ...prev };
-      const next = {
-        ...base,
-        countriesRated: [...(base.countriesRated || [])],
-        specialOriginsTasted: [...(base.specialOriginsTasted || [])],
-      };
-
-      if (type === 'vote') {
-        next.votesCount += 1;
-        const p = payload?.cafe?.pais;
-        if (p) next.countriesRated.push(p);
-        const sig = normalize(`${payload?.cafe?.nombre || ''} ${payload?.cafe?.variedad || ''} ${payload?.cafe?.pais || ''}`);
-        if (sig.includes('geisha')) next.specialOriginsTasted.push('geisha');
-        if (sig.includes('bourbon pointu')) next.specialOriginsTasted.push('bourbon_pointu');
-        if (sig.includes('yemen')) next.specialOriginsTasted.push('yemen');
-      }
-
-      if (type === 'favorite_mark') {
-        next.favoritesMarkedCount += 1;
-      }
-
-      if (type === 'add_cafe') {
-        next.cafesAddedCount += 1;
-        if (payload?.hasPhoto) next.photosCount += 1;
-        if (payload?.hasReview) next.reviewsCount += 1;
-      }
-
-      const normalized = normalizeGamification(next);
-      saveGamification(normalized);
-      return normalized;
-    });
-  };
-
   const guardarCacheOfertas = async (nextByCafe) => {
     try {
       await SecureStore.setItemAsync(KEY_OFFERS_CACHE, JSON.stringify({ byCafe: nextByCafe, savedAt: Date.now() }));
     } catch {}
-  };
-
-  const cargarDatos = async () => {
-    setCargando(true);
-    try {
-      const cafes   = await getUserCafes(user.uid);
-      const ranking = await getCollection('cafes', 'puntuacion', 100);
-      const todos   = await getCollection('cafes', 'fecha', 100);
-      // Ordenar mis cafés por fecha más reciente
-      const cafesPorFecha = [...cafes].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-      setMisCafes(cafesPorFecha);
-      setTopCafes(ranking);
-      setAllCafes(todos);
-    } catch (e) { console.error('Error de carga:', e); }
-    finally { setCargando(false); }
   };
 
   const parsePrecio = (value) => {
@@ -1826,62 +1797,6 @@ function MainScreen({ onLogout }) {
     if (options.navigate) setActiveTab('Ofertas');
     await buscarOfertasCafe(cafe, !!options.forceRefresh);
   };
-
-  useEffect(() => {
-    cargarDatos();
-  }, []);
-
-  const toggleFav = async (cafe) => {
-    const wasFav = favs.includes(cafe.id);
-    const nf = wasFav ? favs.filter(f => f !== cafe.id) : [...favs, cafe.id];
-    setFavs(nf);
-    await SecureStore.setItemAsync(KEY_FAVS, JSON.stringify(nf)).catch(() => {});
-    if (!wasFav) registrarEventoGamificacion('favorite_mark', { cafe });
-  };
-
-  const eliminarCafe = (item) => {
-    Alert.alert('Eliminar', `¿Eliminar "${item.nombre}"?`, [
-      { text: 'Cancelar', style: 'cancel' },
-      { text: 'Eliminar', style: 'destructive', onPress: async () => {
-        try { await deleteDocument('cafes', item.id); setCafeDetalle(null); cargarDatos(); }
-        catch { Alert.alert('Error', 'No se pudo eliminar'); }
-      }},
-    ]);
-  };
-
-  const filtrar = (lista, query) => {
-    if (!query.trim()) return lista;
-    const q = normalize(query);
-    return lista.filter(c =>
-      normalize(c.nombre).includes(q) || normalize(c.pais).includes(q) ||
-      normalize(c.region).includes(q) || normalize(c.origen).includes(q) ||
-      normalize(c.variedad).includes(q) || normalize(c.proceso).includes(q) ||
-      normalize(c.notas).includes(q)
-    ).slice(0, 50);
-  };
-
-  const favCafes       = allCafes.filter(c => favs.includes(c.id));
-  const cafesFiltrados = filtrar(misCafes, busquedaMis);
-  const topFiltrados   = filtrar(topCafes, busquedaTop);
-  const topCafesPais   = topCafes.filter(c => normalize(c.pais) === normalize(perfil.pais || 'España'));
-  const topCafesVista  = topCafesPais.length > 0 ? topCafesPais : topCafes;
-  // Últimos 10 de toda la BD: allCafes viene ordenado por fecha desc (ver cargarDatos)
-  const ultimosGlobal = allCafes.slice(0, 10);
-  const ultimos100    = allCafes.slice(0, 100);
-  const top100        = topCafesVista.slice(0, 100);
-  const cafesParaOfertas = allCafes.slice(0, 30);
-  const forumThreadsByCategory = forumCategory
-    ? forumThreads
-        .filter((t) => t.categoryId === forumCategory.id)
-        .sort((a, b) => {
-          if (forumSort === 'recent') return new Date(b.createdAt) - new Date(a.createdAt);
-          return (b.upvotes || 0) - (a.upvotes || 0);
-        })
-    : [];
-  const forumRepliesByThread = forumThread
-    ? forumReplies.filter((r) => r.threadId === forumThread.id).sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
-    : [];
-  const forumTopReplies = forumRepliesByThread.filter((r) => !r.parentId);
 
   const abrirOfertaWeb = (oferta) => {
     if (!oferta?.link) return;
@@ -2282,6 +2197,8 @@ function MainScreen({ onLogout }) {
     setForumEditBody,
     guardarEdicionForo,
     forumEditing,
+    interactionFeedbackEnabled: interactionFeedbackSettings.enabled,
+    interactionFeedbackMode: interactionFeedbackSettings.mode,
   };
 
   const inicioTabProps = {
@@ -2416,6 +2333,10 @@ function MainScreen({ onLogout }) {
     appVersion: APP_VERSION,
     premiumAccent: PREMIUM_ACCENT,
     iconFaint: THEME.icon.faint,
+    interactionFeedbackEnabled: interactionFeedbackSettings.enabled,
+    interactionFeedbackMode: interactionFeedbackSettings.mode,
+    guardarFeedbackInteracciones,
+    guardarModoFeedbackInteracciones,
   };
 
   const bottomBarProps = {
@@ -2431,6 +2352,38 @@ function MainScreen({ onLogout }) {
   return (
     <SafeAreaView style={s.screen}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+
+      <OnboardingModal
+        visible={showOnboarding}
+        onClose={completeOnboarding}
+        onStartQuiz={startQuizFromOnboarding}
+      />
+
+      {!!achievementToast && (
+        <TouchableOpacity activeOpacity={0.95} onPress={closeAchievementToast} style={s.achievementToastWrap}>
+          <Animated.View
+            style={[
+              s.achievementToastCard,
+              {
+                opacity: achievementToastOpacity,
+                transform: [{ translateY: achievementToastTranslateY }],
+              },
+            ]}
+          >
+            <View style={s.achievementToastRow}>
+              <Text style={s.achievementToastEmoji}>{achievementToast.icon}</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={s.achievementToastKicker}>🏆 LOGRO DESBLOQUEADO</Text>
+                <Text style={s.achievementToastTitle}>{achievementToast.title}</Text>
+                <Text style={s.achievementToastDesc}>{achievementToast.desc}</Text>
+              </View>
+              <View style={s.achievementToastXpBadge}>
+                <Text style={s.achievementToastXpText}>+{achievementToast.xpGained} XP</Text>
+              </View>
+            </View>
+          </Animated.View>
+        </TouchableOpacity>
+      )}
 
       {cafeDetalle && (
         <CafeDetailScreen
@@ -2893,6 +2846,15 @@ const mas = StyleSheet.create({
   achievementTitle:{ fontSize: 13, fontWeight: '700', color: '#222' },
   achievementTitleOff:{ fontSize: 13, fontWeight: '700', color: '#8f7e70' },
   achievementDesc:{ fontSize: 12, color: '#777', marginTop: 1 },
+  achievementToastWrap: { position: 'absolute', top: Platform.OS === 'ios' ? 52 : 16, left: 12, right: 12, zIndex: 9999 },
+  achievementToastCard: { backgroundColor: '#2d1b14', borderRadius: 18, borderWidth: 1, borderColor: '#5f3c2c', paddingVertical: 14, paddingHorizontal: 14, shadowColor: '#000', shadowOpacity: 0.28, shadowRadius: 14, shadowOffset: { width: 0, height: 6 }, elevation: 8 },
+  achievementToastRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  achievementToastEmoji: { fontSize: 30, marginRight: 2 },
+  achievementToastKicker: { fontSize: 11, fontWeight: '900', letterSpacing: 1, color: '#f4d7b9', marginBottom: 3 },
+  achievementToastTitle: { fontSize: 16, fontWeight: '800', color: '#fff7ef', marginBottom: 2 },
+  achievementToastDesc: { fontSize: 12, color: '#ead8c8' },
+  achievementToastXpBadge: { backgroundColor: '#7a4b34', borderWidth: 1, borderColor: '#c58c63', borderRadius: 999, paddingHorizontal: 10, paddingVertical: 6, marginLeft: 8 },
+  achievementToastXpText: { fontSize: 11, fontWeight: '900', color: '#fff6ee', letterSpacing: 0.3 },
   emptyAchText: { color: '#8c847d', fontSize: 13, lineHeight: 19 },
   logoutBtn:    { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, borderRadius: 30, paddingVertical: 14, backgroundColor: '#2f1d14', borderWidth: 1, borderColor: '#513728', marginBottom: 4 },
   logoutText:   { fontSize: 15, fontWeight: '800', color: '#fff5eb' },

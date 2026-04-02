@@ -40,6 +40,10 @@ export default function MasTab({
   appVersion,
   premiumAccent,
   iconFaint,
+  interactionFeedbackEnabled,
+  interactionFeedbackMode,
+  guardarFeedbackInteracciones,
+  guardarModoFeedbackInteracciones,
 }) {
   return (
     <View style={{ paddingTop: 20 }}>
@@ -169,6 +173,51 @@ export default function MasTab({
 
         <Text style={mas.blockTitle}>Aplicación</Text>
         <View style={mas.listCard}>
+          <View style={mas.item}>
+            <View style={mas.iconWrap}><Ionicons name="pulse-outline" size={22} color={premiumAccent} /></View>
+            <View style={{ flex: 1 }}>
+              <Text style={mas.label}>Feedback sensorial</Text>
+              <Text style={mas.sub}>Modo actual: {interactionFeedbackMode === 'haptic' ? 'táctil' : 'suave'} · estable</Text>
+            </View>
+            <Switch
+              value={interactionFeedbackEnabled}
+              onValueChange={guardarFeedbackInteracciones}
+              trackColor={{ false: '#d8cbbf', true: '#6b4a37' }}
+              thumbColor="#fffdf8"
+            />
+          </View>
+          <View style={{ flexDirection: 'row', gap: 8, paddingHorizontal: 12, paddingBottom: 12 }}>
+            <TouchableOpacity
+              style={{
+                flex: 1,
+                borderRadius: 12,
+                paddingVertical: 10,
+                alignItems: 'center',
+                borderWidth: 1,
+                borderColor: interactionFeedbackMode === 'haptic' ? '#6b4a37' : '#e2d4c7',
+                backgroundColor: interactionFeedbackMode === 'haptic' ? '#f2e6d9' : '#fffaf6',
+              }}
+              onPress={() => guardarModoFeedbackInteracciones('haptic')}
+              disabled={!interactionFeedbackEnabled}
+            >
+              <Text style={{ fontSize: 13, fontWeight: '700', color: interactionFeedbackMode === 'haptic' ? '#5d4030' : '#9a8a7d' }}>Táctil</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{
+                flex: 1,
+                borderRadius: 12,
+                paddingVertical: 10,
+                alignItems: 'center',
+                borderWidth: 1,
+                borderColor: interactionFeedbackMode === 'sound' ? '#6b4a37' : '#e2d4c7',
+                backgroundColor: interactionFeedbackMode === 'sound' ? '#f2e6d9' : '#fffaf6',
+              }}
+              onPress={() => guardarModoFeedbackInteracciones('sound')}
+              disabled={!interactionFeedbackEnabled}
+            >
+              <Text style={{ fontSize: 13, fontWeight: '700', color: interactionFeedbackMode === 'sound' ? '#5d4030' : '#9a8a7d' }}>Sonido</Text>
+            </TouchableOpacity>
+          </View>
           <MasItem
             icon="information-circle-outline"
             label="Versión"

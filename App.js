@@ -28,7 +28,7 @@ import {
 } from 'react-native';
 
 import {
-  addDocument, deleteDocument, getCollection, getDocument,
+  addDocument, deleteDocument, getCollection, getDocument, queryCollection,
   getUserCafes,
   loginUser, registerUser, resetPassword,
   setDocument, updateDocument, uploadImageToStorage,
@@ -51,8 +51,12 @@ import {
 import useCoffeeData from './src/hooks/useCoffeeData';
 import useForumState from './src/hooks/useForumState';
 import useGamification from './src/hooks/useGamification';
+import useNoteBook from './src/hooks/useNoteBook';
 import BottomBarNav from './src/screens/BottomBarNav';
+import CataDetailModal from './src/screens/CataDetailModal';
+import CataFormModal from './src/screens/CataFormModal';
 import CommunityTab from './src/screens/CommunityTab';
+import DiarioCatasSection from './src/screens/DiarioCatasSection';
 import InicioTab from './src/screens/InicioTab';
 import MasTab from './src/screens/MasTab';
 import MisCafesTab from './src/screens/MisCafesTab';
@@ -1487,6 +1491,8 @@ function MainScreen({ onLogout }) {
     forumTopReplies,
   } = useForumState();
 
+  const notebook = useNoteBook();
+
   useEffect(() => {
     SecureStore.getItemAsync(KEY_FAVS).then(v => v && setFavs(JSON.parse(v))).catch(() => {});
     SecureStore.getItemAsync(KEY_VOTES).then(v => v && setVotes(JSON.parse(v))).catch(() => {});
@@ -1876,6 +1882,76 @@ function MainScreen({ onLogout }) {
 
   const hasUserVotedForoItem = (item) => !!user?.uid && csvToSet(item?.voterUids).has(user.uid);
   const hasUserReportedForoItem = (item) => !!user?.uid && csvToSet(item?.reporterUids).has(user.uid);
+
+    // ─── DIARIO DE CATAS ───────────────────────────────────────────────────────
+    const cargarCatas = async () => {
+      if (!user?.uid) return;
+      notebook.setCargando(true);
+      try {
+        const mias = await queryCollection('diario_catas', 'uid', user.uid, 'fechaHora');
+        notebook.setCatas(mias);
+      } catch (e) {
+        console.error('Error cargar catas:', e);
+      } finally {
+        notebook.setCargando(false);
+      }
+    };
+
+    const guardarCata = async () => {
+      if (!notebook.cafeNombre.trim()) {
+        Alert.alert('Aviso', 'Ingresa el nombre del café');
+        return;
+      }
+      notebook.setGuardando(true);
+      try {
+        let fotoUrl = notebook.foto;
+        if (notebook.foto && !notebook.foto.startsWith('http')) {
+          fotoUrl = await uploadImageToStorage(notebook.foto, 'diario_catas');
+        }
+        await addDocument('diario_catas', {
+          uid: user.uid,
+          cafeNombre: notebook.cafeNombre,
+          cafeId: notebook.cafeId,
+          fechaHora: notebook.fechaHora,
+          metodoPreparacion: notebook.metodoPreparacion,
+          dosis: Number(notebook.dosis) || 0,
+          agua: Number(notebook.agua) || 0,
+          temperatura: Number(notebook.temperatura) || 0,
+          tiempoExtraccion: Number(notebook.tiempoExtraccion) || 0,
+          puntuacion: notebook.puntuacion,
+          notas: notebook.notas,
+          foto: fotoUrl || '',
+          contexto: notebook.contexto,
+          createdAt: new Date().toISOString(),
+        });
+        await cargarCatas();
+        notebook.irCerrarModal();
+      } catch (e) {
+        Alert.alert('Error', 'No se pudo guardar la cata');
+        console.error(e);
+      } finally {
+        notebook.setGuardando(false);
+      }
+    };
+
+    const eliminarCata = async (cataId) => {
+      Alert.alert('Confirmar', '¿Eliminar esta cata?', [
+        { text: 'Cancelar' },
+        {
+          text: 'Eliminar',
+          onPress: async () => {
+            try {
+              await deleteDocument('diario_catas', cataId);
+              await cargarCatas();
+              notebook.irCerrarDetail();
+            } catch (e) {
+              Alert.alert('Error', 'No se pudo eliminar la cata');
+              console.error(e);
+            }
+          },
+        },
+      ]);
+    };
   const isForumOwner = (item) => !!user?.uid && item?.authorUid === user.uid;
 
   useEffect(() => {
@@ -1883,6 +1959,10 @@ function MainScreen({ onLogout }) {
       cargarForo();
     }
   }, [activeTab]);
+
+    useEffect(() => {
+      cargarCatas();
+    }, [user?.uid]);
 
   const guardarNewsletter = async (nextSubscribed) => {
     if (!user?.uid) return;
@@ -2264,6 +2344,9 @@ function MainScreen({ onLogout }) {
     CardVertical,
     eliminarCafe,
     premiumAccent: PREMIUM_ACCENT,
+      notebook,
+      theme: THEME,
+      DiarioCatasSection,
   };
 
   const ultimosAnadidosTabProps = {
@@ -2448,6 +2531,72 @@ function MainScreen({ onLogout }) {
       {!(activeTab === 'Comunidad' && !!forumThread) && (
         <BottomBarNav {...bottomBarProps} />
       )}
+
+        {/* ── DIARIO DE CATAS - MODALS ── */}
+        <CataFormModal
+          visible={notebook.modalFormOpen}
+          onClose={notebook.irCerrarModal}
+          onSave={guardarCata}
+          allCafes={allCafes}
+          cafeNombre={notebook.cafeNombre}
+          setCafeNombre={notebook.setCafeNombre}
+          cafeId={notebook.cafeId}
+          setCafeId={notebook.setCafeId}
+          fechaHora={notebook.fechaHora}
+          setFechaHora={notebook.setFechaHora}
+          metodoPreparacion={notebook.metodoPreparacion}
+          setMetodoPreparacion={notebook.setMetodoPreparacion}
+          dosis={notebook.dosis}
+          setDosis={notebook.setDosis}
+          agua={notebook.agua}
+          setAgua={notebook.setAgua}
+          temperatura={notebook.temperatura}
+          setTemperatura={notebook.setTemperatura}
+          tiempoExtraccion={notebook.tiempoExtraccion}
+          setTiempoExtraccion={notebook.setTiempoExtraccion}
+          puntuacion={notebook.puntuacion}
+          setPuntuacion={notebook.setPuntuacion}
+          notas={notebook.notas}
+          setNotas={notebook.setNotas}
+          foto={notebook.foto}
+          setFoto={notebook.setFoto}
+          contexto={notebook.contexto}
+          setContexto={notebook.setContexto}
+          METODOS_PREPARACION={notebook.METODOS_PREPARACION}
+          CONTEXTOS={notebook.CONTEXTOS}
+          guardando={notebook.guardando}
+          isEditing={notebook.isEditing}
+          theme={THEME}
+          s={s}
+          premiumAccent={PREMIUM_ACCENT}
+        />
+
+        <CataDetailModal
+          visible={notebook.modalDetailOpen}
+          cata={notebook.cataSeleccionada}
+          onClose={notebook.irCerrarDetail}
+          onEdit={(cata) => {
+            notebook.setCafeNombre(cata.cafeNombre);
+            notebook.setCafeId(cata.cafeId || '');
+            notebook.setFechaHora(cata.fechaHora || new Date().toISOString());
+            notebook.setMetodoPreparacion(cata.metodoPreparacion);
+            notebook.setDosis(String(cata.dosis));
+            notebook.setAgua(String(cata.agua));
+            notebook.setTemperatura(String(cata.temperatura));
+            notebook.setTiempoExtraccion(String(cata.tiempoExtraccion));
+            notebook.setPuntuacion(cata.puntuacion);
+            notebook.setNotas(cata.notas);
+            notebook.setFoto(cata.foto);
+            notebook.setContexto(cata.contexto);
+            notebook.setIsEditing(true);
+            notebook.irCerrarDetail();
+            notebook.irAbrirModal();
+          }}
+          onDelete={(cataId) => eliminarCata(cataId)}
+          theme={THEME}
+          s={s}
+          premiumAccent={PREMIUM_ACCENT}
+        />
     </SafeAreaView>
   );
 }

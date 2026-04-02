@@ -276,97 +276,48 @@ export default function CommunityTab({
   return (
     <View style={{ flex: 1 }}>
       {!forumCategory && (
-        <Animated.ScrollView
-          contentContainerStyle={s.communityScrollContent}
-          style={{
-            opacity: categoryListEnterAnim,
-            transform: [
-              {
-                translateX: categoryListEnterAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [-14, 0],
-                }),
-              },
-            ],
-          }}
-        >
-          <View style={s.communityIntroWrap}>
-            <Animated.View
-              style={[
-                s.communityHeroCard,
-                {
-                  opacity: communityHeroAnim,
-                  transform: [
-                    {
-                      translateY: communityHeroAnim.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [16, 0],
-                      }),
-                    },
-                  ],
-                },
-              ]}
-            >
-              <View style={s.communityHeroGlowOne} />
-              <View style={s.communityHeroGlowTwo} />
-              <Text style={s.communityHeroKicker}>SALON ETIOVE</Text>
-              <Text style={s.communityHeroTitle}>Comunidad cafetera</Text>
-              <Text style={s.communityHeroSub}>Comparte recetas, descubre tostadores y conversa con amantes del cafe de especialidad.</Text>
-              <View style={s.communityHeroMetaRow}>
-                <View style={s.communityHeroBadge}>
-                  <Text style={s.communityHeroBadgeText}>{forumCategories.length} categorias</Text>
-                </View>
-                <Text style={s.communityHeroHint}>Toca una para entrar</Text>
-              </View>
-            </Animated.View>
-          </View>
-          <View style={s.communityCategoryGrid}>
-            {forumCategories.map((cat, idx) => {
-              const rowAnim = categoryRowAnimsRef.current[idx] || new Animated.Value(1);
-              const pressAnim = getPressAnim(categoryPressAnimsRef, idx);
-              return (
-                <Animated.View
-                  key={cat.id}
-                  style={{
-                    opacity: rowAnim,
-                    transform: [
-                      {
-                        translateY: rowAnim.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: [14, 0],
-                        }),
-                      },
-                      {
-                        scale: rowAnim.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: [0.98, 1],
-                        }),
-                      },
-                      { scale: pressAnim },
-                    ],
-                  }}
-                >
-                  <TouchableOpacity
-                    style={s.forumCatCard}
-                    onPress={() => handleOpenCategory(cat)}
-                    onPressIn={() => animatePressIn(pressAnim)}
-                    onPressOut={() => animatePressOut(pressAnim)}
-                    activeOpacity={0.95}
+        <View style={{ flex: 1 }}>
+          <Animated.View style={{ opacity: communityHeroAnim, paddingHorizontal: 16, paddingTop: 16, paddingBottom: 10 }}>
+            <Text style={s.sectionSub}>SALON ETIOVE</Text>
+            <Text style={s.sectionTitle}>Comunidad cafetera</Text>
+            <Text style={s.forumThreadBody}>Comparte recetas, descubre tostadores y conversa con amantes del café de especialidad.</Text>
+          </Animated.View>
+          <Animated.View style={{ opacity: categoryListEnterAnim, flex: 1 }}>
+            <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 110, gap: 10 }}>
+              {forumCategories.map((cat, idx) => {
+                const rowAnim = categoryRowAnimsRef.current[idx] || new Animated.Value(1);
+                const pressAnim = getPressAnim(categoryPressAnimsRef, idx);
+                return (
+                  <Animated.View
+                    key={cat.id}
+                    style={{
+                      opacity: rowAnim,
+                      transform: [
+                        { translateY: rowAnim.interpolate({ inputRange: [0, 1], outputRange: [12, 0] }) },
+                        { scale: pressAnim },
+                      ],
+                    }}
                   >
-                    <Text style={s.forumCatEmoji}>{cat.emoji}</Text>
-                    <View style={{ flex: 1 }}>
-                      <Text style={s.forumCatTitle}>{cat.label}</Text>
-                      <Text style={s.forumCatDesc}>{cat.desc}</Text>
-                    </View>
-                    <View style={s.forumCatChevronWrap}>
-                      <Ionicons name="chevron-forward" size={18} color={theme.brand.accentDeep} />
-                    </View>
-                  </TouchableOpacity>
-                </Animated.View>
-              );
-            })}
-          </View>
-        </Animated.ScrollView>
+                    <TouchableOpacity
+                      style={s.forumCatCard}
+                      activeOpacity={0.96}
+                      onPress={() => handleOpenCategory(cat)}
+                      onPressIn={() => animatePressIn(pressAnim)}
+                      onPressOut={() => animatePressOut(pressAnim)}
+                    >
+                      <Text style={s.forumCatEmoji}>{cat.emoji}</Text>
+                      <View style={{ flex: 1 }}>
+                        <Text style={s.forumCatTitle}>{cat.label}</Text>
+                        {!!cat.desc && <Text style={s.forumCatDesc}>{cat.desc}</Text>}
+                      </View>
+                      <Ionicons name="chevron-forward" size={16} color={premiumAccent} />
+                    </TouchableOpacity>
+                  </Animated.View>
+                );
+              })}
+            </ScrollView>
+          </Animated.View>
+        </View>
       )}
 
       {forumCategory && !forumThread && (

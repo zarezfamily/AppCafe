@@ -19,11 +19,27 @@ export default function MisCafesTab({
   CardVertical,
   eliminarCafe,
   premiumAccent,
+  notebook,
+  theme,
+  DiarioCatasSection,
 }) {
   return (
     <View style={{ paddingTop: 20 }}>
       <View style={{ paddingHorizontal: 16 }}><Text style={s.pageTitle}>Mis Cafés</Text></View>
       {!cargando && <QuizSection allCafes={allCafes} onGamifyEvent={registrarEventoGamificacion} />}
+
+      {notebook && <DiarioCatasSection
+        s={s}
+        theme={theme}
+        premiumAccent={premiumAccent}
+        catas={notebook.catas || []}
+        catasFiltradas={notebook.catasFiltradas || []}
+        stats={notebook.stats || { totalCatas: 0, promedioPuntuacion: 0, cafesProbados: 0 }}
+        filtroPeriodo={notebook.filtroPeriodo}
+        setFiltroPeriodo={notebook.setFiltroPeriodo}
+        irAbrirModal={notebook.irAbrirModal}
+        irAbrirDetail={notebook.irAbrirDetail}
+      />}
 
       {favCafes.length > 0 && (
         <>

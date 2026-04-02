@@ -118,6 +118,36 @@ const mapAuthError = (errorMessage, fallbackMessage) => {
 
 // ─── API ───────────────────────────────────────────────────────────────────────
 
+// Consulta con filtro WHERE field == value (usa runQuery para respetar reglas de Firestore)
+export const queryCollection = async (colName, field, value, orderByField = null) => {
+  const url = `${BASE_URL.replace('/documents', '')}:runQuery?key=${FIREBASE_API_KEY}`;
+  const body = {
+    structuredQuery: {
+      from: [{ collectionId: colName }],
+      where: {
+        fieldFilter: {
+          field: { fieldPath: field },
+          op: 'EQUAL',
+          value: toFirestoreValue(value),
+        },
+      },
+    },
+  };
+  if (orderByField) {
+    body.structuredQuery.orderBy = [{ field: { fieldPath: orderByField }, direction: 'DESCENDING' }];
+  }
+  const res = await fetch(url, { method: 'POST', headers: authHeaders(), body: JSON.stringify(body) });
+  if (!res.ok) {
+    const txt = await res.text();
+    console.log('[Firestore] Error:', res.status, txt.substring(0, 200));
+    throw new Error(`queryCollection(${colName}) → ${res.status}`);
+  }
+  const json = await res.json();
+  return json
+    .filter((r) => r.document)
+    .map((r) => docToObject(r.document));
+};
+
 export const getCollection = async (colName, orderByField = null, limitN = null) => {
   const pageSize = limitN ? limitN * 3 : 100;
   // Siempre añadimos la API key como fallback además del Bearer token

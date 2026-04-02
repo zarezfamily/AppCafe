@@ -63,5 +63,14 @@ service cloud.firestore {
         && request.resource.data.subscribed is bool;
       allow delete: if false;
     }
+
+    // Diario de catas: privado (solo el usuario ve el suyo)
+    match /diario_catas/{cataId} {
+      allow read, delete: if isSignedIn() && resource.data.uid == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+      allow update: if isSignedIn()
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.uid == request.auth.uid;
+    }
   }
 }

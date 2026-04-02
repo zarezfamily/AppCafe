@@ -1,5 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
-import { ActivityIndicator, Alert, Image, Linking, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { useState } from 'react';
+import { ActivityIndicator, Image, Linking, Switch, Text, TouchableOpacity, View } from 'react-native';
+import AppDialogModal from '../components/AppDialogModal';
+import MemberInfoModal from '../components/MemberInfoModal';
 
 function MasItem({ icon, label, sub, onPress, mas, premiumAccent, iconFaint }) {
   return (
@@ -45,12 +48,58 @@ export default function MasTab({
   guardarFeedbackInteracciones,
   guardarModoFeedbackInteracciones,
 }) {
+  const [showMemberInfo, setShowMemberInfo] = useState(false);
+  const [dialogVisible, setDialogVisible] = useState(false);
+  const [dialogConfig, setDialogConfig] = useState({ title: '', description: '', actions: [] });
+
+  const openDialog = (title, description, actions) => {
+    setDialogConfig({ title, description, actions });
+    setDialogVisible(true);
+  };
+
+  const abrirAjustesFeedback = () => {
+    openDialog(
+      'Feedback sensorial',
+      `Estado: ${interactionFeedbackEnabled ? 'Activo' : 'Inactivo'}\nModo: ${interactionFeedbackMode === 'haptic' ? 'Táctil' : 'Sonido'}`,
+      [
+        {
+          label: interactionFeedbackEnabled ? 'Desactivar' : 'Activar',
+          onPress: () => guardarFeedbackInteracciones(!interactionFeedbackEnabled),
+        },
+        {
+          label: 'Modo táctil',
+          onPress: () => {
+            if (!interactionFeedbackEnabled) guardarFeedbackInteracciones(true);
+            guardarModoFeedbackInteracciones('haptic');
+          },
+        },
+        {
+          label: 'Modo sonido',
+          onPress: () => {
+            if (!interactionFeedbackEnabled) guardarFeedbackInteracciones(true);
+            guardarModoFeedbackInteracciones('sound');
+          },
+        },
+        { label: 'Cerrar' },
+      ]
+    );
+  };
+
   return (
     <View style={{ paddingTop: 20 }}>
+      <MemberInfoModal visible={showMemberInfo} onClose={() => setShowMemberInfo(false)} />
+      <AppDialogModal
+        visible={dialogVisible}
+        onClose={() => setDialogVisible(false)}
+        title={dialogConfig.title}
+        description={dialogConfig.description}
+        actions={dialogConfig.actions}
+      />
+
       <View style={{ paddingHorizontal: 16 }}>
         <Text style={s.pageTitle}>Más</Text>
 
-        <View style={mas.premiumCard}>
+        <TouchableOpacity style={mas.premiumCard} activeOpacity={0.95} onLongPress={() => setShowMemberInfo(true)} delayLongPress={280}>
           <View style={mas.premiumGlow} />
           <View style={mas.premiumGlowTwo} />
           <Text style={mas.clubTag}>ETIOVE MEMBER STATUS</Text>
@@ -90,7 +139,7 @@ export default function MasTab({
             <Text style={mas.memberProgressText}>{pendingAchievements[0] ? `SIGUIENTE: ${pendingAchievements[0].title.toUpperCase()}` : 'STATUS COMPLETO'}</Text>
           </View>
           <View style={mas.memberProgressBar}><View style={[mas.memberProgressFill, { width: `${achievementProgress * 100}%` }]} /></View>
-        </View>
+        </TouchableOpacity>
 
         <Text style={mas.blockTitle}>Accesos</Text>
         <View style={mas.quickGrid}>
@@ -171,58 +220,22 @@ export default function MasTab({
           </TouchableOpacity>
         </View>
 
-        <Text style={mas.blockTitle}>Aplicación</Text>
+        <Text style={mas.blockTitle}>Ajustes</Text>
         <View style={mas.listCard}>
-          <View style={mas.item}>
-            <View style={mas.iconWrap}><Ionicons name="pulse-outline" size={22} color={premiumAccent} /></View>
-            <View style={{ flex: 1 }}>
-              <Text style={mas.label}>Feedback sensorial</Text>
-              <Text style={mas.sub}>Modo actual: {interactionFeedbackMode === 'haptic' ? 'táctil' : 'suave'} · estable</Text>
-            </View>
-            <Switch
-              value={interactionFeedbackEnabled}
-              onValueChange={guardarFeedbackInteracciones}
-              trackColor={{ false: '#d8cbbf', true: '#6b4a37' }}
-              thumbColor="#fffdf8"
-            />
-          </View>
-          <View style={{ flexDirection: 'row', gap: 8, paddingHorizontal: 12, paddingBottom: 12 }}>
-            <TouchableOpacity
-              style={{
-                flex: 1,
-                borderRadius: 12,
-                paddingVertical: 10,
-                alignItems: 'center',
-                borderWidth: 1,
-                borderColor: interactionFeedbackMode === 'haptic' ? '#6b4a37' : '#e2d4c7',
-                backgroundColor: interactionFeedbackMode === 'haptic' ? '#f2e6d9' : '#fffaf6',
-              }}
-              onPress={() => guardarModoFeedbackInteracciones('haptic')}
-              disabled={!interactionFeedbackEnabled}
-            >
-              <Text style={{ fontSize: 13, fontWeight: '700', color: interactionFeedbackMode === 'haptic' ? '#5d4030' : '#9a8a7d' }}>Táctil</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{
-                flex: 1,
-                borderRadius: 12,
-                paddingVertical: 10,
-                alignItems: 'center',
-                borderWidth: 1,
-                borderColor: interactionFeedbackMode === 'sound' ? '#6b4a37' : '#e2d4c7',
-                backgroundColor: interactionFeedbackMode === 'sound' ? '#f2e6d9' : '#fffaf6',
-              }}
-              onPress={() => guardarModoFeedbackInteracciones('sound')}
-              disabled={!interactionFeedbackEnabled}
-            >
-              <Text style={{ fontSize: 13, fontWeight: '700', color: interactionFeedbackMode === 'sound' ? '#5d4030' : '#9a8a7d' }}>Sonido</Text>
-            </TouchableOpacity>
-          </View>
+          <MasItem
+            icon="pulse-outline"
+            label="Feedback sensorial"
+            sub={`Estado: ${interactionFeedbackEnabled ? 'Activo' : 'Inactivo'} · Modo: ${interactionFeedbackMode === 'haptic' ? 'Táctil' : 'Sonido'}`}
+            onPress={abrirAjustesFeedback}
+            mas={mas}
+            premiumAccent={premiumAccent}
+            iconFaint={iconFaint}
+          />
           <MasItem
             icon="information-circle-outline"
             label="Versión"
             sub={`Etiove v${appVersion}`}
-            onPress={() => Alert.alert('Etiove', `Versión ${appVersion}\n\nReact Native + Expo\nFirebase Firestore`)}
+            onPress={() => openDialog('Etiove', `Versión ${appVersion}\n\nReact Native + Expo\nFirebase Firestore`, [{ label: 'Cerrar' }])}
             mas={mas}
             premiumAccent={premiumAccent}
             iconFaint={iconFaint}
@@ -263,7 +276,13 @@ export default function MasTab({
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={mas.logoutBtn} onPress={() => Alert.alert('Cerrar sesión', '¿Seguro?', [{ text: 'Cancelar', style: 'cancel' }, { text: 'Salir', style: 'destructive', onPress: onLogout }])}>
+        <TouchableOpacity
+          style={mas.logoutBtn}
+          onPress={() => openDialog('Cerrar sesión', '¿Seguro que quieres salir de tu cuenta?', [
+            { label: 'Cancelar' },
+            { label: 'Salir', variant: 'danger', onPress: onLogout },
+          ])}
+        >
           <Ionicons name="log-out-outline" size={20} color="#fff" />
           <Text style={mas.logoutText}>Cerrar sesión</Text>
         </TouchableOpacity>

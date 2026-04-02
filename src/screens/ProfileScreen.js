@@ -3,11 +3,12 @@ import * as ImagePicker from 'expo-image-picker';
 import * as SecureStore from 'expo-secure-store';
 import { useEffect, useState } from 'react';
 import {
-  ActivityIndicator, Alert, Image, Modal, SafeAreaView,
-  ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View,
+    ActivityIndicator, Image, Modal, SafeAreaView,
+    ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View,
 } from 'react-native';
-import { PREMIUM_ACCENT, THEME, W } from '../constants/theme';
+import AppDialogModal from '../components/AppDialogModal';
 import { KEY_PROFILE } from '../constants/storageKeys';
+import { PREMIUM_ACCENT, THEME, W } from '../constants/theme';
 import { useAuth } from '../context/AuthContext';
 import { shared } from '../styles/sharedStyles';
 import PaisPicklist from './PaisPicklist';
@@ -22,8 +23,15 @@ export default function ProfileScreen({ onClose }) {
   const [pais,      setPais]      = useState('España');
   const [foto,      setFoto]      = useState(null);
   const [guardando, setGuardando] = useState(false);
+  const [dialogVisible, setDialogVisible] = useState(false);
+  const [dialogConfig, setDialogConfig] = useState({ title: '', description: '', actions: [] });
   const emailValido = /^\S+@\S+\.\S+$/.test(String(email || '').trim());
   const camposObligatoriosCompletos = !!nombre.trim() && !!apellidos.trim() && !!alias.trim() && !!email.trim();
+
+  const showDialog = (title, description, actions = [{ label: 'Cerrar' }]) => {
+    setDialogConfig({ title, description, actions });
+    setDialogVisible(true);
+  };
 
   useEffect(() => {
     SecureStore.getItemAsync(KEY_PROFILE).then(v => {
@@ -38,17 +46,22 @@ export default function ProfileScreen({ onClose }) {
 
   const elegirFoto = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') { Alert.alert('Permiso denegado', 'Necesitas permitir el acceso a la galería.'); return; }
+    if (status !== 'granted') {
+      showDialog('Permiso denegado', 'Necesitas permitir el acceso a la galería.');
+      return;
+    }
     const res = await ImagePicker.launchImageLibraryAsync({ allowsEditing: true, aspect: [1, 1], quality: 0.7 });
     if (!res.canceled) setFoto(res.assets[0].uri);
   };
 
   const guardar = async () => {
     if (!camposObligatoriosCompletos) {
-      return Alert.alert('Campos obligatorios', 'Nombre, apellidos, alias y email son obligatorios.');
+      showDialog('Campos obligatorios', 'Nombre, apellidos, alias y email son obligatorios.');
+      return;
     }
     if (!emailValido) {
-      return Alert.alert('Email inválido', 'Introduce un email válido para continuar.');
+      showDialog('Email inválido', 'Introduce un email válido para continuar.');
+      return;
     }
     setGuardando(true);
     try {
@@ -61,14 +74,21 @@ export default function ProfileScreen({ onClose }) {
         pais,
         foto,
       }));
-      Alert.alert('✅ Guardado', 'Tu perfil ha sido actualizado');
+      showDialog('Guardado', 'Tu perfil ha sido actualizado');
       onClose();
-    } catch { Alert.alert('Error', 'No se pudo guardar el perfil'); }
+    } catch { showDialog('Error', 'No se pudo guardar el perfil'); }
     finally { setGuardando(false); }
   };
 
   return (
     <Modal visible animationType="slide" onRequestClose={onClose}>
+      <AppDialogModal
+        visible={dialogVisible}
+        onClose={() => setDialogVisible(false)}
+        title={dialogConfig.title}
+        description={dialogConfig.description}
+        actions={dialogConfig.actions}
+      />
       <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
         <StatusBar barStyle="dark-content" />
         <View style={prf.header}>

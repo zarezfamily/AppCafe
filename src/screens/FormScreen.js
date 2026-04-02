@@ -2,14 +2,15 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
 import {
-  ActivityIndicator, Alert, Image, SafeAreaView,
-  ScrollView, StatusBar, Text, TextInput, TouchableOpacity, View,
+    ActivityIndicator, Image, SafeAreaView,
+    ScrollView, StatusBar, Text, TextInput, TouchableOpacity, View,
 } from 'react-native';
 import { addDocument, getDocument, setDocument, updateDocument } from '../../firebaseConfig';
+import AppDialogModal from '../components/AppDialogModal';
+import Stars from '../components/Stars';
 import { THEME } from '../constants/theme';
 import { useAuth } from '../context/AuthContext';
 import { shared } from '../styles/sharedStyles';
-import Stars from '../components/Stars';
 
 export default function FormScreen({ onSave, onBack, onCafeAdded }) {
   const { user } = useAuth();
@@ -19,16 +20,29 @@ export default function FormScreen({ onSave, onBack, onCafeAdded }) {
   const [rating, setRating]         = useState(0);
   const [foto, setFoto]             = useState(null);
   const [subiendo, setSubiendo]     = useState(false);
+  const [dialogVisible, setDialogVisible] = useState(false);
+  const [dialogConfig, setDialogConfig] = useState({ title: '', description: '', actions: [] });
+
+  const showDialog = (title, description, actions = [{ label: 'Cerrar' }]) => {
+    setDialogConfig({ title, description, actions });
+    setDialogVisible(true);
+  };
 
   const hacerFoto = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== 'granted') { Alert.alert('Permiso denegado', 'Necesitas permitir la cámara.'); return; }
+    if (status !== 'granted') {
+      showDialog('Permiso denegado', 'Necesitas permitir la cámara.');
+      return;
+    }
     const res = await ImagePicker.launchCameraAsync({ allowsEditing: true, quality: 0.6 });
     if (!res.canceled) setFoto(res.assets[0].uri);
   };
 
   const guardarCafe = async () => {
-    if (!nombreCafe.trim()) return Alert.alert('Aviso', 'Escribe el nombre del café');
+    if (!nombreCafe.trim()) {
+      showDialog('Aviso', 'Escribe el nombre del café');
+      return;
+    }
     setSubiendo(true);
     try {
       await addDocument('cafes', { nombre: nombreCafe.trim(), origen: origen.trim(), puntuacion: rating, notas, foto: foto || '', fecha: new Date().toISOString(), uid: user.uid });
@@ -44,14 +58,21 @@ export default function FormScreen({ onSave, onBack, onCafeAdded }) {
         foto: foto || '',
         notas: notas || '',
       });
-      Alert.alert('✅ Guardado', 'Café añadido a tu colección');
+      showDialog('Guardado', 'Café añadido a tu colección');
       onSave();
-    } catch { Alert.alert('Error', 'No se pudo conectar con Firebase'); }
+    } catch { showDialog('Error', 'No se pudo conectar con Firebase'); }
     finally { setSubiendo(false); }
   };
 
   return (
     <SafeAreaView style={shared.screen}>
+      <AppDialogModal
+        visible={dialogVisible}
+        onClose={() => setDialogVisible(false)}
+        title={dialogConfig.title}
+        description={dialogConfig.description}
+        actions={dialogConfig.actions}
+      />
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <ScrollView contentContainerStyle={shared.formScroll}>
         <TouchableOpacity onPress={onBack} style={shared.backRow}>

@@ -2,14 +2,15 @@ import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
 import { useState } from 'react';
 import {
-  ActivityIndicator, Alert, Modal, SafeAreaView, ScrollView,
-  StatusBar, StyleSheet, Text, TouchableOpacity, View,
+    ActivityIndicator, Modal, SafeAreaView, ScrollView,
+    StatusBar, StyleSheet, Text, TouchableOpacity, View,
 } from 'react-native';
 import { updateDocument } from '../../firebaseConfig';
-import { PREMIUM_ACCENT, PREMIUM_ACCENT_DEEP, PREMIUM_BORDER_SOFT, PREMIUM_SURFACE_SOFT, PREMIUM_SURFACE_TINT, THEME, W, H } from '../constants/theme';
-import { KEY_VOTES } from '../constants/storageKeys';
+import AppDialogModal from '../components/AppDialogModal';
 import PackshotImage from '../components/PackshotImage';
 import Stars from '../components/Stars';
+import { KEY_VOTES } from '../constants/storageKeys';
+import { H, PREMIUM_ACCENT, PREMIUM_ACCENT_DEEP, PREMIUM_BORDER_SOFT, PREMIUM_SURFACE_SOFT, PREMIUM_SURFACE_TINT, THEME, W } from '../constants/theme';
 import { shared } from '../styles/sharedStyles';
 
 function Chip({ label, icon }) {
@@ -50,6 +51,13 @@ export default function CafeDetailScreen({ cafe, onClose, onDelete, favs = [], o
   const [votando, setVotando]                     = useState(false);
   const [votosActuales, setVotosActuales]         = useState(cafe.votos || 0);
   const [puntuacionActual, setPuntuacionActual]   = useState(cafe.puntuacion || 0);
+  const [dialogVisible, setDialogVisible] = useState(false);
+  const [dialogConfig, setDialogConfig] = useState({ title: '', description: '', actions: [] });
+
+  const showDialog = (title, description, actions = [{ label: 'Cerrar' }]) => {
+    setDialogConfig({ title, description, actions });
+    setDialogVisible(true);
+  };
 
   const votar = async (estrellas) => {
     if (votando || yaVotado || miVoto > 0) return;
@@ -65,13 +73,23 @@ export default function CafeDetailScreen({ cafe, onClose, onDelete, favs = [], o
       setVotes?.(newVotes);
       await SecureStore.setItemAsync(KEY_VOTES, JSON.stringify(newVotes)).catch(() => {});
       onVote?.(cafe);
-      Alert.alert('¡Gracias!', `Has valorado este café con ${estrellas} ⭐\nNueva puntuación media: ${nuevaPuntuacion}.0`);
-    } catch { Alert.alert('Error', 'No se pudo guardar tu voto'); setMiVoto(0); }
+      showDialog('Gracias', `Has valorado este café con ${estrellas} estrellas.\nNueva puntuación media: ${nuevaPuntuacion}.0`);
+    } catch {
+      showDialog('Error', 'No se pudo guardar tu voto');
+      setMiVoto(0);
+    }
     finally { setVotando(false); }
   };
 
   return (
     <Modal visible animationType="slide" onRequestClose={onClose}>
+      <AppDialogModal
+        visible={dialogVisible}
+        onClose={() => setDialogVisible(false)}
+        title={dialogConfig.title}
+        description={dialogConfig.description}
+        actions={dialogConfig.actions}
+      />
       <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
         <StatusBar barStyle="dark-content" />
         <ScrollView showsVerticalScrollIndicator={false}>

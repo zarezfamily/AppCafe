@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
     ActivityIndicator,
     Animated,
@@ -14,6 +14,7 @@ import {
     Vibration,
     View,
 } from 'react-native';
+import MemberInfoModal from '../components/MemberInfoModal';
 
 export default function CommunityTab({
   s,
@@ -74,6 +75,7 @@ export default function CommunityTab({
   getAchievementDefs,
   LEVELS,
 }) {
+  const [showMemberInfo, setShowMemberInfo] = useState(false);
   const communityHeroAnim = useRef(new Animated.Value(0)).current;
   const categoryRowAnimsRef = useRef([]);
   const categoryPressAnimsRef = useRef([]);
@@ -280,6 +282,7 @@ export default function CommunityTab({
 
   return (
     <View style={{ flex: 1 }}>
+      <MemberInfoModal visible={showMemberInfo} onClose={() => setShowMemberInfo(false)} />
       {!forumCategory && (
         <View style={{ flex: 1 }}>
           <Animated.View style={{ opacity: communityHeroAnim }}>
@@ -306,7 +309,12 @@ export default function CommunityTab({
 
                 {/* User Rank Section */}
                 {gamification && (
-                  <View style={{ backgroundColor: '#faf8f5', borderRadius: 16, padding: 14, gap: 10, borderWidth: 1, borderColor: '#e8dcc8' }}>
+                  <TouchableOpacity
+                    activeOpacity={0.96}
+                    onLongPress={() => setShowMemberInfo(true)}
+                    delayLongPress={280}
+                    style={{ backgroundColor: '#faf8f5', borderRadius: 16, padding: 14, gap: 10, borderWidth: 1, borderColor: '#e8dcc8' }}
+                  >
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                       <Text style={{ fontSize: 32 }}>{getUserLevel(gamification.xp).icon}</Text>
                       <View style={{ flex: 1 }}>
@@ -336,7 +344,7 @@ export default function CommunityTab({
                         }} />
                       </View>
                     </View>
-                  </View>
+                  </TouchableOpacity>
                 )}
               </View>
 

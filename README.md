@@ -113,6 +113,30 @@ EXPO_PUBLIC_FIREBASE_PROJECT_ID=...
 EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=<tu_project_id>.appspot.com
 ```
 
+## 🔔 Push remoto (Cloud Functions)
+
+La app ya guarda tokens en `push_subscriptions` y soporta notificaciones locales. Para push remoto real (aunque la app no este abierta), este repo incluye funciones en `functions/` que envian a Expo:
+
+- Nuevo cafe en la comunidad (`cafes` create)
+- Nueva respuesta en tu hilo (`foro_respuestas` create)
+- Cambio de puntuacion en un favorito (`cafes` update + `favoriteCafeIds`)
+
+Despliegue:
+
+```bash
+cd functions
+npm install
+cd ..
+firebase login
+firebase use <tu_project_id>
+firebase deploy --only functions
+```
+
+Notas:
+
+- `firebase.json` ya apunta a `functions` como source.
+- Para favoritos, la app sincroniza `favoriteCafeIds` dentro de `push_subscriptions`.
+
 ### 5. Arranca la app
 
 ```bash

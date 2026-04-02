@@ -12,7 +12,7 @@ import * as Notifications from 'expo-notifications';
 import * as SecureStore from 'expo-secure-store';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import {
-    ActivityIndicator, Alert, Animated, Dimensions,
+    ActivityIndicator, Animated, Dimensions,
     Easing,
     FlatList,
     Image,
@@ -44,6 +44,7 @@ import {
     updateDocument,
     uploadImageToStorage
 } from './firebaseConfig';
+import AppDialogModal from './src/components/AppDialogModal';
 import OnboardingModal from './src/components/OnboardingModal';
 import {
     LEVELS,
@@ -416,6 +417,13 @@ function CafeDetailScreen({ cafe, onClose, onDelete, favs = [], onToggleFav, vot
   const [votando, setVotando]             = useState(false);
   const [votosActuales, setVotosActuales] = useState(cafe.votos || 0);
   const [puntuacionActual, setPuntuacionActual] = useState(cafe.puntuacion || 0);
+  const [dialogVisible, setDialogVisible] = useState(false);
+  const [dialogConfig, setDialogConfig] = useState({ title: '', description: '', actions: [] });
+
+  const showDialog = (title, description, actions = [{ label: 'Cerrar' }]) => {
+    setDialogConfig({ title, description, actions });
+    setDialogVisible(true);
+  };
 
   const votar = async (estrellas) => {
     if (votando || yaVotado || miVoto > 0) return;
@@ -431,13 +439,23 @@ function CafeDetailScreen({ cafe, onClose, onDelete, favs = [], onToggleFav, vot
       setVotes?.(newVotes);
       await SecureStore.setItemAsync(KEY_VOTES, JSON.stringify(newVotes)).catch(() => {});
       onVote?.(cafe);
-      Alert.alert('¡Gracias!', `Has valorado este café con ${estrellas} ⭐\nNueva puntuación media: ${nuevaPuntuacion}.0`);
-    } catch { Alert.alert('Error', 'No se pudo guardar tu voto'); setMiVoto(0); }
+      showDialog('Gracias', `Has valorado este café con ${estrellas} estrellas.\nNueva puntuación media: ${nuevaPuntuacion}.0`);
+    } catch {
+      showDialog('Error', 'No se pudo guardar tu voto');
+      setMiVoto(0);
+    }
     finally { setVotando(false); }
   };
 
   return (
     <Modal visible animationType="slide" onRequestClose={onClose}>
+      <AppDialogModal
+        visible={dialogVisible}
+        onClose={() => setDialogVisible(false)}
+        title={dialogConfig.title}
+        description={dialogConfig.description}
+        actions={dialogConfig.actions}
+      />
       <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
         <StatusBar barStyle="dark-content" />
         <ScrollView showsVerticalScrollIndicator={false}>
@@ -571,8 +589,15 @@ function ProfileScreen({ onClose }) {
   const [pais,      setPais]      = useState('España');
   const [foto,      setFoto]      = useState(null);
   const [guardando, setGuardando] = useState(false);
+  const [dialogVisible, setDialogVisible] = useState(false);
+  const [dialogConfig, setDialogConfig] = useState({ title: '', description: '', actions: [] });
   const emailValido = /^\S+@\S+\.\S+$/.test(String(email || '').trim());
   const camposObligatoriosCompletos = !!nombre.trim() && !!apellidos.trim() && !!alias.trim() && !!email.trim();
+
+  const showDialog = (title, description, actions = [{ label: 'Cerrar' }]) => {
+    setDialogConfig({ title, description, actions });
+    setDialogVisible(true);
+  };
 
   useEffect(() => {
     SecureStore.getItemAsync(KEY_PROFILE).then(v => {
@@ -587,17 +612,22 @@ function ProfileScreen({ onClose }) {
 
   const elegirFoto = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') { Alert.alert('Permiso denegado', 'Necesitas permitir el acceso a la galería.'); return; }
+    if (status !== 'granted') {
+      showDialog('Permiso denegado', 'Necesitas permitir el acceso a la galería.');
+      return;
+    }
     const res = await ImagePicker.launchImageLibraryAsync({ allowsEditing: true, aspect: [1, 1], quality: 0.7 });
     if (!res.canceled) setFoto(res.assets[0].uri);
   };
 
   const guardar = async () => {
     if (!camposObligatoriosCompletos) {
-      return Alert.alert('Campos obligatorios', 'Nombre, apellidos, alias y email son obligatorios.');
+      showDialog('Campos obligatorios', 'Nombre, apellidos, alias y email son obligatorios.');
+      return;
     }
     if (!emailValido) {
-      return Alert.alert('Email inválido', 'Introduce un email válido para continuar.');
+      showDialog('Email inválido', 'Introduce un email válido para continuar.');
+      return;
     }
 
     setGuardando(true);
@@ -611,14 +641,21 @@ function ProfileScreen({ onClose }) {
         pais,
         foto,
       }));
-      Alert.alert('✅ Guardado', 'Tu perfil ha sido actualizado');
+      showDialog('Guardado', 'Tu perfil ha sido actualizado');
       onClose();
-    } catch { Alert.alert('Error', 'No se pudo guardar el perfil'); }
+    } catch { showDialog('Error', 'No se pudo guardar el perfil'); }
     finally { setGuardando(false); }
   };
 
   return (
     <Modal visible animationType="slide" onRequestClose={onClose}>
+      <AppDialogModal
+        visible={dialogVisible}
+        onClose={() => setDialogVisible(false)}
+        title={dialogConfig.title}
+        description={dialogConfig.description}
+        actions={dialogConfig.actions}
+      />
       <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
         <StatusBar barStyle="dark-content" />
         <View style={prf.header}>
@@ -1209,6 +1246,13 @@ function AuthScreen({ onAuth }) {
   const [faceIdDisponible, setFID] = useState(false);
   const [faceIdGuardado, setFIG]   = useState(false);
   const [hasAccount, setHasAccount] = useState(false);
+  const [dialogVisible, setDialogVisible] = useState(false);
+  const [dialogConfig, setDialogConfig] = useState({ title: '', description: '', actions: [] });
+
+  const showDialog = (title, description, actions = [{ label: 'Cerrar' }]) => {
+    setDialogConfig({ title, description, actions });
+    setDialogVisible(true);
+  };
 
   useEffect(() => {
     (async () => {
@@ -1236,7 +1280,10 @@ function AuthScreen({ onAuth }) {
   };
 
   const handleSubmit = async () => {
-    if (!email.trim() || (!password.trim() && modo !== 'reset')) return Alert.alert('Aviso', 'Rellena todos los campos');
+    if (!email.trim() || (!password.trim() && modo !== 'reset')) {
+      showDialog('Aviso', 'Rellena todos los campos');
+      return;
+    }
     setCargando(true);
     try {
       if (modo === 'login') {
@@ -1250,15 +1297,15 @@ function AuthScreen({ onAuth }) {
         await marcarCuenta();
         onAuth(user);
       }
-      else { await resetPassword(email.trim()); Alert.alert('✅ Email enviado', 'Revisa tu bandeja de entrada'); setModo('login'); }
-    } catch (e) { Alert.alert('Error', e.message || 'Algo salió mal'); }
+      else { await resetPassword(email.trim()); showDialog('Email enviado', 'Revisa tu bandeja de entrada'); setModo('login'); }
+    } catch (e) { showDialog('Error', e.message || 'Algo salió mal'); }
     finally { setCargando(false); }
   };
 
   const handleFaceId = async () => {
     try {
       if (Constants.appOwnership === 'expo' || Constants.executionEnvironment === 'storeClient') {
-        Alert.alert('Face ID en Expo Go', 'En Expo Go Face ID puede fallar. Usa un build de desarrollo/TestFlight para autenticación biométrica real.');
+        showDialog('Face ID en Expo Go', 'En Expo Go Face ID puede fallar. Usa un build de desarrollo/TestFlight para autenticación biométrica real.');
         return;
       }
 
@@ -1268,7 +1315,7 @@ function AuthScreen({ onAuth }) {
       const hasFaceId = supportedTypes.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION);
 
       if (!hasHardware || !isEnrolled || !hasFaceId) {
-        Alert.alert('Face ID no disponible', 'Este dispositivo/app no tiene Face ID listo para usar en este momento.');
+        showDialog('Face ID no disponible', 'Este dispositivo/app no tiene Face ID listo para usar en este momento.');
         return;
       }
 
@@ -1290,18 +1337,28 @@ function AuthScreen({ onAuth }) {
           user_fallback: 'Face ID no está disponible ahora mismo. Revisa su configuración.',
           invalid_context: 'No se pudo iniciar Face ID en este momento.',
         };
-        Alert.alert('Face ID', errorMap[auth.error] || `No se pudo completar la autenticación biométrica (${auth.error || 'desconocido'}).`);
+        showDialog('Face ID', errorMap[auth.error] || `No se pudo completar la autenticación biométrica (${auth.error || 'desconocido'}).`);
         return;
       }
       const em = await SecureStore.getItemAsync(KEY_EMAIL); const pw = await SecureStore.getItemAsync(KEY_PASSWORD);
-      if (!em || !pw) return Alert.alert('Aviso', 'Primero inicia sesión y activa "Recordarme"');
+      if (!em || !pw) {
+        showDialog('Aviso', 'Primero inicia sesión y activa "Recordarme"');
+        return;
+      }
       setCargando(true); onAuth(await loginUser(em, pw));
-    } catch { Alert.alert('Error', 'No se pudo autenticar'); }
+    } catch { showDialog('Error', 'No se pudo autenticar'); }
     finally { setCargando(false); }
   };
 
   return (
     <SafeAreaView style={s.screen}>
+      <AppDialogModal
+        visible={dialogVisible}
+        onClose={() => setDialogVisible(false)}
+        title={dialogConfig.title}
+        description={dialogConfig.description}
+        actions={dialogConfig.actions}
+      />
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={s.authScroll}>
@@ -1406,16 +1463,29 @@ function FormScreen({ onSave, onBack, onCafeAdded }) {
   const [rating, setRating]         = useState(0);
   const [foto, setFoto]             = useState(null);
   const [subiendo, setSubiendo]     = useState(false);
+  const [dialogVisible, setDialogVisible] = useState(false);
+  const [dialogConfig, setDialogConfig] = useState({ title: '', description: '', actions: [] });
+
+  const showDialog = (title, description, actions = [{ label: 'Cerrar' }]) => {
+    setDialogConfig({ title, description, actions });
+    setDialogVisible(true);
+  };
 
   const hacerFoto = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== 'granted') { Alert.alert('Permiso denegado', 'Necesitas permitir la cámara.'); return; }
+    if (status !== 'granted') {
+      showDialog('Permiso denegado', 'Necesitas permitir la cámara.');
+      return;
+    }
     const res = await ImagePicker.launchCameraAsync({ allowsEditing: true, quality: 0.6 });
     if (!res.canceled) setFoto(res.assets[0].uri);
   };
 
   const guardarCafe = async () => {
-    if (!nombreCafe.trim()) return Alert.alert('Aviso', 'Escribe el nombre del café');
+    if (!nombreCafe.trim()) {
+      showDialog('Aviso', 'Escribe el nombre del café');
+      return;
+    }
     setSubiendo(true);
     try {
       await addDocument('cafes', { nombre: nombreCafe.trim(), origen: origen.trim(), puntuacion: rating, notas, foto: foto || '', fecha: new Date().toISOString(), uid: user.uid });
@@ -1431,14 +1501,21 @@ function FormScreen({ onSave, onBack, onCafeAdded }) {
         foto: foto || '',
         notas: notas || '',
       });
-      Alert.alert('✅ Guardado', 'Café añadido a tu colección');
+      showDialog('Guardado', 'Café añadido a tu colección');
       onSave();
-    } catch { Alert.alert('Error', 'No se pudo conectar con Firebase'); }
+    } catch { showDialog('Error', 'No se pudo conectar con Firebase'); }
     finally { setSubiendo(false); }
   };
 
   return (
     <SafeAreaView style={s.screen}>
+      <AppDialogModal
+        visible={dialogVisible}
+        onClose={() => setDialogVisible(false)}
+        title={dialogConfig.title}
+        description={dialogConfig.description}
+        actions={dialogConfig.actions}
+      />
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <ScrollView contentContainerStyle={s.formScroll}>
         <TouchableOpacity onPress={onBack} style={s.backRow}><Ionicons name="chevron-back" size={20} color={PREMIUM_ACCENT} /><Text style={s.backText}>Volver</Text></TouchableOpacity>
@@ -1487,6 +1564,9 @@ function MainScreen({ onLogout }) {
   const [interactionFeedbackSettings, setInteractionFeedbackSettings] = useState({ enabled: true, mode: 'haptic' });
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [notificationsReady, setNotificationsReady] = useState(false);
+  const [pushToken, setPushToken] = useState(null);
+  const [dialogVisible, setDialogVisible] = useState(false);
+  const [dialogConfig, setDialogConfig] = useState({ title: '', description: '', actions: [] });
   const forumThreadScrollRef = useRef(null);
   const forumReplyInputRef = useRef(null);
   const communityNotificationBootRef = useRef(false);
@@ -1503,6 +1583,11 @@ function MainScreen({ onLogout }) {
     achievementToastOpacity,
     achievementToastTranslateY,
   } = useGamification({ storageKey: KEY_GAMIFICATION });
+
+  const showDialog = (title, description, actions = [{ label: 'Cerrar' }]) => {
+    setDialogConfig({ title, description, actions });
+    setDialogVisible(true);
+  };
 
   const {
     misCafes,
@@ -1539,6 +1624,7 @@ function MainScreen({ onLogout }) {
     getUserCafes,
     getCollection,
     deleteDocument,
+    openDialog: showDialog,
   });
 
   const {
@@ -1642,6 +1728,7 @@ function MainScreen({ onLogout }) {
     registerForPushNotificationsAsync()
       .then(async ({ status, token }) => {
         setNotificationsReady(status === 'granted');
+        setPushToken(token || null);
         if (!token) return;
         await setDocument('push_subscriptions', user.uid, {
           uid: user.uid,
@@ -1649,11 +1736,25 @@ function MainScreen({ onLogout }) {
           platform: Platform.OS,
           appVersion: APP_VERSION,
           notificationsEnabled: true,
+          favoriteCafeIds: Array.isArray(favs) ? favs : [],
           updatedAt: new Date().toISOString(),
         });
       })
       .catch(() => setNotificationsReady(false));
   }, [user?.uid]);
+
+  useEffect(() => {
+    if (!user?.uid || !notificationsReady || !pushToken) return;
+    setDocument('push_subscriptions', user.uid, {
+      uid: user.uid,
+      expoPushToken: pushToken,
+      platform: Platform.OS,
+      appVersion: APP_VERSION,
+      notificationsEnabled: true,
+      favoriteCafeIds: Array.isArray(favs) ? favs : [],
+      updatedAt: new Date().toISOString(),
+    }).catch(() => {});
+  }, [user?.uid, pushToken, notificationsReady, favs]);
 
   const guardarFeedbackInteracciones = async (nextValue) => {
     const next = {
@@ -2145,7 +2246,7 @@ function MainScreen({ onLogout }) {
 
     const guardarCata = async () => {
       if (!notebook.cafeNombre.trim()) {
-        Alert.alert('Aviso', 'Ingresa el nombre del café');
+        showDialog('Aviso', 'Ingresa el nombre del café');
         return;
       }
       notebook.setGuardando(true);
@@ -2183,11 +2284,11 @@ function MainScreen({ onLogout }) {
         });
         await cargarCatas();
         if (fotoOmitidaPorPermisos) {
-          Alert.alert('Cata guardada', 'La cata se guardó sin foto porque Firebase Storage rechazó la subida.');
+          showDialog('Cata guardada', 'La cata se guardó sin foto porque Firebase Storage rechazó la subida.');
         }
         notebook.irCerrarModal();
       } catch (e) {
-        Alert.alert('Error', 'No se pudo guardar la cata');
+        showDialog('Error', 'No se pudo guardar la cata');
         console.error(e);
       } finally {
         notebook.setGuardando(false);
@@ -2195,17 +2296,18 @@ function MainScreen({ onLogout }) {
     };
 
     const eliminarCata = async (cataId) => {
-      Alert.alert('Confirmar', '¿Eliminar esta cata?', [
-        { text: 'Cancelar' },
+      showDialog('Confirmar', '¿Eliminar esta cata?', [
+        { label: 'Cancelar' },
         {
-          text: 'Eliminar',
+          label: 'Eliminar',
+          variant: 'danger',
           onPress: async () => {
             try {
               await deleteDocument('diario_catas', cataId);
               await cargarCatas();
               notebook.irCerrarDetail();
             } catch (e) {
-              Alert.alert('Error', 'No se pudo eliminar la cata');
+              showDialog('Error', 'No se pudo eliminar la cata');
               console.error(e);
             }
           },
@@ -2233,7 +2335,7 @@ function MainScreen({ onLogout }) {
   const guardarNewsletter = async (nextSubscribed) => {
     if (!user?.uid) return;
     if (!newsletterHasEmail) {
-      Alert.alert('Falta tu email', 'Completa tu perfil antes de suscribirte a la newsletter.');
+      showDialog('Falta tu email', 'Completa tu perfil antes de suscribirte a la newsletter.');
       return;
     }
 
@@ -2264,14 +2366,14 @@ function MainScreen({ onLogout }) {
         subscribedAt: payload.subscribedAt,
         updatedAt: payload.updatedAt,
       });
-      Alert.alert(
+      showDialog(
         nextSubscribed ? 'Newsletter activada' : 'Newsletter pausada',
         nextSubscribed
           ? 'Te avisaremos por email de novedades, lanzamientos y selecciones especiales.'
           : 'Has dejado de recibir emails. Podrás activarlos otra vez cuando quieras.'
       );
     } catch {
-      Alert.alert('Error', 'No se pudo guardar tu preferencia de newsletter.');
+      showDialog('Error', 'No se pudo guardar tu preferencia de newsletter.');
     } finally {
       setNewsletterSaving(false);
     }
@@ -2279,7 +2381,10 @@ function MainScreen({ onLogout }) {
 
   const seleccionarFotoForo = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') return Alert.alert('Permiso denegado', 'Necesitas permitir acceso a galería.');
+    if (status !== 'granted') {
+      showDialog('Permiso denegado', 'Necesitas permitir acceso a galería.');
+      return;
+    }
     const res = await ImagePicker.launchImageLibraryAsync({ allowsEditing: true, quality: 0.7 });
     if (!res.canceled) setForumPhoto(res.assets[0].uri);
   };
@@ -2287,10 +2392,10 @@ function MainScreen({ onLogout }) {
   const crearHiloForo = async () => {
     const title = forumTitle.trim();
     const body = forumBody.trim();
-    if (!forumCategory) return Alert.alert('Categoría', 'Selecciona una categoría.');
-    if (!title || !body) return Alert.alert('Completa el hilo', 'Añade título y contenido.');
-    if (title.length > 120) return Alert.alert('Título demasiado largo', 'Máximo 120 caracteres.');
-    if (body.length > 1000) return Alert.alert('Contenido demasiado largo', 'Máximo 1000 caracteres.');
+    if (!forumCategory) return showDialog('Categoría', 'Selecciona una categoría.');
+    if (!title || !body) return showDialog('Completa el hilo', 'Añade título y contenido.');
+    if (title.length > 120) return showDialog('Título demasiado largo', 'Máximo 120 caracteres.');
+    if (body.length > 1000) return showDialog('Contenido demasiado largo', 'Máximo 1000 caracteres.');
 
     setForumSaving(true);
     try {
@@ -2317,7 +2422,7 @@ function MainScreen({ onLogout }) {
       setForumPhoto(null);
       await cargarForo();
     } catch {
-      Alert.alert('Error', 'No se pudo crear el hilo.');
+      showDialog('Error', 'No se pudo crear el hilo.');
     } finally {
       setForumSaving(false);
     }
@@ -2325,30 +2430,30 @@ function MainScreen({ onLogout }) {
 
   const votarEnForo = async (collection, item) => {
     if (!item?.id || !user?.uid) return;
-    if (hasUserReportedForoItem(item)) return Alert.alert('Acción no permitida', 'Ya reportaste este contenido. No puedes votarlo.');
+    if (hasUserReportedForoItem(item)) return showDialog('Acción no permitida', 'Ya reportaste este contenido. No puedes votarlo.');
     const voters = csvToSet(item.voterUids);
-    if (voters.has(user.uid)) return Alert.alert('Voto registrado', 'Ya votaste este contenido.');
+    if (voters.has(user.uid)) return showDialog('Voto registrado', 'Ya votaste este contenido.');
     voters.add(user.uid);
     const ok = await updateDocument(collection, item.id, {
       upvotes: Number(item.upvotes || 0) + voteWeight,
       voterUids: setToCsv(voters),
     });
-    if (!ok) return Alert.alert('Error', 'No se pudo guardar tu voto. Inténtalo de nuevo.');
+    if (!ok) return showDialog('Error', 'No se pudo guardar tu voto. Inténtalo de nuevo.');
     await cargarForo();
   };
 
   const reportarForo = async (collection, item) => {
     if (!item?.id || !user?.uid) return;
-    if (hasUserVotedForoItem(item)) return Alert.alert('Acción no permitida', 'Ya votaste este contenido. No puedes reportarlo.');
+    if (hasUserVotedForoItem(item)) return showDialog('Acción no permitida', 'Ya votaste este contenido. No puedes reportarlo.');
     const reporters = csvToSet(item.reporterUids);
-    if (reporters.has(user.uid)) return Alert.alert('Reporte enviado', 'Ya reportaste este contenido.');
+    if (reporters.has(user.uid)) return showDialog('Reporte enviado', 'Ya reportaste este contenido.');
     reporters.add(user.uid);
     const ok = await updateDocument(collection, item.id, {
       reportedCount: Number(item.reportedCount || 0) + 1,
       reporterUids: setToCsv(reporters),
     });
-    if (!ok) return Alert.alert('Error', 'No se pudo guardar tu reporte. Inténtalo de nuevo.');
-    Alert.alert('Gracias', 'Reporte enviado a moderación.');
+    if (!ok) return showDialog('Error', 'No se pudo guardar tu reporte. Inténtalo de nuevo.');
+    showDialog('Gracias', 'Reporte enviado a moderación.');
     await cargarForo();
   };
 
@@ -2356,7 +2461,7 @@ function MainScreen({ onLogout }) {
     if (!forumThread?.id) return;
     const text = forumReplyText.trim();
     if (!text) return;
-    if (text.length > 1000) return Alert.alert('Respuesta demasiado larga', 'Máximo 1000 caracteres.');
+    if (text.length > 1000) return showDialog('Respuesta demasiado larga', 'Máximo 1000 caracteres.');
 
     setForumSendingReply(true);
     try {
@@ -2380,7 +2485,7 @@ function MainScreen({ onLogout }) {
       setForumReplyTo(null);
       await cargarForo();
     } catch {
-      Alert.alert('Error', 'No se pudo enviar tu respuesta.');
+      showDialog('Error', 'No se pudo enviar tu respuesta.');
     } finally {
       setForumSendingReply(false);
     }
@@ -2406,21 +2511,21 @@ function MainScreen({ onLogout }) {
   const guardarEdicionForo = async () => {
     if (!forumEditTarget?.id || !forumEditCollection) return;
     const body = forumEditBody.trim();
-    if (!body) return Alert.alert('Contenido vacío', 'Escribe contenido para guardar.');
-    if (body.length > 1000) return Alert.alert('Contenido demasiado largo', 'Máximo 1000 caracteres.');
+    if (!body) return showDialog('Contenido vacío', 'Escribe contenido para guardar.');
+    if (body.length > 1000) return showDialog('Contenido demasiado largo', 'Máximo 1000 caracteres.');
 
     let payload = { body };
     if (forumEditCollection === 'foro_hilos') {
       const title = forumEditTitle.trim();
-      if (!title) return Alert.alert('Título vacío', 'Escribe un título para el hilo.');
-      if (title.length > 120) return Alert.alert('Título demasiado largo', 'Máximo 120 caracteres.');
+      if (!title) return showDialog('Título vacío', 'Escribe un título para el hilo.');
+      if (title.length > 120) return showDialog('Título demasiado largo', 'Máximo 120 caracteres.');
       payload = { title, body };
     }
 
     setForumEditing(true);
     try {
       const ok = await updateDocument(forumEditCollection, forumEditTarget.id, payload);
-      if (!ok) return Alert.alert('Error', 'No se pudo guardar la edición.');
+      if (!ok) return showDialog('Error', 'No se pudo guardar la edición.');
       setForumEditOpen(false);
       setForumEditTarget(null);
       setForumEditCollection('');
@@ -2432,11 +2537,11 @@ function MainScreen({ onLogout }) {
 
   const eliminarItemForo = (collection, item) => {
     if (!item?.id || !isForumOwner(item)) return;
-    Alert.alert('Eliminar', 'Esta acción no se puede deshacer. ¿Deseas continuar?', [
-      { text: 'Cancelar', style: 'cancel' },
+    showDialog('Eliminar', 'Esta acción no se puede deshacer. ¿Deseas continuar?', [
+      { label: 'Cancelar' },
       {
-        text: 'Eliminar',
-        style: 'destructive',
+        label: 'Eliminar',
+        variant: 'danger',
         onPress: async () => {
           try {
             if (collection === 'foro_hilos') {
@@ -2462,7 +2567,7 @@ function MainScreen({ onLogout }) {
             }
             await cargarForo();
           } catch {
-            Alert.alert('Error', 'No se pudo eliminar el contenido.');
+            showDialog('Error', 'No se pudo eliminar el contenido.');
           }
         },
       },
@@ -2471,10 +2576,10 @@ function MainScreen({ onLogout }) {
 
   const abrirMenuAutorForo = (collection, item) => {
     if (!isForumOwner(item)) return;
-    Alert.alert('Opciones', 'Elige una acción', [
-      { text: 'Editar', onPress: () => abrirEditorForo(collection, item) },
-      { text: 'Eliminar', style: 'destructive', onPress: () => eliminarItemForo(collection, item) },
-      { text: 'Cancelar', style: 'cancel' },
+    showDialog('Opciones', 'Elige una acción', [
+      { label: 'Editar', onPress: () => abrirEditorForo(collection, item) },
+      { label: 'Eliminar', variant: 'danger', onPress: () => eliminarItemForo(collection, item) },
+      { label: 'Cancelar' },
     ]);
   };
 
@@ -2705,6 +2810,13 @@ function MainScreen({ onLogout }) {
 
   return (
     <SafeAreaView style={s.screen}>
+      <AppDialogModal
+        visible={dialogVisible}
+        onClose={() => setDialogVisible(false)}
+        title={dialogConfig.title}
+        description={dialogConfig.description}
+        actions={dialogConfig.actions}
+      />
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
       <OnboardingModal

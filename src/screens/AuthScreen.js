@@ -4,12 +4,13 @@ import * as LocalAuthentication from 'expo-local-authentication';
 import * as SecureStore from 'expo-secure-store';
 import { useEffect, useState } from 'react';
 import {
-  ActivityIndicator, Alert, KeyboardAvoidingView, Platform,
-  SafeAreaView, ScrollView, StatusBar, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View,
+    ActivityIndicator, KeyboardAvoidingView, Platform,
+    SafeAreaView, ScrollView, StatusBar, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View,
 } from 'react-native';
 import { loginUser, registerUser, resetPassword } from '../../firebaseConfig';
-import { THEME } from '../constants/theme';
+import AppDialogModal from '../components/AppDialogModal';
 import { KEY_EMAIL, KEY_HAS_ACCOUNT, KEY_PASSWORD, KEY_REMEMBER } from '../constants/storageKeys';
+import { THEME } from '../constants/theme';
 
 export default function AuthScreen({ onAuth }) {
   const [modo, setModo]         = useState('login');
@@ -20,6 +21,13 @@ export default function AuthScreen({ onAuth }) {
   const [faceIdDisponible, setFID] = useState(false);
   const [faceIdGuardado, setFIG]   = useState(false);
   const [hasAccount, setHasAccount] = useState(false);
+  const [dialogVisible, setDialogVisible] = useState(false);
+  const [dialogConfig, setDialogConfig] = useState({ title: '', description: '', actions: [] });
+
+  const showDialog = (title, description, actions = [{ label: 'Cerrar' }]) => {
+    setDialogConfig({ title, description, actions });
+    setDialogVisible(true);
+  };
 
   useEffect(() => {
     (async () => {
@@ -56,7 +64,10 @@ export default function AuthScreen({ onAuth }) {
   };
 
   const handleSubmit = async () => {
-    if (!email.trim() || (!password.trim() && modo !== 'reset')) return Alert.alert('Aviso', 'Rellena todos los campos');
+    if (!email.trim() || (!password.trim() && modo !== 'reset')) {
+      showDialog('Aviso', 'Rellena todos los campos');
+      return;
+    }
     setCargando(true);
     try {
       if (modo === 'login') {
@@ -70,17 +81,17 @@ export default function AuthScreen({ onAuth }) {
         onAuth(user);
       } else {
         await resetPassword(email.trim());
-        Alert.alert('✅ Email enviado', 'Revisa tu bandeja de entrada');
+        showDialog('Email enviado', 'Revisa tu bandeja de entrada');
         setModo('login');
       }
-    } catch (e) { Alert.alert('Error', e.message || 'Algo salió mal'); }
+    } catch (e) { showDialog('Error', e.message || 'Algo salió mal'); }
     finally { setCargando(false); }
   };
 
   const handleFaceId = async () => {
     try {
       if (Constants.appOwnership === 'expo' || Constants.executionEnvironment === 'storeClient') {
-        Alert.alert('Face ID en Expo Go', 'En Expo Go Face ID puede fallar. Usa un build de desarrollo/TestFlight para autenticación biométrica real.');
+        showDialog('Face ID en Expo Go', 'En Expo Go Face ID puede fallar. Usa un build de desarrollo/TestFlight para autenticación biométrica real.');
         return;
       }
       const hasHardware    = await LocalAuthentication.hasHardwareAsync();
@@ -88,7 +99,7 @@ export default function AuthScreen({ onAuth }) {
       const supportedTypes = await LocalAuthentication.supportedAuthenticationTypesAsync();
       const hasFaceId      = supportedTypes.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION);
       if (!hasHardware || !isEnrolled || !hasFaceId) {
-        Alert.alert('Face ID no disponible', 'Este dispositivo/app no tiene Face ID listo para usar en este momento.');
+        showDialog('Face ID no disponible', 'Este dispositivo/app no tiene Face ID listo para usar en este momento.');
         return;
       }
       const auth = await LocalAuthentication.authenticateAsync({ promptMessage: 'Accede a Etiove', disableDeviceFallback: true, fallbackLabel: '' });
@@ -105,20 +116,30 @@ export default function AuthScreen({ onAuth }) {
           user_fallback:         'Face ID no está disponible ahora mismo. Revisa su configuración.',
           invalid_context:       'No se pudo iniciar Face ID en este momento.',
         };
-        Alert.alert('Face ID', errorMap[auth.error] || `No se pudo completar la autenticación biométrica (${auth.error || 'desconocido'}).`);
+        showDialog('Face ID', errorMap[auth.error] || `No se pudo completar la autenticación biométrica (${auth.error || 'desconocido'}).`);
         return;
       }
       const em = await SecureStore.getItemAsync(KEY_EMAIL);
       const pw = await SecureStore.getItemAsync(KEY_PASSWORD);
-      if (!em || !pw) return Alert.alert('Aviso', 'Primero inicia sesión y activa "Recordarme"');
+      if (!em || !pw) {
+        showDialog('Aviso', 'Primero inicia sesión y activa "Recordarme"');
+        return;
+      }
       setCargando(true);
       onAuth(await loginUser(em, pw));
-    } catch { Alert.alert('Error', 'No se pudo autenticar'); }
+    } catch { showDialog('Error', 'No se pudo autenticar'); }
     finally { setCargando(false); }
   };
 
   return (
     <SafeAreaView style={styles.screen}>
+      <AppDialogModal
+        visible={dialogVisible}
+        onClose={() => setDialogVisible(false)}
+        title={dialogConfig.title}
+        description={dialogConfig.description}
+        actions={dialogConfig.actions}
+      />
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.authScroll}>

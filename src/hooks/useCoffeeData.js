@@ -1,7 +1,6 @@
 import * as Location from 'expo-location';
 import * as SecureStore from 'expo-secure-store';
 import { useEffect, useMemo, useState } from 'react';
-import { Alert } from 'react-native';
 
 import { loadCollectionOfflineCache, saveCollectionOfflineCache } from '../core/offlineCache';
 import { buildPlacesPhotoUrl, calcDistanceMeters, fetchNearbyPlaces, isGooglePlacesConfigured } from '../core/places';
@@ -22,6 +21,7 @@ export default function useCoffeeData({
   getUserCafes,
   getCollection,
   deleteDocument,
+  openDialog,
 }) {
   const [misCafes, setMisCafes] = useState([]);
   const [topCafes, setTopCafes] = useState([]);
@@ -136,18 +136,18 @@ export default function useCoffeeData({
   };
 
   const eliminarCafe = (item) => {
-    Alert.alert('Eliminar', `¿Eliminar "${item.nombre}"?`, [
-      { text: 'Cancelar', style: 'cancel' },
+    openDialog?.('Eliminar', `¿Eliminar "${item.nombre}"?`, [
+      { label: 'Cancelar' },
       {
-        text: 'Eliminar',
-        style: 'destructive',
+        label: 'Eliminar',
+        variant: 'danger',
         onPress: async () => {
           try {
             await deleteDocument('cafes', item.id);
             setCafeDetalle(null);
             cargarDatos();
           } catch {
-            Alert.alert('Error', 'No se pudo eliminar');
+            openDialog?.('Error', 'No se pudo eliminar');
           }
         },
       },

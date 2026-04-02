@@ -159,7 +159,7 @@ export default function AuthScreen({ onAuth }) {
                 </View>
                 <Text style={styles.wordmark}>ETIOVE</Text>
                 <Text style={[styles.wordmarkSub, styles.authWordmarkSub]}>COFFEE ATELIER</Text>
-                <Text style={[styles.wordmarkTag, styles.authWordmarkTag]}>DONDE EL ORIGEN SE CONVIERTE EN RITUAL</Text>
+                <Text style={[styles.wordmarkTag, styles.authWordmarkTag]}>Donde nació el café</Text>
               </View>
             </View>
 

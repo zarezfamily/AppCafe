@@ -1398,7 +1398,7 @@ function AuthScreen({ onAuth }) {
                 </View>
                 <Text style={s.wordmark}>ETIOVE</Text>
                 <Text style={[s.wordmarkSub, s.authWordmarkSub]}>COFFEE ATELIER</Text>
-                <Text style={[s.wordmarkTag, s.authWordmarkTag]}>DONDE EL ORIGEN SE CONVIERTE EN RITUAL</Text>
+                <Text style={[s.wordmarkTag, s.authWordmarkTag]}>Donde nació el café</Text>
               </View>
             </View>
 
@@ -1611,6 +1611,7 @@ function MainScreen({ onLogout }) {
     cargandoCafInicio,
     errorCafInicio,
     cargarDatos,
+    cargarCafeteriasInicio,
     toggleFav,
     eliminarCafe,
     filtrar,
@@ -2703,6 +2704,7 @@ function MainScreen({ onLogout }) {
     cargandoCafInicio,
     errorCafInicio,
     cafeteriasInicio,
+    cargarCafeteriasInicio,
     theme: THEME,
     cafesParaOfertas,
     abrirOfertasCafe,

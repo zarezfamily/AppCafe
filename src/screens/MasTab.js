@@ -274,6 +274,16 @@ export default function MasTab({
             <Text style={{ fontSize: 12, fontWeight: '700', color: '#1f140f', textAlign: 'center' }}>TikTok</Text>
             <Text style={{ fontSize: 10, color: '#8b7355', textAlign: 'center' }}>@etiove</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={{ flexDirection: 'column', alignItems: 'center', gap: 8, paddingVertical: 12, paddingHorizontal: 16, borderRadius: 14, backgroundColor: '#faf8f5', borderWidth: 1, borderColor: '#e8dcc8', flex: 1 }}
+            onPress={() => Linking.openURL('https://etiove.com')}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="globe-outline" size={32} color="#5B7FA6" />
+            <Text style={{ fontSize: 12, fontWeight: '700', color: '#1f140f', textAlign: 'center' }}>Web</Text>
+            <Text style={{ fontSize: 10, color: '#8b7355', textAlign: 'center' }}>etiove.com</Text>
+          </TouchableOpacity>
         </View>
 
         <TouchableOpacity

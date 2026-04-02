@@ -15,6 +15,8 @@
     "seed:10": "npm run env:check:seed-auth && node --env-file=.env seed10.js",
     "seed:full": "npm run env:check:seed-api && node --env-file=.env seed_cafes_v2.js",
     "cafes:delete": "npm run env:check:seed-api && node --env-file=.env delete_cafes.js",
+    "screenshots:ios": "./scripts/capture_screenshots_ios.sh",
+    "screenshots:ios:auto": "AUTO_CAPTURE=1 ./scripts/capture_screenshots_ios.sh",
     "import:es:coffee:dry": "npm run env:check:import-dry && DRY_RUN=true node --env-file=.env scripts/import_top_es_real.js",
     "import:es:coffee": "npm run env:check:import-write && node --env-file=.env scripts/import_top_es_real.js"
   },

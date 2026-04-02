@@ -59,6 +59,13 @@ export default function useCoffeeData({
   };
 
   const cargarCafeteriasInicio = async () => {
+    if (!user?.uid) {
+      setCafeteriasInicio([]);
+      setErrorCafInicio(null);
+      setCargandoCafInicio(false);
+      return;
+    }
+
     setCargandoCafInicio(true);
     setErrorCafInicio(null);
     try {
@@ -67,14 +74,38 @@ export default function useCoffeeData({
         setCafeteriasInicio([]);
         return;
       }
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
+
+      const servicesEnabled = await Location.hasServicesEnabledAsync();
+      if (!servicesEnabled) {
+        setErrorCafInicio('Activa los servicios de ubicación para ver cafeterías cercanas.');
+        setCafeteriasInicio([]);
+        return;
+      }
+
+      let permission = await Location.getForegroundPermissionsAsync();
+      if (permission.status !== 'granted') {
+        permission = await Location.requestForegroundPermissionsAsync();
+      }
+
+      if (permission.status !== 'granted') {
         setErrorCafInicio('Activa la ubicación para ver cafeterías cercanas.');
         setCafeteriasInicio([]);
         return;
       }
 
-      const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+      const lastKnownLocation = await Location.getLastKnownPositionAsync();
+      let loc = lastKnownLocation;
+
+      try {
+        loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+      } catch (positionError) {
+        if (!lastKnownLocation) throw positionError;
+      }
+
+      if (!loc?.coords) {
+        throw new Error('LOCATION_UNAVAILABLE');
+      }
+
       const { latitude: lat, longitude: lon } = loc.coords;
 
       const places = await fetchNearbyPlaces({
@@ -125,6 +156,13 @@ export default function useCoffeeData({
   }, [user?.uid]);
 
   useEffect(() => {
+    if (!user?.uid) {
+      setCafeteriasInicio([]);
+      setErrorCafInicio(null);
+      setCargandoCafInicio(false);
+      return;
+    }
+
     cargarCafeteriasInicio();
   }, [user?.uid]);
 

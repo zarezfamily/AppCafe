@@ -184,7 +184,7 @@ Recomendacion minima de capturas:
 - Perfil + gamificacion
 - Cafeterias cercanas
 
-Ejemplo de nombres:
+Nombres esperados:
 
 - `assets/screenshots/home.png`
 - `assets/screenshots/detail.png`
@@ -192,12 +192,27 @@ Ejemplo de nombres:
 - `assets/screenshots/profile.png`
 - `assets/screenshots/cafeterias.png`
 
-Cuando las tengas, puedes incrustarlas asi:
+Render en README (se mostraran en cuanto existan los archivos):
 
-```md
-![Inicio](assets/screenshots/home.png)
-![Detalle](assets/screenshots/detail.png)
+![Inicio premium](assets/screenshots/home.png)
+![Detalle de cafe](assets/screenshots/detail.png)
+![Comunidad y foro](assets/screenshots/community.png)
+![Perfil y gamificacion](assets/screenshots/profile.png)
+![Cafeterias cercanas](assets/screenshots/cafeterias.png)
+
+Captura guiada rapida en iOS Simulator:
+
+```bash
+npm run screenshots:ios
 ```
+
+El script te va pidiendo navegar por cada pantalla y pulsar Enter para guardar:
+
+- `assets/screenshots/home.png`
+- `assets/screenshots/detail.png`
+- `assets/screenshots/community.png`
+- `assets/screenshots/profile.png`
+- `assets/screenshots/cafeterias.png`
 
 ## Seguridad
 

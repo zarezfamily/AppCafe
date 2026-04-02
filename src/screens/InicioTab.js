@@ -38,6 +38,7 @@ export default function InicioTab({
   cargandoCafInicio,
   errorCafInicio,
   cafeteriasInicio,
+  cargarCafeteriasInicio,
   theme,
   cafesParaOfertas,
   abrirOfertasCafe,
@@ -67,6 +68,7 @@ export default function InicioTab({
             </View>
             <Text style={s.homeLoverText}>COFFEE</Text>
           </View>
+          <Text style={s.wordmarkTag}>Donde nació el café</Text>
         </View>
         <TouchableOpacity style={s.locationPill} onPress={() => setShowProfile(true)} onLongPress={handleMemberRoastLongPress} delayLongPress={280}>
           <View style={s.brandDecorOne} />
@@ -172,6 +174,9 @@ export default function InicioTab({
             ) : errorCafInicio ? (
               <View style={{ paddingHorizontal: 16 }}>
                 <Text style={[s.empty, { marginTop: 6 }]}>{errorCafInicio}</Text>
+                <TouchableOpacity style={[s.redBtn, { marginTop: 12 }]} onPress={cargarCafeteriasInicio}>
+                  <Text style={s.redBtnText}>Reintentar cafeterías</Text>
+                </TouchableOpacity>
               </View>
             ) : (
               <HorizontalCardRow

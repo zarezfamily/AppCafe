@@ -33,11 +33,33 @@ import {
   loginUser, registerUser, resetPassword,
   setDocument, updateDocument, uploadImageToStorage,
 } from './firebaseConfig';
+import {
+  LEVELS,
+  defaultGamification,
+  getAchievementDefs,
+  getLevelFromXp,
+  normalizeGamification,
+} from './src/core/gamification';
+import { PAISES, getFlagForPais } from './src/core/paises';
+import {
+  csvToSet,
+  formatRelativeTime,
+  getCleanCoffeePhoto,
+  normalize,
+  setToCsv,
+} from './src/core/utils';
+import BottomBarNav from './src/screens/BottomBarNav';
+import CommunityTab from './src/screens/CommunityTab';
+import InicioTab from './src/screens/InicioTab';
+import MasTab from './src/screens/MasTab';
+import MisCafesTab from './src/screens/MisCafesTab';
+import OfertasTab from './src/screens/OfertasTab';
+import TopCafesTab from './src/screens/TopCafesTab';
+import UltimosAnadidosTab from './src/screens/UltimosAnadidosTab';
 
 const { width: W, height: H } = Dimensions.get('window');
 const APP_VERSION = '2.1.0';
 const GOOGLE_PLACES_KEY = 'AIzaSyDWW3lsdg7jgKYtVNcji-5gyDtv-QUWOpA';
-const CLEAN_COFFEE_IMAGE = 'https://images.openfoodfacts.org/images/products/761/303/656/9927/front_en.44.400.jpg';
 const PREMIUM_ACCENT = '#8f5e3b';
 const PREMIUM_ACCENT_DEEP = '#5d4030';
 const PREMIUM_SURFACE_SOFT = '#f6ede3';
@@ -98,63 +120,8 @@ const KEY_GAMIFICATION = 'etiove_gamification';
 const KEY_HAS_ACCOUNT = 'etiove_has_account';
 const OFFERS_CACHE_TTL_MS = 1000 * 60 * 60 * 8;
 
-const XP_RULES = {
-  vote: 8,
-  photo: 15,
-  review: 14,
-  addCafe: 18,
-  favorite: 3,
-};
-
-const LEVELS = [
-  { name: 'Novato', icon: '🌱', minXp: 0 },
-  { name: 'Aficionado', icon: '☕', minXp: 220 },
-  { name: 'Catador', icon: '🎯', minXp: 700 },
-  { name: 'Experto', icon: '⭐', minXp: 1700 },
-  { name: 'Maestro', icon: '👑', minXp: 3400 },
-];
-
 const AuthContext = createContext(null);
 const useAuth = () => useContext(AuthContext);
-
-// ─── PAÍSES ───────────────────────────────────────────────────────────────────
-const PAISES = [
-  { label: '🇪🇸 España',           value: 'España',           flag: '🇪🇸' },
-  { label: '🇲🇽 México',            value: 'México',           flag: '🇲🇽' },
-  { label: '🇨🇴 Colombia',          value: 'Colombia',         flag: '🇨🇴' },
-  { label: '🇦🇷 Argentina',         value: 'Argentina',        flag: '🇦🇷' },
-  { label: '🇨🇱 Chile',             value: 'Chile',            flag: '🇨🇱' },
-  { label: '🇵🇪 Perú',              value: 'Perú',             flag: '🇵🇪' },
-  { label: '🇻🇪 Venezuela',         value: 'Venezuela',        flag: '🇻🇪' },
-  { label: '🇪🇨 Ecuador',           value: 'Ecuador',          flag: '🇪🇨' },
-  { label: '🇧🇴 Bolivia',           value: 'Bolivia',          flag: '🇧🇴' },
-  { label: '🇵🇾 Paraguay',          value: 'Paraguay',         flag: '🇵🇾' },
-  { label: '🇺🇾 Uruguay',           value: 'Uruguay',          flag: '🇺🇾' },
-  { label: '🇧🇷 Brasil',            value: 'Brasil',           flag: '🇧🇷' },
-  { label: '🇺🇸 Estados Unidos',    value: 'Estados Unidos',   flag: '🇺🇸' },
-  { label: '🇬🇧 Reino Unido',       value: 'Reino Unido',      flag: '🇬🇧' },
-  { label: '🇫🇷 Francia',           value: 'Francia',          flag: '🇫🇷' },
-  { label: '🇩🇪 Alemania',          value: 'Alemania',         flag: '🇩🇪' },
-  { label: '🇮🇹 Italia',            value: 'Italia',           flag: '🇮🇹' },
-  { label: '🇵🇹 Portugal',          value: 'Portugal',         flag: '🇵🇹' },
-  { label: '🇳🇱 Países Bajos',      value: 'Países Bajos',     flag: '🇳🇱' },
-  { label: '🇧🇪 Bélgica',           value: 'Bélgica',          flag: '🇧🇪' },
-  { label: '🇨🇭 Suiza',             value: 'Suiza',            flag: '🇨🇭' },
-  { label: '🇸🇪 Suecia',            value: 'Suecia',           flag: '🇸🇪' },
-  { label: '🇳🇴 Noruega',           value: 'Noruega',          flag: '🇳🇴' },
-  { label: '🇩🇰 Dinamarca',         value: 'Dinamarca',        flag: '🇩🇰' },
-  { label: '🇫🇮 Finlandia',         value: 'Finlandia',        flag: '🇫🇮' },
-  { label: '🇵🇱 Polonia',           value: 'Polonia',          flag: '🇵🇱' },
-  { label: '🇯🇵 Japón',             value: 'Japón',            flag: '🇯🇵' },
-  { label: '🇰🇷 Corea del Sur',     value: 'Corea del Sur',    flag: '🇰🇷' },
-  { label: '🇨🇳 China',             value: 'China',            flag: '🇨🇳' },
-  { label: '🇦🇺 Australia',         value: 'Australia',        flag: '🇦🇺' },
-  { label: '🇨🇦 Canadá',            value: 'Canadá',           flag: '🇨🇦' },
-  { label: '🇲🇦 Marruecos',         value: 'Marruecos',        flag: '🇲🇦' },
-  { label: '🇪🇹 Etiopía',           value: 'Etiopía',          flag: '🇪🇹' },
-];
-
-const getFlagForPais = (pais) => PAISES.find(p => p.value === pais)?.flag || '🌍';
 
 const FORUM_CATEGORIES = [
   { id: 'general', emoji: '💬', label: 'General', desc: 'Todo lo demás relacionado con café' },
@@ -163,93 +130,6 @@ const FORUM_CATEGORIES = [
   { id: 'novedades', emoji: '🆕', label: 'Novedades', desc: 'Cafés nuevos, eventos y ferias' },
   { id: 'aprende', emoji: '🎓', label: 'Aprende', desc: 'Dudas de novatos, técnica, agua y molienda' },
 ];
-
-// ─── UTILIDADES ───────────────────────────────────────────────────────────────
-const normalize = (str) =>
-  (str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-
-const csvToSet = (value) => new Set(String(value || '').split('|').map(v => v.trim()).filter(Boolean));
-const setToCsv = (set) => Array.from(set).join('|');
-
-const formatRelativeTime = (value) => {
-  if (!value) return 'ahora';
-  const date = new Date(value);
-  const diff = Date.now() - date.getTime();
-  const min = Math.floor(diff / 60000);
-  const h = Math.floor(min / 60);
-  const d = Math.floor(h / 24);
-  if (min < 60) return `${Math.max(1, min)}m`;
-  if (h < 24) return `${h}h`;
-  if (d < 7) return `${d}d`;
-  return `${Math.floor(d / 7)} sem`;
-};
-
-const getCleanCoffeePhoto = (foto) => foto || CLEAN_COFFEE_IMAGE;
-
-const defaultGamification = () => ({
-  xp: 0,
-  votesCount: 0,
-  photosCount: 0,
-  reviewsCount: 0,
-  cafesAddedCount: 0,
-  favoritesMarkedCount: 0,
-  countriesRated: [],
-  specialOriginsTasted: [],
-  achievementIds: [],
-  updatedAt: Date.now(),
-});
-
-const getLevelFromXp = (xp) => {
-  let current = LEVELS[0];
-  LEVELS.forEach((lvl) => { if (xp >= lvl.minXp) current = lvl; });
-  return current;
-};
-
-const computeXp = (state) => (
-  state.votesCount * XP_RULES.vote +
-  state.photosCount * XP_RULES.photo +
-  state.reviewsCount * XP_RULES.review +
-  state.cafesAddedCount * XP_RULES.addCafe +
-  state.favoritesMarkedCount * XP_RULES.favorite
-);
-
-const computeAchievements = (state) => {
-  const lvl = getLevelFromXp(state.xp);
-  const out = [];
-  if (state.votesCount >= 3) out.push('primera_cata');
-  if (state.photosCount >= 12) out.push('fotografo');
-  if (state.countriesRated.length >= 8) out.push('viajero');
-  if (state.votesCount >= 30) out.push('adicto');
-  if (lvl.name === 'Maestro') out.push('maestro_catador');
-  if (state.favoritesMarkedCount >= 25) out.push('coleccionista');
-  if (state.reviewsCount >= 12) out.push('critico');
-  if (state.specialOriginsTasted.length >= 1) out.push('origen_unico');
-  return out;
-};
-
-const normalizeGamification = (state) => {
-  const next = {
-    ...defaultGamification(),
-    ...state,
-    countriesRated: Array.from(new Set((state.countriesRated || []).filter(Boolean))),
-    specialOriginsTasted: Array.from(new Set((state.specialOriginsTasted || []).filter(Boolean))),
-  };
-  next.xp = computeXp(next);
-  next.achievementIds = computeAchievements(next);
-  next.updatedAt = Date.now();
-  return next;
-};
-
-const getAchievementDefs = () => ([
-  { id: 'primera_cata', icon: '🥇', title: 'Ritual de inicio', desc: 'Valora 3 cafes' },
-  { id: 'fotografo', icon: '📸', title: 'Ojo barista', desc: 'Sube 12 fotos de tus cafes' },
-  { id: 'viajero', icon: '🌍', title: 'Ruta de origen', desc: 'Prueba cafes de 8 paises distintos' },
-  { id: 'adicto', icon: '🔥', title: 'Tueste constante', desc: 'Valora 30 cafes' },
-  { id: 'maestro_catador', icon: '👑', title: 'Paladar Etiove', desc: 'Alcanza nivel Maestro' },
-  { id: 'coleccionista', icon: '❤️', title: 'Bodega signature', desc: 'Marca 25 favoritos' },
-  { id: 'critico', icon: '✍️', title: 'Cuaderno de cata', desc: 'Escribe 12 resenas' },
-  { id: 'origen_unico', icon: '🌱', title: 'Lote de autor', desc: 'Prueba Geisha, Bourbon Pointu o Yemen' },
-]);
 
 function PackshotImage({ uri, frameStyle, imageStyle }) {
   return (
@@ -518,12 +398,10 @@ function CafeDetailScreen({ cafe, onClose, onDelete, favs = [], onToggleFav, vot
     try {
       setMiVoto(estrellas);
       const nuevosVotos = votosActuales + 1;
-      // Recalcular puntuación media
       const nuevaPuntuacion = Math.round(((puntuacionActual * votosActuales) + estrellas) / nuevosVotos);
       await updateDocument('cafes', cafe.id, { votos: nuevosVotos, puntuacion: nuevaPuntuacion });
       setVotosActuales(nuevosVotos);
       setPuntuacionActual(nuevaPuntuacion);
-      // Guardar que este café ya fue votado
       const newVotes = [...votes, cafe.id];
       setVotes?.(newVotes);
       await SecureStore.setItemAsync(KEY_VOTES, JSON.stringify(newVotes)).catch(() => {});
@@ -539,7 +417,7 @@ function CafeDetailScreen({ cafe, onClose, onDelete, favs = [], onToggleFav, vot
         <StatusBar barStyle="dark-content" />
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={det.hero}>
-            <View style={[StyleSheet.absoluteFillObject, { backgroundColor: '#f7f4ef', alignItems: 'center', justifyContent: 'center' }]}> 
+            <View style={[StyleSheet.absoluteFillObject, { backgroundColor: '#f7f4ef', alignItems: 'center', justifyContent: 'center' }]}>
               <PackshotImage uri={cafe.foto} frameStyle={s.packshotHeroFrame} imageStyle={s.packshotHeroImage} />
             </View>
             <View style={det.heroGrad} />
@@ -564,7 +442,6 @@ function CafeDetailScreen({ cafe, onClose, onDelete, favs = [], onToggleFav, vot
               {cafe.altura   && <Chip label={`${cafe.altura} msnm`}   icon="trending-up-outline" />}
             </ScrollView>
 
-            {/* VOTAR */}
             <View style={det.votarBox}>
               {yaVotado || miVoto > 0
                 ? <><Text style={det.votarTitle}>¡Ya has valorado este café!</Text><Text style={det.votarSub}>Tu voto ha sido registrado ⭐</Text></>
@@ -1190,32 +1067,6 @@ function CardVertical({ item, onDelete, onPress, favs = [], onToggleFav }) {
       <TouchableOpacity onPress={() => onDelete(item)} style={{ padding: 4 }}>
         <Ionicons name="trash-outline" size={18} color={THEME.icon.faint} />
       </TouchableOpacity>
-    </TouchableOpacity>
-  );
-}
-
-function TabBtn({ icon, label, tab, active, onPress, badge }) {
-  const isActive = active === tab;
-  return (
-    <TouchableOpacity style={s.tabBtn} onPress={() => onPress(tab)}>
-      <View>
-        <Ionicons name={isActive ? icon : `${icon}-outline`} size={22} color={isActive ? THEME.brand.accent : THEME.icon.inactive} />
-        {badge > 0 && <View style={s.tabBadge}><Text style={s.tabBadgeText}>{badge}</Text></View>}
-      </View>
-      <Text style={[s.tabLabel, isActive && { color: PREMIUM_ACCENT }]}>{label}</Text>
-    </TouchableOpacity>
-  );
-}
-
-function MasItem({ icon, label, sub, onPress }) {
-  return (
-    <TouchableOpacity style={mas.item} onPress={onPress} activeOpacity={0.7}>
-      <View style={mas.iconWrap}><Ionicons name={icon} size={22} color={PREMIUM_ACCENT} /></View>
-      <View style={{ flex: 1 }}>
-        <Text style={mas.label}>{label}</Text>
-        {sub && <Text style={mas.sub}>{sub}</Text>}
-      </View>
-      <Ionicons name="chevron-forward" size={18} color={THEME.icon.faint} />
     </TouchableOpacity>
   );
 }
@@ -2380,6 +2231,203 @@ function MainScreen({ onLogout }) {
   if (scanning) return <ScannerScreen onScanned={() => { setScanning(false); setShowForm(true); }} onSkip={() => { setScanning(false); setShowForm(true); }} onBack={() => setScanning(false)} />;
   if (showForm) return <FormScreen onBack={() => setShowForm(false)} onSave={() => { setShowForm(false); setActiveTab('Mis Cafés'); cargarDatos(); }} onCafeAdded={(cafe) => registrarEventoGamificacion('add_cafe', { hasPhoto: !!cafe?.foto, hasReview: !!String(cafe?.notas || '').trim() })} />;
 
+  const communityTabProps = {
+    s,
+    theme: THEME,
+    premiumAccent: PREMIUM_ACCENT,
+    forumCategories: FORUM_CATEGORIES,
+    forumCategory,
+    setForumCategory,
+    forumThread,
+    setForumThread,
+    forumCreateOpen,
+    setForumCreateOpen,
+    forumSort,
+    setForumSort,
+    forumLoading,
+    forumThreadsByCategory,
+    forumError,
+    formatRelativeTime,
+    forumThreadScrollRef,
+    hasUserVotedForoItem,
+    hasUserReportedForoItem,
+    isForumOwner,
+    abrirMenuAutorForo,
+    votarEnForo,
+    reportarForo,
+    forumTopReplies,
+    forumRepliesByThread,
+    prepararRespuestaForo,
+    setForumReplyTo,
+    forumReplyTo,
+    forumReplyInputRef,
+    forumReplyText,
+    setForumReplyText,
+    enviarRespuestaForo,
+    forumSendingReply,
+    forumTitle,
+    setForumTitle,
+    forumBody,
+    setForumBody,
+    forumPhoto,
+    seleccionarFotoForo,
+    crearHiloForo,
+    forumSaving,
+    forumEditOpen,
+    setForumEditOpen,
+    forumEditCollection,
+    forumEditTitle,
+    setForumEditTitle,
+    forumEditBody,
+    setForumEditBody,
+    guardarEdicionForo,
+    forumEditing,
+  };
+
+  const inicioTabProps = {
+    s,
+    perfil,
+    setShowProfile,
+    brandCardAnim,
+    brandCardTranslateY,
+    brandCardScale,
+    profileInitial,
+    profileAlias,
+    profileName,
+    currentLevel,
+    gamification,
+    nextLevel,
+    brandProgressWidth,
+    busqueda,
+    setBusqueda,
+    SearchInput,
+    allCafes,
+    filtrar,
+    CardVertical,
+    setCafeDetalle,
+    favs,
+    toggleFav,
+    ultimosGlobal,
+    setActiveTab,
+    cargando,
+    premiumAccent: PREMIUM_ACCENT,
+    CardHorizontal,
+    topCafesVista,
+    flag,
+    cargandoCafInicio,
+    errorCafInicio,
+    cafeteriasInicio,
+    theme: THEME,
+    cafesParaOfertas,
+    abrirOfertasCafe,
+    PackshotImage,
+    abrirOfertaWeb,
+    ofertasPorCafe,
+    buscandoOfertaId,
+    openOfferCafeId,
+    errorOfertas,
+  };
+
+  const misCafesTabProps = {
+    s,
+    cargando,
+    allCafes,
+    registrarEventoGamificacion,
+    QuizSection,
+    favCafes,
+    CardHorizontal,
+    setCafeDetalle,
+    favs,
+    toggleFav,
+    busquedaMis,
+    setBusquedaMis,
+    misCafes,
+    SearchInput,
+    cafesFiltrados,
+    CardVertical,
+    eliminarCafe,
+    premiumAccent: PREMIUM_ACCENT,
+  };
+
+  const ultimosAnadidosTabProps = {
+    s,
+    setActiveTab,
+    premiumAccent: PREMIUM_ACCENT,
+    cargando,
+    ultimos100,
+    CardVertical,
+    setCafeDetalle,
+    favs,
+    toggleFav,
+  };
+
+  const topCafesTabProps = {
+    s,
+    setActiveTab,
+    premiumAccent: PREMIUM_ACCENT,
+    perfil,
+    cargando,
+    top100,
+    CardVertical,
+    setCafeDetalle,
+    favs,
+    toggleFav,
+  };
+
+  const ofertasTabProps = {
+    s,
+    setActiveTab,
+    premiumAccent: PREMIUM_ACCENT,
+    cafesParaOfertas,
+    ofertasPorCafe,
+    buscandoOfertaId,
+    openOfferCafeId,
+    abrirOfertasCafe,
+    PackshotImage,
+    abrirOfertaWeb,
+    theme: THEME,
+    premiumAccentDeep: PREMIUM_ACCENT_DEEP,
+    errorOfertas,
+  };
+
+  const masTabProps = {
+    s,
+    mas,
+    perfil,
+    profileInitial,
+    profileAlias,
+    profileName,
+    memberStatus,
+    unlockedCount,
+    achievementTotal,
+    pendingAchievements,
+    achievementProgress,
+    setShowProfile,
+    setActiveTab,
+    premiumAccentDeep: PREMIUM_ACCENT_DEEP,
+    unlockedAchievements,
+    newsletterState,
+    guardarNewsletter,
+    newsletterLoading,
+    newsletterSaving,
+    newsletterHasEmail,
+    newsletterEmail,
+    onLogout,
+    appVersion: APP_VERSION,
+    premiumAccent: PREMIUM_ACCENT,
+    iconFaint: THEME.icon.faint,
+  };
+
+  const bottomBarProps = {
+    s,
+    activeTab,
+    setActiveTab,
+    setScanning,
+    favs,
+    accentColor: PREMIUM_ACCENT,
+    inactiveColor: THEME.icon.inactive,
+  };
+
   return (
     <SafeAreaView style={s.screen}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
@@ -2406,315 +2454,7 @@ function MainScreen({ onLogout }) {
       )}
 
       {activeTab === 'Comunidad' && (
-        <View style={{ flex: 1 }}>
-          {!forumCategory && (
-            <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
-              <View style={{ paddingHorizontal: 16, paddingTop: 18 }}>
-                <Text style={s.pageTitle}>Comunidad</Text>
-                <Text style={s.sectionSub}>Comparte, aprende y debate con otros coffee lovers</Text>
-              </View>
-              <View style={{ paddingHorizontal: 16, gap: 10 }}>
-                {FORUM_CATEGORIES.map((cat) => (
-                  <TouchableOpacity key={cat.id} style={s.forumCatCard} activeOpacity={0.9} onPress={() => setForumCategory(cat)}>
-                    <Text style={s.forumCatEmoji}>{cat.emoji}</Text>
-                    <View style={{ flex: 1 }}>
-                      <Text style={s.forumCatTitle}>{cat.label}</Text>
-                      <Text style={s.forumCatDesc}>{cat.desc}</Text>
-                    </View>
-                    <Ionicons name="chevron-forward" size={18} color={THEME.icon.inactive} />
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </ScrollView>
-          )}
-
-          {forumCategory && !forumThread && (
-            <View style={{ flex: 1 }}>
-              <View style={s.forumHeaderRow}>
-                <TouchableOpacity onPress={() => setForumCategory(null)} style={s.backRow}>
-                  <Ionicons name="chevron-back" size={20} color={PREMIUM_ACCENT} />
-                  <Text style={s.backText}>Categorías</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={s.forumNewBtn} onPress={() => setForumCreateOpen(true)}>
-                  <Text style={s.forumNewBtnText}>Nuevo</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={{ paddingHorizontal: 16, paddingBottom: 8 }}>
-                <Text style={s.sectionTitle}>{forumCategory.emoji} {forumCategory.label}</Text>
-                <View style={s.forumSortRow}>
-                  <TouchableOpacity style={[s.forumSortChip, forumSort === 'top' && s.forumSortChipActive]} onPress={() => setForumSort('top')}>
-                    <Text style={[s.forumSortText, forumSort === 'top' && s.forumSortTextActive]}>Más votados</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={[s.forumSortChip, forumSort === 'recent' && s.forumSortChipActive]} onPress={() => setForumSort('recent')}>
-                    <Text style={[s.forumSortText, forumSort === 'recent' && s.forumSortTextActive]}>Más recientes</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-              {forumLoading ? (
-                <ActivityIndicator color={PREMIUM_ACCENT} style={{ marginTop: 24 }} />
-              ) : (
-                <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 110, gap: 10 }}>
-                  {forumThreadsByCategory.map((thread) => (
-                    <TouchableOpacity key={thread.id} style={s.forumThreadCard} activeOpacity={0.9} onPress={() => setForumThread(thread)}>
-                      <Text style={s.forumThreadTitle} numberOfLines={2}>{thread.title}</Text>
-                      <Text style={s.forumThreadBody} numberOfLines={2}>{thread.body}</Text>
-                      <View style={s.forumMetaRow}>
-                        <View style={s.forumAuthorRow}>
-                          <View style={s.forumAvatar}><Text style={s.forumAvatarText}>{(thread.authorName || '?')[0]?.toUpperCase() || '?'}</Text></View>
-                          <View>
-                            <Text style={s.forumAuthorName}>{thread.authorName || 'Usuario'}</Text>
-                            <Text style={s.forumAuthorLevel}>{thread.authorLevel || 'Novato'}</Text>
-                          </View>
-                        </View>
-                        <Text style={s.forumMetaText}>{formatRelativeTime(thread.createdAt)}</Text>
-                      </View>
-                      <View style={s.forumCountersRow}>
-                        <Text style={s.forumCounter}>💬 {thread.replyCount || 0}</Text>
-                        <Text style={s.forumCounter}>❤️ {thread.upvotes || 0}</Text>
-                        <Text style={s.forumCounter}>💔 {thread.reportedCount || 0}</Text>
-                      </View>
-                    </TouchableOpacity>
-                  ))}
-                  {!forumLoading && forumThreadsByCategory.length === 0 && <Text style={s.empty}>Todavía no hay hilos en esta categoría.</Text>}
-                  {!!forumError && <Text style={s.empty}>{forumError}</Text>}
-                </ScrollView>
-              )}
-            </View>
-          )}
-
-          {forumCategory && forumThread && (
-            <KeyboardAvoidingView
-              style={{ flex: 1 }}
-              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-              keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 12}
-            >
-              <View style={s.forumHeaderRow}>
-                <TouchableOpacity onPress={() => { setForumThread(null); setForumReplyTo(null); }} style={s.backRow}>
-                  <Ionicons name="chevron-back" size={20} color={PREMIUM_ACCENT} />
-                  <Text style={s.backText}>Hilos</Text>
-                </TouchableOpacity>
-              </View>
-
-              <ScrollView
-                ref={forumThreadScrollRef}
-                style={{ flex: 1 }}
-                keyboardShouldPersistTaps="handled"
-                contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 130 }}
-              >
-                {(() => {
-                  const threadUserVoted = hasUserVotedForoItem(forumThread);
-                  const threadUserReported = hasUserReportedForoItem(forumThread);
-                  return (
-                <View style={s.forumMainPost}>
-                  <View style={s.forumMainPostHead}>
-                    <Text style={s.forumThreadTitle}>{forumThread.title}</Text>
-                    {isForumOwner(forumThread) && (
-                      <TouchableOpacity style={s.forumDotsBtn} onPress={() => abrirMenuAutorForo('foro_hilos', forumThread)}>
-                        <Ionicons name="ellipsis-vertical" size={18} color={THEME.brand.accentDeep} />
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                  <Text style={s.forumThreadBody}>{forumThread.body}</Text>
-                  {!!forumThread.image && <Image source={{ uri: forumThread.image }} style={s.forumMainPostImage} resizeMode="cover" />}
-                  <View style={s.forumCountersRow}>
-                    <Text style={s.forumCounter}>❤️ {forumThread.upvotes || 0}</Text>
-                    <Text style={s.forumCounter}>💬 {forumThread.replyCount || 0}</Text>
-                    <Text style={s.forumCounter}>💔 {forumThread.reportedCount || 0}</Text>
-                    <Text style={s.forumMetaText}>{formatRelativeTime(forumThread.createdAt)}</Text>
-                  </View>
-                  <View style={{ flexDirection: 'row', gap: 10, marginTop: 8 }}>
-                    <TouchableOpacity
-                      style={[s.forumActionBtn, (threadUserVoted || threadUserReported) && s.forumActionBtnDisabled]}
-                      onPress={() => votarEnForo('foro_hilos', forumThread)}
-                      disabled={threadUserVoted || threadUserReported}
-                    >
-                      <Text style={[s.forumActionText, (threadUserVoted || threadUserReported) && s.forumActionTextDisabled]}>❤️ INTERESANTE</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[s.forumActionBtn, (threadUserReported || threadUserVoted) && s.forumActionBtnDisabled]}
-                      onPress={() => reportarForo('foro_hilos', forumThread)}
-                      disabled={threadUserReported || threadUserVoted}
-                    >
-                      <Text style={[s.forumActionText, (threadUserReported || threadUserVoted) && s.forumActionTextDisabled]}>💔 NI FÚ NI FÁ</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-                  );
-                })()}
-
-                <Text style={[s.sectionTitle, { marginTop: 14, marginBottom: 10 }]}>Respuestas</Text>
-                {forumTopReplies.map((reply) => {
-                  const childReplies = forumRepliesByThread.filter((r) => r.parentId === reply.id).slice(0, 50);
-                  const replyUserReported = hasUserReportedForoItem(reply);
-                  return (
-                    <View key={reply.id} style={s.forumReplyCard}>
-                      <View style={s.forumMetaRow}>
-                        <View style={s.forumAuthorRow}>
-                          <View style={s.forumAvatar}><Text style={s.forumAvatarText}>{(reply.authorName || '?')[0]?.toUpperCase() || '?'}</Text></View>
-                          <View>
-                            <Text style={s.forumAuthorName}>{reply.authorName || 'Usuario'}</Text>
-                            <Text style={s.forumAuthorLevel}>{reply.authorLevel || 'Novato'}</Text>
-                          </View>
-                        </View>
-                        <View style={s.forumMetaActions}>
-                          <Text style={s.forumMetaText}>{formatRelativeTime(reply.createdAt)}</Text>
-                          {isForumOwner(reply) && (
-                            <TouchableOpacity style={s.forumDotsBtn} onPress={() => abrirMenuAutorForo('foro_respuestas', reply)}>
-                              <Ionicons name="ellipsis-vertical" size={16} color={THEME.brand.accentDeep} />
-                            </TouchableOpacity>
-                          )}
-                        </View>
-                      </View>
-                      <Text style={s.forumThreadBody}>{reply.body}</Text>
-                      <View style={{ flexDirection: 'row', gap: 10, marginTop: 8 }}>
-                        <TouchableOpacity onPress={() => prepararRespuestaForo(reply)}><Text style={s.forumActionText}>↩ Responder</Text></TouchableOpacity>
-                        <TouchableOpacity onPress={() => reportarForo('foro_respuestas', reply)} disabled={replyUserReported}><Text style={[s.forumActionText, replyUserReported && s.forumActionTextDisabled]}>💔 NI FÚ NI FÁ {reply.reportedCount || 0}</Text></TouchableOpacity>
-                      </View>
-
-                      {childReplies.map((child) => (
-                        <View key={child.id} style={s.forumChildReplyCard}>
-                          <View style={s.forumMetaRow}>
-                            <Text style={s.forumAuthorName}>{child.authorName || 'Usuario'}</Text>
-                            <View style={s.forumMetaActions}>
-                              <Text style={s.forumMetaText}>{formatRelativeTime(child.createdAt)}</Text>
-                              {isForumOwner(child) && (
-                                <TouchableOpacity style={s.forumDotsBtn} onPress={() => abrirMenuAutorForo('foro_respuestas', child)}>
-                                  <Ionicons name="ellipsis-vertical" size={15} color={THEME.brand.accentDeep} />
-                                </TouchableOpacity>
-                              )}
-                            </View>
-                          </View>
-                          <Text style={s.forumThreadBody}>{child.body}</Text>
-                          {(() => {
-                            const childUserReported = hasUserReportedForoItem(child);
-                            return (
-                          <View style={{ flexDirection: 'row', gap: 10, marginTop: 6 }}>
-                            <TouchableOpacity onPress={() => reportarForo('foro_respuestas', child)} disabled={childUserReported}><Text style={[s.forumActionText, childUserReported && s.forumActionTextDisabled]}>💔 NI FÚ NI FÁ {child.reportedCount || 0}</Text></TouchableOpacity>
-                          </View>
-                            );
-                          })()}
-                        </View>
-                      ))}
-                    </View>
-                  );
-                })}
-                {forumTopReplies.length === 0 && <Text style={s.empty}>Sé el primero en responder.</Text>}
-              </ScrollView>
-
-              <View style={s.forumComposerWrap}>
-                {!!forumReplyTo && (
-                  <View style={s.forumReplyingTag}>
-                    <Text style={s.forumReplyingText}>Respondiendo a {forumReplyTo.authorName}</Text>
-                    <TouchableOpacity onPress={() => setForumReplyTo(null)}><Ionicons name="close" size={16} color={THEME.icon.inactive} /></TouchableOpacity>
-                  </View>
-                )}
-                <View style={s.forumComposerRow}>
-                  <TextInput
-                    ref={forumReplyInputRef}
-                    style={s.forumComposerInput}
-                    placeholder="Escribe tu respuesta..."
-                    placeholderTextColor="#9e958d"
-                    value={forumReplyText}
-                    onChangeText={setForumReplyText}
-                    multiline
-                  />
-                  <TouchableOpacity style={s.forumSendBtn} onPress={enviarRespuestaForo} disabled={forumSendingReply}>
-                    {forumSendingReply ? <ActivityIndicator color="#fff" /> : <Ionicons name="send" size={16} color="#fff" />}
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </KeyboardAvoidingView>
-          )}
-
-          <Modal visible={forumCreateOpen} animationType="slide" transparent onRequestClose={() => setForumCreateOpen(false)}>
-            <KeyboardAvoidingView
-              style={s.forumModalOverlay}
-              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-              keyboardVerticalOffset={Platform.OS === 'ios' ? 20 : 0}
-            >
-              <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end' }}>
-                <View style={s.forumModalCard}>
-                  <Text style={s.sectionTitle}>Nuevo hilo</Text>
-                  <Text style={s.sectionSub}>{forumCategory?.label || 'Comunidad'}</Text>
-                  <Text style={[s.label, { marginTop: 4 }]}>Título</Text>
-                  <TextInput
-                    style={s.input}
-                    value={forumTitle}
-                    onChangeText={(v) => setForumTitle(v.slice(0, 120))}
-                    placeholder="Máximo 120 caracteres"
-                    placeholderTextColor="#b3a9a0"
-                  />
-                  <Text style={[s.label, { marginTop: -6 }]}>Contenido</Text>
-                  <TextInput
-                    style={[s.input, { minHeight: 120, textAlignVertical: 'top' }]}
-                    value={forumBody}
-                    onChangeText={(v) => setForumBody(v.slice(0, 1000))}
-                    placeholder="Comparte tu experiencia cafetera..."
-                    placeholderTextColor="#b3a9a0"
-                    multiline
-                  />
-                  <Text style={s.forumCountText}>{forumTitle.length}/120 · {forumBody.length}/1000</Text>
-                  <TouchableOpacity style={s.faceIdBtn} onPress={seleccionarFotoForo}>
-                    <Ionicons name="image-outline" size={18} color={THEME.brand.accentDeep} />
-                    <Text style={s.faceIdText}>{forumPhoto ? 'Cambiar foto' : 'Añadir foto opcional'}</Text>
-                  </TouchableOpacity>
-                  <View style={{ flexDirection: 'row', gap: 10, marginTop: 14, paddingBottom: Platform.OS === 'ios' ? 8 : 14 }}>
-                    <TouchableOpacity style={[s.authSecondaryBtn, { flex: 1, marginTop: 0 }]} onPress={() => setForumCreateOpen(false)}>
-                      <Text style={s.authSecondaryBtnText}>Cancelar</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[s.redBtn, { flex: 1, marginTop: 0 }]} onPress={crearHiloForo} disabled={forumSaving}>
-                      {forumSaving ? <ActivityIndicator color="#fff" /> : <Text style={s.redBtnText}>Publicar</Text>}
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </ScrollView>
-            </KeyboardAvoidingView>
-          </Modal>
-
-          <Modal visible={forumEditOpen} animationType="slide" transparent onRequestClose={() => setForumEditOpen(false)}>
-            <KeyboardAvoidingView
-              style={s.forumModalOverlay}
-              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-              keyboardVerticalOffset={Platform.OS === 'ios' ? 20 : 0}
-            >
-              <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end' }}>
-                <View style={s.forumModalCard}>
-                  <Text style={s.sectionTitle}>{forumEditCollection === 'foro_hilos' ? 'Editar hilo' : 'Editar respuesta'}</Text>
-                  {forumEditCollection === 'foro_hilos' && (
-                    <>
-                      <Text style={[s.label, { marginTop: 4 }]}>Título</Text>
-                      <TextInput
-                        style={s.input}
-                        value={forumEditTitle}
-                        onChangeText={(v) => setForumEditTitle(v.slice(0, 120))}
-                        placeholder="Máximo 120 caracteres"
-                        placeholderTextColor="#b3a9a0"
-                      />
-                    </>
-                  )}
-                  <Text style={[s.label, { marginTop: forumEditCollection === 'foro_hilos' ? -6 : 4 }]}>Contenido</Text>
-                  <TextInput
-                    style={[s.input, { minHeight: 120, textAlignVertical: 'top' }]}
-                    value={forumEditBody}
-                    onChangeText={(v) => setForumEditBody(v.slice(0, 1000))}
-                    placeholder="Escribe aquí..."
-                    placeholderTextColor="#b3a9a0"
-                    multiline
-                  />
-                  <Text style={s.forumCountText}>{forumEditCollection === 'foro_hilos' ? `${forumEditTitle.length}/120 · ` : ''}{forumEditBody.length}/1000</Text>
-                  <View style={{ flexDirection: 'row', gap: 10, marginTop: 14, paddingBottom: Platform.OS === 'ios' ? 8 : 14 }}>
-                    <TouchableOpacity style={[s.authSecondaryBtn, { flex: 1, marginTop: 0 }]} onPress={() => setForumEditOpen(false)}>
-                      <Text style={s.authSecondaryBtnText}>Cancelar</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[s.redBtn, { flex: 1, marginTop: 0 }]} onPress={guardarEdicionForo} disabled={forumEditing}>
-                      {forumEditing ? <ActivityIndicator color="#fff" /> : <Text style={s.redBtnText}>Guardar</Text>}
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </ScrollView>
-            </KeyboardAvoidingView>
-          </Modal>
-        </View>
+        <CommunityTab {...communityTabProps} />
       )}
 
       {activeTab !== 'Cafeterías' && activeTab !== 'Comunidad' && (
@@ -2722,448 +2462,38 @@ function MainScreen({ onLogout }) {
 
         {/* ── INICIO ── */}
         {activeTab === 'Inicio' && (
-          <View>
-            <View style={s.topBar}>
-              <View style={s.homeBrandWrap}>
-                <Text style={s.homeWordmark}>ETIOVE</Text>
-                <View style={s.homeLoverRow}>
-                  <Text style={s.homeLoverText}>SPECIALTY</Text>
-                  <View style={s.homeMiniSealOuter}>
-                    <View style={s.homeMiniSealMiddle}>
-                      <View style={s.homeMiniSealInner}>
-                        <Text style={s.homeMiniSealText}>E</Text>
-                      </View>
-                    </View>
-                  </View>
-                  <Text style={s.homeLoverText}>COFFEE</Text>
-                </View>
-              </View>
-              <TouchableOpacity style={s.locationPill} onPress={() => setShowProfile(true)}>
-                <View style={s.brandDecorOne} />
-                <View style={s.brandDecorTwo} />
-                <View style={s.brandTopRule} />
-                <Animated.View style={[s.brandPillContent, { opacity: brandCardAnim, transform: [{ translateY: brandCardTranslateY }, { scale: brandCardScale }] }]}>
-                  <Text style={s.brandEyebrow}>Member Roast Card</Text>
-                  <View style={s.brandMemberRow}>
-                    <View style={s.brandMemberIdentity}>
-                      {perfil.foto
-                        ? <Image source={{ uri: perfil.foto }} style={s.brandMemberAvatar} />
-                        : <View style={s.brandMemberAvatarFallback}><Text style={s.brandMemberAvatarText}>{profileInitial}</Text></View>
-                      }
-                      <View style={s.brandMemberCopy}>
-                        <Text style={s.brandAlias}>@{profileAlias.replace(/^@+/, '')}</Text>
-                        <Text style={s.brandName} numberOfLines={1}>{profileName}</Text>
-                      </View>
-                    </View>
-                    <View style={s.brandLevelBadge}>
-                      <Text style={s.brandLevelText}>{currentLevel.icon} {currentLevel.name}</Text>
-                    </View>
-                  </View>
-                  <View style={s.brandRow}>
-                    <View style={s.brandTitleWrap}>
-                      <Text style={s.brandXpText}>{gamification.xp} XP acumulados</Text>
-                    </View>
-                  </View>
-                  <View style={s.brandMetaRow}>
-                    <Text style={s.brandMetaText}>{nextLevel ? `Próximo nivel: ${nextLevel.name}` : 'Nivel máximo alcanzado'}</Text>
-                    {nextLevel && <Text style={s.brandMetaText}>{nextLevel.minXp} XP</Text>}
-                  </View>
-                  <View style={s.brandProgressTrack}>
-                    <Animated.View style={[s.brandProgressFill, { width: brandProgressWidth }]} />
-                  </View>
-                  <View style={s.brandStatsRow}>
-                    <View style={s.brandStatCard}>
-                      <Text style={s.brandStatValue}>{gamification.votesCount}</Text>
-                      <Text style={s.brandStatLabel}>Votos</Text>
-                    </View>
-                    <View style={s.brandStatCard}>
-                      <Text style={s.brandStatValue}>{gamification.photosCount}</Text>
-                      <Text style={s.brandStatLabel}>Fotos</Text>
-                    </View>
-                    <View style={s.brandStatCard}>
-                      <Text style={s.brandStatValue}>{gamification.reviewsCount}</Text>
-                      <Text style={s.brandStatLabel}>Reseñas</Text>
-                    </View>
-                    <View style={s.brandStatCard}>
-                      <Text style={s.brandStatValue}>{gamification.favoritesMarkedCount}</Text>
-                      <Text style={s.brandStatLabel}>Favoritos</Text>
-                    </View>
-                  </View>
-                </Animated.View>
-              </TouchableOpacity>
-            </View>
-
-            <SearchInput
-              value={busqueda}
-              onChangeText={setBusqueda}
-              onSearch={(q) => { setBusqueda(q); }}
-              allCafes={allCafes}
-              placeholder="Buscar cualquier café..."
-            />
-
-            {busqueda.trim()
-              ? <>
-                  <View style={s.sectionHeader}><Text style={s.sectionTitle}>Resultados ({filtrar(allCafes, busqueda).length})</Text></View>
-                  <View style={{ paddingHorizontal: 16 }}>
-                    {filtrar(allCafes, busqueda).map(item => <CardVertical key={item.id} item={item} onDelete={() => {}} onPress={setCafeDetalle} favs={favs} onToggleFav={toggleFav} />)}
-                  </View>
-                </>
-              : <>
-                  <View style={s.sectionHeader}>
-                    <Text style={s.sectionTitle}>Últimos añadidos</Text>
-                    <TouchableOpacity onPress={() => setActiveTab('Últimos añadidos')}><Ionicons name="chevron-forward" size={20} color="#555" /></TouchableOpacity>
-                  </View>
-                  <Text style={s.sectionSub}>Los 10 más recientes de la comunidad</Text>
-                  {cargando ? <ActivityIndicator color={PREMIUM_ACCENT} style={{ margin: 30 }} /> : (
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingLeft: 16, paddingRight: 8, gap: 12 }}>
-                      {ultimosGlobal.map(item => <CardHorizontal key={item.id} item={item} badge={`${item.puntuacion}.0`} onPress={setCafeDetalle} favs={favs} onToggleFav={toggleFav} />)}
-                      {ultimosGlobal.length === 0 && <Text style={[s.empty, { marginLeft: 0 }]}>Aún no hay cafés.</Text>}
-                    </ScrollView>
-                  )}
-
-                  <View style={[s.sectionHeader, { marginTop: 28 }]}>
-                    <Text style={s.sectionTitle}>Top cafés en {perfil.pais || 'España'} {flag}</Text>
-                    <TouchableOpacity onPress={() => setActiveTab('Top cafés')}><Ionicons name="chevron-forward" size={20} color="#555" /></TouchableOpacity>
-                  </View>
-                  <Text style={s.sectionSub}>Los mejor puntuados · filtrando por tu país</Text>
-                  {cargando ? <ActivityIndicator color={PREMIUM_ACCENT} style={{ margin: 30 }} /> : (
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingLeft: 16, paddingRight: 8, gap: 12 }}>
-                      {topCafesVista.slice(0, 10).map(item => <CardHorizontal key={item.id} item={item} badge={`${item.puntuacion}.0 ⭐`} onPress={setCafeDetalle} favs={favs} onToggleFav={toggleFav} />)}
-                      {topCafesVista.length === 0 && <Text style={[s.empty, { marginLeft: 0 }]}>Aún no hay cafés.</Text>}
-                    </ScrollView>
-                  )}
-
-                  <View style={[s.sectionHeader, { marginTop: 28 }]}>
-                    <Text style={s.sectionTitle}>Cafeterías cerca de ti</Text>
-                    <TouchableOpacity onPress={() => setActiveTab('Cafeterías')}><Ionicons name="chevron-forward" size={20} color="#555" /></TouchableOpacity>
-                  </View>
-                  <Text style={s.sectionSub}>Se cargan automáticamente al entrar en Inicio</Text>
-                  {cargandoCafInicio ? (
-                    <ActivityIndicator color={PREMIUM_ACCENT} style={{ margin: 18 }} />
-                  ) : errorCafInicio ? (
-                    <View style={{ paddingHorizontal: 16 }}>
-                      <Text style={[s.empty, { marginTop: 6 }]}>{errorCafInicio}</Text>
-                    </View>
-                  ) : (
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingLeft: 16, paddingRight: 8, gap: 12 }}>
-                      {cafeteriasInicio.map((cafItem) => (
-                        <TouchableOpacity key={cafItem.id} style={s.cardH} onPress={() => setActiveTab('Cafeterías')} activeOpacity={0.88}>
-                          <View style={s.cardHImg}>
-                            {cafItem.foto
-                              ? <Image source={{ uri: cafItem.foto }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
-                              : <View style={[StyleSheet.absoluteFillObject, { alignItems: 'center', justifyContent: 'center', backgroundColor: '#f2ece5' }]}><Text style={{ fontSize: 30 }}>☕</Text></View>
-                            }
-                            <View style={[s.badgeRed, { right: 8, left: 'auto' }]}>
-                              <Text style={s.badgeText}>{cafItem.abierto === null ? '—' : cafItem.abierto ? 'Abierto' : 'Cerrado'}</Text>
-                            </View>
-                          </View>
-                          <Text style={s.cardHName} numberOfLines={2}>{cafItem.nombre}</Text>
-                          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 4 }}>
-                            <Ionicons name="star" size={12} color={THEME.status.favorite} />
-                            <Text style={s.cardHRating}>{cafItem.rating}</Text>
-                            <Text style={s.cardHVotos}>({cafItem.numResenas})</Text>
-                          </View>
-                          <Text style={s.cardHOrigin}>{cafItem.distancia < 1000 ? `${cafItem.distancia}m` : `${(cafItem.distancia / 1000).toFixed(1)}km`}</Text>
-                        </TouchableOpacity>
-                      ))}
-                    </ScrollView>
-                  )}
-
-                  <View style={[s.sectionHeader, { marginTop: 28 }]}>
-                    <Text style={s.sectionTitle}>Ofertas de cafés (web)</Text>
-                    <TouchableOpacity onPress={() => setActiveTab('Ofertas')}><Ionicons name="chevron-forward" size={20} color="#555" /></TouchableOpacity>
-                  </View>
-                  <Text style={s.sectionSub}>Pulsa un café y te mostramos las 3 ofertas más baratas encontradas en Google</Text>
-                  {cargando ? <ActivityIndicator color={PREMIUM_ACCENT} style={{ margin: 20 }} /> : (
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingLeft: 16, paddingRight: 8, gap: 12 }}>
-                      {cafesParaOfertas.slice(0, 10).map(cafe => (
-                        <TouchableOpacity key={cafe.id} style={s.cardH} onPress={() => abrirOfertasCafe(cafe, { navigate: true })} activeOpacity={0.88}>
-                          <View style={s.cardHImg}><PackshotImage uri={cafe.foto} frameStyle={s.packshotCardFrame} imageStyle={s.packshotCardImage} /></View>
-                          <Text style={s.cardHOrigin} numberOfLines={1}>{cafe.pais || 'Sin país'}</Text>
-                          <Text style={s.cardHName} numberOfLines={2}>{cafe.nombre}</Text>
-                          <Text style={s.cardHVotos} numberOfLines={2}>Pulsa para ver 3 ofertas en Google</Text>
-                        </TouchableOpacity>
-                      ))}
-                      {cafesParaOfertas.length === 0 && <Text style={[s.empty, { marginLeft: 0 }]}>No hay cafés en base de datos.</Text>}
-                    </ScrollView>
-                  )}
-                </>
-            }
-          </View>
+          <InicioTab {...inicioTabProps} />
         )}
 
         {/* ── MIS CAFÉS ── */}
         {activeTab === 'Mis Cafés' && (
-          <View style={{ paddingTop: 20 }}>
-            <View style={{ paddingHorizontal: 16 }}><Text style={s.pageTitle}>Mis Cafés</Text></View>
-            {!cargando && <QuizSection allCafes={allCafes} onGamifyEvent={registrarEventoGamificacion} />}
-
-            {favCafes.length > 0 && (
-              <>
-                <View style={[s.sectionHeader, { marginTop: 24 }]}><Text style={s.sectionTitle}>⭐ Mis favoritos</Text></View>
-                <Text style={s.sectionSub}>{favCafes.length} cafés guardados</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingLeft: 16, paddingRight: 8, gap: 12 }}>
-                  {favCafes.map(item => <CardHorizontal key={item.id} item={item} badge={`${item.puntuacion}.0`} onPress={setCafeDetalle} favs={favs} onToggleFav={toggleFav} />)}
-                </ScrollView>
-              </>
-            )}
-
-            <View style={{ paddingHorizontal: 16, marginTop: 24 }}>
-              <Text style={[s.sectionTitle, { marginBottom: 12 }]}>Mi colección</Text>
-              <SearchInput value={busquedaMis} onChangeText={setBusquedaMis} onSearch={setBusquedaMis} allCafes={misCafes} placeholder="Buscar en tu colección" />
-            </View>
-            {cargando ? <ActivityIndicator color={PREMIUM_ACCENT} style={{ margin: 30 }} /> : (
-              <View style={{ paddingHorizontal: 16 }}>
-                {cafesFiltrados.map(item => <CardVertical key={item.id} item={item} onDelete={eliminarCafe} onPress={setCafeDetalle} favs={favs} onToggleFav={toggleFav} />)}
-                {cafesFiltrados.length === 0 && <Text style={s.empty}>{busquedaMis ? 'Sin resultados' : 'No has añadido cafés aún'}</Text>}
-              </View>
-            )}
-          </View>
+          <MisCafesTab {...misCafesTabProps} />
         )}
 
         {/* ── ÚLTIMOS AÑADIDOS (100) ── */}
         {activeTab === 'Últimos añadidos' && (
-          <View style={{ paddingTop: 20 }}>
-            <View style={{ paddingHorizontal: 16 }}>
-              <TouchableOpacity onPress={() => setActiveTab('Inicio')} style={s.backRow}>
-                <Ionicons name="chevron-back" size={20} color={PREMIUM_ACCENT} />
-                <Text style={s.backText}>Volver</Text>
-              </TouchableOpacity>
-              <Text style={s.pageTitle}>Últimos añadidos</Text>
-              <Text style={s.sectionSub}>Mostrando los 100 más recientes de la comunidad</Text>
-            </View>
-            {cargando ? <ActivityIndicator color={PREMIUM_ACCENT} style={{ margin: 30 }} /> : (
-              <View style={{ paddingHorizontal: 16, marginTop: 8 }}>
-                {ultimos100.map(item => <CardVertical key={item.id} item={item} onDelete={() => {}} onPress={setCafeDetalle} favs={favs} onToggleFav={toggleFav} />)}
-                {ultimos100.length === 0 && <Text style={s.empty}>Aún no hay cafés.</Text>}
-              </View>
-            )}
-          </View>
+          <UltimosAnadidosTab {...ultimosAnadidosTabProps} />
         )}
 
         {/* ── TOP CAFÉS (100) ── */}
         {activeTab === 'Top cafés' && (
-          <View style={{ paddingTop: 20 }}>
-            <View style={{ paddingHorizontal: 16 }}>
-              <TouchableOpacity onPress={() => setActiveTab('Inicio')} style={s.backRow}>
-                <Ionicons name="chevron-back" size={20} color={PREMIUM_ACCENT} />
-                <Text style={s.backText}>Volver</Text>
-              </TouchableOpacity>
-              <Text style={s.pageTitle}>Top cafés</Text>
-              <Text style={s.sectionSub}>Mostrando los 100 mejor puntuados ({perfil.pais || 'España'})</Text>
-            </View>
-            {cargando ? <ActivityIndicator color={PREMIUM_ACCENT} style={{ margin: 30 }} /> : (
-              <View style={{ paddingHorizontal: 16, marginTop: 8 }}>
-                {top100.map(item => <CardVertical key={item.id} item={item} onDelete={() => {}} onPress={setCafeDetalle} favs={favs} onToggleFav={toggleFav} />)}
-                {top100.length === 0 && <Text style={s.empty}>Aún no hay cafés.</Text>}
-              </View>
-            )}
-          </View>
+          <TopCafesTab {...topCafesTabProps} />
         )}
 
         {/* ── OFERTAS WEB ── */}
         {activeTab === 'Ofertas' && (
-          <View style={{ paddingTop: 20 }}>
-            <View style={{ paddingHorizontal: 16 }}>
-              <TouchableOpacity onPress={() => setActiveTab('Inicio')} style={s.backRow}>
-                <Ionicons name="chevron-back" size={20} color={PREMIUM_ACCENT} />
-                <Text style={s.backText}>Volver</Text>
-              </TouchableOpacity>
-              <Text style={s.pageTitle}>Ofertas de cafés</Text>
-              <Text style={s.sectionSub}>Pulsa cualquier café para cargar sus 3 ofertas más baratas encontradas en Google</Text>
-            </View>
-            <View style={{ paddingHorizontal: 16, marginTop: 8 }}>
-              {cafesParaOfertas.map(cafe => {
-                const ofertas = ofertasPorCafe[cafe.id]?.offers || [];
-                const buscando = buscandoOfertaId === cafe.id;
-                const expanded = openOfferCafeId === cafe.id;
-                return (
-                  <TouchableOpacity key={cafe.id} style={[s.cardV, { borderBottomColor: '#f2f2f2', marginBottom: 18 }]} activeOpacity={0.9} onPress={() => abrirOfertasCafe(cafe, { forceRefresh: expanded })}> 
-                    <View style={s.cardVImg}><PackshotImage uri={cafe.foto} frameStyle={s.packshotListFrame} imageStyle={s.packshotListImage} /></View>
-                    <View style={{ flex: 1 }}>
-                      <Text style={s.cardVName}>{cafe.nombre}</Text>
-                      <Text style={s.cardVOrigin}>{cafe.pais || 'Sin país'} {cafe.marca ? `· ${cafe.marca}` : ''}</Text>
-                      <Text style={s.offerHint}>{buscando ? 'Buscando ofertas en Google...' : expanded ? 'Pulsa de nuevo para refrescar resultados' : 'Pulsa para ver las 3 ofertas más baratas en Google'}</Text>
-
-                      {buscando && <ActivityIndicator color={PREMIUM_ACCENT} style={{ marginTop: 12, alignSelf: 'flex-start' }} />}
-
-                      {expanded && ofertas.length > 0 && (
-                        <View style={{ marginTop: 10, gap: 8 }}>
-                          {ofertas.map((of) => (
-                            <TouchableOpacity key={of.id} onPress={() => abrirOfertaWeb(of)} style={{ backgroundColor: THEME.surface.subtle, borderRadius: 10, padding: 10, borderWidth: 1, borderColor: THEME.border.soft }}>
-                              <View style={s.offerMetaRow}>
-                                <Text style={{ fontSize: 12, color: '#777', flex: 1 }}>{of.tienda}</Text>
-                                <Text style={s.offerSourceBadge}>Google</Text>
-                              </View>
-                              <Text style={{ fontSize: 13, fontWeight: '700', color: THEME.text.primary }} numberOfLines={2}>{of.titulo}</Text>
-                              <Text style={{ fontSize: 13, color: PREMIUM_ACCENT_DEEP, fontWeight: '700' }}>{of.precioTexto} · Ver oferta</Text>
-                            </TouchableOpacity>
-                          ))}
-                        </View>
-                      )}
-                    </View>
-                  </TouchableOpacity>
-                );
-              })}
-              {cafesParaOfertas.length === 0 && <Text style={s.empty}>No hay cafés en base de datos.</Text>}
-              {!!errorOfertas && <Text style={[s.empty, { marginTop: 8 }]}>{errorOfertas}</Text>}
-            </View>
-          </View>
+          <OfertasTab {...ofertasTabProps} />
         )}
 
         {/* ── MÁS ── */}
         {activeTab === 'Más' && (
-          <View style={{ paddingTop: 20 }}>
-            <View style={{ paddingHorizontal: 16 }}>
-              <Text style={s.pageTitle}>Más</Text>
-
-              <View style={mas.premiumCard}>
-                <View style={mas.premiumGlow} />
-                <View style={mas.premiumGlowTwo} />
-                <Text style={mas.clubTag}>ETIOVE MEMBER STATUS</Text>
-                <View style={mas.premiumTopRow}>
-                  <View style={mas.premiumIdentity}>
-                    {perfil.foto
-                      ? <Image source={{ uri: perfil.foto }} style={mas.premiumAvatar} />
-                      : <View style={mas.premiumAvatarFallback}><Text style={mas.premiumAvatarText}>{profileInitial}</Text></View>
-                    }
-                    <View style={{ flex: 1 }}>
-                      <Text style={mas.premiumAlias}>@{profileAlias.replace(/^@+/, '')}</Text>
-                      <Text style={mas.premiumName} numberOfLines={1}>{profileName}</Text>
-                    </View>
-                  </View>
-                  <View style={mas.premiumLevelBadge}>
-                    <Text style={mas.premiumLevelText}>{memberStatus.icon} {memberStatus.label}</Text>
-                  </View>
-                </View>
-
-                <View style={mas.premiumStatsRow}>
-                  <View style={mas.premiumStatCard}>
-                    <Text style={mas.premiumStatValue}>{unlockedCount}</Text>
-                    <Text style={mas.premiumStatLabel}>LOGROS</Text>
-                  </View>
-                  <View style={mas.premiumStatCard}>
-                    <Text style={mas.premiumStatValue}>{achievementTotal}</Text>
-                    <Text style={mas.premiumStatLabel}>OBJETIVOS</Text>
-                  </View>
-                  <View style={mas.premiumStatCard}>
-                    <Text style={mas.premiumStatValue}>{pendingAchievements.length}</Text>
-                    <Text style={mas.premiumStatLabel}>PENDIENTES</Text>
-                  </View>
-                </View>
-
-                <View style={mas.memberProgressRow}>
-                  <Text style={mas.memberProgressText}>{unlockedCount}/{achievementTotal} LOGROS</Text>
-                  <Text style={mas.memberProgressText}>{pendingAchievements[0] ? `SIGUIENTE: ${pendingAchievements[0].title.toUpperCase()}` : 'STATUS COMPLETO'}</Text>
-                </View>
-                <View style={mas.memberProgressBar}><View style={[mas.memberProgressFill, { width: `${achievementProgress * 100}%` }]} /></View>
-              </View>
-
-              <Text style={mas.blockTitle}>Accesos</Text>
-              <View style={mas.quickGrid}>
-                <TouchableOpacity style={[mas.quickCard, mas.quickCardDark]} onPress={() => setShowProfile(true)}>
-                  <Ionicons name="person-circle-outline" size={20} color="#f8e7d5" />
-                  <Text style={mas.quickTitleDark}>Mi Perfil</Text>
-                  <Text style={mas.quickSubDark}>Editar datos y foto</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[mas.quickCard, mas.quickCardSoft]} onPress={() => setActiveTab('Mis Cafés')}>
-                  <Ionicons name="heart-outline" size={20} color={PREMIUM_ACCENT_DEEP} />
-                  <Text style={mas.quickTitle}>Mis Cafés</Text>
-                  <Text style={mas.quickSub}>Tu colección personal</Text>
-                </TouchableOpacity>
-              </View>
-
-              <Text style={mas.blockTitle}>Logros conseguidos</Text>
-              <View style={mas.achievementsCard}>
-                {unlockedAchievements.length > 0 ? unlockedAchievements.slice(0, 4).map((a) => (
-                  <View key={a.id} style={mas.achievementOn}>
-                    <Text style={mas.achievementIcon}>{a.icon}</Text>
-                    <View style={{ flex: 1 }}>
-                      <Text style={mas.achievementTitle}>{a.title}</Text>
-                      <Text style={mas.achievementDesc}>{a.desc}</Text>
-                    </View>
-                  </View>
-                )) : <Text style={mas.emptyAchText}>Aún no has desbloqueado logros. Empieza a catar y guardar cafés.</Text>}
-              </View>
-
-              <Text style={mas.blockTitle}>Siguiente por conseguir</Text>
-              <View style={mas.achievementsCard}>
-                {pendingAchievements.slice(0, 3).map((a) => (
-                  <View key={a.id} style={mas.achievementOff}>
-                    <Text style={mas.achievementIconOff}>🔒</Text>
-                    <View style={{ flex: 1 }}>
-                      <Text style={mas.achievementTitleOff}>{a.title}</Text>
-                      <Text style={mas.achievementDesc}>{a.desc}</Text>
-                    </View>
-                  </View>
-                ))}
-              </View>
-
-              <Text style={mas.blockTitle}>NEWSLETTER</Text>
-              <View style={mas.newsletterCard}>
-                <View style={mas.newsletterTopRow}>
-                  <View style={mas.newsletterTitleWrap}>
-                    <Text style={mas.newsletterTitle}>BE ETIOVE BY EMAIL</Text>
-                    <Text style={mas.newsletterSub}>recibe lanzamientos, cafes destacados y novedades de la comunidad.</Text>
-                  </View>
-                  <Switch
-                    value={newsletterState.subscribed}
-                    onValueChange={guardarNewsletter}
-                    disabled={newsletterLoading || newsletterSaving || !newsletterHasEmail}
-                    trackColor={{ false: '#d8cbbf', true: '#6b4a37' }}
-                    thumbColor="#fffdf8"
-                  />
-                </View>
-
-                <View style={mas.newsletterMetaRow}>
-                  <View style={[mas.newsletterStatusPill, newsletterState.subscribed ? mas.newsletterStatusOn : mas.newsletterStatusOff]}>
-                    <Text style={[mas.newsletterStatusText, newsletterState.subscribed ? mas.newsletterStatusTextOn : mas.newsletterStatusTextOff]}>
-                      {newsletterLoading ? 'CARGANDO' : newsletterState.subscribed ? 'SUSCRIPCION ACTIVA' : 'NO SUSCRITO'}
-                    </Text>
-                  </View>
-                  <Text style={mas.newsletterEmail}>{newsletterHasEmail ? newsletterEmail.toUpperCase() : 'ANADE UN EMAIL EN TU PERFIL PARA ACTIVAR LA NEWSLETTER.'}</Text>
-                </View>
-
-                <Text style={mas.newsletterNote}>guardamos tu consentimiento en base de datos para poder incluirte despues en envios a todos los suscritos.</Text>
-
-                <TouchableOpacity
-                  style={[mas.newsletterBtn, (!newsletterHasEmail || newsletterSaving) && mas.newsletterBtnDisabled]}
-                  onPress={() => guardarNewsletter(!newsletterState.subscribed)}
-                  disabled={!newsletterHasEmail || newsletterSaving}
-                >
-                  {newsletterSaving
-                    ? <ActivityIndicator color="#fff" />
-                    : <Text style={mas.newsletterBtnText}>{newsletterState.subscribed ? 'DARME DE BAJA' : 'SUSCRIBIRME AHORA'}</Text>
-                  }
-                </TouchableOpacity>
-              </View>
-
-              <Text style={mas.blockTitle}>Aplicación</Text>
-              <View style={mas.listCard}>
-                <MasItem icon="information-circle-outline" label="Versión" sub={`Etiove v${APP_VERSION}`} onPress={() => Alert.alert('Etiove', `Versión ${APP_VERSION}\n\nReact Native + Expo\nFirebase Firestore`)} />
-              </View>
-
-              <TouchableOpacity style={mas.logoutBtn} onPress={() => Alert.alert('Cerrar sesión', '¿Seguro?', [{ text: 'Cancelar', style: 'cancel' }, { text: 'Salir', style: 'destructive', onPress: onLogout }])}>
-                <Ionicons name="log-out-outline" size={20} color="#fff" />
-                <Text style={mas.logoutText}>Cerrar sesión</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={{ height: 20 }} />
-          </View>
+          <MasTab {...masTabProps} />
         )}
       </ScrollView>
       )}
 
       {!(activeTab === 'Comunidad' && !!forumThread) && (
-        <View style={s.bottomBar}>
-          <TabBtn icon="home"           label="Inicio"      tab="Inicio"      active={activeTab} onPress={setActiveTab} />
-          <TabBtn icon="people"         label="Comunidad"   tab="Comunidad"   active={activeTab} onPress={setActiveTab} />
-          <TouchableOpacity style={s.camBtn} onPress={() => setScanning(true)}>
-            <Ionicons name="camera" size={28} color="#fff" />
-          </TouchableOpacity>
-          <TabBtn icon="cafe"           label="Mis Cafés"   tab="Mis Cafés"   active={activeTab} onPress={setActiveTab} />
-          <TabBtn icon="ellipsis-horizontal" label="Más"   tab="Más"         active={activeTab} onPress={setActiveTab} badge={favs.length} />
-        </View>
+        <BottomBarNav {...bottomBarProps} />
       )}
     </SafeAreaView>
   );

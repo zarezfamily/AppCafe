@@ -7,6 +7,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "web:deploy": "npx netlify-cli deploy --dir=web --site=$NETLIFY_SITE_ID",
+    "web:deploy:prod": "npx netlify-cli deploy --prod --dir=web --site=$NETLIFY_SITE_ID",
     "env:check:seed-auth": "node --env-file=.env scripts/check_env.js seed-auth",
     "env:check:seed-api": "node --env-file=.env scripts/check_env.js seed-api",
     "env:check:import-dry": "node --env-file=.env scripts/check_env.js import-dry",

@@ -1,3 +1,4 @@
+import * as Haptics from 'expo-haptics';
 import * as SecureStore from 'expo-secure-store';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, Easing } from 'react-native';
@@ -55,6 +56,7 @@ export default function useGamification({ storageKey }) {
   const showAchievementToast = useCallback((achievement, xpDelta) => {
     if (!achievement) return;
     if (achievementToastTimerRef.current) clearTimeout(achievementToastTimerRef.current);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
     setAchievementToast({
       icon: achievement.icon || '🏆',
       title: achievement.title || 'Logro desbloqueado',

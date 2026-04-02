@@ -60,7 +60,8 @@
           "icon": "./assets/images/icon.png",
           "color": "#8f5e3b"
         }
-      ]
+      ],
+      "expo-font"
     ]
   }
 }

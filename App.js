@@ -2,9 +2,15 @@
 //  App.js — Etiove ☕  v2.1
 // ─────────────────────────────────────────────────────────────────────────────
 
+import {
+    PlayfairDisplay_700Bold,
+    PlayfairDisplay_800ExtraBold,
+} from '@expo-google-fonts/playfair-display';
 import { Ionicons } from '@expo/vector-icons';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import Constants from 'expo-constants';
+import { useFonts } from 'expo-font';
+import * as Haptics from 'expo-haptics';
 import * as ImagePicker from 'expo-image-picker';
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as Location from 'expo-location';
@@ -351,7 +357,12 @@ function QuizSection({ allCafes, onGamifyEvent }) {
     const nf = wasFav ? favs.filter(f => f !== cafe.id) : [...favs, cafe.id];
     setFavs(nf);
     await SecureStore.setItemAsync(KEY_FAVS, JSON.stringify(nf)).catch(() => {});
-    if (!wasFav) onGamifyEvent?.('favorite_mark', { cafe });
+    if (!wasFav) {
+      onGamifyEvent?.('favorite_mark', { cafe });
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+    } else {
+      Haptics.selectionAsync().catch(() => {});
+    }
   };
 
   const reiniciar = () => { setStep(0); setPrefs({}); setResultados([]); SecureStore.deleteItemAsync(KEY_PREFS).catch(() => {}); };
@@ -428,6 +439,7 @@ function CafeDetailScreen({ cafe, onClose, onDelete, favs = [], onToggleFav, vot
   const votar = async (estrellas) => {
     if (votando || yaVotado || miVoto > 0) return;
     setVotando(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
     try {
       setMiVoto(estrellas);
       const nuevosVotos = votosActuales + 1;
@@ -439,6 +451,7 @@ function CafeDetailScreen({ cafe, onClose, onDelete, favs = [], onToggleFav, vot
       setVotes?.(newVotes);
       await SecureStore.setItemAsync(KEY_VOTES, JSON.stringify(newVotes)).catch(() => {});
       onVote?.(cafe);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
       showDialog('Gracias', `Has valorado este café con ${estrellas} estrellas.\nNueva puntuación media: ${nuevaPuntuacion}.0`);
     } catch {
       showDialog('Error', 'No se pudo guardar tu voto');
@@ -2986,9 +2999,14 @@ function MainScreen({ onLogout }) {
 
 // ─── ROOT ─────────────────────────────────────────────────────────────────────
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    PlayfairDisplay_700Bold,
+    PlayfairDisplay_800ExtraBold,
+  });
   const [user, setUser]               = useState(null);
   const [showWelcome, setShowWelcome] = useState(true);
   useEffect(() => { const t = setTimeout(() => setShowWelcome(false), 4000); return () => clearTimeout(t); }, []);
+  if (!fontsLoaded) return null;
   if (showWelcome) return <WelcomeScreen />;
   return (
     <AuthContext.Provider value={{ user }}>
@@ -3015,9 +3033,9 @@ const s = StyleSheet.create({
   welcomeAuraTwo:   { position: 'absolute', bottom: 80, left: -40, width: 220, height: 220, borderRadius: 110, backgroundColor: 'rgba(255, 248, 241, 0.76)' },
   welcomeCard:      { width: '100%', borderRadius: 30, backgroundColor: '#fffaf5', borderWidth: 1, borderColor: '#eadbce', paddingVertical: 34, paddingHorizontal: 22, alignItems: 'center', shadowColor: '#3a2416', shadowOpacity: 0.12, shadowRadius: 18, shadowOffset: { width: 0, height: 10 }, elevation: 4 },
   welcomeTypeBox:   { width: '100%', alignItems: 'center', justifyContent: 'center', minHeight: 130, gap: 6 },
-  welcomeLineTop:   { fontSize: 24, fontWeight: '900', letterSpacing: 4.1, color: '#5e4332' },
-  welcomeLineBottom:{ fontSize: 44, fontWeight: '900', letterSpacing: 5.8, color: '#1c120d' },
-  welcomeTitle:     { fontSize: 44, fontWeight: '900', letterSpacing: 5.8, color: '#1c120d' },
+  welcomeLineTop:   { fontSize: 24, fontWeight: '900', letterSpacing: 3.2, color: '#5e4332', fontFamily: 'PlayfairDisplay_800ExtraBold' },
+  welcomeLineBottom:{ fontSize: 44, fontWeight: '900', letterSpacing: 4.2, color: '#1c120d', fontFamily: 'PlayfairDisplay_800ExtraBold' },
+  welcomeTitle:     { fontSize: 44, fontWeight: '900', letterSpacing: 4.2, color: '#1c120d', fontFamily: 'PlayfairDisplay_800ExtraBold' },
   welcomeSub:       { fontSize: 10, color: '#6f5444', fontWeight: '800', letterSpacing: 2.1, textAlign: 'center', marginTop: 2 },
   welcomeCaption:   { marginTop: 18, fontSize: 13, color: '#8a6d5b', fontWeight: '600', letterSpacing: 0.4, textAlign: 'center' },
   permScreen:       { flex: 1, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', padding: 32, gap: 16 },
@@ -3028,7 +3046,7 @@ const s = StyleSheet.create({
   authAuraOne:      { position: 'absolute', top: -28, right: -18, width: 150, height: 150, borderRadius: 75, backgroundColor: 'rgba(119, 82, 57, 0.09)' },
   authAuraTwo:      { position: 'absolute', bottom: 90, left: -36, width: 180, height: 180, borderRadius: 90, backgroundColor: 'rgba(255, 248, 241, 0.72)' },
   authBrandBlock:   { paddingTop: 8, paddingBottom: 2 },
-  authTitle:        { fontSize: 30, fontWeight: '800', color: '#1f140f', marginBottom: 8 },
+  authTitle:        { fontSize: 30, fontWeight: '800', color: '#1f140f', marginBottom: 8, fontFamily: 'PlayfairDisplay_700Bold' },
   authSub:          { fontSize: 15, color: '#7e6b5f', marginBottom: 24, lineHeight: 22 },
   authKicker:       { fontSize: 11, fontWeight: '800', color: '#8d6d58', textTransform: 'uppercase', letterSpacing: 1.4, marginBottom: 10 },
   authCard:         { backgroundColor: '#fffaf5', borderRadius: 28, padding: 22, borderWidth: 1, borderColor: '#eadbce', shadowColor: '#3a2416', shadowOpacity: 0.1, shadowRadius: 18, shadowOffset: { width: 0, height: 10 }, elevation: 4 },
@@ -3048,7 +3066,7 @@ const s = StyleSheet.create({
   authSecondaryBtnText:{ color: THEME.brand.accentDeep, fontWeight: '700', fontSize: 15 },
   topBar:           { paddingHorizontal: 16, paddingTop: 10, paddingBottom: 8, gap: 10 },
   homeBrandWrap:    { alignItems: 'center', justifyContent: 'center', gap: 5, paddingTop: 2, paddingBottom: 2 },
-  homeWordmark:     { fontSize: 42, fontWeight: '900', letterSpacing: 6, color: '#1c120d', textShadowColor: 'rgba(111, 84, 68, 0.08)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 8 },
+  homeWordmark:     { fontSize: 42, fontWeight: '900', letterSpacing: 4.2, color: '#1c120d', textShadowColor: 'rgba(111, 84, 68, 0.08)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 8, fontFamily: 'PlayfairDisplay_800ExtraBold' },
   homeLoverRow:     { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
   homeLoverText:    { fontSize: 10, fontWeight: '800', color: '#6f5444', letterSpacing: 2.2 },
   homeMiniSealOuter:{ width: 24, height: 24, borderRadius: 12, borderWidth: 1, borderColor: '#c4a18a', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fcf7f1' },
@@ -3063,7 +3081,7 @@ const s = StyleSheet.create({
   wordmarkSealMiddle:{ width: 30, height: 30, borderRadius: 15, borderWidth: 1, borderColor: 'rgba(154, 121, 99, 0.38)', alignItems: 'center', justifyContent: 'center' },
   wordmarkSeal:     { width: 22, height: 22, borderRadius: 11, borderWidth: 1, borderColor: '#8f6a53', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f2e7dc' },
   wordmarkSealText: { fontSize: 11, fontWeight: '900', color: '#6f5444', letterSpacing: 1.1 },
-  wordmark:         { fontSize: 40, fontWeight: '900', letterSpacing: 5.8, color: '#1c120d', textShadowColor: 'rgba(111, 84, 68, 0.08)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 8 },
+  wordmark:         { fontSize: 40, fontWeight: '900', letterSpacing: 4.2, color: '#1c120d', textShadowColor: 'rgba(111, 84, 68, 0.08)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 8, fontFamily: 'PlayfairDisplay_800ExtraBold' },
   wordmarkSub:      { fontSize: 10, color: '#8a6b57', fontWeight: '800', letterSpacing: 3.2, marginTop: -2 },
   wordmarkTag:      { fontSize: 10, color: '#6f5444', fontWeight: '800', letterSpacing: 2.1, textAlign: 'center', marginTop: 2 },
   authWordmarkSub:  { marginBottom: 10 },
@@ -3102,9 +3120,9 @@ const s = StyleSheet.create({
   searchWrap:       { flexDirection: 'row', alignItems: 'center', marginHorizontal: 16, marginVertical: 10, backgroundColor: '#f5f5f5', borderRadius: 25, paddingHorizontal: 14, height: 44 },
   searchInput:      { flex: 1, fontSize: 15, color: '#222', marginLeft: 8 },
   sectionHeader:    { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, marginTop: 20, marginBottom: 2 },
-  sectionTitle:     { fontSize: 20, fontWeight: '700', color: '#111' },
+  sectionTitle:     { fontSize: 20, fontWeight: '700', color: '#111', fontFamily: 'PlayfairDisplay_700Bold' },
   sectionSub:       { fontSize: 13, color: THEME.text.secondary, paddingHorizontal: 16, marginBottom: 14 },
-  pageTitle:        { fontSize: 24, fontWeight: '700', color: '#111', marginBottom: 12 },
+  pageTitle:        { fontSize: 24, fontWeight: '700', color: '#111', marginBottom: 12, fontFamily: 'PlayfairDisplay_700Bold' },
   empty:            { color: THEME.text.muted, textAlign: 'center', marginTop: 40, fontSize: 14 },
   packshotFrame:    { backgroundColor: '#ffffff', borderRadius: 18, borderWidth: 1, borderColor: '#f1ece4', shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 2, alignItems: 'center', justifyContent: 'center' },
   packshotInner:    { width: '100%', height: '100%', backgroundColor: '#fff', borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
@@ -3241,7 +3259,7 @@ const det = StyleSheet.create({
   scoreNum:     { fontSize: 42, fontWeight: '800', color: '#fff' },
   scoreVotos:   { fontSize: 13, color: 'rgba(255,255,255,0.8)' },
   body:         { padding: 20 },
-  nombre:       { fontSize: 26, fontWeight: '800', color: '#111', marginBottom: 4 },
+  nombre:       { fontSize: 26, fontWeight: '800', color: '#111', marginBottom: 4, fontFamily: 'PlayfairDisplay_700Bold' },
   finca:        { fontSize: 15, color: '#555', marginBottom: 4 },
   originRow:    { marginBottom: 14 },
   originText:   { fontSize: 14, color: THEME.text.secondary },
@@ -3259,7 +3277,7 @@ const det = StyleSheet.create({
   scaFill:      { height: '100%', backgroundColor: PREMIUM_ACCENT, borderRadius: 4 },
   scaCat:       { fontSize: 13, color: '#555', fontWeight: '600' },
   divider:      { height: 0.5, backgroundColor: THEME.border.soft, marginVertical: 20 },
-  sectionTitle: { fontSize: 18, fontWeight: '700', color: '#111', marginBottom: 14 },
+  sectionTitle: { fontSize: 18, fontWeight: '700', color: '#111', marginBottom: 14, fontFamily: 'PlayfairDisplay_700Bold' },
   notasBox:     { backgroundColor: PREMIUM_SURFACE_TINT, borderRadius: 12, padding: 14, marginBottom: 14 },
   notasLabel:   { fontSize: 11, fontWeight: '700', color: PREMIUM_ACCENT_DEEP, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 6 },
   notasText:    { fontSize: 15, color: '#333', lineHeight: 22 },

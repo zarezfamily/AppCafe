@@ -1,16 +1,15 @@
-import { ActivityIndicator, ScrollView, Text } from 'react-native';
+import { ScrollView, Text } from 'react-native';
+import { SkeletonHorizontalRow } from './SkeletonLoader';
 
 export default function HorizontalCardRow({
   s,
   loading,
-  loadingColor,
-  loadingMargin = 30,
   items,
   renderItem,
   emptyText,
 }) {
   if (loading) {
-    return <ActivityIndicator color={loadingColor} style={{ margin: loadingMargin }} />;
+    return <SkeletonHorizontalRow />;
   }
 
   return (

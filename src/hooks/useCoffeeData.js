@@ -1,3 +1,4 @@
+import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
 import * as SecureStore from 'expo-secure-store';
 import { useEffect, useMemo, useState } from 'react';
@@ -132,7 +133,12 @@ export default function useCoffeeData({
     const nf = wasFav ? favs.filter((f) => f !== cafe.id) : [...favs, cafe.id];
     setFavs(nf);
     await SecureStore.setItemAsync(keyFavs, JSON.stringify(nf)).catch(() => {});
-    if (!wasFav) registrarEventoGamificacion('favorite_mark', { cafe });
+    if (!wasFav) {
+      registrarEventoGamificacion('favorite_mark', { cafe });
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+    } else {
+      Haptics.selectionAsync().catch(() => {});
+    }
   };
 
   const eliminarCafe = (item) => {

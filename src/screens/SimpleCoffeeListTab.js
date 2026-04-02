@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
+import { SkeletonVerticalList } from '../components/SkeletonLoader';
 
 export default function SimpleCoffeeListTab({
   s,
@@ -25,7 +26,7 @@ export default function SimpleCoffeeListTab({
         <Text style={s.pageTitle}>{title}</Text>
         <Text style={s.sectionSub}>{subtitle}</Text>
       </View>
-      {cargando ? <ActivityIndicator color={premiumAccent} style={{ margin: 30 }} /> : (
+      {cargando ? <SkeletonVerticalList /> : (
         <View style={{ paddingHorizontal: 16, marginTop: 8 }}>
           {items.map((item) => (
             <CardVertical

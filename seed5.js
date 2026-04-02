@@ -1,5 +1,4 @@
-const PID   = 'miappdecafe';
-const KEY   = 'AIzaSyA1BcU0iRk3HyFtV92CLrnalHFKLaOWH24';
+const PID   = process.env.FIREBASE_PROJECT_ID || process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID || '';
 const BASE  = `https://europe-west1-firestore.googleapis.com/v1/projects/${PID}/databases/(default)/documents`;
 
 const toFirestoreValue = (val) => {
@@ -16,9 +15,7 @@ const toFields = (obj) => {
 };
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
-// ─── NECESITAS PEGAR AQUÍ UN TOKEN FRESCO ────────────────────────────────────
-// Loguéate en la app con los logs activos y copia el TOKEN COMPLETO
-const TOKEN = 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjM3MzAwNzY5YTA3ZTA1MTE2ZjdlNTEzOGZhOTA5MzY4NWVlYmMyNDAiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vbWlhcHBkZWNhZmUiLCJhdWQiOiJtaWFwcGRlY2FmZSIsImF1dGhfdGltZSI6MTc3NDk4OTM3MiwidXNlcl9pZCI6ImtHOVV4MWcydllkVDBuSENLR0N4NXlaRVh5SDIiLCJzdWIiOiJrRzlVeDFnMnZZZFQwbkhDS0dDeDV5WkVYeUgyIiwiaWF0IjoxNzc0OTg5MzcyLCJleHAiOjE3NzQ5OTI5NzIsImVtYWlsIjoiaXZhbmNhYmV6YUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsiaXZhbmNhYmV6YUBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.VgAhUVB_12LuMuw-aT1qmNF46RobaKaT5tblFa1du3VfbwtPbTlay-BH2qYmKqEkM2t2NeQDgrPCcTwkzYAWZxIWNG203aRQe4z2ZdfF_3I0YFKtymqLM4HW17yDHBuHci9WgbwoXflHyb7F_uOFnz78ucl-9igr2gEstPrONUnwm5JEoDAyFx7_Te7SAtF9szUlFd2InxGCskKhIXQxX9EHwpJCcAcUn6JcLPjKHgLxHT3hlI2P3jHC0EXB3eSev1lzegry9j2VLlT30JRdWp4yz28J4FW1qbOL_ssAI4MiS9Jcmcm1jG4GwXKrSrxlfZL4NRmVhcRPIrUs1N4asg';
+const TOKEN = process.env.FIREBASE_AUTH_TOKEN || process.env.TOKEN || '';
 
 const headers = {
   'Content-Type': 'application/json',
@@ -99,9 +96,9 @@ const cafes = [
 ];
 
 async function main() {
-  if (TOKEN === 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjM3MzAwNzY5YTA3ZTA1MTE2ZjdlNTEzOGZhOTA5MzY4NWVlYmMyNDAiLCJ0eXAiOiJKV1QifQ') {
-    console.log('\n⚠️  Primero pega tu token en la variable TOKEN del script.\n');
-    console.log('Para obtenerlo: loguéate en la app y copia el TOKEN COMPLETO de los logs.\n');
+  if (!PID || !TOKEN) {
+    console.log('\n⚠️  Faltan variables de entorno.\n');
+    console.log('Ejemplo: FIREBASE_PROJECT_ID=miappdecafe FIREBASE_AUTH_TOKEN=eyJ... node seed5.js\n');
     return;
   }
   console.log(`\n☕ Subiendo ${cafes.length} cafés premium...\n`);

@@ -7,7 +7,7 @@
 
   Uso:
     FIREBASE_PROJECT_ID=miappdecafe \
-    FIREBASE_API_KEY=AIza... \
+    FIREBASE_API_KEY=<tu_api_key> \
     FIREBASE_AUTH_TOKEN=eyJ... \
     node scripts/import_top_es_real.js
 

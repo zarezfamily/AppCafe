@@ -1,6 +1,6 @@
 // seed_cafes_v2.js — 300 cafés con información completa y fotos de Unsplash
-const FIREBASE_PROJECT_ID = "miappdecafe";
-const FIREBASE_API_KEY    = "AIzaSyA1BcU0iRk3HyFtV92CLrnalHFKLaOWH24";
+const FIREBASE_PROJECT_ID = process.env.FIREBASE_PROJECT_ID || process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID || '';
+const FIREBASE_API_KEY    = process.env.FIREBASE_API_KEY || process.env.EXPO_PUBLIC_FIREBASE_API_KEY || '';
 const BASE_URL = `https://europe-west1-firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/default/documents`;
 
 // Fotos de Unsplash libres de derechos — variadas para dar diversidad visual
@@ -1584,6 +1584,11 @@ async function addCafe(cafe, index) {
 // ─── MAIN ─────────────────────────────────────────────────────────────────────
 
 async function main() {
+  if (!FIREBASE_PROJECT_ID || !FIREBASE_API_KEY) {
+    console.log('\n⚠️  Faltan FIREBASE_PROJECT_ID y/o FIREBASE_API_KEY.\n');
+    console.log('Ejemplo: FIREBASE_PROJECT_ID=miappdecafe FIREBASE_API_KEY=AIza... node seed_cafes_v2.js\n');
+    return;
+  }
   console.log(`\n☕ Seeding ${cafes.length} cafés con info completa...\n`);
   let ok = 0, fail = 0;
 

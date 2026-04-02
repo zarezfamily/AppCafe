@@ -1,166 +1,206 @@
-# ☕ Etiove
+# Etiove
 
-App móvil para registrar, puntuar y gestionar tu colección de cafés. Escanea el código de barras del paquete, añade notas y puntuación, y consulta el ranking global de los cafés más populares.
+App movil de cafe de especialidad con enfoque premium: catalogo, detalle sensorial, gamificacion, foro, diario de catas, cafeterias cercanas y notificaciones push.
 
-## ✨ Funcionalidades
+## Que incluye hoy
 
-- 📷 **Escáner de código de barras** — escanea cualquier paquete de café para iniciar una entrada
-- ⭐ **Puntuación de 1 a 5 estrellas**
-- 📝 **Notas personales** por cada café
-- 📸 **Foto del café** (guardada localmente)
-- 🏆 **Ranking global** — los 5 cafés más votados en tiempo real
-- 📦 **Mi Bodega** — tu colección personal con opción de eliminar entradas
-- 💬 **Comunidad / foro** — hilos, respuestas, imágenes y acciones de autor
-- ✉️ **Newsletter** — suscripción desde la pestaña Más guardada en Firestore
+- Autenticacion con Firebase Auth REST (token guardado en SecureStore)
+- Catalogo de cafes (mis cafes, top, ultimos anadidos, favoritos)
+- Detalle de cafe con votacion y acciones de favorito
+- Foro de comunidad (hilos, respuestas, adjuntos y acciones de autor)
+- Gamificacion (XP, niveles, logros y toast de desbloqueo)
+- Diario de catas y notas
+- Cafeterias cercanas con Google Places API
+- Push local con `expo-notifications`
+- Push remoto server-driven con Cloud Functions (Gen2)
+- Cache offline de colecciones con `expo-file-system`
 
-## 🛠️ Tecnologías
+## Stack tecnico
 
-- [React Native](https://reactnative.dev/) + [Expo](https://expo.dev/) ~54
-- [Firebase Firestore Lite](https://firebase.google.com/docs/firestore) para la base de datos en la nube
-- [expo-camera](https://docs.expo.dev/versions/latest/sdk/camera/) para el escáner
-- [expo-image-picker](https://docs.expo.dev/versions/latest/sdk/imagepicker/) para las fotos
+- Expo SDK 54 + React Native 0.81
+- Firestore REST API (sin SDK cliente de Firestore)
+- Firebase Auth REST
+- Firebase Storage (subida de imagenes)
+- Cloud Functions for Firebase (Node.js 22)
+- Expo Notifications, Expo Location, Expo Camera, Expo Haptics
 
-> **¿Por qué `jsEngine: "jsc"` en app.json?**
-> Firebase Firestore Lite tiene incompatibilidades con el motor Hermes de React Native. Usando JSC (JavaScriptCore) se evitan errores de inicialización en producción.
+## Instalacion
 
-## 🚀 Instalación
-
-### 1. Clona el repositorio
-
-```bash
-git clone https://github.com/zarezfamily/Etiove.git
-cd Etiove
-```
-
-### 2. Instala las dependencias
+### 1) Clonar e instalar
 
 ```bash
+git clone https://github.com/zarezfamily/etiove.git
+cd etiove
 npm install
 ```
 
-### 3. Configura Firebase
-
-Copia el fichero de ejemplo y rellena con tus credenciales:
+### 2) Configurar variables de entorno
 
 ```bash
 cp .env.example .env
 ```
 
-Edita `.env` con tus datos de Firebase:
+Rellena `.env`:
 
-```
-EXPO_PUBLIC_FIREBASE_API_KEY=tu_api_key
-EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=tu_proyecto.firebaseapp.com
-EXPO_PUBLIC_FIREBASE_PROJECT_ID=tu_proyecto_id
-EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=tu_proyecto.appspot.com
-EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=tu_sender_id
-EXPO_PUBLIC_FIREBASE_APP_ID=tu_app_id
-```
-
-Puedes encontrar estos valores en la **Consola de Firebase → Configuración del proyecto**.
-
-> ⚠️ **Nunca subas el fichero `.env` a GitHub.** Ya está incluido en `.gitignore`.
-
-### 4. Configura las reglas de seguridad de Firestore
-
-En la consola de Firebase → Firestore → Reglas, usa al menos:
-
-```
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if true; // Cambia a autenticación cuando añadas login
-    }
-  }
-}
-```
-
-## 🔧 Firebase listo (Firestore + Storage)
-
-El proyecto ya incluye:
-
-- `firestore.rules` (incluye reglas para `foro_hilos`, `foro_respuestas` y `newsletter_subscribers`)
-- `storage.rules` (subida de imágenes del foro en `foro_hilos/**`)
-- `firebase.json` (apunta a ambos archivos de reglas)
-- `.env.example` (variables mínimas para arrancar)
-
-Para desplegar reglas automáticamente con Firebase CLI:
-
-```bash
-firebase login
-firebase use <tu_project_id>
-firebase deploy --only firestore:rules,storage
-```
-
-Estado actual en este proyecto:
-
-- `firestore.rules` ya se desplegó correctamente en `miappdecafe`.
-- `storage.rules` no puede desplegarse hasta activar Firebase Storage una vez en la consola del proyecto.
-
-Para activarlo:
-
-1. Abre Firebase Console para `miappdecafe`.
-2. Entra en `Storage`.
-3. Pulsa `Get Started` y completa la inicialización.
-4. Después ejecuta `npx firebase-tools deploy --only storage --project miappdecafe`.
-
-Variables mínimas en `.env` para que la subida de fotos funcione:
-
-```bash
+```env
 EXPO_PUBLIC_FIREBASE_API_KEY=...
 EXPO_PUBLIC_FIREBASE_PROJECT_ID=...
-EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=<tu_project_id>.appspot.com
-```
-
-## 🔔 Push remoto (Cloud Functions)
-
-La app ya guarda tokens en `push_subscriptions` y soporta notificaciones locales. Para push remoto real (aunque la app no este abierta), este repo incluye funciones en `functions/` que envian a Expo:
-
-- Nuevo cafe en la comunidad (`cafes` create)
-- Nueva respuesta en tu hilo (`foro_respuestas` create)
-- Cambio de puntuacion en un favorito (`cafes` update + `favoriteCafeIds`)
-
-Despliegue:
-
-```bash
-cd functions
-npm install
-cd ..
-firebase login
-firebase use <tu_project_id>
-firebase deploy --only functions
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=... # normalmente <project-id>.appspot.com
+EXPO_PUBLIC_GOOGLE_PLACES_KEY=...
 ```
 
 Notas:
 
-- `firebase.json` ya apunta a `functions` como source.
-- Para favoritos, la app sincroniza `favoriteCafeIds` dentro de `push_subscriptions`.
+- El proyecto usa API REST de Firebase, por eso `AUTH_DOMAIN`, `APP_ID` y `MESSAGING_SENDER_ID` no son obligatorias en el flujo actual.
+- `EXPO_PUBLIC_GOOGLE_PLACES_KEY` es obligatoria para que funcione la pantalla de cafeterias cercanas.
 
-### 5. Arranca la app
+### 3) Google Places (requerido para Cafeterias)
+
+Debes crear una API key en Google Cloud con Places API habilitada.
+
+Pasos recomendados:
+
+1. Crear una clave en Google Cloud Console
+2. Habilitar Places API
+3. Restringir por API (Places) y por app segun entorno
+4. Pegarla en `.env` como `EXPO_PUBLIC_GOOGLE_PLACES_KEY`
+
+Si no esta configurada, la app muestra mensaje de configuracion y no carga cafeterias.
+
+### 4) Ejecutar en desarrollo
 
 ```bash
 npx expo start
 ```
 
-Escanea el QR con **Expo Go** o abre en un emulador.
+## Cloud Functions (push remoto)
 
-## 📁 Estructura del proyecto
+El repo incluye funciones en `functions/` para disparar notificaciones push remotas cuando:
 
+- Se crea un cafe nuevo en comunidad
+- Se responde un hilo del foro
+- Cambia la puntuacion de un cafe favorito
+
+Deploy:
+
+```bash
+cd functions
+npm install
+cd ..
+CI=true npx firebase-tools deploy --only functions --project <tu-project-id> --force
 ```
-Etiove/
-├── App.js              # Componente principal y toda la lógica
-├── firebaseConfig.js   # Inicialización de Firebase (sin credenciales)
-├── app.json            # Configuración de Expo (permisos, iconos, etc.)
-├── metro.config.js     # Configuración de Metro (soporte .mjs para Firebase)
-├── babel.config.js     # Configuración de Babel
-├── .env.example        # Plantilla de variables de entorno
-├── assets/             # Imágenes e iconos
-└── scripts/            # Scripts de utilidad de Expo
+
+Runtime actual: Node.js 22.
+
+## Scripts de datos (seed / import / limpieza)
+
+Los scripts cargan `.env` automaticamente (via `node --env-file=.env`).
+Tambien ejecutan un chequeo previo de variables antes de correr (`env:check:*`).
+
+Variables esperadas en `.env` para esta seccion:
+
+- `EXPO_PUBLIC_FIREBASE_PROJECT_ID`
+- `EXPO_PUBLIC_FIREBASE_API_KEY` (seed full, delete, import)
+- `FIREBASE_AUTH_TOKEN` (seed 5/10 e import con escritura)
+
+Ejecucion:
+
+```bash
+npm run seed:5
+npm run seed:10
+npm run seed:full
+npm run cafes:delete
 ```
 
-## 🔒 Seguridad
+Import desde Open Food Facts:
 
-- Las credenciales de Firebase **nunca** se incluyen en el código fuente
-- Se gestionan mediante variables de entorno con el prefijo `EXPO_PUBLIC_`
-- El fichero `.env` está en `.gitignore`
+```bash
+npm run import:es:coffee:dry
+npm run import:es:coffee
+```
+
+Si falta alguna variable requerida, el pre-check falla con mensaje explicativo antes de ejecutar el script principal.
+
+## Estructura real del proyecto
+
+```text
+etiove/
+├── App.js
+├── firebaseConfig.js
+├── app.json
+├── functions/
+│   ├── index.js
+│   └── package.json
+├── src/
+│   ├── components/
+│   │   ├── AppDialogModal.js
+│   │   ├── MemberInfoModal.js
+│   │   ├── SkeletonLoader.js
+│   │   └── ...
+│   ├── constants/
+│   │   ├── theme.js
+│   │   └── ...
+│   ├── core/
+│   │   ├── notifications.js
+│   │   ├── offlineCache.js
+│   │   └── ...
+│   ├── hooks/
+│   │   ├── useCoffeeData.js
+│   │   ├── useForumState.js
+│   │   └── useGamification.js
+│   ├── screens/
+│   │   ├── InicioTab.js
+│   │   ├── CommunityTab.js
+│   │   ├── MasTab.js
+│   │   └── ...
+│   └── styles/
+│       ├── appStyles.js
+│       └── sharedStyles.js
+├── assets/
+└── scripts/
+```
+
+## Dependencias clave del cliente
+
+- `expo-notifications`
+- `expo-location`
+- `expo-haptics`
+- `expo-file-system`
+- `expo-camera`
+- `expo-image-picker`
+- `expo-local-authentication`
+- `@expo-google-fonts/playfair-display`
+- `expo-font`
+
+## Screenshots
+
+Crea una carpeta `assets/screenshots/` y anade imagenes reales de la app para mostrar la calidad visual del producto.
+
+Recomendacion minima de capturas:
+
+- Inicio premium (wordmark + cards)
+- Detalle de cafe
+- Comunidad / foro
+- Perfil + gamificacion
+- Cafeterias cercanas
+
+Ejemplo de nombres:
+
+- `assets/screenshots/home.png`
+- `assets/screenshots/detail.png`
+- `assets/screenshots/community.png`
+- `assets/screenshots/profile.png`
+- `assets/screenshots/cafeterias.png`
+
+Cuando las tengas, puedes incrustarlas asi:
+
+```md
+![Inicio](assets/screenshots/home.png)
+![Detalle](assets/screenshots/detail.png)
+```
+
+## Seguridad
+
+- `.env` no se sube al repo
+- No hardcodear API keys ni tokens
+- Reglas de Firestore y Storage versionadas en `firestore.rules` y `storage.rules`

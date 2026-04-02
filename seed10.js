@@ -1,6 +1,5 @@
-const PID   = 'miappdecafe';
-const KEY   = 'AIzaSyA1BcU0iRk3HyFtV92CLrnalHFKLaOWH24';
-const TOKEN = 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjM3MzAwNzY5YTA3ZTA1MTE2ZjdlNTEzOGZhOTA5MzY4NWVlYmMyNDAiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vbWlhcHBkZWNhZmUiLCJhdWQiOiJtaWFwcGRlY2FmZSIsImF1dGhfdGltZSI6MTc3NDkwODQ1OSwidXNlcl9pZCI6ImtHOVV4MWcydllkVDBuSENLR0N4NXlaRVh5SDIiLCJzdWIiOiJrRzlVeDFnMnZZZFQwbkhDS0dDeDV5WkVYeUgyIiwiaWF0IjoxNzc0OTA4NDU5LCJleHAiOjE3NzQ5MTIwNTksImVtYWlsIjoiaXZhbmNhYmV6YUBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsiaXZhbmNhYmV6YUBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.Tc6icrlX5iiXrESSKy7jfODIHxp3pEB_hkAAgQOYt33TF_KUpBvCuA4T0tGl8amz7qslZImONR5epOb5TTAyUK45YOwz2t3mJctNDBdaQzdLliMRNsarzF3X34we8OzSkrg9kW4CcaZq6IIOjeAGUKqCNq6OFNKdAB2z-GBbTbYkMm_cp6g7WUw8gjy_b-cO7KA1WwXgCxd2JU9DfnYqCH_uPCB1EKMQJsv9nivgD6BgcrRCK7vSfY7-VqoNdtsRt-qjxIYI5tE127GrbvQqvZki-Ct1mKLifrjbJvsT55gBv45od0a4Nub0z6Q9qLctuNjUrRM0JFQqpcPr2BzKcg';
+const PID   = process.env.FIREBASE_PROJECT_ID || process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID || '';
+const TOKEN = process.env.FIREBASE_AUTH_TOKEN || process.env.TOKEN || '';
 const BASE  = `https://europe-west1-firestore.googleapis.com/v1/projects/${PID}/databases/(default)/documents`;
 
 const headers = {
@@ -38,6 +37,11 @@ const cafes = [
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
 async function main() {
+  if (!PID || !TOKEN) {
+    console.log('\n⚠️  Faltan variables de entorno.\n');
+    console.log('Ejemplo: FIREBASE_PROJECT_ID=miappdecafe FIREBASE_AUTH_TOKEN=eyJ... node seed10.js\n');
+    return;
+  }
   console.log('\n☕ Subiendo 10 cafés con token Auth...\n');
   let ok = 0;
   for (const cafe of cafes) {

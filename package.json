@@ -7,8 +7,16 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "import:es:coffee:dry": "DRY_RUN=true node scripts/import_top_es_real.js",
-    "import:es:coffee": "node scripts/import_top_es_real.js"
+    "env:check:seed-auth": "node --env-file=.env scripts/check_env.js seed-auth",
+    "env:check:seed-api": "node --env-file=.env scripts/check_env.js seed-api",
+    "env:check:import-dry": "node --env-file=.env scripts/check_env.js import-dry",
+    "env:check:import-write": "node --env-file=.env scripts/check_env.js import-write",
+    "seed:5": "npm run env:check:seed-auth && node --env-file=.env seed5.js",
+    "seed:10": "npm run env:check:seed-auth && node --env-file=.env seed10.js",
+    "seed:full": "npm run env:check:seed-api && node --env-file=.env seed_cafes_v2.js",
+    "cafes:delete": "npm run env:check:seed-api && node --env-file=.env delete_cafes.js",
+    "import:es:coffee:dry": "npm run env:check:import-dry && DRY_RUN=true node --env-file=.env scripts/import_top_es_real.js",
+    "import:es:coffee": "npm run env:check:import-write && node --env-file=.env scripts/import_top_es_real.js"
   },
   "dependencies": {
     "@expo-google-fonts/playfair-display": "^0.4.2",

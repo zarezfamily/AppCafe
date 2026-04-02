@@ -85,7 +85,7 @@ import UltimosAnadidosTab from './src/screens/UltimosAnadidosTab';
 
 const { width: W, height: H } = Dimensions.get('window');
 const APP_VERSION = '2.1.0';
-const GOOGLE_PLACES_KEY = 'AIzaSyDWW3lsdg7jgKYtVNcji-5gyDtv-QUWOpA';
+const GOOGLE_PLACES_KEY = process.env.EXPO_PUBLIC_GOOGLE_PLACES_KEY || '';
 const PREMIUM_ACCENT = '#8f5e3b';
 const PREMIUM_ACCENT_DEEP = '#5d4030';
 const PREMIUM_SURFACE_SOFT = '#f6ede3';

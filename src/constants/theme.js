@@ -2,7 +2,7 @@ import { Dimensions } from 'react-native';
 
 export const { width: W, height: H } = Dimensions.get('window');
 export const APP_VERSION = '2.1.0';
-export const GOOGLE_PLACES_KEY = 'AIzaSyDWW3lsdg7jgKYtVNcji-5gyDtv-QUWOpA';
+export const GOOGLE_PLACES_KEY = process.env.EXPO_PUBLIC_GOOGLE_PLACES_KEY || '';
 
 export const PREMIUM_ACCENT       = '#8f5e3b';
 export const PREMIUM_ACCENT_DEEP  = '#5d4030';

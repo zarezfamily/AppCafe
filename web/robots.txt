@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://etiove.com/sitemap.xml
+
+# Bloquear acceso a archivos internos
+Disallow: /_template-post.html
+Disallow: /node_modules/

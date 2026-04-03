@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404 | Etiove</title>
+  <meta name="description" content="La página que buscas no existe. Vuelve a Etiove." />
+  <link rel="canonical" href="https://etiove.com/404.html" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700;800&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --ink: #1c120d;
+      --ink-soft: #5d4030;
+      --cream: #f6efe7;
+      --cream-alt: #fffaf5;
+      --border: #e4d3c2;
+      --accent: #8f5e3b;
+    }
+    body {
+      font-family: 'Playfair Display', serif;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle at 20% 10%, rgba(143, 94, 59, 0.12), transparent 42%), var(--cream);
+      color: var(--ink);
+      padding: 24px;
+      text-align: center;
+    }
+    .box {
+      width: min(680px, 94vw);
+      background: var(--cream-alt);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 34px 24px;
+      box-shadow: 0 14px 36px rgba(28, 18, 13, 0.08);
+    }
+    .wordmark {
+      font-size: clamp(36px, 7vw, 60px);
+      letter-spacing: 8px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .code {
+      font-size: 13px;
+      letter-spacing: 2.4px;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      margin-bottom: 14px;
+    }
+    .copy {
+      font-size: clamp(18px, 3vw, 24px);
+      color: var(--ink-soft);
+      margin-bottom: 24px;
+    }
+    .btn {
+      display: inline-block;
+      text-decoration: none;
+      border: 1px solid var(--accent);
+      color: #fffaf5;
+      background: var(--accent);
+      border-radius: 999px;
+      padding: 12px 18px;
+      font-size: 14px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .scroll-top {
+      position: fixed;
+      bottom: 24px;
+      right: 20px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff9f1;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 18px rgba(28, 18, 13, 0.22);
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      pointer-events: none;
+      z-index: 200;
+    }
+    .scroll-top.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  </style>
+</head>
+<body>
+  <main class="box">
+    <h1 class="wordmark">Etiove</h1>
+    <p class="code">Error 404</p>
+    <p class="copy">La ruta que intentas abrir no existe.</p>
+    <a class="btn" href="/">Volver al inicio</a>
+  </main>
+
+  <button class="scroll-top" id="scrollTopBtn" aria-label="Volver arriba">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+  </button>
+
+  <script>
+    const scrollTopBtn = document.getElementById('scrollTopBtn');
+    window.addEventListener('scroll', () => {
+      scrollTopBtn.classList.toggle('visible', window.scrollY > 160);
+    });
+    scrollTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

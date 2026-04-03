@@ -12,6 +12,21 @@ service cloud.firestore {
         && request.resource.data[field].size() <= max;
     }
 
+    function isValidThreadAccess(data) {
+      return data.accessLevel == null
+        || (data.accessLevel is string
+          && (data.accessLevel == 'public' || data.accessLevel == 'registered_only'));
+    }
+
+    function canReadThreadData(data) {
+      return isSignedIn() || data.accessLevel == null || data.accessLevel == 'public';
+    }
+
+    function canReadThreadById(threadId) {
+      return exists(/databases/$(database)/documents/foro_hilos/$(threadId))
+        && canReadThreadData(get(/databases/$(database)/documents/foro_hilos/$(threadId)).data);
+    }
+
     // Catálogo de cafés: público lectura, escritura autenticada.
     match /cafes/{cafeId} {
       allow read: if true;
@@ -26,31 +41,46 @@ service cloud.firestore {
       allow write: if isSignedIn();
     }
 
-    // Foro: lectura pública, escritura autenticada.
+    // Foro: hilos con visibilidad pública o solo registrados.
     match /foro_hilos/{threadId} {
-      allow read: if true;
+      allow read: if canReadThreadData(resource.data);
       allow create: if isSignedIn()
         && request.resource.data.authorUid == request.auth.uid
         && hasString('title', 3, 120)
         && hasString('body', 3, 1000)
         && request.resource.data.categoryId is string
-        && request.resource.data.categoryLabel is string;
+        && request.resource.data.categoryLabel is string
+        && isValidThreadAccess(request.resource.data);
+      allow update: if isSignedIn()
+        && resource.data.authorUid == request.auth.uid
+        && request.resource.data.authorUid == resource.data.authorUid
+        && isValidThreadAccess(request.resource.data);
+      allow delete: if isSignedIn() && resource.data.authorUid == request.auth.uid;
+    }
+
+    match /foro_respuestas/{replyId} {
+      allow read: if canReadThreadById(resource.data.threadId);
+      allow create: if isSignedIn()
+        && request.resource.data.authorUid == request.auth.uid
+        && hasString('threadId', 1, 200)
+        && hasString('body', 1, 1000)
+        && canReadThreadById(request.resource.data.threadId);
       allow update: if isSignedIn()
         && resource.data.authorUid == request.auth.uid
         && request.resource.data.authorUid == resource.data.authorUid;
       allow delete: if isSignedIn() && resource.data.authorUid == request.auth.uid;
     }
 
-    match /foro_respuestas/{replyId} {
+    match /blog_comentarios/{commentId} {
       allow read: if true;
       allow create: if isSignedIn()
+        && request.resource.data.authorUid is string
         && request.resource.data.authorUid == request.auth.uid
-        && hasString('threadId', 1, 200)
-        && hasString('body', 1, 1000);
-      allow update: if isSignedIn()
-        && resource.data.authorUid == request.auth.uid
-        && request.resource.data.authorUid == resource.data.authorUid;
-      allow delete: if isSignedIn() && resource.data.authorUid == request.auth.uid;
+        && request.resource.data.authorName is string
+        && hasString('postSlug', 1, 200)
+        && hasString('body', 3, 1000)
+        && request.resource.data.createdAt is string;
+      allow update, delete: if isSignedIn() && resource.data.authorUid == request.auth.uid;
     }
 
     match /newsletter_subscribers/{subscriberId} {

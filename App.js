@@ -1664,6 +1664,8 @@ function MainScreen({ onLogout }) {
     setForumTitle,
     forumBody,
     setForumBody,
+    forumAccessLevel,
+    setForumAccessLevel,
     forumPhoto,
     setForumPhoto,
     forumEditOpen,
@@ -2223,12 +2225,17 @@ function MainScreen({ onLogout }) {
         getCollection('foro_hilos', 'createdAt', 300),
         getCollection('foro_respuestas', 'createdAt', 1200),
       ]);
-      setForumThreads(hilos || []);
-      setForumReplies(respuestas || []);
+      const canReadThread = (thread) => thread?.accessLevel !== 'registered_only' || !!user?.uid;
+      const visibleThreads = (hilos || []).filter(canReadThread);
+      const visibleThreadIds = new Set(visibleThreads.map((t) => t.id));
+      const visibleReplies = (respuestas || []).filter((r) => visibleThreadIds.has(r.threadId));
+
+      setForumThreads(visibleThreads);
+      setForumReplies(visibleReplies);
       setForumThread((prev) => {
         if (!prev?.id) return prev;
-        const updated = (hilos || []).find((t) => t.id === prev.id);
-        return updated || prev;
+        const updated = visibleThreads.find((t) => t.id === prev.id);
+        return updated || null;
       });
     } catch (e) {
       setForumError('No se pudo cargar la comunidad.');
@@ -2406,6 +2413,7 @@ function MainScreen({ onLogout }) {
   const crearHiloForo = async () => {
     const title = forumTitle.trim();
     const body = forumBody.trim();
+    const accessLevel = forumAccessLevel === 'registered_only' ? 'registered_only' : 'public';
     if (!forumCategory) return showDialog('Categoría', 'Selecciona una categoría.');
     if (!title || !body) return showDialog('Completa el hilo', 'Añade título y contenido.');
     if (title.length > 120) return showDialog('Título demasiado largo', 'Máximo 120 caracteres.');
@@ -2426,6 +2434,7 @@ function MainScreen({ onLogout }) {
         createdAt: new Date().toISOString(),
         upvotes: 0,
         voterUids: '',
+        accessLevel,
         replyCount: 0,
         reportedCount: 0,
         reporterUids: '',
@@ -2433,6 +2442,7 @@ function MainScreen({ onLogout }) {
       setForumCreateOpen(false);
       setForumTitle('');
       setForumBody('');
+      setForumAccessLevel('public');
       setForumPhoto(null);
       await cargarForo();
     } catch {
@@ -2649,6 +2659,8 @@ function MainScreen({ onLogout }) {
     setForumTitle,
     forumBody,
     setForumBody,
+    forumAccessLevel,
+    setForumAccessLevel,
     forumPhoto,
     seleccionarFotoForo,
     crearHiloForo,

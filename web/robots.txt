@@ -3,6 +3,10 @@ Allow: /
 
 Sitemap: https://etiove.com/sitemap.xml
 
-# Bloquear acceso a archivos internos
-Disallow: /_template-post.html
+# Evitar rastreo de recursos internos/no públicos
 Disallow: /node_modules/
+Disallow: /blog/_template-post.html
+Disallow: /404.html
+
+# Señal opcional para algunos crawlers
+Host: etiove.com

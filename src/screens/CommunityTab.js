@@ -54,6 +54,8 @@ export default function CommunityTab({
   setForumTitle,
   forumBody,
   setForumBody,
+  forumAccessLevel,
+  setForumAccessLevel,
   forumPhoto,
   seleccionarFotoForo,
   crearHiloForo,
@@ -532,6 +534,11 @@ export default function CommunityTab({
                     >
                       <Text style={s.forumThreadTitle} numberOfLines={2}>{thread.title}</Text>
                       <Text style={s.forumThreadBody} numberOfLines={2}>{thread.body}</Text>
+                      <View style={{ marginTop: 6, alignSelf: 'flex-start', paddingHorizontal: 9, paddingVertical: 4, borderRadius: 999, backgroundColor: thread.accessLevel === 'registered_only' ? '#f3e9de' : '#eff6ed' }}>
+                        <Text style={{ fontSize: 11, fontWeight: '700', color: thread.accessLevel === 'registered_only' ? '#8f5e3b' : '#4f7a53' }}>
+                          {thread.accessLevel === 'registered_only' ? 'Solo registrados' : 'Público'}
+                        </Text>
+                      </View>
                       <View style={s.forumMetaRow}>
                         <View style={s.forumAuthorRow}>
                           <View style={s.forumAvatar}><Text style={s.forumAvatarText}>{(thread.authorName || '?')[0]?.toUpperCase() || '?'}</Text></View>
@@ -583,7 +590,14 @@ export default function CommunityTab({
               return (
                 <View style={s.forumMainPost}>
                   <View style={s.forumMainPostHead}>
-                    <Text style={s.forumThreadTitle}>{forumThread.title}</Text>
+                    <View style={{ flex: 1, paddingRight: 8 }}>
+                      <Text style={s.forumThreadTitle}>{forumThread.title}</Text>
+                      <View style={{ marginTop: 6, alignSelf: 'flex-start', paddingHorizontal: 9, paddingVertical: 4, borderRadius: 999, backgroundColor: forumThread.accessLevel === 'registered_only' ? '#f3e9de' : '#eff6ed' }}>
+                        <Text style={{ fontSize: 11, fontWeight: '700', color: forumThread.accessLevel === 'registered_only' ? '#8f5e3b' : '#4f7a53' }}>
+                          {forumThread.accessLevel === 'registered_only' ? 'Solo registrados' : 'Público'}
+                        </Text>
+                      </View>
+                    </View>
                     {isForumOwner(forumThread) && (
                       <TouchableOpacity style={s.forumDotsBtn} onPress={() => abrirMenuAutorForo('foro_hilos', forumThread)}>
                         <Ionicons name="ellipsis-vertical" size={18} color={theme.brand.accentDeep} />
@@ -782,6 +796,39 @@ export default function CommunityTab({
                 placeholderTextColor="#b3a9a0"
                 multiline
               />
+              <Text style={[s.label, { marginTop: -6 }]}>Visibilidad</Text>
+              <View style={{ flexDirection: 'row', gap: 8, marginBottom: 10 }}>
+                <TouchableOpacity
+                  style={{
+                    flex: 1,
+                    borderWidth: 1,
+                    borderColor: forumAccessLevel === 'public' ? '#8f5e3b' : '#d8c5b6',
+                    borderRadius: 10,
+                    paddingVertical: 10,
+                    paddingHorizontal: 12,
+                    backgroundColor: forumAccessLevel === 'public' ? '#f3e9de' : '#fff',
+                  }}
+                  onPress={() => setForumAccessLevel('public')}
+                >
+                  <Text style={{ fontSize: 13, fontWeight: '700', color: '#5d4030' }}>Público</Text>
+                  <Text style={{ fontSize: 11, color: '#8b7355', marginTop: 2 }}>Cualquiera puede leerlo</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{
+                    flex: 1,
+                    borderWidth: 1,
+                    borderColor: forumAccessLevel === 'registered_only' ? '#8f5e3b' : '#d8c5b6',
+                    borderRadius: 10,
+                    paddingVertical: 10,
+                    paddingHorizontal: 12,
+                    backgroundColor: forumAccessLevel === 'registered_only' ? '#f3e9de' : '#fff',
+                  }}
+                  onPress={() => setForumAccessLevel('registered_only')}
+                >
+                  <Text style={{ fontSize: 13, fontWeight: '700', color: '#5d4030' }}>Solo registrados</Text>
+                  <Text style={{ fontSize: 11, color: '#8b7355', marginTop: 2 }}>Solo usuarios con sesión</Text>
+                </TouchableOpacity>
+              </View>
               <Text style={s.forumCountText}>{forumTitle.length}/120 · {forumBody.length}/1000</Text>
               <TouchableOpacity style={s.faceIdBtn} onPress={seleccionarFotoForo}>
                 <Ionicons name="image-outline" size={18} color={theme.brand.accentDeep} />

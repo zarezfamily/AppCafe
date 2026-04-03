@@ -5,6 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Etiove — Café de especialidad</title>
   <meta name="description" content="Etiove es la app para los amantes del café de especialidad. Descubre, cata, colecciona y conecta." />
+  <link rel="canonical" href="https://etiove.com/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Etiove" />
+  <meta property="og:locale" content="es_ES" />
+  <meta property="og:title" content="Etiove | La mayor comunidad de café de especialidad" />
+  <meta property="og:description" content="Descubre, cata, colecciona y conecta con amantes del café de especialidad en Etiove." />
+  <meta property="og:url" content="https://etiove.com/" />
+  <meta property="og:image" content="https://etiove.com/og-image.jpg" />
+  <meta property="og:image:secure_url" content="https://etiove.com/og-image.jpg" />
+  <meta property="og:image:type" content="image/jpeg" />
+  <meta property="og:image:width" content="1500" />
+  <meta property="og:image:height" content="500" />
+  <meta property="og:image:alt" content="Etiove, donde nació el café" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Etiove | La mayor comunidad de café de especialidad" />
+  <meta name="twitter:description" content="Descubre, cata, colecciona y conecta con amantes del café de especialidad en Etiove." />
+  <meta name="twitter:image" content="https://etiove.com/og-image.jpg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700;800&display=swap" rel="stylesheet" />
@@ -330,6 +347,7 @@
       color: var(--ink-soft);
       font-weight: 300;
       margin-bottom: 20px;
+      text-align: justify;
     }
 
     .about-visual {
@@ -541,6 +559,71 @@
       }
       .section-app { padding: 80px 24px; }
       footer { padding: 40px 24px; flex-direction: column; align-items: flex-start; }
+      body { padding-bottom: 68px; }
+    }
+
+    /* ── MOBILE NAV BAR ── */
+    .mobile-nav { display: none; }
+
+    /* ── SCROLL TO TOP ── */
+    .scroll-top {
+      position: fixed;
+      bottom: 24px;
+      right: 20px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--accent-deep);
+      color: #fff9f1;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 18px rgba(28, 18, 13, 0.22);
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      pointer-events: none;
+      z-index: 200;
+    }
+    .scroll-top.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .scroll-top:hover { background: var(--accent); }
+
+    @media (max-width: 768px) {
+      .mobile-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        z-index: 150;
+        background: rgba(246, 239, 231, 0.95);
+        backdrop-filter: blur(10px);
+        border-top: 1px solid var(--border-soft);
+        padding: 10px 20px;
+        padding-bottom: max(10px, env(safe-area-inset-bottom));
+        gap: 12px;
+      }
+      .mobile-nav-link {
+        flex: 1;
+        text-align: center;
+        text-decoration: none;
+        color: var(--ink-soft);
+        font-size: 12px;
+        letter-spacing: 1.4px;
+        text-transform: uppercase;
+        font-weight: 700;
+        padding: 10px 0;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: var(--cream-alt);
+        transition: all 0.2s ease;
+      }
+      .mobile-nav-link.primary {
+        background: var(--accent-deep);
+        color: #fff9f1;
+        border-color: var(--accent-deep);
+      }
+      .scroll-top { bottom: 80px; right: 16px; }
     }
   </style>
 </head>
@@ -553,7 +636,7 @@
       <a class="nav-link" href="#sobre">Sobre nosotros</a>
       <a class="nav-link" href="#app">La app</a>
       <a class="nav-link" href="/comunidad.html">Comunidad</a>
-      <a class="nav-link" href="/blog/">Blog</a>
+      <a class="nav-link" href="/blog.html">Blog</a>
     </div>
   </nav>
 
@@ -573,7 +656,7 @@
       </div>
     </div>
 
-    <p class="hero-eyebrow">Café de especialidad</p>
+    <p class="hero-eyebrow">La mayor comunidad de café de especialidad</p>
     <h1 class="hero-title">Etiove</h1>
     <p class="hero-tagline">Donde nació el café</p>
 
@@ -582,25 +665,6 @@
     </div>
 
     <div class="download-group">
-      <a href="/comunidad.html" class="btn-download light">
-        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 4a3 3 0 110 6 3 3 0 010-6zm0 14a8 8 0 01-5.657-2.343C7.12 15.99 9.45 15 12 15s4.88.99 5.657 2.657A8 8 0 0112 20z"/>
-        </svg>
-        <div class="btn-copy">
-          <span class="btn-copy-sub">Entrar en</span>
-          <span class="btn-copy-main">Comunidad web</span>
-        </div>
-      </a>
-      <a href="/blog/" class="btn-download light">
-        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M6 2h9l5 5v15a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm8 1.5V8h4.5"/>
-          <path d="M8 12h8M8 15h8M8 18h6" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-        </svg>
-        <div class="btn-copy">
-          <span class="btn-copy-sub">Lee el</span>
-          <span class="btn-copy-main">Blog Etiove</span>
-        </div>
-      </a>
       <a href="https://apps.apple.com/app/etiove" target="_blank" class="btn-download dark">
         <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
           <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
@@ -628,15 +692,16 @@
       <p class="about-label">Quiénes somos</p>
       <h2 class="about-title">Nacimos del amor por el <em>buen café</em></h2>
       <p class="about-text">
-        Etiove es una app creada por y para los apasionados del café de especialidad. 
-        No para cualquiera — para los que leen las notas de cata antes de comprar, 
-        los que tienen una opinión sobre el proceso anaeróbico y los que ya no pueden 
-        tomar un café de supermercado.
+        Nos llamamos ETIOVE porque nuestro nombre cuenta exactamente lo que defendemos.
+        Etio evoca Etiopía, el origen histórico del café; y Ove, en italiano, significa
+        "donde". De esa unión nace nuestra idea central y también nuestro lema:
+        "donde nació el café".
       </p>
       <p class="about-text">
-        Nuestro objetivo es simple: construir la mejor herramienta para descubrir, 
-        catar y coleccionar café de especialidad en España, y conectar a las personas 
-        que comparten esa pasión.
+        Etiove es una comunidad creada para quienes viven el café de especialidad de
+        verdad: personas que quieren descubrir mejores orígenes, catar con criterio,
+        aprender en comunidad y conectar con otros apasionados que comparten la misma
+        obsesión por una taza extraordinaria.
       </p>
     </div>
     <div class="about-visual reveal">
@@ -720,6 +785,19 @@
     <p class="footer-copy">© 2026 Etiove. Hecho con ☕ en España.</p>
   </footer>
 
+  <!-- MOBILE BOTTOM NAV -->
+  <nav class="mobile-nav" aria-label="Navegación móvil">
+    <a class="mobile-nav-link primary" href="/comunidad.html">Comunidad</a>
+    <a class="mobile-nav-link" href="/blog.html">Blog</a>
+  </nav>
+
+  <!-- SCROLL TO TOP -->
+  <button class="scroll-top" id="scrollTopBtn" aria-label="Volver arriba">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+  </button>
+
   <script>
     // Scroll reveal
     const reveals = document.querySelectorAll('.reveal');
@@ -731,6 +809,15 @@
       });
     }, { threshold: 0.1 });
     reveals.forEach(el => observer.observe(el));
+
+    // Scroll to top
+    const scrollTopBtn = document.getElementById('scrollTopBtn');
+    window.addEventListener('scroll', () => {
+      scrollTopBtn.classList.toggle('visible', window.scrollY > 320);
+    });
+    scrollTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
   </script>
 </body>
 </html>

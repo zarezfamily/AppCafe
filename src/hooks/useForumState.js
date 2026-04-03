@@ -12,6 +12,7 @@ export default function useForumState() {
   const [forumSaving, setForumSaving] = useState(false);
   const [forumTitle, setForumTitle] = useState('');
   const [forumBody, setForumBody] = useState('');
+  const [forumAccessLevel, setForumAccessLevel] = useState('public');
   const [forumPhoto, setForumPhoto] = useState(null);
   const [forumEditOpen, setForumEditOpen] = useState(false);
   const [forumEditing, setForumEditing] = useState(false);
@@ -68,6 +69,8 @@ export default function useForumState() {
     setForumTitle,
     forumBody,
     setForumBody,
+    forumAccessLevel,
+    setForumAccessLevel,
     forumPhoto,
     setForumPhoto,
     forumEditOpen,

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Etiove Comunidad</title>
+  <title>Comunidad Etiove | Foro de café de especialidad</title>
   <meta name="description" content="Comunidad Etiove: comparte hilos y respuestas sobre cafe de especialidad." />
   <link rel="canonical" href="https://etiove.com/comunidad.html" />
   <meta property="og:type" content="website" />
@@ -23,7 +23,7 @@
   <meta name="twitter:image" content="https://etiove.com/og-image.jpg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700;800&family=Source+Serif+4:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;0,800;1,400;1,700&family=Source+Serif+4:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -35,6 +35,7 @@
       --accent: #8f5e3b;
       --accent-deep: #5d4030;
       --border: #e4d3c2;
+      --border-soft: rgba(228,211,194,0.5);
       --danger: #a44f45;
       --success: #4f7a53;
     }
@@ -55,39 +56,39 @@
       z-index: 0;
       opacity: 0.5;
     }
-    .container {
-      width: min(1120px, 92vw);
-      margin: 0 auto;
-      padding: 104px 0 56px;
-      position: relative;
-      z-index: 1;
-    }
+
+    /* ─── NAV ─── */
     nav {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 18px 34px;
-      background: rgba(246, 239, 231, 0.86);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(228, 211, 194, 0.52);
+      padding: 18px 48px;
+      background: rgba(246,239,231,0.86);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(228,211,194,0.5);
     }
     .nav-wordmark {
       font-family: 'Playfair Display', serif;
-      font-size: 21px;
+      font-size: 22px;
       letter-spacing: 4px;
       text-transform: uppercase;
       color: var(--ink);
       text-decoration: none;
+      font-weight: 700;
+    }
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 24px;
     }
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 24px;
     }
     .nav-link {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -97,149 +98,370 @@
       color: var(--ink-muted);
       text-decoration: none;
       font-weight: 600;
+      transition: color 0.2s;
     }
     .nav-link:hover { color: var(--accent); }
-    .top {
-      margin-bottom: 24px;
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      background: linear-gradient(150deg, rgba(255, 250, 245, 0.96) 0%, rgba(246, 232, 220, 0.78) 100%);
-      padding: 22px;
-      box-shadow: 0 14px 30px rgba(28, 18, 13, 0.06);
-      animation: topIn 0.6s ease both;
+    .nav-link.active { color: var(--accent-deep); }
+    .nav-cta {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.6px;
+      font-weight: 700;
+      color: var(--cream);
+      background: var(--accent-deep);
+      border: none;
+      border-radius: 999px;
+      padding: 9px 20px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.2s;
+      cursor: pointer;
+      display: inline-block;
     }
-    .brand {
+    .nav-cta:hover { background: var(--accent); transform: translateY(-1px); }
+
+    /* ─── HERO ─── */
+    .hero {
+      position: relative;
+      height: 100vh;
+      min-height: 620px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .hero-img {
+      position: absolute;
+      inset: 0;
+      background-image: url('https://images.unsplash.com/photo-1521017432531-fbd92d768814?auto=format&fit=crop&w=1800&q=80');
+      background-size: cover;
+      background-position: center 30%;
+      filter: brightness(0.40) saturate(0.75);
+      transform: scale(1.04);
+      transition: transform 12s ease;
+      will-change: transform;
+    }
+    .hero-img.loaded { transform: scale(1); }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg,
+        rgba(28,18,13,0.18) 0%,
+        rgba(28,18,13,0.08) 38%,
+        rgba(28,18,13,0.52) 78%,
+        rgba(28,18,13,0.82) 100%);
+    }
+    .hero-aura1 {
+      position: absolute;
+      width: 540px; height: 540px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(143,94,59,0.22) 0%, transparent 70%);
+      top: 12%; left: 10%;
+      animation: auraPulse 7s ease-in-out infinite alternate;
+    }
+    .hero-aura2 {
+      position: absolute;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(93,64,48,0.18) 0%, transparent 70%);
+      bottom: 18%; right: 9%;
+      animation: auraPulse 9s ease-in-out infinite alternate-reverse;
+    }
+    @keyframes auraPulse {
+      from { opacity: 0.6; transform: scale(0.94); }
+      to   { opacity: 1;   transform: scale(1.06); }
+    }
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      color: #fff;
+      padding: 0 24px;
+      max-width: 860px;
+    }
+    .hero-eyebrow {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 11px;
+      letter-spacing: 3.5px;
+      text-transform: uppercase;
+      color: rgba(255,248,240,0.65);
+      margin-bottom: 18px;
+      animation: fadeUp 0.8s ease both;
+    }
+    .hero-title {
       font-family: 'Playfair Display', serif;
-      font-size: 36px;
+      font-size: clamp(52px, 9vw, 108px);
+      font-weight: 800;
+      line-height: 1.0;
+      letter-spacing: -1px;
+      color: #fff8f0;
+      animation: fadeUp 0.9s 0.12s ease both;
+      margin-bottom: 22px;
+    }
+    .hero-title em {
+      font-style: italic;
+      color: rgba(228,185,140,0.92);
+    }
+    .hero-sub {
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: clamp(15px, 2vw, 19px);
+      color: rgba(255,248,240,0.76);
+      line-height: 1.65;
+      animation: fadeUp 1s 0.24s ease both;
+      max-width: 540px;
+      margin: 0 auto 36px;
+    }
+    .hero-btn {
+      display: inline-block;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 11px;
       letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--ink);
+      background: rgba(255,248,240,0.96);
+      border: none;
+      border-radius: 999px;
+      padding: 14px 34px;
+      text-decoration: none;
+      animation: fadeUp 1s 0.36s ease both;
+      transition: background 0.2s, transform 0.2s;
+      cursor: pointer;
+    }
+    .hero-btn:hover { background: #fff; transform: translateY(-2px); }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .scroll-indicator {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      color: rgba(255,248,240,0.40);
+      animation: fadeUp 1s 0.7s ease both;
+      pointer-events: none;
+    }
+    .scroll-indicator span {
+      font-family: -apple-system, sans-serif;
+      font-size: 9px;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+    }
+    .scroll-indicator svg { animation: bounce 2s ease-in-out infinite; }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(5px); }
+    }
+
+    /* ─── FORUM SECTION ─── */
+    .forum-section {
+      position: relative;
+      z-index: 1;
+      padding: 72px 0 88px;
+    }
+    .container {
+      width: min(1160px, 92vw);
+      margin: 0 auto;
+      position: relative;
+    }
+    .section-lead {
+      text-align: center;
+      margin-bottom: 52px;
+    }
+    .section-lead .overline {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .section-lead h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(30px, 4vw, 46px);
       font-weight: 800;
       color: var(--ink);
-      text-decoration: none;
+      line-height: 1.15;
     }
-    .tagline {
-      font-family: 'Playfair Display', serif;
-      color: var(--ink-soft);
-      font-size: 17px;
-      font-style: italic;
-    }
-    .top-sub {
-      margin-top: 8px;
-      color: var(--ink-soft);
-      font-size: 14px;
+    .section-lead p {
+      margin-top: 12px;
+      color: var(--ink-muted);
+      font-size: 16px;
       line-height: 1.6;
-      max-width: 820px;
-    }
-    .home-link {
-      text-decoration: none;
-      color: var(--accent-deep);
-      border: 1px solid var(--border);
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: var(--cream-alt);
-      font-weight: 600;
-      font-size: 13px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
     }
     .grid {
       display: grid;
-      grid-template-columns: 320px 1fr;
-      gap: 20px;
+      grid-template-columns: 330px 1fr;
+      gap: 24px;
       align-items: start;
     }
-    .card {
+
+    /* ─── SIDEBAR ─── */
+    .sidebar-card {
+      background: linear-gradient(150deg, rgba(255,250,245,0.98) 0%, rgba(246,232,220,0.82) 100%);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 28px 22px;
+      box-shadow: 0 12px 40px rgba(28,18,13,0.07);
+      position: sticky;
+      top: 90px;
+    }
+    .sidebar-card h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--ink);
+    }
+    .card-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 22px 0;
+    }
+
+    /* ─── MAIN ─── */
+    .main-card {
       background: var(--cream-alt);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 16px;
-      box-shadow: 0 8px 24px rgba(28, 18, 13, 0.05);
+      border-radius: 22px;
+      padding: 28px 26px;
+      box-shadow: 0 8px 28px rgba(28,18,13,0.05);
     }
-    .card h2 {
+    .main-card h2 {
       font-family: 'Playfair Display', serif;
-      font-size: 24px;
-      margin-bottom: 10px;
+      font-size: 26px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      color: var(--ink);
     }
-    .muted { color: var(--ink-muted); font-size: 13px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-    .auth-row { display: flex; gap: 8px; margin-top: 10px; }
+
+    /* ─── FORM ─── */
+    .muted {
+      color: var(--ink-muted);
+      font-size: 13px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.55;
+    }
+    .auth-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
     input, textarea, select {
       width: 100%;
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 10px 12px;
+      padding: 11px 13px;
       font-size: 14px;
       background: #fff;
       color: var(--ink);
+      font-family: 'Source Serif 4', Georgia, serif;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(143,94,59,0.12);
     }
     textarea { min-height: 90px; resize: vertical; }
     .field { margin-top: 10px; }
     .btn {
       border: 1px solid var(--accent-deep);
       border-radius: 10px;
-      padding: 10px 14px;
+      padding: 10px 16px;
       font-weight: 700;
       font-size: 13px;
       cursor: pointer;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      transition: all 0.2s ease;
     }
     .btn.primary { background: var(--accent-deep); color: #fff8f0; }
+    .btn.primary:hover { background: var(--accent); border-color: var(--accent); transform: translateY(-1px); }
     .btn.ghost { background: transparent; color: var(--accent-deep); }
-    .btn:disabled { opacity: 0.55; cursor: not-allowed; }
-    .status { margin-top: 10px; font-size: 12px; }
+    .btn.ghost:hover { background: rgba(93,64,48,0.06); }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none !important; }
+    .status { margin-top: 10px; font-size: 12px; font-family: -apple-system, sans-serif; }
     .status.error { color: var(--danger); }
     .status.ok { color: var(--success); }
-    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 14px; }
+
+    /* ─── CHIPS ─── */
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 16px; }
     .chip {
       border: 1px solid var(--border);
       border-radius: 999px;
-      padding: 8px 12px;
+      padding: 8px 14px;
       font-size: 12px;
       background: #fff;
       cursor: pointer;
       color: var(--ink-soft);
       transition: all 0.22s ease;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-weight: 500;
     }
     .chip.active { background: var(--accent-deep); border-color: var(--accent-deep); color: #fff8f0; }
     .chip:hover { transform: translateY(-1px); border-color: var(--accent); }
+
+    /* ─── THREADS ─── */
     .thread {
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 18px;
       background: #fff;
-      padding: 12px;
-      margin-top: 10px;
-      box-shadow: 0 8px 18px rgba(28, 18, 13, 0.04);
+      padding: 18px;
+      margin-top: 14px;
+      box-shadow: 0 6px 22px rgba(28,18,13,0.04);
       opacity: 0;
       transform: translateY(10px);
       animation: threadIn 0.45s ease forwards;
       transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
     }
     .thread:hover {
-      transform: translateY(-2px);
+      transform: translateY(-3px);
       border-color: #d8bca7;
-      box-shadow: 0 14px 26px rgba(28, 18, 13, 0.09);
+      box-shadow: 0 16px 36px rgba(28,18,13,0.10);
     }
     .thread-tags {
       display: flex;
       align-items: center;
       gap: 7px;
       flex-wrap: wrap;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
     .pill {
       display: inline-block;
       border-radius: 999px;
-      padding: 3px 9px;
+      padding: 4px 10px;
       font-size: 11px;
       font-weight: 700;
-      letter-spacing: 0.2px;
-      line-height: 1.2;
+      letter-spacing: 0.3px;
+      line-height: 1.3;
       border: 1px solid transparent;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
     .pill.category {
       background: #f5eee7;
       color: var(--ink-soft);
       border-color: #ead8c9;
     }
-    .thread h3 { font-size: 16px; margin-bottom: 6px; color: var(--ink); }
-    .meta { font-size: 12px; color: var(--ink-muted); margin-bottom: 8px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-    .thread p { font-size: 14px; color: var(--ink-soft); line-height: 1.5; white-space: pre-wrap; }
-    .thread-foot { margin-top: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .thread h3 {
+      font-size: 16px;
+      margin-bottom: 6px;
+      color: var(--ink);
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+    .meta {
+      font-size: 12px;
+      color: var(--ink-muted);
+      margin-bottom: 8px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+    .thread p { font-size: 14px; color: var(--ink-soft); line-height: 1.55; white-space: pre-wrap; }
+    .thread-foot { margin-top: 12px; display: flex; justify-content: space-between; align-items: center; }
     .link-btn {
       border: 0;
       background: transparent;
@@ -247,19 +469,23 @@
       font-weight: 700;
       cursor: pointer;
       font-size: 13px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 0;
+      transition: color 0.2s;
     }
-    .reply-box { margin-top: 10px; }
+    .link-btn:hover { color: var(--accent); }
+    .reply-box { margin-top: 12px; }
     .reply {
       border-top: 1px dashed var(--border);
-      padding-top: 8px;
-      margin-top: 8px;
+      padding-top: 10px;
+      margin-top: 10px;
       opacity: 0;
       transform: translateY(6px);
       animation: replyIn 0.34s ease forwards;
     }
     .thread-image, .reply-image {
       width: 100%;
-      border-radius: 10px;
+      border-radius: 12px;
       border: 1px solid var(--border);
       margin-top: 10px;
       max-height: 320px;
@@ -280,15 +506,18 @@
       font-size: 11px;
       color: var(--ink-muted);
       margin-top: 6px;
+      font-family: -apple-system, sans-serif;
     }
     .empty { margin-top: 16px; color: var(--ink-muted); font-size: 14px; }
+
+    /* ─── SKELETON ─── */
     .thread-skeleton {
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 18px;
       background: #fff;
-      padding: 12px;
-      margin-top: 10px;
-      box-shadow: 0 8px 18px rgba(28, 18, 13, 0.04);
+      padding: 18px;
+      margin-top: 14px;
+      box-shadow: 0 6px 22px rgba(28,18,13,0.04);
     }
     .skeleton-line {
       width: 100%;
@@ -302,48 +531,58 @@
     .skeleton-line.w70 { width: 70%; }
     .skeleton-line.w40 { width: 40%; }
     .skeleton-line:last-child { margin-bottom: 0; }
-    @keyframes shimmer {
-      from { background-position: 200% 0; }
-      to { background-position: -40% 0; }
-    }
-    @keyframes topIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes threadIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes replyIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @media (max-width: 900px) {
-      nav { padding: 15px 18px; }
-      .nav-links { display: none; }
-      .container { padding: 86px 0 42px; }
-      .grid { grid-template-columns: 1fr; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .top,
-      .thread,
-      .reply {
-        animation: none !important;
-        opacity: 1 !important;
-        transform: none !important;
-      }
-      .chip,
-      .thread,
-      .thread-image,
-      .reply-image,
-      .skeleton-line {
-        transition: none !important;
-      }
-      .skeleton-line {
-        animation: none !important;
-      }
-    }
 
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--ink);
+      color: rgba(255,248,240,0.60);
+      padding: 52px 48px 36px;
+    }
+    .footer-inner {
+      max-width: 1160px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+    .footer-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: rgba(255,248,240,0.90);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .footer-foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(255,248,240,0.10);
+      padding-top: 22px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .footer-copy {
+      font-size: 12px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    .footer-links {
+      display: flex;
+      gap: 20px;
+    }
+    .footer-link {
+      font-size: 11px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: rgba(255,248,240,0.45);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-link:hover { color: rgba(255,248,240,0.85); }
+
+    /* ─── SCROLL TOP ─── */
     .scroll-top {
       position: fixed;
       bottom: 24px;
@@ -358,79 +597,164 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 18px rgba(28, 18, 13, 0.22);
+      box-shadow: 0 4px 18px rgba(28,18,13,0.22);
       opacity: 0;
       transform: translateY(12px);
-      transition: opacity 0.3s ease, transform 0.3s ease;
+      transition: opacity 0.3s ease, transform 0.3s ease, background 0.2s;
       pointer-events: none;
       z-index: 220;
     }
     .scroll-top.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
     .scroll-top:hover { background: var(--accent); }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes shimmer {
+      from { background-position: 200% 0; }
+      to   { background-position: -40% 0; }
+    }
+    @keyframes threadIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes replyIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 960px) {
+      nav { padding: 15px 20px; }
+      .nav-links { display: none; }
+      .hero-title { font-size: 52px; }
+      .grid { grid-template-columns: 1fr; }
+      .sidebar-card { position: static; }
+      .forum-section { padding: 52px 0 56px; }
+      footer { padding: 40px 20px 28px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hero-img, .hero-aura1, .hero-aura2,
+      .thread, .reply {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+      }
+      .chip, .thread, .btn,
+      .thread-image, .reply-image, .skeleton-line {
+        transition: none !important;
+      }
+      .skeleton-line { animation: none !important; }
+      .scroll-indicator svg { animation: none !important; }
+    }
   </style>
 </head>
 <body>
+
+  <!-- NAV -->
   <nav>
     <a class="nav-wordmark" href="/">Etiove</a>
-    <div class="nav-links">
-      <a class="nav-link" href="/">Inicio</a>
-      <a class="nav-link" href="/blog.html">Blog</a>
-      <a class="nav-link" href="/comunidad.html">Comunidad</a>
+    <div class="nav-right">
+      <div class="nav-links">
+        <a class="nav-link" href="/">Inicio</a>
+        <a class="nav-link" href="/blog.html">Blog</a>
+        <a class="nav-link active" href="/comunidad.html">Comunidad</a>
+      </div>
+      <a class="nav-cta" href="https://apps.apple.com/app/etiove" target="_blank" rel="noopener">Descargar app</a>
     </div>
   </nav>
 
-  <div class="container">
-    <div class="top">
-      <div>
-        <a class="brand" href="/">ETIOVE</a>
-        <div class="tagline">Donde nació el café</div>
-        <p class="top-sub">Comunidad oficial de Etiove. Comparte recetas, dudas y experiencias de cata con otros apasionados del café de especialidad.</p>
+  <!-- HERO -->
+  <section class="hero" aria-label="Cabecera comunidad">
+    <div class="hero-img" id="heroImg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-aura1" aria-hidden="true"></div>
+    <div class="hero-aura2" aria-hidden="true"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow">Etiove &middot; Comunidad</p>
+      <h1 class="hero-title">La Comunidad<br><em>del Café</em></h1>
+      <p class="hero-sub">Comparte recetas, descubre orígenes y conecta con apasionados del café de especialidad.</p>
+      <a class="hero-btn" href="#forum">Explorar hilos</a>
+    </div>
+    <div class="scroll-indicator" aria-hidden="true">
+      <span>Scroll</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 12 15 18 9"></polyline>
+      </svg>
+    </div>
+  </section>
+
+  <!-- FORUM -->
+  <section class="forum-section" id="forum">
+    <div class="container">
+      <div class="section-lead">
+        <p class="overline">Foro &middot; Comunidad Etiove</p>
+        <h2>Hilos de la comunidad</h2>
+        <p>Lo que publiques aquí aparece también en la app iOS y Android. Misma comunidad, cualquier pantalla.</p>
+      </div>
+
+      <div class="grid">
+        <!-- SIDEBAR -->
+        <aside class="sidebar-card">
+          <h2>Acceso</h2>
+          <p class="muted">Inicia sesión para crear hilos y responder. Usa el mismo email y contraseña de tu cuenta en la app (no el alias).</p>
+          <div class="field"><input id="email" type="email" placeholder="tu@email.com" autocomplete="username" /></div>
+          <div class="field"><input id="password" type="password" placeholder="Contraseña" autocomplete="current-password" /></div>
+          <div class="auth-row">
+            <button class="btn primary" id="loginBtn">Entrar</button>
+            <button class="btn ghost" id="registerBtn">Crear cuenta</button>
+            <button class="btn ghost" id="logoutBtn" style="display:none">Salir</button>
+          </div>
+          <div id="authStatus" class="status"></div>
+
+          <div class="card-divider"></div>
+
+          <h2>Nuevo hilo</h2>
+          <div class="field"><select id="categorySelect"></select></div>
+          <div class="field">
+            <select id="threadAccessLevel">
+              <option value="public">Público (cualquiera puede leer)</option>
+              <option value="registered_only">Solo registrados</option>
+            </select>
+          </div>
+          <div class="field"><input id="threadTitle" maxlength="120" placeholder="Título (3–120 caracteres)" /></div>
+          <div class="field"><textarea id="threadBody" maxlength="1000" placeholder="Contenido (3–1000 caracteres)"></textarea></div>
+          <div class="field"><input id="threadImage" type="file" accept="image/*" /></div>
+          <p class="file-note">Imagen opcional para el hilo</p>
+          <div style="margin-top:14px">
+            <button class="btn primary" id="createThreadBtn">Publicar hilo</button>
+          </div>
+          <div id="threadStatus" class="status"></div>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="main-card">
+          <h2>Hilos recientes</h2>
+          <p class="muted">Filtra por categoría o explora todo lo que comparte la comunidad.</p>
+
+          <div class="chips" id="categoryChips"></div>
+          <button class="btn ghost" id="refreshBtn">↻ Recargar</button>
+
+          <div id="threadsWrap"></div>
+        </main>
       </div>
     </div>
+  </section>
 
-    <div class="grid">
-      <aside class="card">
-        <h2>Acceso</h2>
-        <p class="muted">Inicia sesión para crear hilos y responder. Cada autor puede publicar hilos públicos o solo para registrados.</p>
-        <p class="muted" style="margin-top:8px">Usa el mismo email y contraseña de tu cuenta en la app (no el alias).</p>
-
-        <div class="field"><input id="email" type="email" placeholder="tu@email.com" /></div>
-        <div class="field"><input id="password" type="password" placeholder="Contraseña" /></div>
-        <div class="auth-row">
-          <button class="btn primary" id="loginBtn">Entrar</button>
-          <button class="btn ghost" id="registerBtn">Crear cuenta</button>
-          <button class="btn ghost" id="logoutBtn" style="display:none">Salir</button>
-        </div>
-        <div id="authStatus" class="status"></div>
-
-        <h2 style="margin-top:20px">Nuevo hilo</h2>
-        <div class="field"><select id="categorySelect"></select></div>
-        <div class="field">
-          <select id="threadAccessLevel">
-            <option value="public">Público (cualquiera puede leer)</option>
-            <option value="registered_only">Solo registrados</option>
-          </select>
-        </div>
-        <div class="field"><input id="threadTitle" maxlength="120" placeholder="Título (3-120)" /></div>
-        <div class="field"><textarea id="threadBody" maxlength="1000" placeholder="Contenido (3-1000)"></textarea></div>
-        <div class="field"><input id="threadImage" type="file" accept="image/*" /></div>
-        <div class="file-note">Opcional: imagen para el hilo</div>
-        <button class="btn primary" id="createThreadBtn">Publicar hilo</button>
-        <div id="threadStatus" class="status"></div>
-      </aside>
-
-      <main class="card">
-        <h2>Comunidad Etiove</h2>
-        <p class="muted">Misma comunidad de la app. Lo que publiques aquí aparece también en iOS/Android.</p>
-
-        <div class="chips" id="categoryChips"></div>
-        <button class="btn ghost" id="refreshBtn">Recargar</button>
-
-        <div id="threadsWrap"></div>
-      </main>
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <a class="footer-brand" href="/">Etiove</a>
+      <div class="footer-foot">
+        <span class="footer-copy">&copy; 2025 Etiove &middot; Café de especialidad</span>
+        <nav class="footer-links" aria-label="Footer">
+          <a class="footer-link" href="/">Inicio</a>
+          <a class="footer-link" href="/blog.html">Blog</a>
+          <a class="footer-link" href="/comunidad.html">Comunidad</a>
+        </nav>
+      </div>
     </div>
-  </div>
+  </footer>
 
+  <!-- SCROLL TOP -->
   <button class="scroll-top" id="scrollTopBtn" aria-label="Volver arriba">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
       <polyline points="18 15 12 9 6 15"></polyline>
@@ -439,6 +763,7 @@
 
   <script src="./community.js"></script>
   <script>
+    // Scroll-top button
     const scrollTopBtn = document.getElementById('scrollTopBtn');
     window.addEventListener('scroll', () => {
       scrollTopBtn.classList.toggle('visible', window.scrollY > 320);
@@ -446,6 +771,22 @@
     scrollTopBtn.addEventListener('click', () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
+
+    // Smooth scroll hero CTA
+    document.querySelector('.hero-btn').addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('forum').scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // Hero image — set after script load to avoid render-blocking
+    (function() {
+      const heroImg = document.getElementById('heroImg');
+      const src = 'https://images.unsplash.com/photo-1521017432531-fbd92d768814?auto=format&fit=crop&w=1800&q=80';
+      heroImg.style.backgroundImage = "url('" + src + "')";
+      const probe = new Image();
+      probe.onload = () => heroImg.classList.add('loaded');
+      probe.src = src;
+    })();
   </script>
 </body>
 </html>

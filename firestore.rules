@@ -27,6 +27,22 @@ service cloud.firestore {
         && canReadThreadData(get(/databases/$(database)/documents/foro_hilos/$(threadId)).data);
     }
 
+    function isValidPremiumPlan(value) {
+      return value is string && (value == 'monthly' || value == 'lifetime');
+    }
+
+    function isValidPremiumRecord(data) {
+      return data.uid is string
+        && data.uid == request.auth.uid
+        && isValidPremiumPlan(data.plan)
+        && data.activatedAt is string
+        && data.updatedAt is string
+        && data.transactionId is string
+        && (data.expiresAt == null || data.expiresAt is string)
+        && (!('provider' in data) || data.provider is string)
+        && (!('productId' in data) || data.productId is string);
+    }
+
     // Catálogo de cafés: público lectura, escritura autenticada.
     match /cafes/{cafeId} {
       allow read: if true;
@@ -103,6 +119,14 @@ service cloud.firestore {
         && request.resource.data.expoPushToken is string
         && request.resource.data.notificationsEnabled is bool;
       allow delete: if isSignedIn() && subscriberId == request.auth.uid;
+    }
+
+    match /premium_users/{premiumUserId} {
+      allow read: if isSignedIn() && premiumUserId == request.auth.uid;
+      allow create, update: if isSignedIn()
+        && premiumUserId == request.auth.uid
+        && isValidPremiumRecord(request.resource.data);
+      allow delete: if false;
     }
 
     // Diario de catas: privado (solo el usuario ve el suyo)

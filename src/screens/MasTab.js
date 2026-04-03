@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { ActivityIndicator, Image, Linking, Switch, Text, TouchableOpacity, View } from 'react-native';
 import AppDialogModal from '../components/AppDialogModal';
 import MemberInfoModal from '../components/MemberInfoModal';
+import PremiumBadge from './PremiumBadge';
 
 function MasItem({ icon, label, sub, onPress, mas, premiumAccent, iconFaint }) {
   return (
@@ -42,6 +43,9 @@ export default function MasTab({
   onLogout,
   appVersion,
   premiumAccent,
+  isPremium,
+  premiumDaysLeft,
+  onOpenPaywall,
   iconFaint,
   interactionFeedbackEnabled,
   interactionFeedbackMode,
@@ -140,6 +144,28 @@ export default function MasTab({
           </View>
           <View style={mas.memberProgressBar}><View style={[mas.memberProgressFill, { width: `${achievementProgress * 100}%` }]} /></View>
         </TouchableOpacity>
+
+        <Text style={mas.blockTitle}>ETIOVE PREMIUM</Text>
+        <View style={mas.achievementsCard}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+            <View style={{ flex: 1 }}>
+              {isPremium ? <PremiumBadge size="lg" /> : <Text style={mas.achievementTitle}>Desbloquea Etiove Premium</Text>}
+              <Text style={[mas.achievementDesc, { marginTop: 8 }]}>Diario ilimitado, estadísticas avanzadas, PDF y ventajas exclusivas en la comunidad.</Text>
+              {isPremium ? (
+                <Text style={[mas.quickSub, { marginTop: 8 }]}>
+                  {premiumDaysLeft == null ? 'Plan de por vida activo' : `${premiumDaysLeft} días restantes en tu plan`}
+                </Text>
+              ) : null}
+            </View>
+            <TouchableOpacity
+              style={[mas.newsletterBtn, { paddingHorizontal: 18, paddingVertical: 12, minWidth: 126 }, isPremium && mas.newsletterBtnDisabled]}
+              onPress={onOpenPaywall}
+              activeOpacity={0.85}
+            >
+              <Text style={mas.newsletterBtnText}>{isPremium ? 'VER PLAN' : 'HAZTE PREMIUM'}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
 
         <Text style={mas.blockTitle}>Accesos</Text>
         <View style={mas.quickGrid}>

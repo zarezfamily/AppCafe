@@ -60,6 +60,7 @@ import {
 import { registerForPushNotificationsAsync, scheduleEtioveNotification } from './src/core/notifications';
 import { PAISES, getFlagForPais } from './src/core/paises';
 import { buildPlacesPhotoUrl, calcDistanceMeters, fetchNearbyPlaces, isGooglePlacesConfigured } from './src/core/places';
+import { FREE_LIMITS } from './src/core/premium';
 import {
     csvToSet,
     formatRelativeTime,
@@ -71,6 +72,7 @@ import useCoffeeData from './src/hooks/useCoffeeData';
 import useForumState from './src/hooks/useForumState';
 import useGamification from './src/hooks/useGamification';
 import useNoteBook from './src/hooks/useNoteBook';
+import usePremium from './src/hooks/usePremium';
 import BottomBarNav from './src/screens/BottomBarNav';
 import CataDetailModal from './src/screens/CataDetailModal';
 import CataFormModal from './src/screens/CataFormModal';
@@ -80,6 +82,8 @@ import InicioTab from './src/screens/InicioTab';
 import MasTab from './src/screens/MasTab';
 import MisCafesTab from './src/screens/MisCafesTab';
 import OfertasTab from './src/screens/OfertasTab';
+import PaywallModal from './src/screens/PaywallModal';
+import PremiumBadge from './src/screens/PremiumBadge';
 import TopCafesTab from './src/screens/TopCafesTab';
 import UltimosAnadidosTab from './src/screens/UltimosAnadidosTab';
 
@@ -592,7 +596,7 @@ function PaisPicklist({ value, onChange }) {
 }
 
 // ─── PERFIL ───────────────────────────────────────────────────────────────────
-function ProfileScreen({ onClose }) {
+function ProfileScreen({ isPremium, premiumDaysLeft, onClose }) {
   const { user } = useAuth();
   const [nombre,    setNombre]    = useState('');
   const [alias,     setAlias]     = useState('');
@@ -684,6 +688,12 @@ function ProfileScreen({ onClose }) {
             }
             <View style={prf.avatarBadge}><Ionicons name="camera" size={14} color="#fff" /></View>
             <Text style={prf.avatarEmail}>{user?.email}</Text>
+            {isPremium && <PremiumBadge size="lg" style={{ marginTop: 8 }} />}
+            {isPremium && (
+              <Text style={{ fontSize: 12, color: THEME.text.secondary }}>
+                {premiumDaysLeft == null ? 'Premium de por vida activo' : `Premium activo · ${premiumDaysLeft} días restantes`}
+              </Text>
+            )}
             <Text style={{ fontSize: 12, color: THEME.text.muted }}>Toca para cambiar foto</Text>
           </TouchableOpacity>
 
@@ -1578,6 +1588,9 @@ function MainScreen({ onLogout }) {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [notificationsReady, setNotificationsReady] = useState(false);
   const [pushToken, setPushToken] = useState(null);
+  const [purchasesReady, setPurchasesReady] = useState(false);
+  const [purchasingPlan, setPurchasingPlan] = useState('');
+  const [restoringPurchases, setRestoringPurchases] = useState(false);
   const [dialogVisible, setDialogVisible] = useState(false);
   const [dialogConfig, setDialogConfig] = useState({ title: '', description: '', actions: [] });
   const forumThreadScrollRef = useRef(null);
@@ -1692,6 +1705,44 @@ function MainScreen({ onLogout }) {
   } = useForumState();
 
   const notebook = useNoteBook();
+  const premium = usePremium({ user, getDocument, setDocument });
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const initRevenueCat = async () => {
+      if (!user?.uid || !isRevenueCatConfigured()) {
+        if (!cancelled) setPurchasesReady(false);
+        return;
+      }
+
+      try {
+        const ready = await configureRevenueCat(user.uid);
+        if (cancelled) return;
+        setPurchasesReady(ready);
+
+        const currentPurchase = await getCurrentPremiumPurchase();
+        if (cancelled || !currentPurchase?.plan) return;
+
+        await premium.activatePremium(currentPurchase.plan, currentPurchase.transactionId, {
+          expiresAt: currentPurchase.expiresAt,
+          provider: currentPurchase.source,
+          productId: currentPurchase.productId,
+        });
+      } catch (error) {
+        if (!cancelled) {
+          setPurchasesReady(false);
+          console.warn('[RevenueCat] Init error:', error?.message || error);
+        }
+      }
+    };
+
+    initRevenueCat();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [premium.activatePremium, user?.uid]);
 
   useEffect(() => {
     SecureStore.getItemAsync(KEY_FAVS).then(v => v && setFavs(JSON.parse(v))).catch(() => {});
@@ -2197,6 +2248,77 @@ function MainScreen({ onLogout }) {
   const forumAuthorName = (perfil.alias || perfil.nombre || user?.email?.split('@')[0] || 'Catador').trim();
   const voteWeight = currentLevel.name === 'Maestro' ? 2 : 1;
 
+  const abrirNuevaCata = (cafeExistente = null) => {
+    if (!cafeExistente && !premium.isPremium && notebook.catas.length >= FREE_LIMITS.diarioCatasMax) {
+      premium.requirePremium('diario_limit');
+      return;
+    }
+    notebook.irAbrirModal(cafeExistente);
+  };
+
+  const handlePremiumPurchase = async (plan) => {
+    if (!purchasesReady) {
+      showDialog('Compras no disponibles', 'Configura las claves públicas de RevenueCat para esta plataforma y vuelve a intentarlo.');
+      return;
+    }
+
+    setPurchasingPlan(plan);
+    try {
+      const purchase = await purchasePremiumPlan(plan);
+      if (!purchase?.plan) throw new Error('premium_purchase_not_found');
+
+      const activated = await premium.activatePremium(purchase.plan, purchase.transactionId, {
+        expiresAt: purchase.expiresAt,
+        provider: purchase.source,
+        productId: purchase.productId,
+      });
+
+      if (!activated) throw new Error('premium_firestore_sync_failed');
+
+      premium.closePaywall();
+      showDialog('Premium activado', purchase.plan === 'lifetime' ? 'Tu plan de por vida ya está activo.' : 'Tu suscripción Premium ya está activa.');
+    } catch (error) {
+      if (!isRevenueCatCancellation(error)) {
+        showDialog('No se pudo completar la compra', 'La compra no se completó o no se pudo sincronizar con tu cuenta.');
+      }
+    } finally {
+      setPurchasingPlan('');
+    }
+  };
+
+  const handleRestorePurchases = async () => {
+    if (!purchasesReady) {
+      showDialog('Compras no disponibles', 'Configura las claves públicas de RevenueCat para esta plataforma y vuelve a intentarlo.');
+      return;
+    }
+
+    setRestoringPurchases(true);
+    try {
+      const restoredPurchase = await restorePremiumPurchases();
+      if (!restoredPurchase?.plan) {
+        showDialog('Sin compras para restaurar', 'No encontramos compras Premium asociadas a tu cuenta de App Store o Google Play.');
+        return;
+      }
+
+      const activated = await premium.activatePremium(restoredPurchase.plan, restoredPurchase.transactionId, {
+        expiresAt: restoredPurchase.expiresAt,
+        provider: restoredPurchase.source,
+        productId: restoredPurchase.productId,
+      });
+
+      if (!activated) throw new Error('premium_restore_sync_failed');
+
+      premium.closePaywall();
+      showDialog('Compras restauradas', restoredPurchase.plan === 'lifetime' ? 'Hemos restaurado tu plan Premium de por vida.' : 'Hemos restaurado tu suscripción Premium.');
+    } catch (error) {
+      if (!isRevenueCatCancellation(error)) {
+        showDialog('No se pudieron restaurar tus compras', 'Inténtalo de nuevo más tarde.');
+      }
+    } finally {
+      setRestoringPurchases(false);
+    }
+  };
+
   const flag = getFlagForPais(perfil.pais || 'España');
 
   useEffect(() => {
@@ -2431,6 +2553,7 @@ function MainScreen({ onLogout }) {
         authorUid: user.uid,
         authorName: forumAuthorName,
         authorLevel: currentLevel.name,
+        authorIsPremium: premium.isPremium,
         createdAt: new Date().toISOString(),
         upvotes: 0,
         voterUids: '',
@@ -2496,6 +2619,7 @@ function MainScreen({ onLogout }) {
         authorUid: user.uid,
         authorName: forumAuthorName,
         authorLevel: currentLevel.name,
+        authorIsPremium: premium.isPremium,
         createdAt: new Date().toISOString(),
         upvotes: 0,
         voterUids: '',
@@ -2625,6 +2749,7 @@ function MainScreen({ onLogout }) {
     s,
     theme: THEME,
     premiumAccent: PREMIUM_ACCENT,
+    PremiumBadge,
     forumCategories: FORUM_CATEGORIES,
     forumCategory,
     setForumCategory,
@@ -2747,9 +2872,12 @@ function MainScreen({ onLogout }) {
     CardVertical,
     eliminarCafe,
     premiumAccent: PREMIUM_ACCENT,
-      notebook,
-      theme: THEME,
-      DiarioCatasSection,
+    notebook: {
+      ...notebook,
+      irAbrirModal: abrirNuevaCata,
+    },
+    theme: THEME,
+    DiarioCatasSection,
   };
 
   const ultimosAnadidosTabProps = {
@@ -2818,6 +2946,9 @@ function MainScreen({ onLogout }) {
     onLogout,
     appVersion: APP_VERSION,
     premiumAccent: PREMIUM_ACCENT,
+    isPremium: premium.isPremium,
+    premiumDaysLeft: premium.daysLeft,
+    onOpenPaywall: () => premium.openPaywall('mas_tab'),
     iconFaint: THEME.icon.faint,
     interactionFeedbackEnabled: interactionFeedbackSettings.enabled,
     interactionFeedbackMode: interactionFeedbackSettings.mode,
@@ -2889,7 +3020,11 @@ function MainScreen({ onLogout }) {
         />
       )}
       {showProfile && (
-        <ProfileScreen onClose={() => { setShowProfile(false); SecureStore.getItemAsync(KEY_PROFILE).then(v => v && setPerfil(JSON.parse(v))).catch(() => {}); }} />
+        <ProfileScreen
+          isPremium={premium.isPremium}
+          premiumDaysLeft={premium.daysLeft}
+          onClose={() => { setShowProfile(false); SecureStore.getItemAsync(KEY_PROFILE).then(v => v && setPerfil(JSON.parse(v))).catch(() => {}); }}
+        />
       )}
 
       {/* Cafeterías se renderiza fuera del ScrollView para evitar FlatList anidado */}
@@ -3006,6 +3141,18 @@ function MainScreen({ onLogout }) {
           theme={THEME}
           s={s}
           premiumAccent={PREMIUM_ACCENT}
+        />
+
+        <PaywallModal
+          visible={premium.showPaywall}
+          onClose={premium.closePaywall}
+          onRestore={handleRestorePurchases}
+          trigger={premium.paywallTrigger}
+          isPremium={premium.isPremium}
+          purchasingPlan={purchasingPlan}
+          restoring={restoringPurchases}
+          revenueCatReady={purchasesReady}
+          onPurchase={handlePremiumPurchase}
         />
     </SafeAreaView>
   );

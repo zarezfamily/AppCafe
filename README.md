@@ -47,12 +47,36 @@ EXPO_PUBLIC_FIREBASE_API_KEY=...
 EXPO_PUBLIC_FIREBASE_PROJECT_ID=...
 EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=... # normalmente <project-id>.appspot.com
 EXPO_PUBLIC_GOOGLE_PLACES_KEY=...
+EXPO_PUBLIC_REVENUECAT_API_KEY_IOS=...
+EXPO_PUBLIC_REVENUECAT_API_KEY_ANDROID=...
 ```
 
 Notas:
 
 - El proyecto usa API REST de Firebase, por eso `AUTH_DOMAIN`, `APP_ID` y `MESSAGING_SENDER_ID` no son obligatorias en el flujo actual.
 - `EXPO_PUBLIC_GOOGLE_PLACES_KEY` es obligatoria para que funcione la pantalla de cafeterias cercanas.
+- Las claves `EXPO_PUBLIC_REVENUECAT_API_KEY_IOS` y `EXPO_PUBLIC_REVENUECAT_API_KEY_ANDROID` habilitan compras Premium reales con RevenueCat.
+
+### 2.1) Premium con RevenueCat
+
+La app ya trae el flujo Premium conectado a `react-native-purchases`.
+
+Necesitas en RevenueCat:
+
+1. Crear un proyecto con el bundle/package `com.zarezfamily.etiove`
+2. Configurar los productos:
+	- iOS mensual: `com.zarezfamily.etiove.premium.monthly`
+	- iOS lifetime: `com.zarezfamily.etiove.premium.lifetime`
+	- Android mensual: `etiove_premium_monthly`
+	- Android lifetime: `etiove_premium_lifetime`
+3. Añadir esos productos a una offering actual en RevenueCat
+4. Copiar las public SDK keys a `.env`
+
+Sin esas claves el paywall sigue abriendo, pero no permite compras reales.
+
+Importante:
+
+- `react-native-purchases` requiere una build nativa. En Expo Go el flujo Premium queda desactivado de forma segura.
 
 ### 3) Google Places (requerido para Cafeterias)
 
@@ -171,6 +195,7 @@ etiove/
 - `expo-local-authentication`
 - `@expo-google-fonts/playfair-display`
 - `expo-font`
+- `react-native-purchases`
 
 ## Screenshots
 

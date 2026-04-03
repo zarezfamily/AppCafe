@@ -20,6 +20,7 @@ export default function CommunityTab({
   s,
   theme,
   premiumAccent,
+  PremiumBadge,
   forumCategories,
   forumCategory,
   setForumCategory,
@@ -544,6 +545,7 @@ export default function CommunityTab({
                           <View style={s.forumAvatar}><Text style={s.forumAvatarText}>{(thread.authorName || '?')[0]?.toUpperCase() || '?'}</Text></View>
                           <View>
                             <Text style={s.forumAuthorName}>{thread.authorName || 'Usuario'}</Text>
+                            {thread.authorIsPremium && PremiumBadge ? <PremiumBadge style={{ marginTop: 4 }} /> : null}
                             <Text style={s.forumAuthorLevel}>{thread.authorLevel || 'Novato'}</Text>
                           </View>
                         </View>
@@ -612,6 +614,7 @@ export default function CommunityTab({
                     <Text style={s.forumCounter}>💔 {forumThread.reportedCount || 0}</Text>
                     <Text style={s.forumMetaText}>{formatRelativeTime(forumThread.createdAt)}</Text>
                   </View>
+                  {forumThread.authorIsPremium && PremiumBadge ? <PremiumBadge style={{ marginTop: 10 }} /> : null}
                   <View style={{ flexDirection: 'row', gap: 10, marginTop: 8 }}>
                     <TouchableOpacity
                       style={[s.forumActionBtn, (threadUserVoted || threadUserReported) && s.forumActionBtnDisabled]}
@@ -643,6 +646,7 @@ export default function CommunityTab({
                       <View style={s.forumAvatar}><Text style={s.forumAvatarText}>{(reply.authorName || '?')[0]?.toUpperCase() || '?'}</Text></View>
                       <View>
                         <Text style={s.forumAuthorName}>{reply.authorName || 'Usuario'}</Text>
+                        {reply.authorIsPremium && PremiumBadge ? <PremiumBadge style={{ marginTop: 4 }} /> : null}
                         <Text style={s.forumAuthorLevel}>{reply.authorLevel || 'Novato'}</Text>
                       </View>
                     </View>
@@ -664,7 +668,10 @@ export default function CommunityTab({
                   {childReplies.map((child) => (
                     <View key={child.id} style={s.forumChildReplyCard}>
                       <View style={s.forumMetaRow}>
-                        <Text style={s.forumAuthorName}>{child.authorName || 'Usuario'}</Text>
+                        <View>
+                          <Text style={s.forumAuthorName}>{child.authorName || 'Usuario'}</Text>
+                          {child.authorIsPremium && PremiumBadge ? <PremiumBadge style={{ marginTop: 4 }} /> : null}
+                        </View>
                         <View style={s.forumMetaActions}>
                           <Text style={s.forumMetaText}>{formatRelativeTime(child.createdAt)}</Text>
                           {isForumOwner(child) && (

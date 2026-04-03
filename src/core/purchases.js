@@ -4,6 +4,7 @@ import { PREMIUM_PLANS } from './premium';
 let configuredUserId = null;
 let configured = false;
 let purchasesModule = undefined;
+const REVENUECAT_TEST_API_KEY = 'test_cSzLKDiWVBSZqtHxscEKhRLkqRA';
 
 const PLAN_PRODUCT_IDS = {
   monthly: [PREMIUM_PLANS.monthly.appleId, PREMIUM_PLANS.monthly.googleId, PREMIUM_PLANS.monthly.id],
@@ -12,8 +13,8 @@ const PLAN_PRODUCT_IDS = {
 
 function getRevenueCatApiKey() {
   return Platform.select({
-    ios: process.env.EXPO_PUBLIC_REVENUECAT_API_KEY_IOS || '',
-    android: process.env.EXPO_PUBLIC_REVENUECAT_API_KEY_ANDROID || '',
+    ios: process.env.EXPO_PUBLIC_REVENUECAT_API_KEY_IOS || REVENUECAT_TEST_API_KEY,
+    android: process.env.EXPO_PUBLIC_REVENUECAT_API_KEY_ANDROID || REVENUECAT_TEST_API_KEY,
     default: '',
   });
 }
@@ -80,6 +81,10 @@ export async function configureRevenueCat(userId) {
   const Purchases = getPurchasesModule();
   const apiKey = getRevenueCatApiKey();
   if (!Purchases || !apiKey || !userId) return false;
+
+  if (Purchases.LOG_LEVEL?.VERBOSE && typeof Purchases.setLogLevel === 'function') {
+    Purchases.setLogLevel(Purchases.LOG_LEVEL.VERBOSE);
+  }
 
   if (!configured) {
     Purchases.configure({ apiKey, appUserID: userId });

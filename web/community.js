@@ -117,6 +117,16 @@ let threads = [];
 let replies = [];
 const THREADS_PAGE_SIZE = 8;
 let currentListPage = 1;
+const IMAGE_MAX_BYTES = 5 * 1024 * 1024;
+const IMAGE_ALLOWED_TYPES = new Set([
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'image/heic',
+  'image/heif',
+]);
 
 const el = {
   email: document.getElementById('email'),
@@ -131,6 +141,7 @@ const el = {
   threadTitle: document.getElementById('threadTitle'),
   threadBody: document.getElementById('threadBody'),
   threadImage: document.getElementById('threadImage'),
+  threadImageStatus: document.getElementById('threadImageStatus'),
   createThreadBtn: document.getElementById('createThreadBtn'),
   threadStatus: document.getElementById('threadStatus'),
 
@@ -300,6 +311,12 @@ const renderMemberEvolutionCard = ({ profile = null, allThreads = [], allReplies
 };
 
 const canManageItem = (item) => !!auth.uid && item && item.authorUid === auth.uid;
+
+const setThreadImageStatus = (text, kind = '') => {
+  if (!el.threadImageStatus) return;
+  el.threadImageStatus.textContent = text || 'Imagen opcional para el hilo';
+  el.threadImageStatus.className = `file-note ${kind}`.trim();
+};
 
 const hasUserVote = (item) => splitCsv(item && item.voterUids).includes(auth.uid);
 
@@ -631,23 +648,12 @@ const uploadImageToStorage = async (file, folder) => {
   if (!file) return '';
   if (!auth.token) throw new Error('UNAUTHENTICATED');
 
-  const allowedTypes = new Set([
-    'image/jpeg',
-    'image/jpg',
-    'image/png',
-    'image/webp',
-    'image/gif',
-    'image/heic',
-    'image/heif',
-  ]);
-  if (!allowedTypes.has(String(file.type || '').toLowerCase())) {
+  if (!IMAGE_ALLOWED_TYPES.has(String(file.type || '').toLowerCase())) {
     throw new Error('UNSUPPORTED_IMAGE_TYPE');
   }
 
-  const maxBytes = 5 * 1024 * 1024;
-
   const compressImageIfNeeded = async (inputFile) => {
-    if (!inputFile || inputFile.size <= maxBytes) return inputFile;
+    if (!inputFile || inputFile.size <= IMAGE_MAX_BYTES) return inputFile;
 
     const mime = String(inputFile.type || '').toLowerCase();
     if (!['image/jpeg', 'image/jpg', 'image/png', 'image/webp'].includes(mime)) {
@@ -689,11 +695,11 @@ const uploadImageToStorage = async (file, folder) => {
     let blob = null;
     while (quality >= 0.5) {
       blob = await new Promise((resolve) => canvas.toBlob(resolve, outputType, quality));
-      if (blob && blob.size <= maxBytes) break;
+      if (blob && blob.size <= IMAGE_MAX_BYTES) break;
       quality -= 0.08;
     }
 
-    if (!blob || blob.size > maxBytes) {
+    if (!blob || blob.size > IMAGE_MAX_BYTES) {
       throw new Error('IMAGE_TOO_LARGE');
     }
 
@@ -702,7 +708,7 @@ const uploadImageToStorage = async (file, folder) => {
   };
 
   const fileToUpload = await compressImageIfNeeded(file);
-  if (fileToUpload.size > maxBytes) throw new Error('IMAGE_TOO_LARGE');
+  if (fileToUpload.size > IMAGE_MAX_BYTES) throw new Error('IMAGE_TOO_LARGE');
 
   const safeFolder = String(folder || 'uploads').replace(/[^a-zA-Z0-9_\-/]/g, '');
   const mime = String(fileToUpload.type || 'image/jpeg').toLowerCase();
@@ -1292,6 +1298,7 @@ const createThread = async () => {
     el.threadBody.value = '';
     el.threadImage.value = '';
     el.threadAccessLevel.value = 'public';
+    setThreadImageStatus('Imagen opcional para el hilo');
 
     if (imageUploadWarning) {
       setStatus(el.threadStatus, `Hilo publicado sin imagen. ${imageUploadWarning}`, 'error');
@@ -1524,6 +1531,27 @@ const init = async () => {
   el.registerBtn.addEventListener('click', () => signIn(true));
   el.logoutBtn.addEventListener('click', logout);
   el.createThreadBtn.addEventListener('click', createThread);
+  el.threadImage.addEventListener('change', () => {
+    const selected = el.threadImage.files && el.threadImage.files[0] ? el.threadImage.files[0] : null;
+    if (!selected) {
+      setThreadImageStatus('Imagen opcional para el hilo');
+      return;
+    }
+
+    const fileType = String(selected.type || '').toLowerCase();
+    if (!IMAGE_ALLOWED_TYPES.has(fileType)) {
+      setThreadImageStatus('Formato no compatible. Usa JPG, PNG, WEBP, GIF o HEIC.', 'error');
+      return;
+    }
+
+    const sizeMb = (selected.size / (1024 * 1024)).toFixed(2);
+    if (selected.size > IMAGE_MAX_BYTES) {
+      setThreadImageStatus(`Imagen seleccionada (${sizeMb} MB). Se intentará comprimir al publicar.`, '');
+      return;
+    }
+
+    setThreadImageStatus(`Imagen lista: ${selected.name} (${sizeMb} MB).`, 'ok');
+  });
   el.refreshBtn.addEventListener('click', loadForum);
   el.categorySelect.addEventListener('change', () => {
     selectedCategory = el.categorySelect.value;

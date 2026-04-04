@@ -781,6 +781,8 @@
       margin-top: 6px;
       font-family: 'Manrope', sans-serif;
     }
+    .file-note.ok { color: var(--success); }
+    .file-note.error { color: var(--danger); }
     .empty { margin-top: 16px; color: var(--ink-muted); font-size: 14px; }
     .threads-pager {
       border-top: 1px dashed var(--border);
@@ -1026,7 +1028,7 @@
           <div class="field"><input id="threadTitle" maxlength="120" placeholder="Título (3–120 caracteres)" /></div>
           <div class="field"><textarea id="threadBody" maxlength="1000" placeholder="Contenido (3–1000 caracteres)"></textarea></div>
           <div class="field"><input id="threadImage" type="file" accept="image/*" /></div>
-          <p class="file-note">Imagen opcional para el hilo</p>
+          <p class="file-note" id="threadImageStatus">Imagen opcional para el hilo</p>
           <div style="margin-top:14px">
             <button class="btn primary" id="createThreadBtn">Publicar hilo</button>
           </div>

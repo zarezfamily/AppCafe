@@ -6,6 +6,7 @@ import {
     ActivityIndicator, Image, Modal, SafeAreaView,
     ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View,
 } from 'react-native';
+import { getDocument, setDocument, uploadImageToStorage } from '../../firebaseConfig';
 import AppDialogModal from '../components/AppDialogModal';
 import { KEY_PROFILE } from '../constants/storageKeys';
 import { PREMIUM_ACCENT, THEME, W } from '../constants/theme';
@@ -65,6 +66,15 @@ export default function ProfileScreen({ onClose }) {
     }
     setGuardando(true);
     try {
+      let fotoPersistida = foto;
+      if (foto && !String(foto).startsWith('http')) {
+        try {
+          fotoPersistida = await uploadImageToStorage(foto, `profile_avatars/${user?.uid || 'anon'}`);
+        } catch {
+          // Si falla la subida, mantenemos guardado local y avisamos luego.
+        }
+      }
+
       await SecureStore.setItemAsync(KEY_PROFILE, JSON.stringify({
         nombre: nombre.trim(),
         alias: alias.trim(),
@@ -72,8 +82,26 @@ export default function ProfileScreen({ onClose }) {
         email: email.trim(),
         telefono,
         pais,
-        foto,
+        foto: fotoPersistida,
       }));
+
+      if (user?.uid) {
+        try {
+          const existing = await getDocument('user_profiles', user.uid);
+          const displayName = alias.trim() || nombre.trim() || email.trim().split('@')[0] || 'Catador';
+          await setDocument('user_profiles', user.uid, {
+            uid: user.uid,
+            displayName,
+            avatarUrl: String(fotoPersistida || ''),
+            motto: String((existing && existing.motto) || '').trim() || '"Ninguno de nosotros es tan listo como todos nosotros."',
+            updatedAt: new Date().toISOString(),
+          });
+        } catch {
+          // No bloqueamos al usuario si falla la sincronización con web.
+        }
+      }
+
+      setFoto(fotoPersistida || null);
       showDialog('Guardado', 'Tu perfil ha sido actualizado');
       onClose();
     } catch { showDialog('Error', 'No se pudo guardar el perfil'); }

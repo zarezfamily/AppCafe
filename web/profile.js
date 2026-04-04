@@ -304,6 +304,12 @@
     return String(hit || '').trim();
   };
 
+  const formatMottoForDisplay = (value) => {
+    const raw = String(value || '').trim();
+    if (!raw) return '';
+    return raw.replace(/^(["'])\s*(.*?)\s*\1$/, '$2').trim();
+  };
+
   const readDisplayNameFromRecord = (record) => {
     if (!record || typeof record !== 'object') return '';
     const candidates = [record.displayName, record.alias, record.authorName, record.nombre, record.nickname];
@@ -501,7 +507,7 @@
     const sinceText = allDates.length ? yearsSince(allDates[0].toISOString()) : 'Miembro reciente';
     const avatarUrl = resolvedProfileAvatar();
     const quote = String(state.profile && state.profile.motto || '').trim();
-    const quoteText = quote || (isOwner() ? 'Añade una frase' : '');
+    const quoteText = formatMottoForDisplay(quote) || (isOwner() ? 'Añade una frase breve' : '');
     const member = computeMemberStats();
     const currentLevel = getLevelFromXp(member.xp);
     const nextLevel = LEVELS.find((level) => level.minXp > member.xp) || null;
@@ -559,7 +565,7 @@
       el.quote.textContent = quoteText;
       el.quote.style.display = quoteText ? '' : 'none';
       el.quote.classList.toggle('editable', isOwner());
-      el.quote.classList.toggle('placeholder', !quote);
+      el.quote.classList.toggle('placeholder', !formatMottoForDisplay(quote));
       el.quote.setAttribute('role', isOwner() ? 'button' : 'note');
       el.quote.setAttribute('tabindex', isOwner() ? '0' : '-1');
       el.quote.setAttribute('aria-label', isOwner() ? 'Editar frase de perfil' : 'Frase de perfil');
@@ -995,7 +1001,7 @@
 
   const handleEditQuote = async () => {
     if (!isOwner()) return;
-    const current = String(state.profile && state.profile.motto || '').trim();
+    const current = formatMottoForDisplay(String(state.profile && state.profile.motto || '').trim());
     const next = window.prompt('Edita tu frase', current);
     if (next === null) return;
     const motto = String(next || '').trim();

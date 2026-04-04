@@ -195,6 +195,34 @@
     return `${raw.slice(0, max - 1)}...`;
   };
 
+  const readAvatarFromRecord = (record) => {
+    if (!record || typeof record !== 'object') return '';
+    const candidates = [
+      record.avatarUrl,
+      record.photoUrl,
+      record.foto,
+      record.authorPhoto,
+      record.authorAvatar,
+    ];
+    const hit = candidates.find((value) => String(value || '').trim());
+    return String(hit || '').trim();
+  };
+
+  const resolvedProfileAvatar = () => {
+    const fromProfile = readAvatarFromRecord(state.profile);
+    if (fromProfile) return fromProfile;
+
+    const authored = [
+      ...state.threads,
+      ...state.replies,
+      ...state.blogComments,
+    ];
+    const fromAuthored = authored
+      .map((item) => readAvatarFromRecord(item))
+      .find((value) => !!value);
+    return String(fromAuthored || '').trim();
+  };
+
   const yearsSince = (dateText) => {
     const dt = new Date(dateText);
     if (Number.isNaN(dt.getTime())) return 'Miembro reciente';
@@ -239,7 +267,7 @@
     const first = name.slice(0, 1).toUpperCase() || '?';
     const allDates = collectDates();
     const sinceText = allDates.length ? yearsSince(allDates[0].toISOString()) : 'Miembro reciente';
-    const avatarUrl = String(state.profile && state.profile.avatarUrl || '').trim();
+    const avatarUrl = resolvedProfileAvatar();
     const quote = String(state.profile && state.profile.motto || '').trim();
 
     if (el.avatar) {
@@ -321,7 +349,7 @@
   const avatarByUid = (targetUid) => {
     const map = profileMap();
     const hit = map.get(targetUid);
-    return String(hit && hit.avatarUrl || '').trim();
+    return readAvatarFromRecord(hit);
   };
 
   const openProfile = (targetUid, name) => {
@@ -689,7 +717,7 @@
     const ok = await updateDocument('user_profiles', uid, {
       uid,
       displayName: getAuthorName(),
-      avatarUrl: String(state.profile && state.profile.avatarUrl || '').trim(),
+      avatarUrl: resolvedProfileAvatar(),
       motto,
       updatedAt: new Date().toISOString(),
     });
@@ -783,6 +811,22 @@
     state.profile = profile;
     state.messages = messages;
     state.profiles = profiles;
+
+    // Si el perfil existe pero la foto está en un campo legacy, normalizamos a avatarUrl.
+    if (state.profile && isOwner()) {
+      const legacyAvatar = readAvatarFromRecord(state.profile);
+      if (legacyAvatar && !String(state.profile.avatarUrl || '').trim()) {
+        await updateDocument('user_profiles', uid, {
+          uid,
+          displayName: getAuthorName(),
+          avatarUrl: legacyAvatar,
+          motto: String(state.profile.motto || '').trim() || '"Ninguno de nosotros es tan listo como todos nosotros."',
+          updatedAt: new Date().toISOString(),
+        });
+        state.profile.avatarUrl = legacyAvatar;
+      }
+    }
+
     refreshFollowState();
 
     renderHeader();

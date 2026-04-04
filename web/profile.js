@@ -53,6 +53,8 @@
     progressFill: document.getElementById('profileProgressFill'),
     statVotes: document.getElementById('statVotes'),
     statPhotos: document.getElementById('statPhotos'),
+    statPosts: document.getElementById('statPosts'),
+    statRepliesWritten: document.getElementById('statRepliesWritten'),
     statReviews: document.getElementById('statReviews'),
     statFavorites: document.getElementById('statFavorites'),
     since: document.getElementById('profileSince'),
@@ -612,6 +614,8 @@
     if (el.progressFill) el.progressFill.style.width = `${progress.toFixed(1)}%`;
     if (el.statVotes) el.statVotes.textContent = String(member.votesCount);
     if (el.statPhotos) el.statPhotos.textContent = String(member.photosCount);
+    if (el.statPosts) el.statPosts.textContent = String(state.threads.length);
+    if (el.statRepliesWritten) el.statRepliesWritten.textContent = String(state.replies.length);
     if (el.statReviews) el.statReviews.textContent = String(member.reviewsCount);
     if (el.statFavorites) el.statFavorites.textContent = String(member.favoritesMarkedCount);
     if (el.counters) {

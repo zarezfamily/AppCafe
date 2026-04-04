@@ -558,6 +558,15 @@
       font-weight: 600;
     }
 
+    @media (max-width: 980px) {
+      nav {
+        padding: 14px 18px;
+        justify-content: center;
+      }
+      .nav-links { display: none !important; }
+      .page { padding-top: 82px; }
+    }
+
     @media (max-width: 760px) {
       nav { padding: 16px 24px; }
       .nav-links { gap: 20px; }
@@ -573,8 +582,7 @@
     }
 
     @media (max-width: 560px) {
-      nav { padding: 14px 20px; }
-      .nav-link:not(.nav-link--active) { display: none; }
+      nav { padding: 12px 14px; }
     }
   </style>
 </head>

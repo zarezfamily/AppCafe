@@ -1,5 +1,9 @@
 # Blog route normalization
 /blog  /blog/  301
 
+# Profile route normalization
+/perfil    /perfil.html  200
+/perfil*   /perfil.html  200
+
 # Custom 404 fallback
 /*  /404.html  404

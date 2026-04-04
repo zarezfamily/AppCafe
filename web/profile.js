@@ -6,14 +6,25 @@
   const FIREBASE_STORAGE_BUCKET = `${FIREBASE_PROJECT_ID}.appspot.com`;
 
   const params = new URLSearchParams(window.location.search);
-  const uid = String(params.get('uid') || '').trim();
-  const queryName = String(params.get('name') || '').trim();
+  const requestedUid = String(params.get('uid') || '').trim();
+  const requestedName = String(params.get('name') || '').trim();
 
   const auth = {
     uid: localStorage.getItem('etiove_web_uid') || '',
     email: localStorage.getItem('etiove_web_email') || '',
     token: localStorage.getItem('etiove_web_token') || '',
   };
+
+  const uid = requestedUid || auth.uid || '';
+  const queryName = requestedName || String(localStorage.getItem('etiove_web_alias') || '').trim();
+
+  if (!requestedUid && uid) {
+    const desiredSearch = `?uid=${encodeURIComponent(uid)}${queryName ? `&name=${encodeURIComponent(queryName)}` : ''}`;
+    const nextUrl = `/perfil.html${desiredSearch}`;
+    if (window.location.pathname !== '/perfil.html' || window.location.search !== desiredSearch) {
+      window.history.replaceState(null, '', nextUrl);
+    }
+  }
 
   const state = {
     threads: [],

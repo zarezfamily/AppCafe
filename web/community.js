@@ -858,7 +858,7 @@ const renderThreads = () => {
 
     return `
       <article class="thread" data-thread-id="${t.id}" style="animation-delay:${delay}s">
-        <h3>${escapeHtml(t.title || '')}</h3>
+        <h3><button class="thread-title-link" data-open-thread="${t.id}" aria-label="Abrir hilo ${escapeHtml(t.title || '')}">${escapeHtml(t.title || '')}</button></h3>
         <div class="meta">${escapeHtml(t.categoryLabel || '')} · <button class="link-btn author-btn" data-author-uid="${escapeHtml(t.authorUid || '')}" data-author-name="${escapeHtml(t.authorName || 'Catador')}" style="font-weight:600;">${escapeHtml(t.authorName || 'Catador')}</button> · ${fmt(t.createdAt)} · ${Number(t.upvotes || 0)} votos</div>
         <div class="thread-tags">
           <span class="pill category">${escapeHtml(t.categoryLabel || 'General')}</span>
@@ -872,7 +872,6 @@ const renderThreads = () => {
             <span class="muted">${threadReplies.length} respuestas</span>
           </div>
           <div class="actions-row">
-            <button class="btn ghost" data-open-thread="${t.id}">Entrar al hilo</button>
             ${threadCanManage
               ? `<button class="link-btn" data-thread-edit="${t.id}">Editar</button><button class="link-btn" data-thread-delete="${t.id}">Eliminar</button>`
               : ''}

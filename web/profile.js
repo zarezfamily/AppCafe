@@ -37,6 +37,7 @@
     isFollowing: false,
     followersCount: 0,
     followingCount: 0,
+    selectedAchievementId: '',
     loaded: false,
   };
 
@@ -60,6 +61,7 @@
     achievements: document.getElementById('profileAchievements'),
     achievementsMeta: document.getElementById('profileAchievementsMeta'),
     achievementsGrid: document.getElementById('profileAchievementsGrid'),
+    scrollTopBtn: document.getElementById('scrollTopBtn'),
     quote: document.getElementById('profileQuote'),
     status: document.getElementById('profileStatus'),
     actions: document.getElementById('profileActions'),
@@ -89,14 +91,14 @@
   ];
 
   const ACHIEVEMENT_DEFS = [
-    { id: 'primera_cata', icon: '🥇', title: 'Ritual de inicio' },
-    { id: 'fotografo', icon: '📸', title: 'Ojo barista' },
-    { id: 'viajero', icon: '🌍', title: 'Ruta de origen' },
-    { id: 'adicto', icon: '🔥', title: 'Tueste constante' },
-    { id: 'maestro_catador', icon: '👑', title: 'Paladar Etiove' },
-    { id: 'coleccionista', icon: '❤️', title: 'Bodega signature' },
-    { id: 'critico', icon: '✍️', title: 'Cuaderno de cata' },
-    { id: 'origen_unico', icon: '🌱', title: 'Lote de autor' },
+    { id: 'primera_cata', icon: '🥇', title: 'Ritual de inicio', desc: 'Valora 3 cafes y desbloquea tu primera insignia.' },
+    { id: 'fotografo', icon: '📸', title: 'Ojo barista', desc: 'Sube 12 fotos de tus cafes para destacar tu lado visual.' },
+    { id: 'viajero', icon: '🌍', title: 'Ruta de origen', desc: 'Prueba cafes de 8 paises distintos y amplia tu mapa sensorial.' },
+    { id: 'adicto', icon: '🔥', title: 'Tueste constante', desc: 'Valora 30 cafes y demuestra constancia de catador.' },
+    { id: 'maestro_catador', icon: '👑', title: 'Paladar Etiove', desc: 'Alcanza el nivel Maestro y corona tu perfil.' },
+    { id: 'coleccionista', icon: '❤️', title: 'Bodega signature', desc: 'Marca 25 favoritos y construye tu propia coleccion.' },
+    { id: 'critico', icon: '✍️', title: 'Cuaderno de cata', desc: 'Escribe 12 resenas y convierte tu perfil en referencia.' },
+    { id: 'origen_unico', icon: '🌱', title: 'Lote de autor', desc: 'Prueba un origen especial como Geisha, Bourbon Pointu o Yemen.' },
   ];
 
   const normalizeName = (value) => String(value || '')
@@ -621,18 +623,28 @@
     }
     if (el.achievements && el.achievementsMeta && el.achievementsGrid) {
       if (unlockedAchievements.length) {
+        const selectedAchievement = unlockedAchievements.find((item) => item.id === state.selectedAchievementId) || unlockedAchievements[0];
+        state.selectedAchievementId = selectedAchievement.id;
         el.achievements.style.display = '';
         el.achievementsMeta.textContent = `${unlockedAchievements.length} insignias desbloqueadas`;
         el.achievementsGrid.innerHTML = unlockedAchievements.map((item) => `
-          <span class="achievement-chip" title="${esc(item.title)}">
+          <button class="achievement-chip${item.id === selectedAchievement.id ? ' active' : ''}" type="button" data-achievement-id="${esc(item.id)}" aria-pressed="${item.id === selectedAchievement.id ? 'true' : 'false'}" title="${esc(item.title)}">
             <span class="achievement-chip-icon">${esc(item.icon)}</span>
             <span class="achievement-chip-label">${esc(item.title)}</span>
-          </span>
+          </button>
         `).join('');
+        const existingHint = el.achievements.querySelector('.profile-achievement-hint');
+        if (existingHint) existingHint.remove();
+        const hint = document.createElement('p');
+        hint.className = 'profile-achievement-hint';
+        hint.textContent = selectedAchievement.desc || '';
+        el.achievements.appendChild(hint);
       } else {
         el.achievements.style.display = 'none';
         el.achievementsMeta.textContent = '';
         el.achievementsGrid.innerHTML = '';
+        const existingHint = el.achievements.querySelector('.profile-achievement-hint');
+        if (existingHint) existingHint.remove();
       }
     }
     if (el.quote) {
@@ -1159,6 +1171,14 @@
         }
       });
     }
+    if (el.achievementsGrid) {
+      el.achievementsGrid.addEventListener('click', (event) => {
+        const chip = event.target.closest('[data-achievement-id]');
+        if (!chip) return;
+        state.selectedAchievementId = String(chip.getAttribute('data-achievement-id') || '').trim();
+        renderHeader();
+      });
+    }
 
     if (el.content) {
       el.content.addEventListener('click', (event) => {
@@ -1174,6 +1194,18 @@
         }
       });
     }
+  };
+
+  const setupScrollTop = () => {
+    if (!el.scrollTopBtn) return;
+    const sync = () => {
+      el.scrollTopBtn.classList.toggle('visible', window.scrollY > 320);
+    };
+    window.addEventListener('scroll', sync);
+    el.scrollTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    sync();
   };
 
   const init = async () => {
@@ -1208,6 +1240,7 @@
     renderHeader();
     attachTabEvents();
     attachActionEvents();
+    setupScrollTop();
     renderButtons();
     renderTab('activity');
     state.loaded = true;

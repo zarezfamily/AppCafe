@@ -385,7 +385,10 @@ const getActiveThreadId = () => {
   }
 };
 
-const threadDetailUrl = (threadId) => `/comunidad/hilo/${encodeURIComponent(String(threadId || '').trim())}`;
+const threadDetailUrl = (threadId) => {
+  const safeId = encodeURIComponent(String(threadId || '').trim());
+  return `/comunidad/hilo/${safeId}?hilo=${safeId}`;
+};
 
 const metaDefaults = {
   title: document.title,
@@ -1259,6 +1262,11 @@ const createThread = async () => {
         imageUrl = await uploadImageWithRetry(imageFile, 'foro_hilos', 3);
       } catch (uploadErr) {
         imageUploadWarning = mapThreadPublishError(uploadErr);
+        const shouldContinue = window.confirm(`No se pudo subir la imagen.\n\n${imageUploadWarning}\n\n¿Quieres publicar el hilo sin imagen?`);
+        if (!shouldContinue) {
+          setStatus(el.threadStatus, 'Publicación cancelada. Inténtalo de nuevo con otra imagen.', 'error');
+          return;
+        }
       }
     }
 

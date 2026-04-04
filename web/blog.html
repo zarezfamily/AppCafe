@@ -75,12 +75,6 @@
       color: var(--ink-muted); text-decoration: none; transition: color 0.3s;
     }
     .nav-link:hover, .nav-link--active { color: var(--accent); }
-    .nav-cta {
-      font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
-      color: var(--cream-alt); background: var(--ink); text-decoration: none;
-      padding: 10px 20px; border-radius: 3px; transition: background 0.3s;
-    }
-    .nav-cta:hover { background: var(--accent-deep); }
 
     /* HERO */
     .hero {
@@ -258,7 +252,6 @@
     @media (max-width: 768px) {
       nav { padding: 16px 24px; }
       .nav-links { display: none; }
-      .nav-cta { display: none; }
       .hero-title { letter-spacing: 5px; }
       .grid { grid-template-columns: 1fr; }
       .card-thumb { height: 210px; }
@@ -268,18 +261,26 @@
     @media (max-width: 560px) {
       nav { padding: 14px 20px; }
       .articles { padding: 60px 0 80px; }
+      .hero-content { padding: 0 18px; }
+      .hero-title { font-size: clamp(2rem, 11vw, 2.8rem); }
+      .hero-tagline { font-size: 12px; letter-spacing: 1.4px; }
+      .hero-scroll { display: none; }
+      .filter-bar { justify-content: flex-start; }
+      .article-card { padding: 18px; }
+      .article-title { font-size: 26px; }
+      .scroll-top { bottom: 80px; right: 16px; }
     }
   </style>
 </head>
 <body>
 
   <nav>
-    <a class="nav-wordmark" href="/">ETIOVE</a>
+    <a class="nav-wordmark" href="/">Etiove</a>
     <div class="nav-links">
-      <a class="nav-link" href="/">Inicio</a>
-      <a class="nav-link nav-link--active" href="/blog/">Blog</a>
+      <a class="nav-link" href="/#sobre">Sobre nosotros</a>
+      <a class="nav-link" href="/#app">La app</a>
       <a class="nav-link" href="/comunidad.html">Comunidad</a>
-      <a class="nav-cta" href="/">Descargar app</a>
+      <a class="nav-link" href="/blog.html">Blog</a>
     </div>
   </nav>
 

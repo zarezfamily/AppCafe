@@ -72,7 +72,6 @@
       background: rgba(246, 239, 231, 0.85);
       backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border-soft);
-      box-shadow: 0 8px 22px rgba(28,18,13,0.05);
     }
     .nav-wordmark {
       font-family: 'Playfair Display', serif;
@@ -84,18 +83,7 @@
       font-size: 11px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase;
       color: var(--ink-muted); text-decoration: none; transition: color 0.3s;
     }
-    .nav-link:hover, .nav-link--active { color: #8f5e3b; }
-    .nav-cta {
-      font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
-      color: #fff8f0;
-      background: linear-gradient(130deg, #69412a 0%, #9e6a42 100%);
-      text-decoration: none;
-      padding: 10px 20px;
-      border-radius: 999px;
-      transition: transform 0.3s, box-shadow 0.3s;
-      box-shadow: 0 8px 20px rgba(95,58,37,0.24);
-    }
-    .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 10px 22px rgba(95,58,37,0.3); }
+    .nav-link:hover, .nav-link--active { color: var(--accent); }
 
     /* ─── HERO ─── */
     .hero {
@@ -1155,14 +1143,8 @@
     @media (max-width: 768px) {
       nav { padding: 16px 24px; }
       .nav-links { display: none; }
-      .nav-cta { display: none; }
       footer { flex-direction: column; text-align: center; }
       .social-row { justify-content: center; }
-    }
-    @media (max-width: 560px) {
-      nav { padding: 14px 20px; }
-    }
-    @media (max-width: 960px) {
       .hero-title { font-size: 52px; }
       .community-kpis { grid-template-columns: 1fr; }
       .salon-banner { flex-direction: column; align-items: flex-start; }
@@ -1174,6 +1156,9 @@
       .threads-pager { align-items: flex-start; }
       .thread h3 { font-size: 17px; }
       .thread-detail-title { font-size: clamp(24px, 7.2vw, 30px); }
+    }
+    @media (max-width: 560px) {
+      nav { padding: 14px 20px; }
     }
     @media (prefers-reduced-motion: reduce) {
       .hero-img, .hero-aura1, .hero-aura2,
@@ -1194,12 +1179,12 @@
 <body>
 
   <nav>
-    <a class="nav-wordmark" href="/">ETIOVE</a>
+    <a class="nav-wordmark" href="/">Etiove</a>
     <div class="nav-links">
-      <a class="nav-link" href="/">Inicio</a>
-      <a class="nav-link" href="/blog/">Blog</a>
-      <a class="nav-link nav-link--active" href="/comunidad.html">Comunidad</a>
-      <a class="nav-cta" href="/">Descargar app</a>
+      <a class="nav-link" href="/#sobre">Sobre nosotros</a>
+      <a class="nav-link" href="/#app">La app</a>
+      <a class="nav-link" href="/comunidad.html">Comunidad</a>
+      <a class="nav-link" href="/blog.html">Blog</a>
     </div>
   </nav>
 

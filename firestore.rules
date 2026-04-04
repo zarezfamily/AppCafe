@@ -27,6 +27,43 @@ service cloud.firestore {
         && canReadThreadData(get(/databases/$(database)/documents/foro_hilos/$(threadId)).data);
     }
 
+    function isThreadAuthor(threadId) {
+      return exists(/databases/$(database)/documents/foro_hilos/$(threadId))
+        && get(/databases/$(database)/documents/foro_hilos/$(threadId)).data.authorUid == request.auth.uid;
+    }
+
+    function isNonNegativeInt(value) {
+      return value is int && value >= 0;
+    }
+
+    function isThreadCountersUpdate() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'upvotes',
+          'voterUids',
+          'replyCount',
+          'reportedCount',
+          'reporterUids'
+        ])
+        && request.resource.data.voterUids is string
+        && isNonNegativeInt(request.resource.data.upvotes)
+        && (!('reporterUids' in request.resource.data) || request.resource.data.reporterUids is string)
+        && (!('replyCount' in request.resource.data) || isNonNegativeInt(request.resource.data.replyCount))
+        && (!('reportedCount' in request.resource.data) || isNonNegativeInt(request.resource.data.reportedCount));
+    }
+
+    function isReplyCountersUpdate() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'upvotes',
+          'voterUids',
+          'reportedCount',
+          'reporterUids'
+        ])
+        && request.resource.data.voterUids is string
+        && isNonNegativeInt(request.resource.data.upvotes)
+        && (!('reporterUids' in request.resource.data) || request.resource.data.reporterUids is string)
+        && (!('reportedCount' in request.resource.data) || isNonNegativeInt(request.resource.data.reportedCount));
+    }
+
     function isValidPremiumPlan(value) {
       return value is string && (value == 'monthly' || value == 'lifetime');
     }
@@ -68,9 +105,14 @@ service cloud.firestore {
         && request.resource.data.categoryLabel is string
         && isValidThreadAccess(request.resource.data);
       allow update: if isSignedIn()
-        && resource.data.authorUid == request.auth.uid
-        && request.resource.data.authorUid == resource.data.authorUid
-        && isValidThreadAccess(request.resource.data);
+        && (
+          (
+            resource.data.authorUid == request.auth.uid
+            && request.resource.data.authorUid == resource.data.authorUid
+            && isValidThreadAccess(request.resource.data)
+          )
+          || isThreadCountersUpdate()
+        );
       allow delete: if isSignedIn() && resource.data.authorUid == request.auth.uid;
     }
 
@@ -82,9 +124,18 @@ service cloud.firestore {
         && hasString('body', 1, 1000)
         && canReadThreadById(request.resource.data.threadId);
       allow update: if isSignedIn()
-        && resource.data.authorUid == request.auth.uid
-        && request.resource.data.authorUid == resource.data.authorUid;
-      allow delete: if isSignedIn() && resource.data.authorUid == request.auth.uid;
+        && (
+          (
+            resource.data.authorUid == request.auth.uid
+            && request.resource.data.authorUid == resource.data.authorUid
+          )
+          || isReplyCountersUpdate()
+        );
+      allow delete: if isSignedIn()
+        && (
+          resource.data.authorUid == request.auth.uid
+          || isThreadAuthor(resource.data.threadId)
+        );
     }
 
     match /blog_comentarios/{commentId} {

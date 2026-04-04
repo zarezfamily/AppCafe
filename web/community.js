@@ -124,6 +124,15 @@ const escapeHtml = (text) => String(text || '')
   .replace(/"/g, '&quot;')
   .replace(/'/g, '&#39;');
 
+const splitCsv = (value) => String(value || '')
+  .split(',')
+  .map((entry) => entry.trim())
+  .filter(Boolean);
+
+const canManageItem = (item) => !!auth.uid && item && item.authorUid === auth.uid;
+
+const hasUserVote = (item) => splitCsv(item && item.voterUids).includes(auth.uid);
+
 const toFirestoreValue = (val) => {
   if (val === null || val === undefined) return { nullValue: null };
   if (typeof val === 'string') return { stringValue: val };
@@ -270,6 +279,14 @@ const updateDocument = async (name, id, data) => {
   return res.ok;
 };
 
+const deleteDocument = async (name, id) => {
+  const res = await fetch(`${BASE_URL}/${name}/${id}?key=${FIREBASE_API_KEY}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
+  return res.ok;
+};
+
 const uploadImageToStorage = async (file, folder) => {
   if (!file) return '';
   if (!auth.token) throw new Error('UNAUTHENTICATED');
@@ -363,8 +380,23 @@ const renderThreads = () => {
       .filter((r) => r.threadId === t.id)
       .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 
+    const threadCanManage = canManageItem(t);
+    const threadVoted = hasUserVote(t);
+
     const repliesHtml = threadReplies.slice(0, 4).map((r, replyIdx) => (
-      `<div class="reply" style="animation-delay:${Math.min(delay + (replyIdx * 0.02), 0.26).toFixed(3)}s"><div class="meta">${escapeHtml(r.authorName || 'Catador')} · ${fmt(r.createdAt)}</div><p>${escapeHtml(r.body || '')}</p></div>`
+      `<div class="reply" style="animation-delay:${Math.min(delay + (replyIdx * 0.02), 0.26).toFixed(3)}s">
+        <div class="meta">${escapeHtml(r.authorName || 'Catador')} · ${fmt(r.createdAt)}</div>
+        <p>${escapeHtml(r.body || '')}</p>
+        <div class="thread-foot">
+          <div class="actions-row">
+            <button class="link-btn" data-reply-vote="${r.id}">${hasUserVote(r) ? 'Ya te interesa' : 'Me interesa'}</button>
+            <span class="muted">${Number(r.upvotes || 0)} votos</span>
+          </div>
+          ${canManageItem(r)
+            ? `<div class="actions-row"><button class="link-btn" data-reply-edit="${r.id}">Editar</button><button class="link-btn" data-reply-delete="${r.id}">Eliminar</button></div>`
+            : ''}
+        </div>
+      </div>`
     )).join('');
 
     const accessTagColor = t.accessLevel === 'registered_only' ? '#8f5e3b' : '#4f7a53';
@@ -381,8 +413,13 @@ const renderThreads = () => {
         <p>${escapeHtml(t.body || '')}</p>
         ${t.image ? `<img class="thread-image" src="${escapeHtml(t.image)}" alt="Imagen del hilo" loading="lazy" decoding="async" />` : ''}
         <div class="thread-foot">
-          <button class="link-btn" data-vote="${t.id}">Votar</button>
-          <span class="muted">${threadReplies.length} respuestas</span>
+          <div class="actions-row">
+            <button class="link-btn" data-vote="${t.id}">${threadVoted ? 'Ya te interesa' : 'Me interesa'}</button>
+            <span class="muted">${threadReplies.length} respuestas</span>
+          </div>
+          ${threadCanManage
+            ? `<div class="actions-row"><button class="link-btn" data-thread-edit="${t.id}">Editar</button><button class="link-btn" data-thread-delete="${t.id}">Eliminar</button></div>`
+            : ''}
         </div>
         <div class="reply-box">
           ${repliesHtml || '<p class="muted">Sin respuestas aún.</p>'}
@@ -398,8 +435,28 @@ const renderThreads = () => {
     btn.addEventListener('click', () => voteThread(btn.getAttribute('data-vote')));
   });
 
+  el.threadsWrap.querySelectorAll('[data-reply-vote]').forEach((btn) => {
+    btn.addEventListener('click', () => voteReply(btn.getAttribute('data-reply-vote')));
+  });
+
   el.threadsWrap.querySelectorAll('[data-reply-send]').forEach((btn) => {
     btn.addEventListener('click', () => sendReply(btn.getAttribute('data-reply-send')));
+  });
+
+  el.threadsWrap.querySelectorAll('[data-thread-edit]').forEach((btn) => {
+    btn.addEventListener('click', () => editThread(btn.getAttribute('data-thread-edit')));
+  });
+
+  el.threadsWrap.querySelectorAll('[data-thread-delete]').forEach((btn) => {
+    btn.addEventListener('click', () => deleteThread(btn.getAttribute('data-thread-delete')));
+  });
+
+  el.threadsWrap.querySelectorAll('[data-reply-edit]').forEach((btn) => {
+    btn.addEventListener('click', () => editReply(btn.getAttribute('data-reply-edit')));
+  });
+
+  el.threadsWrap.querySelectorAll('[data-reply-delete]').forEach((btn) => {
+    btn.addEventListener('click', () => deleteReply(btn.getAttribute('data-reply-delete')));
   });
 
   // Clic en nombre de autor → modal perfil (solo logueados)
@@ -639,7 +696,7 @@ const voteThread = async (threadId) => {
   const item = threads.find((t) => t.id === threadId);
   if (!item) return;
 
-  const voters = new Set(String(item.voterUids || '').split(',').map((v) => v.trim()).filter(Boolean));
+  const voters = new Set(splitCsv(item.voterUids));
   if (voters.has(auth.uid)) {
     setStatus(el.threadStatus, 'Ya votaste este hilo.', 'error');
     return;
@@ -657,6 +714,131 @@ const voteThread = async (threadId) => {
     return;
   }
 
+  await loadForum();
+};
+
+const voteReply = async (replyId) => {
+  if (!auth.token || !auth.uid) {
+    setStatus(el.threadStatus, 'Inicia sesión para votar.', 'error');
+    return;
+  }
+
+  const item = replies.find((reply) => reply.id === replyId);
+  if (!item) return;
+
+  const voters = new Set(splitCsv(item.voterUids));
+  if (voters.has(auth.uid)) {
+    setStatus(el.threadStatus, 'Ya votaste esta respuesta.', 'error');
+    return;
+  }
+
+  voters.add(auth.uid);
+
+  const ok = await updateDocument('foro_respuestas', replyId, {
+    upvotes: Number(item.upvotes || 0) + 1,
+    voterUids: Array.from(voters).join(','),
+  });
+
+  if (!ok) {
+    setStatus(el.threadStatus, 'No se pudo guardar tu voto.', 'error');
+    return;
+  }
+
+  await loadForum();
+};
+
+const editThread = async (threadId) => {
+  const item = threads.find((thread) => thread.id === threadId);
+  if (!canManageItem(item)) return;
+
+  const nextTitle = window.prompt('Editar título del hilo', item.title || '');
+  if (nextTitle === null) return;
+  const nextBody = window.prompt('Editar contenido del hilo', item.body || '');
+  if (nextBody === null) return;
+
+  const title = nextTitle.trim();
+  const body = nextBody.trim();
+  if (title.length < 3 || body.length < 3) {
+    setStatus(el.threadStatus, 'Título y contenido deben tener mínimo 3 caracteres.', 'error');
+    return;
+  }
+
+  const ok = await updateDocument('foro_hilos', threadId, {
+    title,
+    body,
+    updatedAt: new Date().toISOString(),
+  });
+
+  if (!ok) {
+    setStatus(el.threadStatus, 'No se pudo guardar el hilo.', 'error');
+    return;
+  }
+
+  setStatus(el.threadStatus, 'Hilo actualizado.', 'ok');
+  await loadForum();
+};
+
+const deleteThread = async (threadId) => {
+  const item = threads.find((thread) => thread.id === threadId);
+  if (!canManageItem(item)) return;
+  if (!window.confirm('Se eliminará el hilo y sus respuestas.')) return;
+
+  const relatedReplies = replies.filter((reply) => reply.threadId === threadId);
+  const replyResults = await Promise.allSettled(relatedReplies.map((reply) => deleteDocument('foro_respuestas', reply.id)));
+  if (replyResults.some((result) => result.status === 'rejected' || !result.value)) {
+    setStatus(el.threadStatus, 'No se pudieron borrar todas las respuestas del hilo.', 'error');
+    return;
+  }
+
+  const ok = await deleteDocument('foro_hilos', threadId);
+  if (!ok) {
+    setStatus(el.threadStatus, 'No se pudo borrar el hilo.', 'error');
+    return;
+  }
+
+  setStatus(el.threadStatus, 'Hilo eliminado.', 'ok');
+  await loadForum();
+};
+
+const editReply = async (replyId) => {
+  const item = replies.find((reply) => reply.id === replyId);
+  if (!canManageItem(item)) return;
+
+  const nextBody = window.prompt('Editar respuesta', item.body || '');
+  if (nextBody === null) return;
+
+  const body = nextBody.trim();
+  if (!body) {
+    setStatus(el.threadStatus, 'La respuesta no puede quedar vacía.', 'error');
+    return;
+  }
+
+  const ok = await updateDocument('foro_respuestas', replyId, {
+    body,
+    updatedAt: new Date().toISOString(),
+  });
+
+  if (!ok) {
+    setStatus(el.threadStatus, 'No se pudo guardar la respuesta.', 'error');
+    return;
+  }
+
+  setStatus(el.threadStatus, 'Respuesta actualizada.', 'ok');
+  await loadForum();
+};
+
+const deleteReply = async (replyId) => {
+  const item = replies.find((reply) => reply.id === replyId);
+  if (!canManageItem(item)) return;
+  if (!window.confirm('Se eliminará esta respuesta.')) return;
+
+  const ok = await deleteDocument('foro_respuestas', replyId);
+  if (!ok) {
+    setStatus(el.threadStatus, 'No se pudo borrar la respuesta.', 'error');
+    return;
+  }
+
+  setStatus(el.threadStatus, 'Respuesta eliminada.', 'ok');
   await loadForum();
 };
 
@@ -688,10 +870,6 @@ const sendReply = async (threadId) => {
       voterUids: '',
       reportedCount: 0,
       reporterUids: '',
-    });
-
-    await updateDocument('foro_hilos', threadId, {
-      replyCount: Number(thread.replyCount || 0) + 1,
     });
 
     input.value = '';

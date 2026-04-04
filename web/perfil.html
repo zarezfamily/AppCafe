@@ -234,11 +234,11 @@
 
     .profile-name {
       margin: -1px 0 0;
-      font-size: 10px;
-      color: #d2bead;
-      font-weight: 500;
+      font-size: 9px;
+      color: #bea38c;
+      font-weight: 600;
       position: relative;
-      line-height: 1.25;
+      line-height: 1.15;
       text-align: left;
       white-space: nowrap;
       overflow: hidden;
@@ -375,6 +375,53 @@
       position: relative;
       z-index: 1;
       text-align: left;
+    }
+
+    .profile-achievements {
+      margin-top: 8px;
+      display: grid;
+      gap: 7px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .profile-achievements-meta {
+      margin: 0;
+      color: #cfb39a;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      text-align: left;
+    }
+
+    .profile-achievements-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .achievement-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: rgba(255, 248, 241, 0.08);
+      border: 1px solid rgba(255, 232, 212, 0.16);
+      color: #fff2e4;
+      line-height: 1;
+    }
+
+    .achievement-chip-icon {
+      font-size: 14px;
+    }
+
+    .achievement-chip-label {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.15px;
+      color: #f0dcc8;
     }
 
     .profile-quote {
@@ -675,6 +722,10 @@
 
         <p id="profileCounters" class="profile-counts">0 hilos <span>•</span> 0 respuestas <span>•</span> 0 comentarios</p>
         <p id="profileFollowers" class="profile-followers">0 seguidores</p>
+        <div id="profileAchievements" class="profile-achievements" style="display:none;">
+          <p id="profileAchievementsMeta" class="profile-achievements-meta"></p>
+          <div id="profileAchievementsGrid" class="profile-achievements-grid"></div>
+        </div>
       </div>
 
       <div id="profileActions" class="profile-actions">

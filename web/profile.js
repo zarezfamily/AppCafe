@@ -57,6 +57,9 @@
     since: document.getElementById('profileSince'),
     counters: document.getElementById('profileCounters'),
     followers: document.getElementById('profileFollowers'),
+    achievements: document.getElementById('profileAchievements'),
+    achievementsMeta: document.getElementById('profileAchievementsMeta'),
+    achievementsGrid: document.getElementById('profileAchievementsGrid'),
     quote: document.getElementById('profileQuote'),
     status: document.getElementById('profileStatus'),
     actions: document.getElementById('profileActions'),
@@ -83,6 +86,17 @@
     { name: 'Catador', icon: '🎯', minXp: 700 },
     { name: 'Experto', icon: '⭐', minXp: 1700 },
     { name: 'Maestro', icon: '👑', minXp: 3400 },
+  ];
+
+  const ACHIEVEMENT_DEFS = [
+    { id: 'primera_cata', icon: '🥇', title: 'Ritual de inicio' },
+    { id: 'fotografo', icon: '📸', title: 'Ojo barista' },
+    { id: 'viajero', icon: '🌍', title: 'Ruta de origen' },
+    { id: 'adicto', icon: '🔥', title: 'Tueste constante' },
+    { id: 'maestro_catador', icon: '👑', title: 'Paladar Etiove' },
+    { id: 'coleccionista', icon: '❤️', title: 'Bodega signature' },
+    { id: 'critico', icon: '✍️', title: 'Cuaderno de cata' },
+    { id: 'origen_unico', icon: '🌱', title: 'Lote de autor' },
   ];
 
   const normalizeName = (value) => String(value || '')
@@ -337,6 +351,34 @@
       .trim();
   };
 
+  const parseCsvList = (value) => String(value || '')
+    .split(',')
+    .map((item) => String(item || '').trim())
+    .filter(Boolean);
+
+  const computeAchievementIds = (input) => {
+    const stateLike = {
+      xp: Number(input && input.xp || 0),
+      votesCount: Number(input && input.votesCount || 0),
+      photosCount: Number(input && input.photosCount || 0),
+      reviewsCount: Number(input && input.reviewsCount || 0),
+      favoritesMarkedCount: Number(input && input.favoritesMarkedCount || 0),
+      countriesRated: Array.isArray(input && input.countriesRated) ? input.countriesRated : [],
+      specialOriginsTasted: Array.isArray(input && input.specialOriginsTasted) ? input.specialOriginsTasted : [],
+    };
+    const level = getLevelFromXp(stateLike.xp);
+    const out = [];
+    if (stateLike.votesCount >= 3) out.push('primera_cata');
+    if (stateLike.photosCount >= 12) out.push('fotografo');
+    if (stateLike.countriesRated.length >= 8) out.push('viajero');
+    if (stateLike.votesCount >= 30) out.push('adicto');
+    if (level.name === 'Maestro') out.push('maestro_catador');
+    if (stateLike.favoritesMarkedCount >= 25) out.push('coleccionista');
+    if (stateLike.reviewsCount >= 12) out.push('critico');
+    if (stateLike.specialOriginsTasted.length >= 1) out.push('origen_unico');
+    return out;
+  };
+
   const fetchAuthPhotoUrl = async () => {
     if (!auth.token) return '';
     try {
@@ -489,6 +531,21 @@
     return { votesCount, photosCount, reviewsCount, cafesAddedCount, favoritesMarkedCount, xp };
   };
 
+  const resolveUnlockedAchievements = () => {
+    const syncedIds = parseCsvList(state.profile && state.profile.achievementCsv);
+    const ids = syncedIds.length
+      ? syncedIds
+      : computeAchievementIds({
+          ...computeMemberStats(),
+          countriesRated: parseCsvList(state.profile && state.profile.countriesRatedCsv),
+          specialOriginsTasted: parseCsvList(state.profile && state.profile.specialOriginsCsv),
+        });
+
+    return ids
+      .map((id) => ACHIEVEMENT_DEFS.find((item) => item.id === id))
+      .filter(Boolean);
+  };
+
   const getLevelFromXp = (xp) => {
     let current = LEVELS[0];
     LEVELS.forEach((level) => {
@@ -509,6 +566,7 @@
     const quote = String(state.profile && state.profile.motto || '').trim();
     const quoteText = formatMottoForDisplay(quote) || (isOwner() ? 'Añade una frase breve' : '');
     const member = computeMemberStats();
+    const unlockedAchievements = resolveUnlockedAchievements();
     const currentLevel = getLevelFromXp(member.xp);
     const nextLevel = LEVELS.find((level) => level.minXp > member.xp) || null;
     const levelStartXp = currentLevel.minXp;
@@ -560,6 +618,22 @@
     if (el.followers) {
       const suffix = state.followersCount === 1 ? 'seguidor' : 'seguidores';
       el.followers.textContent = `${state.followersCount} ${suffix}`;
+    }
+    if (el.achievements && el.achievementsMeta && el.achievementsGrid) {
+      if (unlockedAchievements.length) {
+        el.achievements.style.display = '';
+        el.achievementsMeta.textContent = `${unlockedAchievements.length} insignias desbloqueadas`;
+        el.achievementsGrid.innerHTML = unlockedAchievements.map((item) => `
+          <span class="achievement-chip" title="${esc(item.title)}">
+            <span class="achievement-chip-icon">${esc(item.icon)}</span>
+            <span class="achievement-chip-label">${esc(item.title)}</span>
+          </span>
+        `).join('');
+      } else {
+        el.achievements.style.display = 'none';
+        el.achievementsMeta.textContent = '';
+        el.achievementsGrid.innerHTML = '';
+      }
     }
     if (el.quote) {
       el.quote.textContent = quoteText;

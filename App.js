@@ -2284,6 +2284,29 @@ function MainScreen({ onLogout }) {
   const newsletterHasEmail = !!newsletterEmail;
   const forumAuthorName = (perfil.alias || perfil.nombre || user?.email?.split('@')[0] || 'Catador').trim();
   const voteWeight = currentLevel.name === 'Maestro' ? 2 : 1;
+  const achievementCsv = (gamification.achievementIds || []).join(',');
+  const countriesRatedCsv = (gamification.countriesRated || []).join(',');
+  const specialOriginsCsv = (gamification.specialOriginsTasted || []).join(',');
+
+  useEffect(() => {
+    if (!user?.uid) return;
+
+    const payload = {
+      uid: user.uid,
+      displayName: profileAlias,
+      achievementCsv,
+      achievementCount: unlockedCount,
+      countriesRatedCsv,
+      specialOriginsCsv,
+      xp: gamification.xp,
+      updatedAt: new Date().toISOString(),
+    };
+
+    const remoteAvatar = String(perfil?.foto || '').startsWith('http') ? String(perfil.foto).trim() : '';
+    if (remoteAvatar) payload.avatarUrl = remoteAvatar;
+
+    setDocument('user_profiles', user.uid, payload).catch(() => {});
+  }, [achievementCsv, countriesRatedCsv, gamification.xp, perfil?.foto, profileAlias, specialOriginsCsv, unlockedCount, user?.uid]);
 
   const abrirNuevaCata = (cafeExistente = null) => {
     if (!cafeExistente && !premium.isPremium && notebook.catas.length >= FREE_LIMITS.diarioCatasMax) {

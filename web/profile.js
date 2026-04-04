@@ -99,7 +99,7 @@
     { id: 'adicto', icon: '🔥', title: 'Tueste constante', desc: 'Valora 30 cafes y demuestra constancia de catador.' },
     { id: 'maestro_catador', icon: '👑', title: 'Paladar Etiove', desc: 'Alcanza el nivel Maestro y corona tu perfil.' },
     { id: 'coleccionista', icon: '❤️', title: 'Bodega signature', desc: 'Marca 25 favoritos y construye tu propia coleccion.' },
-    { id: 'critico', icon: '✍️', title: 'Cuaderno de cata', desc: 'Escribe 12 resenas y convierte tu perfil en referencia.' },
+    { id: 'critico', icon: '✍️', title: 'Cuaderno de cata', desc: 'Escribe 12 reseñas y convierte tu perfil en referencia.' },
     { id: 'origen_unico', icon: '🌱', title: 'Lote de autor', desc: 'Prueba un origen especial como Geisha, Bourbon Pointu o Yemen.' },
   ];
 
@@ -609,7 +609,7 @@
     if (el.since) el.since.textContent = sinceText;
     if (el.level) el.level.textContent = `${currentLevel.icon} ${currentLevel.name}`;
     if (el.xp) el.xp.textContent = `${member.xp} XP acumulados`;
-    if (el.nextLevel) el.nextLevel.textContent = nextLevel ? `Proximo nivel: ${nextLevel.name}` : 'Nivel maximo alcanzado';
+    if (el.nextLevel) el.nextLevel.textContent = nextLevel ? `Próximo nivel: ${nextLevel.name}` : 'Nivel máximo alcanzado';
     if (el.nextXp) el.nextXp.textContent = nextLevel ? `${nextLevel.minXp} XP` : '';
     if (el.progressFill) el.progressFill.style.width = `${progress.toFixed(1)}%`;
     if (el.statVotes) el.statVotes.textContent = String(member.votesCount);
@@ -679,7 +679,7 @@
     if (el.followBtn) {
       if (!auth.uid) {
         el.followBtn.style.display = '';
-        el.followBtn.textContent = 'Inicia sesion para seguir';
+        el.followBtn.textContent = 'Inicia sesión para seguir';
         el.followBtn.disabled = true;
       } else if (isOwner()) {
         el.followBtn.style.display = 'none';
@@ -696,7 +696,7 @@
       if (!auth.uid || isOwner()) {
         el.dmBtn.style.display = isOwner() ? 'none' : '';
         el.dmBtn.disabled = true;
-        el.dmBtn.textContent = isOwner() ? 'No puedes escribirte' : 'Inicia sesion para escribir';
+        el.dmBtn.textContent = isOwner() ? 'No puedes escribirte' : 'Inicia sesión para escribir';
       } else {
         el.dmBtn.style.display = '';
         el.dmBtn.disabled = false;
@@ -843,7 +843,7 @@
         <article class="stat-card"><p class="stat-label">Votos negativos en blog</p><p class="stat-value">${totalDownvotes()}</p></article>
         <article class="stat-card"><p class="stat-label">Seguidores</p><p class="stat-value">${state.followersCount}</p></article>
         <article class="stat-card"><p class="stat-label">Siguiendo</p><p class="stat-value">${state.followingCount}</p></article>
-        <article class="stat-card"><p class="stat-label">Antiguedad</p><p class="stat-value" style="font-size:20px;line-height:1.3;">${esc(memberFor)}</p></article>
+        <article class="stat-card"><p class="stat-label">Antigüedad</p><p class="stat-value" style="font-size:20px;line-height:1.3;">${esc(memberFor)}</p></article>
       </div>
     `;
   };
@@ -902,7 +902,7 @@
 
   const renderMessages = () => {
     if (!auth.uid) {
-      renderEmpty('Inicia sesion para ver y responder mensajes.');
+      renderEmpty('Inicia sesión para ver y responder mensajes.');
       return;
     }
 
@@ -1053,7 +1053,7 @@
 
   const replyDirectMessage = async (targetUid, targetName) => {
     if (!auth.uid) {
-      setStatus('Inicia sesion para responder mensajes.');
+      setStatus('Inicia sesión para responder mensajes.');
       return;
     }
 

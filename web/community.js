@@ -116,7 +116,7 @@ const closeProfileModal = () => {
 let selectedCategory = 'general';
 let threads = [];
 let replies = [];
-const THREADS_PAGE_SIZE = 8;
+const THREADS_PAGE_SIZE = 12;
 let currentListPage = 1;
 const IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 const IMAGE_ALLOWED_TYPES = new Set([
@@ -883,13 +883,32 @@ const renderThreads = () => {
 
     resetCommunityMeta();
 
-    const visibleCount = Math.min(displayList.length, currentListPage * THREADS_PAGE_SIZE);
-    const pagedList = displayList.slice(0, visibleCount);
-    const hasMore = visibleCount < displayList.length;
-    const pagerHtml = `
-      <div class="threads-pager" style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
-        <p class="muted" style="margin:0;">Mostrando ${visibleCount} de ${displayList.length} hilos</p>
-        ${hasMore ? '<button class="btn ghost" data-load-more="1">Cargar más</button>' : ''}
+    const totalPages = Math.max(1, Math.ceil(displayList.length / THREADS_PAGE_SIZE));
+    if (currentListPage > totalPages) currentListPage = totalPages;
+    const start = (currentListPage - 1) * THREADS_PAGE_SIZE;
+    const end = Math.min(start + THREADS_PAGE_SIZE, displayList.length);
+    const pagedList = displayList.slice(start, end);
+
+    // Sliding window of page numbers (max 11 visible)
+    const maxBtns = 11;
+    let pageFrom = Math.max(1, currentListPage - Math.floor(maxBtns / 2));
+    let pageTo = Math.min(totalPages, pageFrom + maxBtns - 1);
+    if (pageTo - pageFrom < maxBtns - 1) pageFrom = Math.max(1, pageTo - maxBtns + 1);
+    const pageNums = [];
+    for (let p = pageFrom; p <= pageTo; p++) pageNums.push(p);
+
+    const prevDisabled = currentListPage === 1 ? 'disabled' : '';
+    const nextDisabled = currentListPage === totalPages ? 'disabled' : '';
+    const pagerHtml = totalPages <= 1 ? '' : `
+      <div class="threads-pager">
+        <div class="pager-nav">
+          <button class="pager-btn pager-arrow" data-page="1" ${prevDisabled} aria-label="Primera página">«</button>
+          <button class="pager-btn pager-arrow" data-page="${currentListPage - 1}" ${prevDisabled} aria-label="Página anterior">‹</button>
+          ${pageNums.map((p) => `<button class="pager-btn${p === currentListPage ? ' active' : ''}" data-page="${p}">${p}</button>`).join('')}
+          <button class="pager-btn pager-arrow" data-page="${currentListPage + 1}" ${nextDisabled} aria-label="Página siguiente">›</button>
+          <button class="pager-btn pager-arrow" data-page="${totalPages}" ${nextDisabled} aria-label="Última página">»</button>
+        </div>
+        <p class="pager-info">Mostrando temas del ${start + 1} al ${end} de ${displayList.length}</p>
       </div>
     `;
 
@@ -935,13 +954,16 @@ const renderThreads = () => {
     btn.addEventListener('click', () => voteThread(btn.getAttribute('data-vote')));
   });
 
-  const loadMoreBtn = el.threadsWrap.querySelector('[data-load-more]');
-  if (loadMoreBtn) {
-    loadMoreBtn.addEventListener('click', () => {
-      currentListPage += 1;
-      renderThreads();
+  el.threadsWrap.querySelectorAll('[data-page]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const newPage = parseInt(btn.getAttribute('data-page'), 10);
+      if (!btn.disabled && newPage >= 1) {
+        currentListPage = newPage;
+        renderThreads();
+        el.threadsWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     });
-  }
+  });
 
   const backBtn = el.threadsWrap.querySelector('[data-back-list]');
   if (backBtn) backBtn.addEventListener('click', goToThreadList);

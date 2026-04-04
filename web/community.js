@@ -157,13 +157,13 @@ const splitCsv = (value) => String(value || '')
   .filter(Boolean);
 
 const BADGE_LIBRARY = {
-  first_thread: { icon: '🌱', label: 'Primer hilo' },
-  first_reply: { icon: '💬', label: 'Primera respuesta' },
-  curator: { icon: '🧠', label: 'Curador' },
-  active_voice: { icon: '⚡', label: 'Voz activa' },
-  top_contributor: { icon: '🏆', label: 'Top contribuidor' },
-  community_pillar: { icon: '🛡️', label: 'Pilar' },
-  espresso_scholar: { icon: '📚', label: 'Scholar' },
+  first_thread: { icon: '🌱', label: 'Primer hilo', desc: 'Iniciaste tu primera conversación en la comunidad.' },
+  first_reply: { icon: '💬', label: 'Primera respuesta', desc: 'Participaste ayudando en un hilo de otro miembro.' },
+  curator: { icon: '🧠', label: 'Curador', desc: 'Tus aportes reciben interés y aportan criterio al foro.' },
+  active_voice: { icon: '⚡', label: 'Voz activa', desc: 'Mantienes presencia frecuente en la conversación.' },
+  top_contributor: { icon: '🏆', label: 'Top contribuidor', desc: 'Acumulaste una participación destacada en hilos y respuestas.' },
+  community_pillar: { icon: '🛡️', label: 'Pilar', desc: 'Eres uno de los perfiles más constantes de la comunidad.' },
+  espresso_scholar: { icon: '📚', label: 'Scholar', desc: 'Tu evolución refleja dominio y aprendizaje continuo.' },
 };
 
 const normalizeBadgeId = (rawBadge) => normalizeText(rawBadge).replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
@@ -188,6 +188,48 @@ const fallbackBadgeIds = (stats) => {
   return badges;
 };
 
+const formatBadgeUnlockDate = (iso) => {
+  const safe = String(iso || '').trim();
+  if (!safe) return '';
+  const d = new Date(safe);
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+};
+
+const extractBadgeUnlockMap = (profile) => {
+  const out = {};
+  if (!profile) return out;
+
+  const rawJson = String(profile.badgeUnlockedAtJson || profile.achievementUnlockedAtJson || '').trim();
+  if (rawJson) {
+    try {
+      const parsed = JSON.parse(rawJson);
+      if (parsed && typeof parsed === 'object') {
+        Object.keys(parsed).forEach((k) => {
+          const key = normalizeBadgeId(k);
+          const value = String(parsed[k] || '').trim();
+          if (key && value) out[key] = value;
+        });
+      }
+    } catch {
+      // Ignore malformed JSON payloads from older profiles.
+    }
+  }
+
+  const rawCsv = String(profile.badgeUnlockedAtCsv || profile.achievementDatesCsv || '').trim();
+  splitCsv(rawCsv).forEach((entry) => {
+    const sep = entry.includes('|') ? '|' : (entry.includes(':') ? ':' : '');
+    if (!sep) return;
+    const idx = entry.indexOf(sep);
+    if (idx < 1) return;
+    const id = normalizeBadgeId(entry.slice(0, idx));
+    const date = String(entry.slice(idx + 1) || '').trim();
+    if (id && date && !out[id]) out[id] = date;
+  });
+
+  return out;
+};
+
 const renderMemberEvolutionCard = ({ profile = null, allThreads = [], allReplies = [] } = {}) => {
   if (!el.memberEvolutionCard) return;
   if (!auth.uid || !auth.token) {
@@ -208,6 +250,7 @@ const renderMemberEvolutionCard = ({ profile = null, allThreads = [], allReplies
 
   const rawAchievementCsv = String((profile && (profile.achievementCsv || profile.achievementsCsv || profile.badgeCsv)) || '').trim();
   const parsedBadges = splitCsv(rawAchievementCsv).map(normalizeBadgeId).filter(Boolean);
+  const badgeUnlockMap = extractBadgeUnlockMap(profile);
   const computedBadges = parsedBadges.length > 0 ? parsedBadges : fallbackBadgeIds({
     threadCount: myThreads.length,
     replyCount: myReplies.length,
@@ -240,8 +283,13 @@ const renderMemberEvolutionCard = ({ profile = null, allThreads = [], allReplies
       const badge = BADGE_LIBRARY[badgeId] || {
         icon: '✦',
         label: badgeId.replace(/_/g, ' '),
+        desc: 'Insignia desbloqueada por tu evolución en la comunidad.',
       };
-      return `<span class="member-evo-badge">${escapeHtml(badge.icon)} ${escapeHtml(badge.label)}</span>`;
+      const unlockedAt = formatBadgeUnlockDate(badgeUnlockMap[badgeId]);
+      const tooltip = unlockedAt
+        ? `${badge.label} · ${badge.desc} · Desbloqueada ${unlockedAt}`
+        : `${badge.label} · ${badge.desc}`;
+      return `<span class="member-evo-badge" data-tip="${escapeHtml(tooltip)}" tabindex="0">${escapeHtml(badge.icon)} ${escapeHtml(badge.label)}</span>`;
     }).join('');
     el.memberEvolutionEmpty.style.display = 'none';
   }

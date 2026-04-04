@@ -523,6 +523,45 @@
       color: var(--ink-soft);
       line-height: 1;
       white-space: nowrap;
+      position: relative;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      cursor: default;
+      outline: none;
+    }
+    .member-evo-badge:hover,
+    .member-evo-badge:focus-visible {
+      transform: translateY(-1px);
+      border-color: #c99557;
+      box-shadow: 0 8px 16px rgba(33,21,15,0.12);
+    }
+    .member-evo-badge::after {
+      content: attr(data-tip);
+      position: absolute;
+      left: 50%;
+      bottom: calc(100% + 8px);
+      transform: translate(-50%, 6px);
+      min-width: 140px;
+      max-width: 220px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(201,149,87,0.45);
+      background: rgba(30,18,12,0.95);
+      color: #f9ead5;
+      font-size: 10px;
+      line-height: 1.35;
+      letter-spacing: 0.2px;
+      white-space: normal;
+      text-align: center;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.34);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+      z-index: 40;
+    }
+    .member-evo-badge:hover::after,
+    .member-evo-badge:focus-visible::after {
+      opacity: 1;
+      transform: translate(-50%, 0);
     }
     .member-evo-empty {
       margin-top: 10px;

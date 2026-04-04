@@ -375,6 +375,7 @@ const resetThreadComposer = (options = {}) => {
 const startThreadEdit = (item) => {
   if (!item) return;
   const lastScrollY = window.scrollY;
+  const openedFromDetail = getActiveThreadId() === item.id;
   editingThreadId = item.id;
   const composerSection = document.getElementById('newThreadSection');
   if (el.threadComposerTitle) el.threadComposerTitle.textContent = 'Editar hilo';
@@ -407,12 +408,18 @@ const startThreadEdit = (item) => {
       window.setTimeout(() => newThreadSection.classList.remove('thread-composer-attention'), 1800);
     }, 180);
   }
-  if (el.threadTitle) {
+  const focusTarget = openedFromDetail ? el.threadBody : el.threadTitle;
+  if (focusTarget) {
     window.setTimeout(() => {
-      el.threadTitle.focus({ preventScroll: true });
-      if (typeof el.threadTitle.setSelectionRange === 'function') {
-        const end = String(el.threadTitle.value || '').length;
-        el.threadTitle.setSelectionRange(0, end);
+      focusTarget.focus({ preventScroll: true });
+      if (typeof focusTarget.setSelectionRange === 'function') {
+        if (focusTarget === el.threadBody) {
+          const end = String(el.threadBody.value || '').length;
+          focusTarget.setSelectionRange(end, end);
+        } else {
+          const end = String(el.threadTitle.value || '').length;
+          focusTarget.setSelectionRange(0, end);
+        }
       }
     }, 220);
   }

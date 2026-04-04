@@ -399,8 +399,23 @@ const startThreadEdit = (item) => {
   window.requestAnimationFrame(() => window.scrollTo({ top: lastScrollY, behavior: 'auto' }));
 
   const newThreadSection = document.getElementById('newThreadSection');
-  if (newThreadSection) newThreadSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  if (el.threadTitle) el.threadTitle.focus();
+  if (newThreadSection) {
+    newThreadSection.classList.remove('thread-composer-attention');
+    newThreadSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    window.setTimeout(() => {
+      newThreadSection.classList.add('thread-composer-attention');
+      window.setTimeout(() => newThreadSection.classList.remove('thread-composer-attention'), 1800);
+    }, 180);
+  }
+  if (el.threadTitle) {
+    window.setTimeout(() => {
+      el.threadTitle.focus({ preventScroll: true });
+      if (typeof el.threadTitle.setSelectionRange === 'function') {
+        const end = String(el.threadTitle.value || '').length;
+        el.threadTitle.setSelectionRange(0, end);
+      }
+    }, 220);
+  }
 };
 
 const hasUserVote = (item) => splitCsv(item && item.voterUids).includes(auth.uid);

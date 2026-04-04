@@ -519,6 +519,35 @@ const normalizeThread = (thread) => {
   };
 };
 
+const normalizeStorageImageUrl = (rawUrl) => {
+  const raw = String(rawUrl || '').trim();
+  if (!raw) return '';
+
+  if (raw.startsWith('gs://')) {
+    const withoutPrefix = raw.slice(5);
+    const slashIdx = withoutPrefix.indexOf('/');
+    if (slashIdx > 0) {
+      const bucket = withoutPrefix.slice(0, slashIdx);
+      const objectPath = withoutPrefix.slice(slashIdx + 1);
+      return `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(objectPath)}?alt=media`;
+    }
+  }
+
+  if (/^[\w-]+\/(?:[\w.-]+\/)*[\w.-]+$/.test(raw) && !raw.startsWith('http')) {
+    return `https://firebasestorage.googleapis.com/v0/b/${FIREBASE_STORAGE_BUCKET}/o/${encodeURIComponent(raw)}?alt=media`;
+  }
+
+  try {
+    const url = new URL(raw);
+    if (url.hostname.includes('firebasestorage.googleapis.com') && !url.searchParams.has('alt')) {
+      url.searchParams.set('alt', 'media');
+    }
+    return url.toString();
+  } catch {
+    return raw;
+  }
+};
+
 const isThreadVisible = (thread) => thread.accessLevel !== 'registered_only' || !!auth.token;
 
 const getCollection = async (name, pageSize = 400) => {
@@ -825,7 +854,7 @@ const renderThreads = () => {
           <span class="pill" style="background:${accessTagBg};color:${accessTagColor}">${escapeHtml(ACCESS_LABELS[activeThread.accessLevel] || 'Público')}</span>
         </div>
         <p>${escapeHtml(activeThread.body || '')}</p>
-        ${activeThread.image ? `<img class="thread-image" src="${escapeHtml(activeThread.image)}" alt="Imagen del hilo" loading="lazy" decoding="async" />` : ''}
+        ${normalizeStorageImageUrl(activeThread.image) ? `<img class="thread-image" src="${escapeHtml(normalizeStorageImageUrl(activeThread.image))}" alt="Imagen del hilo" loading="lazy" decoding="async" />` : ''}
         <div class="thread-foot">
           <div class="actions-row">
             <button class="link-btn" data-vote="${activeThread.id}">${threadVoted ? 'Ya te interesa' : 'Me interesa'}</button>
@@ -887,7 +916,7 @@ const renderThreads = () => {
           <span class="pill" style="background:${accessTagBg};color:${accessTagColor}">${escapeHtml(ACCESS_LABELS[t.accessLevel] || 'Público')}</span>
         </div>
         <p>${escapeHtml(t.body || '')}</p>
-        ${t.image ? `<img class="thread-image" src="${escapeHtml(t.image)}" alt="Imagen del hilo" loading="lazy" decoding="async" />` : ''}
+        ${normalizeStorageImageUrl(t.image) ? `<img class="thread-image" src="${escapeHtml(normalizeStorageImageUrl(t.image))}" alt="Imagen del hilo" loading="lazy" decoding="async" />` : ''}
         <div class="thread-foot">
           <div class="actions-row">
             <button class="link-btn" data-vote="${t.id}">${threadVoted ? 'Ya te interesa' : 'Me interesa'}</button>
@@ -1003,6 +1032,7 @@ const loadForum = async () => {
   }
 
   const h = hRes.value || [];
+  const activeThreadId = getActiveThreadId();
   const visibleThreads = h.filter(isThreadVisible);
   const visibleIds = new Set(visibleThreads.map((t) => t.id));
 
@@ -1030,6 +1060,15 @@ const loadForum = async () => {
 
   const normalizedVisibleThreads = visibleThreads.map((item) => normalizeThread(applyCanonicalAlias(item)));
   threads = normalizedVisibleThreads;
+
+  if (activeThreadId && !threads.some((thread) => thread.id === activeThreadId)) {
+    const explicitThread = await getDocument('foro_hilos', activeThreadId).catch(() => null);
+    if (explicitThread && isThreadVisible(explicitThread)) {
+      const normalizedExplicit = normalizeThread(applyCanonicalAlias(explicitThread));
+      threads = [normalizedExplicit, ...threads.filter((thread) => thread.id !== activeThreadId)];
+      visibleIds.add(activeThreadId);
+    }
+  }
   replies = rRes.status === 'fulfilled'
     ? (rRes.value || []).filter((reply) => visibleIds.has(reply.threadId)).map((item) => applyCanonicalAlias(item))
     : [];

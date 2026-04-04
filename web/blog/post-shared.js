@@ -56,6 +56,41 @@
     window.location.href = url;
   };
 
+  const normalizeName = (value) => String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+
+  let uidByAliasPromise = null;
+  const getUidByAliasMap = async () => {
+    if (uidByAliasPromise) return uidByAliasPromise;
+    uidByAliasPromise = (async () => {
+      const profiles = await getCollection('user_profiles', 2000);
+      const map = new Map();
+      profiles.forEach((profile) => {
+        const safeUid = String(profile.uid || '').trim();
+        if (!safeUid) return;
+        const candidates = [profile.displayName, profile.alias, profile.nickname];
+        candidates.forEach((candidate) => {
+          const key = normalizeName(candidate);
+          if (key && !map.has(key)) map.set(key, safeUid);
+        });
+      });
+      return map;
+    })().catch(() => new Map());
+    return uidByAliasPromise;
+  };
+
+  const resolveUidFromAlias = async (uidValue, nameValue) => {
+    const safeUid = String(uidValue || '').trim();
+    if (safeUid) return safeUid;
+    const key = normalizeName(nameValue);
+    if (!key) return '';
+    const map = await getUidByAliasMap();
+    return String(map.get(key) || '').trim();
+  };
+
   const ensureBlogStyles = () => {
     if (document.getElementById('etioveBlogSharedStyles')) return;
     const style = document.createElement('style');
@@ -331,7 +366,15 @@
     });
 
     el.commentList.querySelectorAll('[data-author-uid]').forEach((btn) => {
-      btn.addEventListener('click', () => goToProfilePage(btn.getAttribute('data-author-uid'), btn.getAttribute('data-author-name')));
+      btn.addEventListener('click', async () => {
+        const authorName = btn.getAttribute('data-author-name') || 'Catador';
+        const resolvedUid = await resolveUidFromAlias(btn.getAttribute('data-author-uid'), authorName);
+        if (!resolvedUid) {
+          setStatus('No se pudo abrir el perfil de este alias.');
+          return;
+        }
+        goToProfilePage(resolvedUid, authorName);
+      });
     });
   };
 

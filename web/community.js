@@ -205,6 +205,21 @@ const goToProfilePage = (uid, name) => {
   window.location.href = url;
 };
 
+const resolveUidByAlias = async (uid, name) => {
+  const safeUid = String(uid || '').trim();
+  if (safeUid) return safeUid;
+
+  const aliasKey = normalizeText(name);
+  if (!aliasKey) return '';
+
+  const profiles = await getCollection('user_profiles', 2000).catch(() => []);
+  const hit = profiles.find((profile) => {
+    const candidates = [profile.displayName, profile.alias, profile.nickname].map((value) => normalizeText(value));
+    return candidates.includes(aliasKey) && String(profile.uid || '').trim();
+  });
+  return String((hit && hit.uid) || '').trim();
+};
+
 const inferCategoryId = (thread) => {
   const rawId = normalizeText(thread.categoryId);
   if (FORUM_CATEGORIES.some((c) => c.id === rawId)) return rawId;
@@ -468,8 +483,14 @@ const renderThreads = () => {
 
   // Clic en nombre de autor → modal perfil (solo logueados)
   el.threadsWrap.querySelectorAll('.author-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      goToProfilePage(btn.getAttribute('data-author-uid'), btn.getAttribute('data-author-name'));
+    btn.addEventListener('click', async () => {
+      const authorName = btn.getAttribute('data-author-name') || 'Catador';
+      const resolvedUid = await resolveUidByAlias(btn.getAttribute('data-author-uid'), authorName);
+      if (!resolvedUid) {
+        setStatus(el.threadStatus, 'No se pudo abrir el perfil de este alias.', 'error');
+        return;
+      }
+      goToProfilePage(resolvedUid, authorName);
     });
     btn.style.cursor = 'pointer';
   });

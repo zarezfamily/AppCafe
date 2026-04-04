@@ -31,6 +31,7 @@
 
   const el = {
     avatar: document.getElementById('profileAvatar'),
+    avatarHint: document.getElementById('avatarHint'),
     name: document.getElementById('profileName'),
     since: document.getElementById('profileSince'),
     counters: document.getElementById('profileCounters'),
@@ -40,7 +41,6 @@
     followBtn: document.getElementById('followBtn'),
     dmBtn: document.getElementById('dmBtn'),
     ownerTools: document.getElementById('ownerTools'),
-    editPhotoBtn: document.getElementById('editPhotoBtn'),
     editQuoteBtn: document.getElementById('editQuoteBtn'),
     photoInput: document.getElementById('photoInput'),
     content: document.getElementById('tabContent'),
@@ -48,6 +48,12 @@
   };
 
   const isOwner = () => !!auth.uid && auth.uid === uid;
+
+  const normalizeName = (value) => String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
 
   const setStatus = (text) => {
     if (el.status) el.status.textContent = text || '';
@@ -439,6 +445,16 @@
 
   const renderButtons = () => {
     if (el.ownerTools) el.ownerTools.style.display = isOwner() ? 'flex' : 'none';
+
+    if (el.avatar) {
+      el.avatar.classList.toggle('editable', isOwner());
+      el.avatar.setAttribute('role', isOwner() ? 'button' : 'img');
+      el.avatar.setAttribute('tabindex', isOwner() ? '0' : '-1');
+      el.avatar.setAttribute('aria-label', isOwner() ? 'Cambiar foto de perfil' : 'Foto de perfil');
+    }
+    if (el.avatarHint) {
+      el.avatarHint.textContent = isOwner() ? 'Pulsa la foto para cambiarla' : '';
+    }
 
     if (el.followBtn) {
       if (!auth.uid) {
@@ -912,8 +928,18 @@
     if (el.followBtn) el.followBtn.addEventListener('click', handleFollowToggle);
     if (el.dmBtn) el.dmBtn.addEventListener('click', handleSendDirectMessage);
     if (el.editQuoteBtn) el.editQuoteBtn.addEventListener('click', handleEditQuote);
-    if (el.editPhotoBtn && el.photoInput) {
-      el.editPhotoBtn.addEventListener('click', () => el.photoInput.click());
+    if (el.avatar && el.photoInput) {
+      const openPicker = () => {
+        if (!isOwner()) return;
+        el.photoInput.click();
+      };
+      el.avatar.addEventListener('click', openPicker);
+      el.avatar.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          openPicker();
+        }
+      });
       el.photoInput.addEventListener('change', handlePhotoSelected);
     }
 

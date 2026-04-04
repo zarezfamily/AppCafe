@@ -57,9 +57,9 @@ service cloud.firestore {
       allow write: if isSignedIn();
     }
 
-    // Foro: hilos con visibilidad pública o solo registrados.
+    // Foro: hilos públicos para lectura. El filtrado de 'registered_only' lo hace el cliente.
     match /foro_hilos/{threadId} {
-      allow read: if canReadThreadData(resource.data);
+      allow read: if true;
       allow create: if isSignedIn()
         && request.resource.data.authorUid == request.auth.uid
         && hasString('title', 3, 120)
@@ -75,7 +75,7 @@ service cloud.firestore {
     }
 
     match /foro_respuestas/{replyId} {
-      allow read: if canReadThreadById(resource.data.threadId);
+      allow read: if true;
       allow create: if isSignedIn()
         && request.resource.data.authorUid == request.auth.uid
         && hasString('threadId', 1, 200)

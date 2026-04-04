@@ -20,9 +20,12 @@
     replies: [],
     blogComments: [],
     follows: [],
+    messages: [],
+    profiles: [],
     profile: null,
     isFollowing: false,
     followersCount: 0,
+    followingCount: 0,
     loaded: false,
   };
 
@@ -290,7 +293,42 @@
 
   const refreshFollowState = () => {
     state.followersCount = state.follows.filter((row) => row.targetUid === uid).length;
+    state.followingCount = state.follows.filter((row) => row.followerUid === uid).length;
     state.isFollowing = !!auth.uid && state.follows.some((row) => row.targetUid === uid && row.followerUid === auth.uid);
+  };
+
+  const profileMap = () => {
+    const map = new Map();
+    state.profiles.forEach((profile) => {
+      if (profile && profile.uid) map.set(profile.uid, profile);
+    });
+    return map;
+  };
+
+  const userNameByUid = (targetUid) => {
+    if (!targetUid) return 'Usuario';
+    if (targetUid === uid) return getAuthorName();
+    const map = profileMap();
+    const hit = map.get(targetUid);
+    if (hit && hit.displayName) return String(hit.displayName);
+    const fromForum = state.threads.find((item) => item.authorUid === targetUid)
+      || state.replies.find((item) => item.authorUid === targetUid)
+      || state.blogComments.find((item) => item.authorUid === targetUid);
+    if (fromForum && fromForum.authorName) return String(fromForum.authorName);
+    return queryName || 'Catador';
+  };
+
+  const avatarByUid = (targetUid) => {
+    const map = profileMap();
+    const hit = map.get(targetUid);
+    return String(hit && hit.avatarUrl || '').trim();
+  };
+
+  const openProfile = (targetUid, name) => {
+    const safeUid = String(targetUid || '').trim();
+    if (!safeUid) return;
+    const url = `/perfil.html?uid=${encodeURIComponent(safeUid)}&name=${encodeURIComponent(String(name || 'Catador'))}`;
+    window.location.href = url;
   };
 
   const renderEmpty = (message) => {
@@ -389,9 +427,105 @@
         <article class="stat-card"><p class="stat-label">Comentarios blog</p><p class="stat-value">${state.blogComments.length}</p></article>
         <article class="stat-card"><p class="stat-label">Votos positivos recibidos</p><p class="stat-value">${totalUpvotes()}</p></article>
         <article class="stat-card"><p class="stat-label">Votos negativos en blog</p><p class="stat-value">${totalDownvotes()}</p></article>
+        <article class="stat-card"><p class="stat-label">Seguidores</p><p class="stat-value">${state.followersCount}</p></article>
+        <article class="stat-card"><p class="stat-label">Siguiendo</p><p class="stat-value">${state.followingCount}</p></article>
         <article class="stat-card"><p class="stat-label">Antiguedad</p><p class="stat-value" style="font-size:20px;line-height:1.3;">${esc(memberFor)}</p></article>
       </div>
     `;
+  };
+
+  const renderFollowers = () => {
+    const incoming = state.follows.filter((row) => row.targetUid === uid);
+    if (!incoming.length) {
+      renderEmpty('Este perfil aun no tiene seguidores.');
+      return;
+    }
+
+    el.content.innerHTML = incoming
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .map((row) => {
+        const name = userNameByUid(row.followerUid);
+        const avatar = avatarByUid(row.followerUid);
+        const initial = (name || '?').slice(0, 1).toUpperCase();
+        return `
+          <article class="feed-item">
+            <div class="feed-thumb">${avatar ? `<img src="${esc(avatar)}" alt="${esc(name)}" style="width:100%;height:100%;object-fit:cover;display:block;" />` : esc(initial)}</div>
+            <div class="feed-body">
+              <p class="feed-meta">Seguidor desde ${esc(fmtDate(row.createdAt))}</p>
+              <p class="feed-title">${esc(name)}</p>
+              <div class="feed-aux"><button class="mini-btn" type="button" data-open-profile="${esc(row.followerUid)}" data-open-name="${esc(name)}">Ver perfil</button></div>
+            </div>
+          </article>
+        `;
+      }).join('');
+  };
+
+  const renderFollowing = () => {
+    const outgoing = state.follows.filter((row) => row.followerUid === uid);
+    if (!outgoing.length) {
+      renderEmpty('Este perfil aun no sigue a nadie.');
+      return;
+    }
+
+    el.content.innerHTML = outgoing
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .map((row) => {
+        const name = userNameByUid(row.targetUid);
+        const avatar = avatarByUid(row.targetUid);
+        const initial = (name || '?').slice(0, 1).toUpperCase();
+        return `
+          <article class="feed-item">
+            <div class="feed-thumb">${avatar ? `<img src="${esc(avatar)}" alt="${esc(name)}" style="width:100%;height:100%;object-fit:cover;display:block;" />` : esc(initial)}</div>
+            <div class="feed-body">
+              <p class="feed-meta">Siguiendo desde ${esc(fmtDate(row.createdAt))}</p>
+              <p class="feed-title">${esc(name)}</p>
+              <div class="feed-aux"><button class="mini-btn" type="button" data-open-profile="${esc(row.targetUid)}" data-open-name="${esc(name)}">Ver perfil</button></div>
+            </div>
+          </article>
+        `;
+      }).join('');
+  };
+
+  const renderMessages = () => {
+    if (!auth.uid) {
+      renderEmpty('Inicia sesion para ver y responder mensajes.');
+      return;
+    }
+
+    const rows = isOwner()
+      ? state.messages.filter((row) => row.senderUid === auth.uid || row.recipientUid === auth.uid)
+      : state.messages.filter((row) => {
+          const meAndProfile = row.senderUid === auth.uid && row.recipientUid === uid;
+          const profileAndMe = row.senderUid === uid && row.recipientUid === auth.uid;
+          return meAndProfile || profileAndMe;
+        });
+
+    if (!rows.length) {
+      renderEmpty('No hay mensajes en esta vista.');
+      return;
+    }
+
+    el.content.innerHTML = rows
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .slice(0, 120)
+      .map((row) => {
+        const mine = row.senderUid === auth.uid;
+        const otherUid = mine ? row.recipientUid : row.senderUid;
+        const otherName = mine ? (row.recipientName || userNameByUid(otherUid)) : (row.senderName || userNameByUid(otherUid));
+        return `
+          <article class="feed-item">
+            <div class="feed-thumb">${mine ? '↗' : '↘'}</div>
+            <div class="feed-body">
+              <p class="feed-meta">${mine ? 'Enviado a' : 'Recibido de'} ${esc(otherName)} · ${esc(fmtDate(row.createdAt))}</p>
+              <p class="feed-title">${esc(short(row.body || '', 400))}</p>
+              <div class="feed-aux">
+                <button class="mini-btn" type="button" data-reply-dm="${esc(otherUid)}" data-reply-name="${esc(otherName)}">Responder</button>
+                <button class="mini-btn" type="button" data-open-profile="${esc(otherUid)}" data-open-name="${esc(otherName)}">Ver perfil</button>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
   };
 
   const renderTab = (tabName) => {
@@ -410,6 +544,18 @@
     }
     if (tabName === 'blog') {
       renderBlogList();
+      return;
+    }
+    if (tabName === 'followers') {
+      renderFollowers();
+      return;
+    }
+    if (tabName === 'following') {
+      renderFollowing();
+      return;
+    }
+    if (tabName === 'messages') {
+      renderMessages();
       return;
     }
     if (tabName === 'stats') {
@@ -484,7 +630,49 @@
       setStatus('No se pudo enviar el mensaje.');
       return;
     }
+    state.messages = await getCollection('direct_messages', 4000);
+    if (el.tabs.some((btn) => btn.classList.contains('active') && btn.getAttribute('data-tab') === 'messages')) {
+      renderMessages();
+    }
     setStatus('Mensaje directo enviado.');
+  };
+
+  const replyDirectMessage = async (targetUid, targetName) => {
+    if (!auth.uid) {
+      setStatus('Inicia sesion para responder mensajes.');
+      return;
+    }
+
+    const safeTargetUid = String(targetUid || '').trim();
+    if (!safeTargetUid) return;
+
+    const message = window.prompt(`Responder a ${targetName || 'usuario'}`);
+    if (message === null) return;
+
+    const body = String(message || '').trim();
+    if (body.length < 2) {
+      setStatus('El mensaje es demasiado corto.');
+      return;
+    }
+
+    const ok = await addDocument('direct_messages', {
+      senderUid: auth.uid,
+      senderName: String(localStorage.getItem('etiove_web_alias') || auth.email.split('@')[0] || 'Catador'),
+      recipientUid: safeTargetUid,
+      recipientName: String(targetName || userNameByUid(safeTargetUid) || 'Catador'),
+      body,
+      createdAt: new Date().toISOString(),
+      read: false,
+    });
+
+    if (!ok) {
+      setStatus('No se pudo enviar la respuesta.');
+      return;
+    }
+
+    state.messages = await getCollection('direct_messages', 4000);
+    renderMessages();
+    setStatus('Respuesta enviada.');
   };
 
   const handleEditQuote = async () => {
@@ -555,6 +743,21 @@
       el.editPhotoBtn.addEventListener('click', () => el.photoInput.click());
       el.photoInput.addEventListener('change', handlePhotoSelected);
     }
+
+    if (el.content) {
+      el.content.addEventListener('click', (event) => {
+        const openBtn = event.target.closest('[data-open-profile]');
+        if (openBtn) {
+          openProfile(openBtn.getAttribute('data-open-profile'), openBtn.getAttribute('data-open-name'));
+          return;
+        }
+
+        const replyBtn = event.target.closest('[data-reply-dm]');
+        if (replyBtn) {
+          replyDirectMessage(replyBtn.getAttribute('data-reply-dm'), replyBtn.getAttribute('data-reply-name'));
+        }
+      });
+    }
   };
 
   const init = async () => {
@@ -563,12 +766,14 @@
       return;
     }
 
-    const [threads, replies, blogComments, follows, profile] = await Promise.all([
+    const [threads, replies, blogComments, follows, profile, messages, profiles] = await Promise.all([
       getCollection('foro_hilos', 1200),
       getCollection('foro_respuestas', 2000),
       getCollection('blog_comentarios', 2000),
       getCollection('profile_follows', 4000),
       getDocument('user_profiles', uid),
+      auth.uid ? getCollection('direct_messages', 4000) : Promise.resolve([]),
+      getCollection('user_profiles', 2000),
     ]);
 
     state.threads = threads.filter((item) => item.authorUid === uid);
@@ -576,6 +781,8 @@
     state.blogComments = blogComments.filter((item) => item.authorUid === uid);
     state.follows = follows;
     state.profile = profile;
+    state.messages = messages;
+    state.profiles = profiles;
     refreshFollowState();
 
     renderHeader();

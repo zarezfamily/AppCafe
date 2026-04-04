@@ -274,6 +274,27 @@
       color: #1f1b16;
     }
 
+    .feed-aux {
+      margin-top: 8px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .mini-btn {
+      border: 1px solid #ccbcae;
+      background: #fffaf3;
+      color: #6d4f31;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .mini-btn:hover { border-color: #b08255; color: #8e4f1d; }
+
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -354,6 +375,9 @@
       <button class="tab-btn" type="button" data-tab="threads">Hilos</button>
       <button class="tab-btn" type="button" data-tab="replies">Respuestas</button>
       <button class="tab-btn" type="button" data-tab="blog">Blog</button>
+      <button class="tab-btn" type="button" data-tab="followers">Seguidores</button>
+      <button class="tab-btn" type="button" data-tab="following">Siguiendo</button>
+      <button class="tab-btn" type="button" data-tab="messages">Mensajes</button>
       <button class="tab-btn" type="button" data-tab="stats">Estadisticas</button>
     </div>
 

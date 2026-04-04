@@ -926,24 +926,19 @@ const renderThreads = () => {
 
     return `
       <article class="thread" data-thread-id="${t.id}" style="animation-delay:${delay}s">
-        <h3><a class="thread-title-link" href="${threadDetailUrl(t.id)}" aria-label="Abrir hilo ${escapeHtml(t.title || '')}">${escapeHtml(t.title || '')}</a></h3>
-        <div class="meta">${escapeHtml(t.categoryLabel || '')} · <button class="link-btn author-btn" data-author-uid="${escapeHtml(t.authorUid || '')}" data-author-name="${escapeHtml(t.authorName || 'Catador')}" style="font-weight:600;">${escapeHtml(t.authorName || 'Catador')}</button> · ${fmt(t.createdAt)} · ${Number(t.upvotes || 0)} votos</div>
-        <div class="thread-tags">
+        <div class="thread-compact-head">
           <span class="pill category">${escapeHtml(t.categoryLabel || 'General')}</span>
-          <span class="pill" style="background:${accessTagBg};color:${accessTagColor}">${escapeHtml(ACCESS_LABELS[t.accessLevel] || 'Público')}</span>
+          ${!!normalizeStorageImageUrl(t.image) ? '<span class="thread-img-badge" title="Incluye imagen">📷</span>' : ''}
         </div>
-        <p>${escapeHtml(t.body || '')}</p>
-        ${normalizeStorageImageUrl(t.image) ? `<img class="thread-image" src="${escapeHtml(normalizeStorageImageUrl(t.image))}" alt="Imagen del hilo" loading="lazy" decoding="async" />` : ''}
-        <div class="thread-foot">
-          <div class="actions-row">
-            <button class="link-btn" data-vote="${t.id}">${threadVoted ? 'Ya te interesa' : 'Me interesa'}</button>
-            <span class="muted">${threadReplies.length} respuestas</span>
-          </div>
-          <div class="actions-row">
-            ${threadCanManage
-              ? `<button class="link-btn" data-thread-edit="${t.id}">Editar</button><button class="link-btn" data-thread-delete="${t.id}">Eliminar</button>`
-              : ''}
-          </div>
+        <h3><a class="thread-title-link" href="${threadDetailUrl(t.id)}" aria-label="Abrir hilo ${escapeHtml(t.title || '')}">${escapeHtml(t.title || '')}</a></h3>
+        <p class="thread-body-preview">${escapeHtml((() => { const b = String(t.body || ''); return b.length > 140 ? b.slice(0, 140) + '…' : b; })())}</p>
+        <div class="thread-compact-foot">
+          <span class="thread-compact-meta"><button class="link-btn author-btn" data-author-uid="${escapeHtml(t.authorUid || '')}" data-author-name="${escapeHtml(t.authorName || 'Catador')}">${escapeHtml(t.authorName || 'Catador')}</button> · ${fmt(t.createdAt)}</span>
+          <span class="thread-compact-stats">
+            <button class="link-btn" data-vote="${t.id}">${threadVoted ? '✓ Interesa' : 'Me interesa'}</button>
+            <span class="muted">${Number(t.upvotes || 0)} votos · ${threadReplies.length} respuestas</span>
+            ${threadCanManage ? `<button class="link-btn" data-thread-edit="${t.id}">Editar</button><button class="link-btn" data-thread-delete="${t.id}">Eliminar</button>` : ''}
+          </span>
         </div>
       </article>
     `;

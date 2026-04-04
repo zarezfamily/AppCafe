@@ -237,6 +237,77 @@ const getActiveThreadId = () => {
 
 const threadDetailUrl = (threadId) => `/comunidad/hilo/${encodeURIComponent(String(threadId || '').trim())}`;
 
+const metaDefaults = {
+  title: document.title,
+  description: '',
+  ogTitle: '',
+  ogDescription: '',
+  ogUrl: '',
+  twitterTitle: '',
+  twitterDescription: '',
+  canonical: '',
+};
+
+const getMetaTag = (selector) => document.querySelector(selector);
+
+const initializeMetaDefaults = () => {
+  const desc = getMetaTag('meta[name="description"]');
+  const ogTitle = getMetaTag('meta[property="og:title"]');
+  const ogDescription = getMetaTag('meta[property="og:description"]');
+  const ogUrl = getMetaTag('meta[property="og:url"]');
+  const twitterTitle = getMetaTag('meta[name="twitter:title"]');
+  const twitterDescription = getMetaTag('meta[name="twitter:description"]');
+  const canonical = getMetaTag('link[rel="canonical"]');
+
+  metaDefaults.description = desc ? (desc.getAttribute('content') || '') : '';
+  metaDefaults.ogTitle = ogTitle ? (ogTitle.getAttribute('content') || '') : '';
+  metaDefaults.ogDescription = ogDescription ? (ogDescription.getAttribute('content') || '') : '';
+  metaDefaults.ogUrl = ogUrl ? (ogUrl.getAttribute('content') || '') : '';
+  metaDefaults.twitterTitle = twitterTitle ? (twitterTitle.getAttribute('content') || '') : '';
+  metaDefaults.twitterDescription = twitterDescription ? (twitterDescription.getAttribute('content') || '') : '';
+  metaDefaults.canonical = canonical ? (canonical.getAttribute('href') || '') : '';
+};
+
+const setMetaContent = (selector, value) => {
+  const node = getMetaTag(selector);
+  if (node) node.setAttribute('content', value);
+};
+
+const resetCommunityMeta = () => {
+  document.title = metaDefaults.title;
+  setMetaContent('meta[name="description"]', metaDefaults.description);
+  setMetaContent('meta[property="og:title"]', metaDefaults.ogTitle);
+  setMetaContent('meta[property="og:description"]', metaDefaults.ogDescription);
+  setMetaContent('meta[property="og:url"]', metaDefaults.ogUrl);
+  setMetaContent('meta[name="twitter:title"]', metaDefaults.twitterTitle);
+  setMetaContent('meta[name="twitter:description"]', metaDefaults.twitterDescription);
+  const canonical = getMetaTag('link[rel="canonical"]');
+  if (canonical && metaDefaults.canonical) canonical.setAttribute('href', metaDefaults.canonical);
+};
+
+const updateCommunityMetaForThread = (thread) => {
+  if (!thread) {
+    resetCommunityMeta();
+    return;
+  }
+
+  const safeTitle = String(thread.title || 'Hilo de comunidad').trim() || 'Hilo de comunidad';
+  const bodyText = String(thread.body || '').replace(/\s+/g, ' ').trim();
+  const summary = bodyText ? bodyText.slice(0, 150) : 'Participa en el hilo de la comunidad Etiove.';
+  const fullTitle = `${safeTitle} | Comunidad Etiove`;
+  const detailUrl = `https://etiove.com${threadDetailUrl(thread.id)}`;
+
+  document.title = fullTitle;
+  setMetaContent('meta[name="description"]', summary);
+  setMetaContent('meta[property="og:title"]', fullTitle);
+  setMetaContent('meta[property="og:description"]', summary);
+  setMetaContent('meta[property="og:url"]', detailUrl);
+  setMetaContent('meta[name="twitter:title"]', fullTitle);
+  setMetaContent('meta[name="twitter:description"]', summary);
+  const canonical = getMetaTag('link[rel="canonical"]');
+  if (canonical) canonical.setAttribute('href', detailUrl);
+};
+
 const goToThreadDetail = (threadId) => {
   const safeId = String(threadId || '').trim();
   if (!safeId) return;
@@ -457,11 +528,14 @@ const renderThreads = () => {
   if (activeThreadId) {
     const activeThread = threads.find((thread) => thread.id === activeThreadId);
     if (!activeThread || !isThreadVisible(activeThread)) {
+      resetCommunityMeta();
       el.threadsWrap.innerHTML = '<p class="empty">Este hilo no está disponible.</p><div style="margin-top:10px"><button class="btn ghost" data-back-list="1">Volver a todos los hilos</button></div>';
       const backBtn = el.threadsWrap.querySelector('[data-back-list]');
       if (backBtn) backBtn.addEventListener('click', goToThreadList);
       return;
     }
+
+    updateCommunityMetaForThread(activeThread);
 
     const threadReplies = replies
       .filter((r) => r.threadId === activeThread.id)
@@ -518,6 +592,7 @@ const renderThreads = () => {
       </article>
     `;
   } else {
+    resetCommunityMeta();
 
     el.threadsWrap.innerHTML = `${fallbackNote}${displayList.map((t, idx) => {
     const delay = Math.min(idx * 0.03, 0.21);
@@ -1064,6 +1139,7 @@ const sendReply = async (threadId) => {
 };
 
 const init = async () => {
+  initializeMetaDefaults();
   renderCategories();
   renderAuthState();
 

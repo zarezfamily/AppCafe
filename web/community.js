@@ -44,6 +44,54 @@ const resolveAuthorAlias = async () => {
   }
 };
 
+// ─── MODAL PERFIL ─────────────────────────────────────────────────────────────
+const openProfileModal = async (authorUid, authorName) => {
+  if (!auth.token) return; // solo para registrados
+  const modal = document.getElementById('profileModal');
+  if (!modal) return;
+
+  // Mostrar modal con datos básicos inmediatamente
+  document.getElementById('profileModalName').textContent = authorName || 'Catador';
+  document.getElementById('profileModalSub').textContent = 'Miembro de la comunidad';
+  const initial = (authorName || '?')[0].toUpperCase();
+  document.getElementById('profileModalAvatar').innerHTML = initial;
+  document.getElementById('profileModalStats').innerHTML = '<span style="color:#ccc;font-size:13px;">Cargando...</span>';
+  document.getElementById('profileModalBody').innerHTML = '';
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+
+  // Buscar hilos y respuestas del usuario
+  try {
+    const [allThreads, allReplies] = await Promise.all([
+      getCollection('foro_hilos', 500),
+      getCollection('foro_respuestas', 1200),
+    ]);
+    const userThreads = allThreads.filter((t) => t.authorUid === authorUid);
+    const userReplies = allReplies.filter((r) => r.authorUid === authorUid);
+    const totalVotes = userThreads.reduce((s, t) => s + Number(t.upvotes || 0), 0);
+
+    document.getElementById('profileModalStats').innerHTML = `
+      <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#1c120d;">${userThreads.length}</div><div style="font-size:11px;color:#8b7355;letter-spacing:1px;text-transform:uppercase;">Hilos</div></div>
+      <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#1c120d;">${userReplies.length}</div><div style="font-size:11px;color:#8b7355;letter-spacing:1px;text-transform:uppercase;">Respuestas</div></div>
+      <div style="text-align:center"><div style="font-size:20px;font-weight:700;color:#1c120d;">${totalVotes}</div><div style="font-size:11px;color:#8b7355;letter-spacing:1px;text-transform:uppercase;">Votos</div></div>
+    `;
+
+    if (userThreads.length > 0) {
+      const recent = userThreads.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3);
+      document.getElementById('profileModalBody').innerHTML = `
+        <p style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8b7355;margin-bottom:8px;">Últimos hilos</p>
+        ${recent.map((t) => `<div style="padding:8px 0;border-bottom:1px solid #f0e8df;font-size:13px;color:#1c120d;">${escapeHtml(t.title)}</div>`).join('')}
+      `;
+    }
+  } catch (_) { /* no bloquear */ }
+};
+
+const closeProfileModal = () => {
+  const modal = document.getElementById('profileModal');
+  if (modal) modal.style.display = 'none';
+  document.body.style.overflow = '';
+};
+
 let selectedCategory = 'general';
 let threads = [];
 let replies = [];
@@ -260,7 +308,11 @@ const renderAuthState = () => {
   el.loginBtn.disabled = logged;
   el.registerBtn.disabled = logged;
   el.createThreadBtn.disabled = !logged;
-  setStatus(el.authStatus, logged ? `Sesión activa: ${auth.email}` : 'Sesión no iniciada', logged ? 'ok' : '');
+  setStatus(el.authStatus, logged ? `Sesión activa: ${getAuthorName()} (${auth.email})` : 'Sesión no iniciada', logged ? 'ok' : '');
+
+  // Mostrar/ocultar bloque "Nuevo hilo"
+  const newThreadSection = document.getElementById('newThreadSection');
+  if (newThreadSection) newThreadSection.style.display = logged ? 'block' : 'none';
 };
 
 const renderCategories = () => {
@@ -321,7 +373,7 @@ const renderThreads = () => {
     return `
       <article class="thread" data-thread-id="${t.id}" style="animation-delay:${delay}s">
         <h3>${escapeHtml(t.title || '')}</h3>
-        <div class="meta">${escapeHtml(t.categoryLabel || '')} · ${escapeHtml(t.authorName || 'Catador')} · ${fmt(t.createdAt)} · ${Number(t.upvotes || 0)} votos</div>
+        <div class="meta">${escapeHtml(t.categoryLabel || '')} · <button class="link-btn author-btn" data-author-uid="${escapeHtml(t.authorUid || '')}" data-author-name="${escapeHtml(t.authorName || 'Catador')}" style="font-weight:600;">${escapeHtml(t.authorName || 'Catador')}</button> · ${fmt(t.createdAt)} · ${Number(t.upvotes || 0)} votos</div>
         <div class="thread-tags">
           <span class="pill category">${escapeHtml(t.categoryLabel || 'General')}</span>
           <span class="pill" style="background:${accessTagBg};color:${accessTagColor}">${escapeHtml(ACCESS_LABELS[t.accessLevel] || 'Público')}</span>
@@ -348,6 +400,15 @@ const renderThreads = () => {
 
   el.threadsWrap.querySelectorAll('[data-reply-send]').forEach((btn) => {
     btn.addEventListener('click', () => sendReply(btn.getAttribute('data-reply-send')));
+  });
+
+  // Clic en nombre de autor → modal perfil (solo logueados)
+  el.threadsWrap.querySelectorAll('.author-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (!auth.token) return;
+      openProfileModal(btn.getAttribute('data-author-uid'), btn.getAttribute('data-author-name'));
+    });
+    if (auth.token) btn.style.cursor = 'pointer';
   });
 
   const markLoaded = (img) => img.classList.add('loaded');
@@ -484,6 +545,16 @@ const signIn = async (registerMode) => {
     localStorage.setItem('etiove_web_email', auth.email);
     localStorage.setItem('etiove_web_token', auth.token);
 
+    // Recordar credenciales si el checkbox está marcado
+    const rememberChk = document.getElementById('rememberMe');
+    if (rememberChk && rememberChk.checked) {
+      localStorage.setItem('etiove_web_saved_email', email);
+      localStorage.setItem('etiove_web_saved_pw', password);
+    } else {
+      localStorage.removeItem('etiove_web_saved_email');
+      localStorage.removeItem('etiove_web_saved_pw');
+    }
+
     // Intentar recuperar el alias real del usuario desde sus hilos anteriores
     try {
       await resolveAuthorAlias();
@@ -503,6 +574,7 @@ const logout = async () => {
   localStorage.removeItem('etiove_web_email');
   localStorage.removeItem('etiove_web_token');
   localStorage.removeItem('etiove_web_alias');
+  // No borramos saved_email/saved_pw — son las credenciales de "Recordarme"
   renderAuthState();
   await loadForum();
 };
@@ -638,6 +710,16 @@ const init = async () => {
     resolveAuthorAlias().catch(() => {});
   }
 
+  // Pre-rellenar campos de login si hay credenciales guardadas (Recordarme)
+  const savedEmail = localStorage.getItem('etiove_web_saved_email');
+  const savedPw = localStorage.getItem('etiove_web_saved_pw');
+  if (savedEmail && el.email) {
+    el.email.value = savedEmail;
+    if (savedPw && el.password) el.password.value = savedPw;
+    const chk = document.getElementById('rememberMe');
+    if (chk) chk.checked = true;
+  }
+
   el.loginBtn.addEventListener('click', () => signIn(false));
   el.registerBtn.addEventListener('click', () => signIn(true));
   el.logoutBtn.addEventListener('click', logout);
@@ -648,6 +730,13 @@ const init = async () => {
     renderCategories();
     renderThreads();
   });
+
+  // Cerrar modal de perfil
+  const closeBtn = document.getElementById('profileModalClose');
+  if (closeBtn) closeBtn.addEventListener('click', closeProfileModal);
+  const modal = document.getElementById('profileModal');
+  if (modal) modal.addEventListener('click', (e) => { if (e.target === modal) closeProfileModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeProfileModal(); });
 
   await loadForum();
 };

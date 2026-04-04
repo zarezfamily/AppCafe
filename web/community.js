@@ -173,6 +173,11 @@ const escapeHtml = (text) => String(text || '')
   .replace(/"/g, '&quot;')
   .replace(/'/g, '&#39;');
 
+const normalizeThreadTitle = (text) => String(text || '')
+  .replace(/\s+/g, ' ')
+  .trim()
+  .toLocaleUpperCase('es-ES');
+
 const splitCsv = (value) => String(value || '')
   .split(',')
   .map((entry) => entry.trim())
@@ -407,7 +412,7 @@ const renderInlineThreadEditor = (item, options = {}) => {
     <div class="thread-inline-editor${compact ? ' compact' : ''}">
       <div class="field"><select data-inline-edit-category="${item.id}">${FORUM_CATEGORIES.map((c) => `<option value="${c.id}" ${c.id === categoryValue ? 'selected' : ''}>${c.emoji} ${c.label}</option>`).join('')}</select></div>
       <div class="field"><select data-inline-edit-access="${item.id}"><option value="public" ${accessValue === 'public' ? 'selected' : ''}>Público (cualquiera puede leer)</option><option value="registered_only" ${accessValue === 'registered_only' ? 'selected' : ''}>Solo registrados</option></select></div>
-      <div class="field"><input data-inline-edit-title="${item.id}" maxlength="120" value="${escapeHtml(draft.title || '')}" /></div>
+      <div class="field"><input data-inline-edit-title="${item.id}" maxlength="120" value="${escapeHtml(normalizeThreadTitle(draft.title || ''))}" /></div>
       <div class="field"><textarea data-inline-edit-body="${item.id}" maxlength="1000">${escapeHtml(draft.body || '')}</textarea></div>
       <div class="thread-inline-image-tools">
         ${activeImageUrl ? `<img class="thread-inline-image-preview" src="${escapeHtml(activeImageUrl)}" alt="Imagen actual del hilo" loading="lazy" decoding="async" />` : ''}
@@ -427,7 +432,7 @@ const startThreadEdit = (item) => {
   if (!item) return;
   editingThreadId = item.id;
   editingThreadDraft = {
-    title: item.title || '',
+    title: normalizeThreadTitle(item.title || ''),
     body: item.body || '',
     categoryId: item.categoryId || 'general',
     accessLevel: item.accessLevel === 'registered_only' ? 'registered_only' : 'public',
@@ -984,7 +989,7 @@ const renderThreads = () => {
 
     const detailBodyHtml = editingThreadId === activeThread.id
       ? renderInlineThreadEditor(activeThread)
-      : `<h3 class="thread-detail-title">${escapeHtml(activeThread.title || '')}</h3>
+      : `<h3 class="thread-detail-title">${escapeHtml(normalizeThreadTitle(activeThread.title || ''))}</h3>
         <div class="meta"><button class="link-btn author-btn" data-author-uid="${escapeHtml(activeThread.authorUid || '')}" data-author-name="${escapeHtml(activeThread.authorName || 'Catador')}" style="font-weight:600;">${escapeHtml(activeThread.authorName || 'Catador')}</button> · ${fmt(activeThread.createdAt)} <span class="meta-cat">${escapeHtml(activeThread.categoryLabel || 'General')}</span> · ${Number(activeThread.upvotes || 0)} votos</div>
         <div class="thread-tags">
           <span class="pill" style="background:${accessTagBg};color:${accessTagColor}">${escapeHtml(ACCESS_LABELS[activeThread.accessLevel] || 'Público')}</span>
@@ -1090,7 +1095,7 @@ const renderThreads = () => {
           ${editingThreadId === t.id ? '<span class="thread-edit-chip">Editando</span>' : ''}
           ${!!normalizeStorageImageUrl(t.image) ? '<span class="thread-img-badge" title="Incluye imagen">📷</span>' : ''}
         </div>
-        <h3><a class="thread-title-link" data-thread-open="${t.id}" href="${threadDetailUrl(t.id)}" aria-label="Abrir hilo ${escapeHtml(t.title || '')}">${escapeHtml(t.title || '')}</a></h3>
+        <h3><a class="thread-title-link" data-thread-open="${t.id}" href="${threadDetailUrl(t.id)}" aria-label="Abrir hilo ${escapeHtml(normalizeThreadTitle(t.title || ''))}">${escapeHtml(normalizeThreadTitle(t.title || ''))}</a></h3>
         <div class="thread-preview-row">
           <p class="thread-body-preview">${escapeHtml(rawBody)}</p>
           ${isLongBody ? `<a class="thread-read-more" data-thread-open="${t.id}" href="${threadDetailUrl(t.id)}" aria-label="Seguir leyendo ${escapeHtml(t.title || '')}">Seguir leyendo</a>` : ''}
@@ -1197,7 +1202,9 @@ const renderThreads = () => {
     el.threadsWrap.addEventListener('input', (event) => {
       const titleInput = event.target.closest('[data-inline-edit-title]');
       if (titleInput && editingThreadDraft) {
-        editingThreadDraft.title = titleInput.value;
+        const normalizedTitle = normalizeThreadTitle(titleInput.value || '');
+        editingThreadDraft.title = normalizedTitle;
+        titleInput.value = normalizedTitle;
         editingThreadFocusField = 'title';
         return;
       }
@@ -1534,7 +1541,7 @@ const createThread = async () => {
     return;
   }
 
-  const title = (el.threadTitle.value || '').trim();
+  const title = normalizeThreadTitle(el.threadTitle.value || '');
   const body = (el.threadBody.value || '').trim();
   const categoryId = el.categorySelect.value;
   const category = FORUM_CATEGORIES.find((c) => c.id === categoryId);
@@ -1663,7 +1670,7 @@ const saveInlineThreadEdit = async (threadId) => {
   const item = threads.find((thread) => thread.id === threadId);
   if (!canManageItem(item) || !editingThreadDraft || editingThreadId !== threadId) return;
 
-  const title = String(editingThreadDraft.title || '').trim();
+  const title = normalizeThreadTitle(editingThreadDraft.title || '');
   const body = String(editingThreadDraft.body || '').trim();
   const categoryId = String(editingThreadDraft.categoryId || 'general').trim() || 'general';
   const category = FORUM_CATEGORIES.find((c) => c.id === categoryId);
@@ -1845,6 +1852,12 @@ const init = async () => {
   if (el.cancelThreadEditBtn) {
     el.cancelThreadEditBtn.addEventListener('click', () => {
       resetThreadComposer();
+    });
+  }
+  if (el.threadTitle) {
+    el.threadTitle.addEventListener('input', () => {
+      const normalizedTitle = normalizeThreadTitle(el.threadTitle.value || '');
+      if (el.threadTitle.value !== normalizedTitle) el.threadTitle.value = normalizedTitle;
     });
   }
   el.threadImage.addEventListener('change', () => {

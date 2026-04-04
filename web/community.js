@@ -119,6 +119,7 @@ let replies = [];
 const THREADS_PAGE_SIZE = 12;
 let currentListPage = 1;
 let editingThreadId = '';
+let pendingThreadAnchorY = null;
 const IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 const IMAGE_ALLOWED_TYPES = new Set([
   'image/jpeg',
@@ -348,7 +349,9 @@ const resetThreadComposer = (options = {}) => {
   const wasEditing = !!editingThreadId;
   const lastScrollY = window.scrollY;
   editingThreadId = '';
+  const composerSection = document.getElementById('newThreadSection');
   if (el.threadComposerTitle) el.threadComposerTitle.textContent = 'Nuevo hilo';
+  if (composerSection) composerSection.classList.remove('thread-composer-is-editing');
   if (el.threadEditBanner) el.threadEditBanner.classList.remove('is-visible');
   if (el.threadEditBannerText) el.threadEditBannerText.textContent = 'Aquí editarás el título y el mensaje del hilo seleccionado.';
   if (el.createThreadBtn) el.createThreadBtn.textContent = 'Publicar hilo';
@@ -373,7 +376,9 @@ const startThreadEdit = (item) => {
   if (!item) return;
   const lastScrollY = window.scrollY;
   editingThreadId = item.id;
+  const composerSection = document.getElementById('newThreadSection');
   if (el.threadComposerTitle) el.threadComposerTitle.textContent = 'Editar hilo';
+  if (composerSection) composerSection.classList.add('thread-composer-is-editing');
   if (el.threadEditBanner) el.threadEditBanner.classList.add('is-visible');
   if (el.threadEditBannerText) {
     el.threadEditBannerText.textContent = `Estás modificando "${String(item.title || 'Sin título').trim()}". Guarda aquí el título y el mensaje actualizados.`;
@@ -562,8 +567,15 @@ const goToThreadDetail = (threadId) => {
   const safeId = String(threadId || '').trim();
   if (!safeId) return;
   window.history.replaceState({ ...(window.history.state || {}), communityScrollY: window.scrollY }, '', window.location.href);
-  window.history.pushState({ communityView: 'thread', threadId: safeId, communityScrollY: window.scrollY }, '', threadDetailUrl(safeId));
-  transitionThreadsView(() => renderThreads());
+  window.history.pushState({ communityView: 'thread', threadId: safeId, communityScrollY: window.scrollY, communityAnchorY: pendingThreadAnchorY }, '', threadDetailUrl(safeId));
+  transitionThreadsView(
+    () => renderThreads(),
+    () => {
+      const targetY = Number((window.history.state && window.history.state.communityAnchorY) || pendingThreadAnchorY);
+      if (Number.isFinite(targetY) && targetY >= 0) window.scrollTo({ top: targetY, behavior: 'auto' });
+      pendingThreadAnchorY = null;
+    },
+  );
 };
 
 const goToThreadList = ({ replace = false, restoreScroll = true } = {}) => {
@@ -1054,13 +1066,6 @@ const renderThreads = () => {
     });
   });
 
-  el.threadsWrap.querySelectorAll('[data-thread-open]').forEach((link) => {
-    link.addEventListener('click', (event) => {
-      event.preventDefault();
-      goToThreadDetail(link.getAttribute('data-thread-open'));
-    });
-  });
-
   const backBtn = el.threadsWrap.querySelector('[data-back-list]');
   if (backBtn) backBtn.addEventListener('click', goToThreadList);
 
@@ -1075,13 +1080,34 @@ const renderThreads = () => {
     btn.addEventListener('click', () => sendReply(btn.getAttribute('data-reply-send')));
   });
 
-  el.threadsWrap.querySelectorAll('[data-thread-edit]').forEach((btn) => {
-    btn.addEventListener('click', () => editThread(btn.getAttribute('data-thread-edit')));
-  });
+  if (!el.threadsWrap.dataset.boundDelegatedClicks) {
+    el.threadsWrap.addEventListener('click', (event) => {
+      const editBtn = event.target.closest('[data-thread-edit]');
+      if (editBtn) {
+        event.preventDefault();
+        editThread(editBtn.getAttribute('data-thread-edit'));
+        return;
+      }
 
-  el.threadsWrap.querySelectorAll('[data-thread-delete]').forEach((btn) => {
-    btn.addEventListener('click', () => deleteThread(btn.getAttribute('data-thread-delete')));
-  });
+      const deleteBtn = event.target.closest('[data-thread-delete]');
+      if (deleteBtn) {
+        event.preventDefault();
+        deleteThread(deleteBtn.getAttribute('data-thread-delete'));
+        return;
+      }
+
+      const openLink = event.target.closest('[data-thread-open]');
+      if (openLink) {
+        event.preventDefault();
+        const article = openLink.closest('[data-thread-id]');
+        pendingThreadAnchorY = article
+          ? Math.max(0, window.scrollY + article.getBoundingClientRect().top - 20)
+          : window.scrollY;
+        goToThreadDetail(openLink.getAttribute('data-thread-open'));
+      }
+    });
+    el.threadsWrap.dataset.boundDelegatedClicks = '1';
+  }
 
   el.threadsWrap.querySelectorAll('[data-reply-edit]').forEach((btn) => {
     btn.addEventListener('click', () => editReply(btn.getAttribute('data-reply-edit')));

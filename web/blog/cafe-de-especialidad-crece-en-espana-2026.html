@@ -51,7 +51,7 @@
     }
 
     /* NAV */
-    nav {
+    .site-nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
       display: flex; align-items: center; justify-content: space-between;
       padding: 20px 40px;
@@ -254,7 +254,7 @@
     .scroll-top:hover { background: var(--accent); }
 
     @media (max-width: 640px) {
-      nav { padding: 12px 16px; }
+      .site-nav { padding: 12px 16px; }
       .nav-links { display: none; }
       .nav-cta { display: none; }
       .post-hero { height: min(220px, 56vw); }
@@ -269,7 +269,7 @@
 <body>
 
   <!-- NAV -->
-  <nav aria-label="Navegación principal">
+  <nav class="site-nav" aria-label="Navegación principal">
     <a class="nav-wordmark" href="/">ETIOVE</a>
     <div class="nav-links">
       <a class="nav-link" href="/">Inicio</a>

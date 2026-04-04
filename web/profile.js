@@ -208,6 +208,53 @@
     return String(hit || '').trim();
   };
 
+  const readMottoFromRecord = (record) => {
+    if (!record || typeof record !== 'object') return '';
+    const candidates = [record.motto, record.frase, record.bio, record.tagline];
+    const hit = candidates.find((value) => String(value || '').trim());
+    return String(hit || '').trim();
+  };
+
+  const readDisplayNameFromRecord = (record) => {
+    if (!record || typeof record !== 'object') return '';
+    const candidates = [record.displayName, record.alias, record.authorName, record.nombre, record.nickname];
+    const hit = candidates.find((value) => String(value || '').trim());
+    return String(hit || '').trim();
+  };
+
+  const getStoredProfileLocal = () => {
+    try {
+      const raw = localStorage.getItem('etiove_profile');
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const fetchAuthPhotoUrl = async () => {
+    if (!auth.token) return '';
+    try {
+      const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${FIREBASE_API_KEY}`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ idToken: auth.token }),
+      });
+      if (!res.ok) return '';
+      const json = await res.json();
+      const user = Array.isArray(json.users) ? json.users[0] : null;
+      return String((user && user.photoUrl) || '').trim();
+    } catch {
+      return '';
+    }
+  };
+
+  const fetchPrivateProfileCandidates = async () => {
+    if (!auth.token || !isOwner()) return [];
+    const collections = ['usuarios', 'users', 'profiles', 'perfiles'];
+    const docs = await Promise.all(collections.map((name) => getDocument(name, uid).catch(() => null)));
+    return docs.filter(Boolean);
+  };
+
   const resolvedProfileAvatar = () => {
     const fromProfile = readAvatarFromRecord(state.profile);
     if (fromProfile) return fromProfile;
@@ -221,6 +268,52 @@
       .map((item) => readAvatarFromRecord(item))
       .find((value) => !!value);
     return String(fromAuthored || '').trim();
+  };
+
+  const syncOwnerProfileIfNeeded = async () => {
+    if (!isOwner()) return;
+
+    const currentAvatar = resolvedProfileAvatar();
+    const currentMotto = String(state.profile && state.profile.motto || '').trim();
+    const currentName = String(state.profile && state.profile.displayName || '').trim();
+    if (currentAvatar && currentMotto && currentName) return;
+
+    const local = getStoredProfileLocal();
+    const privateDocs = await fetchPrivateProfileCandidates();
+    const authPhotoUrl = await fetchAuthPhotoUrl();
+
+    const fallbackAvatar = [
+      currentAvatar,
+      readAvatarFromRecord(local),
+      ...privateDocs.map((doc) => readAvatarFromRecord(doc)),
+      authPhotoUrl,
+    ].find((value) => String(value || '').trim());
+
+    const fallbackMotto = [
+      currentMotto,
+      readMottoFromRecord(local),
+      ...privateDocs.map((doc) => readMottoFromRecord(doc)),
+    ].find((value) => String(value || '').trim()) || '"Ninguno de nosotros es tan listo como todos nosotros."';
+
+    const fallbackName = [
+      currentName,
+      readDisplayNameFromRecord(local),
+      ...privateDocs.map((doc) => readDisplayNameFromRecord(doc)),
+      getAuthorName(),
+    ].find((value) => String(value || '').trim()) || 'Catador';
+
+    if (!fallbackAvatar && !fallbackMotto && !fallbackName) return;
+
+    const ok = await updateDocument('user_profiles', uid, {
+      uid,
+      displayName: fallbackName,
+      avatarUrl: String(fallbackAvatar || '').trim(),
+      motto: fallbackMotto,
+      updatedAt: new Date().toISOString(),
+    });
+
+    if (!ok) return;
+    state.profile = await getDocument('user_profiles', uid);
   };
 
   const yearsSince = (dateText) => {
@@ -812,20 +905,8 @@
     state.messages = messages;
     state.profiles = profiles;
 
-    // Si el perfil existe pero la foto está en un campo legacy, normalizamos a avatarUrl.
-    if (state.profile && isOwner()) {
-      const legacyAvatar = readAvatarFromRecord(state.profile);
-      if (legacyAvatar && !String(state.profile.avatarUrl || '').trim()) {
-        await updateDocument('user_profiles', uid, {
-          uid,
-          displayName: getAuthorName(),
-          avatarUrl: legacyAvatar,
-          motto: String(state.profile.motto || '').trim() || '"Ninguno de nosotros es tan listo como todos nosotros."',
-          updatedAt: new Date().toISOString(),
-        });
-        state.profile.avatarUrl = legacyAvatar;
-      }
-    }
+    // Para el dueño del perfil: importar foto/nombre/frase desde fuentes legacy o Auth.
+    await syncOwnerProfileIfNeeded();
 
     refreshFollowState();
 

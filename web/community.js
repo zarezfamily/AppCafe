@@ -361,9 +361,10 @@ const loadForum = async () => {
   setStatus(el.threadStatus, 'Cargando comunidad...', '');
   renderThreadSkeletons(4);
   const isLogged = !!auth.token;
+  // Ahora las reglas permiten lectura pública: siempre cargamos todo y filtramos en cliente.
   const [hRes, rRes] = await Promise.allSettled([
-    isLogged ? getCollection('foro_hilos', 500) : getPublicThreads(500),
-    isLogged ? getCollection('foro_respuestas', 1200) : Promise.resolve([]),
+    getCollection('foro_hilos', 500),
+    getCollection('foro_respuestas', 1200),
   ]);
 
   if (hRes.status !== 'fulfilled') {

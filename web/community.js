@@ -308,7 +308,7 @@ const renderAuthState = () => {
   el.loginBtn.disabled = logged;
   el.registerBtn.disabled = logged;
   el.createThreadBtn.disabled = !logged;
-  setStatus(el.authStatus, logged ? `Sesión activa: ${getAuthorName()} (${auth.email})` : 'Sesión no iniciada', logged ? 'ok' : '');
+  setStatus(el.authStatus, logged ? `Sesión activa: ${getAuthorName()}` : 'Sesión no iniciada', logged ? 'ok' : '');
 
   // Mostrar/ocultar bloque "Nuevo hilo"
   const newThreadSection = document.getElementById('newThreadSection');

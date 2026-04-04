@@ -82,7 +82,7 @@
     }
     .hero-content {
       position: absolute; bottom: 0; left: 0; right: 0;
-      padding: clamp(16px,4vw,44px); max-width: 860px;
+      padding: clamp(16px,4vw,44px); max-width: 1120px;
     }
     .hero-tag {
       display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 2px;
@@ -91,7 +91,9 @@
     }
     .hero-title {
       font-family: 'Playfair Display', serif;
-      font-size: clamp(22px,4vw,46px); font-weight: 800; line-height: 1.1;
+      font-size: clamp(20px,3.5vw,44px); font-weight: 800; line-height: 1.12;
+      max-width: min(1080px, 100%);
+      text-wrap: balance;
       color: #fff9f1; margin-bottom: 7px;
     }
     .hero-meta { font-size: 12px; color: rgba(255,249,241,0.6); }
@@ -280,7 +282,7 @@
     <div class="hero-overlay"></div>
     <div class="hero-content">
       <span class="hero-tag">Noticia · 04 abril 2026 · 4 min de lectura</span>
-      <h1 class="hero-title">El Café de Especialidad<br>Crece un 34% en España</h1>
+      <h1 class="hero-title">El Café de Especialidad Crece un 34% en España</h1>
       <div class="hero-meta">Por el equipo de Etiove · Foto: Unsplash</div>
     </div>
   </header>
@@ -500,166 +502,10 @@
   </button>
 
   <script>
-    const FIREBASE_PROJECT_ID = 'miappdecafe';
-    const FIREBASE_API_KEY = 'AIzaSyA1BcU0iRk3HyFtV92CLrnalHFKLaOWH24';
-    const FIREBASE_IOS_BUNDLE_ID = 'com.zarezfamily.etiove';
-    const BASE_URL = `https://europe-west1-firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
-    const POST_SLUG = 'cafe-de-especialidad-crece-en-espana-2026';
-
-    const auth = {
-      uid: localStorage.getItem('etiove_web_uid') || '',
-      email: localStorage.getItem('etiove_web_email') || '',
-      token: localStorage.getItem('etiove_web_token') || '',
+    window.ETIOVE_BLOG_POST_CONFIG = {
+      postSlug: 'cafe-de-especialidad-crece-en-espana-2026',
     };
-
-    const el = {
-      shareX: document.getElementById('shareX'),
-      shareInstagram: document.getElementById('shareInstagram'),
-      copyLink: document.getElementById('copyLink'),
-      commentHelp: document.getElementById('commentHelp'),
-      commentBody: document.getElementById('commentBody'),
-      sendComment: document.getElementById('sendComment'),
-      commentStatus: document.getElementById('commentStatus'),
-      commentList: document.getElementById('commentList'),
-    };
-
-    const escapeHtml = (text) => String(text || '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-
-    const fromFirestoreValue = (val = {}) => {
-      if ('stringValue' in val) return val.stringValue;
-      if ('integerValue' in val) return Number(val.integerValue);
-      if ('doubleValue' in val) return Number(val.doubleValue);
-      if ('booleanValue' in val) return val.booleanValue;
-      if ('nullValue' in val) return null;
-      return null;
-    };
-
-    const docToObject = (doc) => {
-      const out = {};
-      const fields = doc && doc.fields ? doc.fields : {};
-      Object.keys(fields).forEach((k) => { out[k] = fromFirestoreValue(fields[k]); });
-      out.id = (doc.name || '').split('/').pop();
-      return out;
-    };
-
-    const toFirestoreValue = (val) => {
-      if (val === null || val === undefined) return { nullValue: null };
-      if (typeof val === 'string') return { stringValue: val };
-      if (typeof val === 'number') return Number.isInteger(val) ? { integerValue: String(val) } : { doubleValue: val };
-      if (typeof val === 'boolean') return { booleanValue: val };
-      return { stringValue: String(val) };
-    };
-
-    const toFields = (obj) => {
-      const fields = {};
-      Object.keys(obj).forEach((k) => { fields[k] = toFirestoreValue(obj[k]); });
-      return { fields };
-    };
-
-    const authHeaders = () => {
-      const headers = { 'Content-Type': 'application/json', 'X-Ios-Bundle-Identifier': FIREBASE_IOS_BUNDLE_ID };
-      if (auth.token) headers.Authorization = `Bearer ${auth.token}`;
-      return headers;
-    };
-
-    const setStatus = (text) => { el.commentStatus.textContent = text || ''; };
-    const formatDate = (iso) => { try { return new Date(iso).toLocaleString('es-ES'); } catch { return iso || ''; } };
-
-    const runStructuredQuery = async (structuredQuery) => {
-      const res = await fetch(`${BASE_URL}:runQuery?key=${FIREBASE_API_KEY}`, {
-        method: 'POST', headers: authHeaders(), body: JSON.stringify({ structuredQuery }),
-      });
-      if (!res.ok) return [];
-      const json = await res.json();
-      return (json || []).filter((row) => row.document).map((row) => docToObject(row.document));
-    };
-
-    const loadComments = async () => {
-      const comments = await runStructuredQuery({
-        from: [{ collectionId: 'blog_comentarios' }],
-        where: { fieldFilter: { field: { fieldPath: 'postSlug' }, op: 'EQUAL', value: { stringValue: POST_SLUG } } },
-        orderBy: [{ field: { fieldPath: 'createdAt' }, direction: 'DESCENDING' }],
-        limit: 60,
-      });
-      if (!comments.length) {
-        el.commentList.innerHTML = '<p class="comment-help">Todavía no hay respuestas en este post.</p>';
-        return;
-      }
-      el.commentList.innerHTML = comments.map((c) => `
-        <article class="comment-item">
-          <div class="comment-meta">${escapeHtml(c.authorName || 'Catador')} · ${escapeHtml(formatDate(c.createdAt))}</div>
-          <p class="comment-body">${escapeHtml(c.body || '')}</p>
-        </article>
-      `).join('');
-    };
-
-    const addComment = async () => {
-      if (!auth.token || !auth.uid) { setStatus('Inicia sesión en Comunidad para publicar respuestas.'); return; }
-      const body = (el.commentBody.value || '').trim();
-      if (!body) { setStatus('Escribe un mensaje antes de publicar.'); return; }
-      if (body.length < 3) { setStatus('La respuesta debe tener al menos 3 caracteres.'); return; }
-      el.sendComment.disabled = true;
-      setStatus('Publicando...');
-      const res = await fetch(`${BASE_URL}/blog_comentarios?key=${FIREBASE_API_KEY}`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify(toFields({
-          postSlug: POST_SLUG, body, authorUid: auth.uid,
-          authorName: (auth.email || '').split('@')[0] || 'Catador',
-          createdAt: new Date().toISOString(),
-        })),
-      });
-      el.sendComment.disabled = false;
-      if (!res.ok) { setStatus('No se pudo publicar la respuesta.'); return; }
-      el.commentBody.value = '';
-      setStatus('Respuesta publicada.');
-      await loadComments();
-    };
-
-    const setupShare = () => {
-      const postUrl = window.location.href;
-      const postTitle = document.title;
-      el.shareX.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(postTitle)}&url=${encodeURIComponent(postUrl)}`;
-      const copyPostUrl = async () => {
-        try { await navigator.clipboard.writeText(postUrl); setStatus('Enlace copiado.'); }
-        catch { setStatus('No se pudo copiar el enlace.'); }
-      };
-      el.copyLink.addEventListener('click', copyPostUrl);
-      el.shareInstagram.addEventListener('click', async () => {
-        await copyPostUrl();
-        window.open('https://www.instagram.com/', '_blank', 'noopener,noreferrer');
-      });
-    };
-
-    const setupCommentUI = () => {
-      if (auth.token && auth.uid) {
-        el.commentHelp.innerHTML = `Sesión iniciada como <strong>${escapeHtml(auth.email)}</strong>.`;
-        el.commentBody.disabled = false;
-        el.sendComment.disabled = false;
-      } else {
-        el.commentHelp.innerHTML = 'Para responder, <a href="/comunidad.html">inicia sesión en Comunidad</a>.';
-        el.commentBody.disabled = true;
-        el.sendComment.disabled = true;
-      }
-      el.sendComment.addEventListener('click', addComment);
-    };
-
-    setupShare();
-    setupCommentUI();
-    loadComments();
-
-    const scrollTopBtn = document.getElementById('scrollTopBtn');
-    window.addEventListener('scroll', () => {
-      scrollTopBtn.classList.toggle('visible', window.scrollY > 320);
-    });
-    scrollTopBtn.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
   </script>
+  <script src="./post-shared.js"></script>
 </body>
 </html>

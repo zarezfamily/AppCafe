@@ -1,4 +1,19 @@
 {
+  "hosting": {
+    "public": "web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "redirects": [
+      {
+        "source": "/blog",
+        "destination": "/blog/",
+        "type": 301
+      }
+    ]
+  },
   "functions": {
     "source": "functions"
   },

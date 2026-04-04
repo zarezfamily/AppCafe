@@ -1,5 +1,0 @@
-# Blog route normalization
-/blog  /blog/  301
-
-# Custom 404 fallback
-/*  /404.html  404

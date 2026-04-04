@@ -59,6 +59,7 @@
     followers: document.getElementById('profileFollowers'),
     quote: document.getElementById('profileQuote'),
     status: document.getElementById('profileStatus'),
+    actions: document.getElementById('profileActions'),
     followBtn: document.getElementById('followBtn'),
     dmBtn: document.getElementById('dmBtn'),
     ownerTools: document.getElementById('ownerTools'),
@@ -530,6 +531,7 @@
   };
 
   const renderButtons = () => {
+    if (el.actions) el.actions.style.display = isOwner() ? 'none' : 'flex';
     if (el.ownerTools) el.ownerTools.style.display = isOwner() ? 'flex' : 'none';
 
     if (el.avatar) {
@@ -544,12 +546,15 @@
 
     if (el.followBtn) {
       if (!auth.uid) {
+        el.followBtn.style.display = '';
         el.followBtn.textContent = 'Inicia sesion para seguir';
         el.followBtn.disabled = true;
       } else if (isOwner()) {
+        el.followBtn.style.display = 'none';
         el.followBtn.textContent = 'Este es tu perfil';
         el.followBtn.disabled = true;
       } else {
+        el.followBtn.style.display = '';
         el.followBtn.disabled = false;
         el.followBtn.textContent = state.isFollowing ? 'Siguiendo' : 'Seguir';
       }
@@ -557,9 +562,11 @@
 
     if (el.dmBtn) {
       if (!auth.uid || isOwner()) {
+        el.dmBtn.style.display = isOwner() ? 'none' : '';
         el.dmBtn.disabled = true;
         el.dmBtn.textContent = isOwner() ? 'No puedes escribirte' : 'Inicia sesion para escribir';
       } else {
+        el.dmBtn.style.display = '';
         el.dmBtn.disabled = false;
         el.dmBtn.textContent = 'Mensaje directo';
       }

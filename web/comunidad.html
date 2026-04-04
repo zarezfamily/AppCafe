@@ -832,6 +832,28 @@
       flex-wrap: wrap;
     }
     .thread-compact-stats .muted { font-size: 11.5px; }
+    .thread-inline-editor {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .thread-inline-editor.compact {
+      margin-top: 2px;
+    }
+    .thread-inline-editor .field {
+      margin-top: 8px;
+    }
+    .thread-inline-editor textarea {
+      min-height: 120px;
+    }
+    .thread-inline-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border-soft);
+    }
     .thread-tags {
       display: flex;
       align-items: center;

@@ -119,6 +119,8 @@ let replies = [];
 const THREADS_PAGE_SIZE = 12;
 let currentListPage = 1;
 let editingThreadId = '';
+let editingThreadDraft = null;
+let editingThreadFocusField = 'title';
 let pendingThreadAnchorY = null;
 const IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 const IMAGE_ALLOWED_TYPES = new Set([
@@ -346,9 +348,6 @@ const transitionThreadsView = (renderFn, afterRender) => {
 
 const resetThreadComposer = (options = {}) => {
   const { preserveStatus = false } = options;
-  const wasEditing = !!editingThreadId;
-  const lastScrollY = window.scrollY;
-  editingThreadId = '';
   const composerSection = document.getElementById('newThreadSection');
   if (el.threadComposerTitle) el.threadComposerTitle.textContent = 'Nuevo hilo';
   if (composerSection) composerSection.classList.remove('thread-composer-is-editing');
@@ -366,63 +365,68 @@ const resetThreadComposer = (options = {}) => {
   if (el.categorySelect && selectedCategory) el.categorySelect.value = selectedCategory;
   setThreadImageStatus('Imagen opcional para el hilo');
   if (!preserveStatus) setStatus(el.threadStatus, '', '');
-  if (wasEditing) {
-    renderThreads();
-    window.requestAnimationFrame(() => window.scrollTo({ top: lastScrollY, behavior: 'auto' }));
+};
+
+const focusInlineThreadEditor = () => {
+  if (!editingThreadId) return;
+  const selector = editingThreadFocusField === 'body'
+    ? `[data-inline-edit-body="${editingThreadId}"]`
+    : `[data-inline-edit-title="${editingThreadId}"]`;
+  const target = el.threadsWrap ? el.threadsWrap.querySelector(selector) : null;
+  if (!target) return;
+  target.focus({ preventScroll: true });
+  if (typeof target.setSelectionRange === 'function') {
+    if (editingThreadFocusField === 'body') {
+      const end = String(target.value || '').length;
+      target.setSelectionRange(end, end);
+    } else {
+      const end = String(target.value || '').length;
+      target.setSelectionRange(0, end);
+    }
   }
+};
+
+const resetInlineThreadEdit = (options = {}) => {
+  const { preserveStatus = false, rerender = true } = options;
+  editingThreadId = '';
+  editingThreadDraft = null;
+  editingThreadFocusField = 'title';
+  if (!preserveStatus) setStatus(el.threadStatus, '', '');
+  if (rerender) renderThreads();
+};
+
+const renderInlineThreadEditor = (item, options = {}) => {
+  const { compact = false } = options;
+  const draft = editingThreadDraft || item;
+  const categoryValue = String(draft.categoryId || item.categoryId || 'general');
+  const accessValue = draft.accessLevel === 'registered_only' ? 'registered_only' : 'public';
+  return `
+    <div class="thread-inline-editor${compact ? ' compact' : ''}">
+      <div class="field"><select data-inline-edit-category="${item.id}">${FORUM_CATEGORIES.map((c) => `<option value="${c.id}" ${c.id === categoryValue ? 'selected' : ''}>${c.emoji} ${c.label}</option>`).join('')}</select></div>
+      <div class="field"><select data-inline-edit-access="${item.id}"><option value="public" ${accessValue === 'public' ? 'selected' : ''}>Público (cualquiera puede leer)</option><option value="registered_only" ${accessValue === 'registered_only' ? 'selected' : ''}>Solo registrados</option></select></div>
+      <div class="field"><input data-inline-edit-title="${item.id}" maxlength="120" value="${escapeHtml(draft.title || '')}" /></div>
+      <div class="field"><textarea data-inline-edit-body="${item.id}" maxlength="1000">${escapeHtml(draft.body || '')}</textarea></div>
+      <div class="thread-inline-actions">
+        <button class="btn primary" data-thread-save="${item.id}">Guardar cambios</button>
+        <button class="btn ghost" data-thread-cancel="${item.id}">Cancelar</button>
+      </div>
+    </div>
+  `;
 };
 
 const startThreadEdit = (item) => {
   if (!item) return;
-  const lastScrollY = window.scrollY;
-  const openedFromDetail = getActiveThreadId() === item.id;
   editingThreadId = item.id;
-  const composerSection = document.getElementById('newThreadSection');
-  if (el.threadComposerTitle) el.threadComposerTitle.textContent = 'Editar hilo';
-  if (composerSection) composerSection.classList.add('thread-composer-is-editing');
-  if (el.threadEditBanner) el.threadEditBanner.classList.add('is-visible');
-  if (el.threadEditBannerText) {
-    el.threadEditBannerText.textContent = `Estás modificando "${String(item.title || 'Sin título').trim()}". Guarda aquí el título y el mensaje actualizados.`;
-  }
-  if (el.createThreadBtn) el.createThreadBtn.textContent = 'Guardar cambios';
-  if (el.cancelThreadEditBtn) el.cancelThreadEditBtn.style.display = 'inline-flex';
-  if (el.categorySelect) el.categorySelect.value = item.categoryId || 'general';
-  if (el.threadAccessLevel) el.threadAccessLevel.value = item.accessLevel === 'registered_only' ? 'registered_only' : 'public';
-  if (el.threadTitle) el.threadTitle.value = item.title || '';
-  if (el.threadBody) el.threadBody.value = item.body || '';
-  if (el.threadImage) {
-    el.threadImage.value = '';
-    el.threadImage.disabled = true;
-  }
-  setThreadImageStatus('La imagen actual se conserva. Aquí estás editando el texto del hilo.', '');
+  editingThreadDraft = {
+    title: item.title || '',
+    body: item.body || '',
+    categoryId: item.categoryId || 'general',
+    accessLevel: item.accessLevel === 'registered_only' ? 'registered_only' : 'public',
+  };
+  editingThreadFocusField = getActiveThreadId() === item.id ? 'body' : 'title';
   setStatus(el.threadStatus, `Editando: ${item.title || 'hilo sin título'}`, '');
   renderThreads();
-  window.requestAnimationFrame(() => window.scrollTo({ top: lastScrollY, behavior: 'auto' }));
-
-  const newThreadSection = document.getElementById('newThreadSection');
-  if (newThreadSection) {
-    newThreadSection.classList.remove('thread-composer-attention');
-    newThreadSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    window.setTimeout(() => {
-      newThreadSection.classList.add('thread-composer-attention');
-      window.setTimeout(() => newThreadSection.classList.remove('thread-composer-attention'), 1800);
-    }, 180);
-  }
-  const focusTarget = openedFromDetail ? el.threadBody : el.threadTitle;
-  if (focusTarget) {
-    window.setTimeout(() => {
-      focusTarget.focus({ preventScroll: true });
-      if (typeof focusTarget.setSelectionRange === 'function') {
-        if (focusTarget === el.threadBody) {
-          const end = String(el.threadBody.value || '').length;
-          focusTarget.setSelectionRange(end, end);
-        } else {
-          const end = String(el.threadTitle.value || '').length;
-          focusTarget.setSelectionRange(0, end);
-        }
-      }
-    }, 220);
-  }
+  window.requestAnimationFrame(() => focusInlineThreadEditor());
 };
 
 const hasUserVote = (item) => splitCsv(item && item.voterUids).includes(auth.uid);
@@ -892,7 +896,10 @@ const renderAuthState = () => {
   // Mostrar/ocultar bloque "Nuevo hilo"
   const newThreadSection = document.getElementById('newThreadSection');
   if (newThreadSection) newThreadSection.style.display = logged ? 'block' : 'none';
-  if (!logged) resetThreadComposer({ preserveStatus: true });
+  if (!logged) {
+    resetThreadComposer({ preserveStatus: true });
+    resetInlineThreadEdit({ preserveStatus: true, rerender: false });
+  }
   if (!logged && el.memberEvolutionCard) el.memberEvolutionCard.style.display = 'none';
 };
 
@@ -961,18 +968,22 @@ const renderThreads = () => {
       </div>`
     )).join('');
 
-    el.threadsWrap.innerHTML = `
-      <div class="thread-detail-top" style="margin-top:12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
-        <button class="btn ghost" data-back-detail="1">← Volver atrás</button>
-      </div>
-      <article class="thread${editingThreadId === activeThread.id ? ' thread-is-editing' : ''}" data-thread-id="${activeThread.id}">
-        <h3>${escapeHtml(activeThread.title || '')}</h3>
+    const detailBodyHtml = editingThreadId === activeThread.id
+      ? renderInlineThreadEditor(activeThread)
+      : `<h3>${escapeHtml(activeThread.title || '')}</h3>
         <div class="meta">${escapeHtml(activeThread.categoryLabel || '')} · <button class="link-btn author-btn" data-author-uid="${escapeHtml(activeThread.authorUid || '')}" data-author-name="${escapeHtml(activeThread.authorName || 'Catador')}" style="font-weight:600;">${escapeHtml(activeThread.authorName || 'Catador')}</button> · ${fmt(activeThread.createdAt)} · ${Number(activeThread.upvotes || 0)} votos</div>
         <div class="thread-tags">
           <span class="pill category">${escapeHtml(activeThread.categoryLabel || 'General')}</span>
           <span class="pill" style="background:${accessTagBg};color:${accessTagColor}">${escapeHtml(ACCESS_LABELS[activeThread.accessLevel] || 'Público')}</span>
         </div>
-        <p>${escapeHtml(activeThread.body || '')}</p>
+        <p>${escapeHtml(activeThread.body || '')}</p>`;
+
+    el.threadsWrap.innerHTML = `
+      <div class="thread-detail-top" style="margin-top:12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+        <button class="btn ghost" data-back-detail="1">← Volver atrás</button>
+      </div>
+      <article class="thread${editingThreadId === activeThread.id ? ' thread-is-editing' : ''}" data-thread-id="${activeThread.id}">
+        ${detailBodyHtml}
         ${normalizeStorageImageUrl(activeThread.image) ? `<img class="thread-image" src="${escapeHtml(normalizeStorageImageUrl(activeThread.image))}" alt="Imagen del hilo" loading="lazy" decoding="async" />` : ''}
         <div class="thread-foot">
           <div class="actions-row">
@@ -1048,6 +1059,19 @@ const renderThreads = () => {
     const rawBody = String(t.body || '').replace(/\s+/g, ' ').trim();
     const isLongBody = rawBody.length > 110;
 
+    if (editingThreadId === t.id) {
+      return `
+        <article class="thread thread-is-editing" data-thread-id="${t.id}" style="animation-delay:${delay}s">
+          <div class="thread-compact-head">
+            <span class="pill category">${escapeHtml(t.categoryLabel || 'General')}</span>
+            <span class="thread-edit-chip">Editando</span>
+            ${!!normalizeStorageImageUrl(t.image) ? '<span class="thread-img-badge" title="Incluye imagen">📷</span>' : ''}
+          </div>
+          ${renderInlineThreadEditor(t, { compact: true })}
+        </article>
+      `;
+    }
+
     return `
       <article class="thread${editingThreadId === t.id ? ' thread-is-editing' : ''}" data-thread-id="${t.id}" style="animation-delay:${delay}s">
         <div class="thread-compact-head">
@@ -1104,6 +1128,21 @@ const renderThreads = () => {
 
   if (!el.threadsWrap.dataset.boundDelegatedClicks) {
     el.threadsWrap.addEventListener('click', (event) => {
+      const saveBtn = event.target.closest('[data-thread-save]');
+      if (saveBtn) {
+        event.preventDefault();
+        saveInlineThreadEdit(saveBtn.getAttribute('data-thread-save'));
+        return;
+      }
+
+      const cancelBtn = event.target.closest('[data-thread-cancel]');
+      if (cancelBtn) {
+        event.preventDefault();
+        resetInlineThreadEdit({ preserveStatus: true });
+        setStatus(el.threadStatus, 'Edición cancelada.', '');
+        return;
+      }
+
       const editBtn = event.target.closest('[data-thread-edit]');
       if (editBtn) {
         event.preventDefault();
@@ -1129,6 +1168,38 @@ const renderThreads = () => {
       }
     });
     el.threadsWrap.dataset.boundDelegatedClicks = '1';
+  }
+
+  if (!el.threadsWrap.dataset.boundDelegatedInputs) {
+    el.threadsWrap.addEventListener('input', (event) => {
+      const titleInput = event.target.closest('[data-inline-edit-title]');
+      if (titleInput && editingThreadDraft) {
+        editingThreadDraft.title = titleInput.value;
+        editingThreadFocusField = 'title';
+        return;
+      }
+
+      const bodyInput = event.target.closest('[data-inline-edit-body]');
+      if (bodyInput && editingThreadDraft) {
+        editingThreadDraft.body = bodyInput.value;
+        editingThreadFocusField = 'body';
+      }
+    });
+
+    el.threadsWrap.addEventListener('change', (event) => {
+      const categoryInput = event.target.closest('[data-inline-edit-category]');
+      if (categoryInput && editingThreadDraft) {
+        editingThreadDraft.categoryId = categoryInput.value;
+        return;
+      }
+
+      const accessInput = event.target.closest('[data-inline-edit-access]');
+      if (accessInput && editingThreadDraft) {
+        editingThreadDraft.accessLevel = accessInput.value;
+      }
+    });
+
+    el.threadsWrap.dataset.boundDelegatedInputs = '1';
   }
 
   el.threadsWrap.querySelectorAll('[data-reply-edit]').forEach((btn) => {
@@ -1162,6 +1233,10 @@ const renderThreads = () => {
       img.addEventListener('error', () => markLoaded(img), { once: true });
     }
   });
+
+  if (editingThreadId) {
+    window.requestAnimationFrame(() => focusInlineThreadEditor());
+  }
 };
 
 const renderThreadSkeletons = (count = 3) => {
@@ -1403,7 +1478,6 @@ const createThread = async () => {
     return;
   }
 
-  const isEditing = !!editingThreadId;
   const title = (el.threadTitle.value || '').trim();
   const body = (el.threadBody.value || '').trim();
   const categoryId = el.categorySelect.value;
@@ -1416,34 +1490,6 @@ const createThread = async () => {
   }
 
   try {
-    if (isEditing) {
-      const item = threads.find((thread) => thread.id === editingThreadId);
-      if (!canManageItem(item)) {
-        setStatus(el.threadStatus, 'Ya no puedes editar este hilo.', 'error');
-        resetThreadComposer({ preserveStatus: true });
-        return;
-      }
-
-      const ok = await updateDocument('foro_hilos', editingThreadId, {
-        categoryId,
-        categoryLabel: category ? category.label : 'General',
-        title,
-        body,
-        accessLevel,
-        updatedAt: new Date().toISOString(),
-      });
-
-      if (!ok) {
-        setStatus(el.threadStatus, 'No se pudieron guardar los cambios del hilo.', 'error');
-        return;
-      }
-
-      setStatus(el.threadStatus, `Cambios guardados en "${title}".`, 'ok');
-      resetThreadComposer({ preserveStatus: true });
-      await loadForum();
-      return;
-    }
-
     const imageFile = el.threadImage.files && el.threadImage.files[0] ? el.threadImage.files[0] : null;
     let imageUrl = '';
     let imageUploadWarning = '';
@@ -1557,6 +1603,43 @@ const editThread = async (threadId) => {
   startThreadEdit(item);
 };
 
+const saveInlineThreadEdit = async (threadId) => {
+  const item = threads.find((thread) => thread.id === threadId);
+  if (!canManageItem(item) || !editingThreadDraft || editingThreadId !== threadId) return;
+
+  const title = String(editingThreadDraft.title || '').trim();
+  const body = String(editingThreadDraft.body || '').trim();
+  const categoryId = String(editingThreadDraft.categoryId || 'general').trim() || 'general';
+  const category = FORUM_CATEGORIES.find((c) => c.id === categoryId);
+  const accessLevel = editingThreadDraft.accessLevel === 'registered_only' ? 'registered_only' : 'public';
+
+  if (title.length < 3 || body.length < 3) {
+    setStatus(el.threadStatus, 'Título y contenido deben tener mínimo 3 caracteres.', 'error');
+    editingThreadFocusField = title.length < 3 ? 'title' : 'body';
+    renderThreads();
+    window.requestAnimationFrame(() => focusInlineThreadEditor());
+    return;
+  }
+
+  const ok = await updateDocument('foro_hilos', threadId, {
+    categoryId,
+    categoryLabel: category ? category.label : 'General',
+    title,
+    body,
+    accessLevel,
+    updatedAt: new Date().toISOString(),
+  });
+
+  if (!ok) {
+    setStatus(el.threadStatus, 'No se pudieron guardar los cambios del hilo.', 'error');
+    return;
+  }
+
+  setStatus(el.threadStatus, `Cambios guardados en "${title}".`, 'ok');
+  resetInlineThreadEdit({ preserveStatus: true, rerender: false });
+  await loadForum();
+};
+
 const deleteThread = async (threadId) => {
   const item = threads.find((thread) => thread.id === threadId);
   if (!canManageItem(item)) return;
@@ -1575,7 +1658,7 @@ const deleteThread = async (threadId) => {
     return;
   }
 
-  if (editingThreadId === threadId) resetThreadComposer({ preserveStatus: true });
+  if (editingThreadId === threadId) resetInlineThreadEdit({ preserveStatus: true, rerender: false });
   setStatus(el.threadStatus, 'Hilo eliminado.', 'ok');
   if (getActiveThreadId() === threadId) {
     goToThreadList();
@@ -1690,16 +1773,9 @@ const init = async () => {
   if (el.cancelThreadEditBtn) {
     el.cancelThreadEditBtn.addEventListener('click', () => {
       resetThreadComposer();
-      setStatus(el.threadStatus, 'Edición cancelada.', '');
     });
   }
   el.threadImage.addEventListener('change', () => {
-    if (editingThreadId) {
-      el.threadImage.value = '';
-      setThreadImageStatus('La imagen actual se conserva. Aquí estás editando el texto del hilo.', '');
-      return;
-    }
-
     const selected = el.threadImage.files && el.threadImage.files[0] ? el.threadImage.files[0] : null;
     if (!selected) {
       setThreadImageStatus('Imagen opcional para el hilo');

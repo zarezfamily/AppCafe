@@ -51,6 +51,18 @@
       font-size: 22px; font-weight: 500; letter-spacing: 4px;
       color: var(--ink); text-decoration: none; text-transform: uppercase;
     }
+    .nav-back {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      color: var(--ink-soft);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+    }
+    .nav-back:hover { color: var(--accent); }
     .nav-links { display: flex; align-items: center; gap: 32px; }
     .nav-link {
       font-size: 11px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase;
@@ -564,6 +576,13 @@
         justify-content: center;
       }
       .nav-links { display: none !important; }
+      .nav-back {
+        display: inline-flex;
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
       .page { padding-top: 82px; }
     }
 
@@ -588,6 +607,7 @@
 </head>
 <body>
   <nav aria-label="Navegación principal">
+    <a class="nav-back" href="/comunidad.html" aria-label="Volver">← Volver</a>
     <a class="nav-wordmark" href="/">ETIOVE</a>
     <div class="nav-links">
       <a class="nav-link" href="/">Inicio</a>

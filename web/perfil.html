@@ -130,6 +130,13 @@
       margin: 0 4px;
     }
 
+    .profile-followers {
+      margin-top: 8px;
+      color: #5f554b;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
     .profile-quote {
       margin: 18px auto 0;
       max-width: 760px;
@@ -146,6 +153,14 @@
       margin: 18px 0 0;
     }
 
+    .profile-owner-tools {
+      margin-top: 12px;
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
     .pill-btn {
       border: 1px solid #cfc9c2;
       background: #f7f7f8;
@@ -156,7 +171,34 @@
       font-size: 24px;
       font-size: clamp(14px, 1.4vw, 24px);
       font-weight: 700;
+      cursor: pointer;
+    }
+
+    .pill-btn:disabled {
       cursor: not-allowed;
+      opacity: 0.56;
+    }
+
+    .owner-btn {
+      border: 1px solid #ccbeb1;
+      background: #fffaf4;
+      color: #6a4f35;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+    }
+
+    .owner-btn:hover { border-color: #b88f68; color: #9f612a; }
+
+    .profile-status {
+      margin-top: 10px;
+      color: #73675b;
+      font-size: 13px;
+      font-weight: 700;
+      min-height: 18px;
     }
 
     .tabs {
@@ -293,11 +335,18 @@
       <h1 id="profileName" class="profile-name">Catador</h1>
       <p id="profileSince" class="profile-sub">Miembro desde hace poco</p>
       <p id="profileCounters" class="profile-counts">0 hilos <span>•</span> 0 respuestas <span>•</span> 0 comentarios</p>
+      <p id="profileFollowers" class="profile-followers">0 seguidores</p>
       <p id="profileQuote" class="profile-quote">"Perfil público de la comunidad Etiove"</p>
       <div class="profile-actions">
-        <button class="pill-btn" type="button" title="Próximamente">Seguir</button>
-        <button class="pill-btn" type="button" title="Próximamente">Mensaje directo</button>
+        <button id="followBtn" class="pill-btn" type="button">Seguir</button>
+        <button id="dmBtn" class="pill-btn" type="button">Mensaje directo</button>
       </div>
+      <div id="ownerTools" class="profile-owner-tools" style="display:none;">
+        <button id="editPhotoBtn" class="owner-btn" type="button">Editar foto</button>
+        <button id="editQuoteBtn" class="owner-btn" type="button">Editar frase</button>
+      </div>
+      <input id="photoInput" type="file" accept="image/*" style="display:none;" />
+      <p id="profileStatus" class="profile-status"></p>
     </section>
 
     <div class="tabs" role="tablist" aria-label="Secciones del perfil">

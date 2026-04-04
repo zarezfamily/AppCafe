@@ -93,6 +93,17 @@ service cloud.firestore {
         && (!('productId' in data) || data.productId is string);
     }
 
+    function isValidUserProfile(data, uid) {
+      return data.uid is string
+        && data.uid == uid
+        && data.uid == request.auth.uid
+        && (!('displayName' in data) || (data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 80))
+        && (!('avatarUrl' in data) || (data.avatarUrl is string && data.avatarUrl.size() <= 2000))
+        && (!('motto' in data) || (data.motto is string && data.motto.size() <= 280))
+        && (!('updatedAt' in data) || data.updatedAt is string)
+        && (!('createdAt' in data) || data.createdAt is string);
+    }
+
     // Catálogo de cafés: público lectura, escritura autenticada.
     match /cafes/{cafeId} {
       allow read: if true;
@@ -166,6 +177,41 @@ service cloud.firestore {
           || isBlogCommentVotesUpdate()
         );
       allow delete: if isSignedIn() && resource.data.authorUid == request.auth.uid;
+    }
+
+    match /user_profiles/{userId} {
+      allow read: if true;
+      allow create, update: if isSignedIn() && isValidUserProfile(request.resource.data, userId);
+      allow delete: if false;
+    }
+
+    match /profile_follows/{followId} {
+      allow read: if true;
+      allow create: if isSignedIn()
+        && request.resource.data.followerUid is string
+        && request.resource.data.followerUid == request.auth.uid
+        && request.resource.data.targetUid is string
+        && request.resource.data.targetUid.size() > 0
+        && request.resource.data.targetUid != request.auth.uid
+        && (!('createdAt' in request.resource.data) || request.resource.data.createdAt is string);
+      allow update: if false;
+      allow delete: if isSignedIn() && resource.data.followerUid == request.auth.uid;
+    }
+
+    match /direct_messages/{messageId} {
+      allow create: if isSignedIn()
+        && request.resource.data.senderUid is string
+        && request.resource.data.senderUid == request.auth.uid
+        && request.resource.data.recipientUid is string
+        && request.resource.data.recipientUid.size() > 0
+        && hasString('body', 2, 2000)
+        && request.resource.data.createdAt is string;
+      allow read: if isSignedIn()
+        && (
+          resource.data.senderUid == request.auth.uid
+          || resource.data.recipientUid == request.auth.uid
+        );
+      allow update, delete: if false;
     }
 
     match /newsletter_subscribers/{subscriberId} {

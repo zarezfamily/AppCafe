@@ -3,15 +3,27 @@
   const FIREBASE_API_KEY = 'AIzaSyA1BcU0iRk3HyFtV92CLrnalHFKLaOWH24';
   const FIREBASE_IOS_BUNDLE_ID = 'com.zarezfamily.etiove';
   const BASE_URL = `https://europe-west1-firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
+  const FIREBASE_STORAGE_BUCKET = `${FIREBASE_PROJECT_ID}.appspot.com`;
 
   const params = new URLSearchParams(window.location.search);
   const uid = String(params.get('uid') || '').trim();
   const queryName = String(params.get('name') || '').trim();
 
+  const auth = {
+    uid: localStorage.getItem('etiove_web_uid') || '',
+    email: localStorage.getItem('etiove_web_email') || '',
+    token: localStorage.getItem('etiove_web_token') || '',
+  };
+
   const state = {
     threads: [],
     replies: [],
     blogComments: [],
+    follows: [],
+    profile: null,
+    isFollowing: false,
+    followersCount: 0,
+    loaded: false,
   };
 
   const el = {
@@ -19,9 +31,23 @@
     name: document.getElementById('profileName'),
     since: document.getElementById('profileSince'),
     counters: document.getElementById('profileCounters'),
+    followers: document.getElementById('profileFollowers'),
     quote: document.getElementById('profileQuote'),
+    status: document.getElementById('profileStatus'),
+    followBtn: document.getElementById('followBtn'),
+    dmBtn: document.getElementById('dmBtn'),
+    ownerTools: document.getElementById('ownerTools'),
+    editPhotoBtn: document.getElementById('editPhotoBtn'),
+    editQuoteBtn: document.getElementById('editQuoteBtn'),
+    photoInput: document.getElementById('photoInput'),
     content: document.getElementById('tabContent'),
     tabs: Array.from(document.querySelectorAll('[data-tab]')),
+  };
+
+  const isOwner = () => !!auth.uid && auth.uid === uid;
+
+  const setStatus = (text) => {
+    if (el.status) el.status.textContent = text || '';
   };
 
   const fromFirestoreValue = (val = {}) => {
@@ -48,13 +74,101 @@
     'X-Ios-Bundle-Identifier': FIREBASE_IOS_BUNDLE_ID,
   });
 
+  const authedHeaders = () => {
+    const headers = authHeaders();
+    if (auth.token) headers.Authorization = `Bearer ${auth.token}`;
+    return headers;
+  };
+
   const getCollection = async (name, pageSize = 1000) => {
     const res = await fetch(`${BASE_URL}/${name}?key=${FIREBASE_API_KEY}&pageSize=${pageSize}`, {
-      headers: authHeaders(),
+      headers: authedHeaders(),
     });
     if (res.status === 404 || !res.ok) return [];
     const json = await res.json();
     return (json.documents || []).map((doc) => docToObject(doc));
+  };
+
+  const toFirestoreValue = (val) => {
+    if (val === null || val === undefined) return { nullValue: null };
+    if (typeof val === 'string') return { stringValue: val };
+    if (typeof val === 'number') return Number.isInteger(val)
+      ? { integerValue: String(val) }
+      : { doubleValue: val };
+    if (typeof val === 'boolean') return { booleanValue: val };
+    return { stringValue: String(val) };
+  };
+
+  const toFields = (obj) => {
+    const fields = {};
+    Object.keys(obj).forEach((k) => {
+      fields[k] = toFirestoreValue(obj[k]);
+    });
+    return { fields };
+  };
+
+  const updateDocument = async (name, id, data) => {
+    const query = new URLSearchParams({ key: FIREBASE_API_KEY });
+    Object.keys(data).forEach((field) => query.append('updateMask.fieldPaths', field));
+    const res = await fetch(`${BASE_URL}/${name}/${id}?${query.toString()}`, {
+      method: 'PATCH',
+      headers: authedHeaders(),
+      body: JSON.stringify(toFields(data)),
+    });
+    return res.ok;
+  };
+
+  const addDocument = async (name, data) => {
+    const res = await fetch(`${BASE_URL}/${name}?key=${FIREBASE_API_KEY}`, {
+      method: 'POST',
+      headers: authedHeaders(),
+      body: JSON.stringify(toFields(data)),
+    });
+    return res.ok;
+  };
+
+  const deleteDocument = async (name, id) => {
+    const res = await fetch(`${BASE_URL}/${name}/${id}?key=${FIREBASE_API_KEY}`, {
+      method: 'DELETE',
+      headers: authedHeaders(),
+    });
+    return res.ok;
+  };
+
+  const getDocument = async (name, id) => {
+    const res = await fetch(`${BASE_URL}/${name}/${id}?key=${FIREBASE_API_KEY}`, {
+      headers: authedHeaders(),
+    });
+    if (res.status === 404 || !res.ok) return null;
+    const json = await res.json();
+    return docToObject(json);
+  };
+
+  const uploadAvatar = async (file) => {
+    if (!auth.token || !auth.uid || !file) throw new Error('UNAUTHENTICATED');
+    const ext = String(file.type || '').includes('png') ? 'png' : 'jpg';
+    const fileName = `profile_avatars/${auth.uid}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
+
+    const uploadUrl = `https://firebasestorage.googleapis.com/v0/b/${FIREBASE_STORAGE_BUCKET}/o?uploadType=media&name=${encodeURIComponent(fileName)}&key=${FIREBASE_API_KEY}`;
+    const res = await fetch(uploadUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': file.type || 'image/jpeg',
+        'X-Ios-Bundle-Identifier': FIREBASE_IOS_BUNDLE_ID,
+        Authorization: `Bearer ${auth.token}`,
+      },
+      body: file,
+    });
+
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error((json.error && json.error.message) || 'storage_upload_failed');
+
+    const objectName = json.name || fileName;
+    const encodedName = encodeURIComponent(objectName);
+    const token = json.downloadTokens || (json.metadata && json.metadata.downloadTokens) || '';
+    return token
+      ? `https://firebasestorage.googleapis.com/v0/b/${FIREBASE_STORAGE_BUCKET}/o/${encodedName}?alt=media&token=${token}`
+      : `https://firebasestorage.googleapis.com/v0/b/${FIREBASE_STORAGE_BUCKET}/o/${encodedName}?alt=media`;
   };
 
   const esc = (text) => String(text || '')
@@ -89,6 +203,7 @@
 
   const getAuthorName = () => {
     const names = [
+      state.profile && state.profile.displayName,
       queryName,
       ...state.threads.map((item) => item.authorName),
       ...state.replies.map((item) => item.authorName),
@@ -121,17 +236,61 @@
     const first = name.slice(0, 1).toUpperCase() || '?';
     const allDates = collectDates();
     const sinceText = allDates.length ? yearsSince(allDates[0].toISOString()) : 'Miembro reciente';
+    const avatarUrl = String(state.profile && state.profile.avatarUrl || '').trim();
+    const quote = String(state.profile && state.profile.motto || '').trim();
 
-    if (el.avatar) el.avatar.textContent = first;
+    if (el.avatar) {
+      if (avatarUrl) {
+        el.avatar.innerHTML = `<img src="${esc(avatarUrl)}" alt="Foto de ${esc(name)}" style="width:100%;height:100%;object-fit:cover;display:block;" />`;
+      } else {
+        el.avatar.textContent = first;
+      }
+    }
     if (el.name) el.name.textContent = name;
     if (el.since) el.since.textContent = sinceText;
     if (el.counters) {
       el.counters.innerHTML = `${state.threads.length} hilos <span>•</span> ${state.replies.length} respuestas <span>•</span> ${state.blogComments.length} comentarios`;
     }
+    if (el.followers) {
+      const suffix = state.followersCount === 1 ? 'seguidor' : 'seguidores';
+      el.followers.textContent = `${state.followersCount} ${suffix}`;
+    }
     if (el.quote) {
-      el.quote.textContent = '"Ninguno de nosotros es tan listo como todos nosotros."';
+      el.quote.textContent = quote || '"Ninguno de nosotros es tan listo como todos nosotros."';
     }
     document.title = `${name} | Perfil Etiove`;
+  };
+
+  const renderButtons = () => {
+    if (el.ownerTools) el.ownerTools.style.display = isOwner() ? 'flex' : 'none';
+
+    if (el.followBtn) {
+      if (!auth.uid) {
+        el.followBtn.textContent = 'Inicia sesion para seguir';
+        el.followBtn.disabled = true;
+      } else if (isOwner()) {
+        el.followBtn.textContent = 'Este es tu perfil';
+        el.followBtn.disabled = true;
+      } else {
+        el.followBtn.disabled = false;
+        el.followBtn.textContent = state.isFollowing ? 'Siguiendo' : 'Seguir';
+      }
+    }
+
+    if (el.dmBtn) {
+      if (!auth.uid || isOwner()) {
+        el.dmBtn.disabled = true;
+        el.dmBtn.textContent = isOwner() ? 'No puedes escribirte' : 'Inicia sesion para escribir';
+      } else {
+        el.dmBtn.disabled = false;
+        el.dmBtn.textContent = 'Mensaje directo';
+      }
+    }
+  };
+
+  const refreshFollowState = () => {
+    state.followersCount = state.follows.filter((row) => row.targetUid === uid).length;
+    state.isFollowing = !!auth.uid && state.follows.some((row) => row.targetUid === uid && row.followerUid === auth.uid);
   };
 
   const renderEmpty = (message) => {
@@ -268,25 +427,163 @@
     });
   };
 
+  const handleFollowToggle = async () => {
+    if (!auth.uid || isOwner()) return;
+
+    el.followBtn.disabled = true;
+    setStatus(state.isFollowing ? 'Quitando seguimiento...' : 'Guardando seguimiento...');
+
+    const existing = state.follows.find((row) => row.targetUid === uid && row.followerUid === auth.uid);
+    let ok = false;
+    if (existing) {
+      ok = await deleteDocument('profile_follows', existing.id);
+    } else {
+      ok = await addDocument('profile_follows', {
+        targetUid: uid,
+        followerUid: auth.uid,
+        createdAt: new Date().toISOString(),
+      });
+    }
+
+    if (!ok) {
+      setStatus('No se pudo actualizar el seguimiento.');
+      renderButtons();
+      return;
+    }
+
+    state.follows = await getCollection('profile_follows', 4000);
+    refreshFollowState();
+    renderHeader();
+    renderButtons();
+    setStatus(state.isFollowing ? 'Ahora sigues a este usuario.' : 'Ya no sigues a este usuario.');
+  };
+
+  const handleSendDirectMessage = async () => {
+    if (!auth.uid || isOwner()) return;
+    const message = window.prompt('Escribe tu mensaje directo');
+    if (message === null) return;
+
+    const body = String(message || '').trim();
+    if (body.length < 2) {
+      setStatus('El mensaje es demasiado corto.');
+      return;
+    }
+
+    setStatus('Enviando mensaje...');
+    const ok = await addDocument('direct_messages', {
+      senderUid: auth.uid,
+      senderName: String(localStorage.getItem('etiove_web_alias') || auth.email.split('@')[0] || 'Catador'),
+      recipientUid: uid,
+      recipientName: getAuthorName(),
+      body,
+      createdAt: new Date().toISOString(),
+      read: false,
+    });
+
+    if (!ok) {
+      setStatus('No se pudo enviar el mensaje.');
+      return;
+    }
+    setStatus('Mensaje directo enviado.');
+  };
+
+  const handleEditQuote = async () => {
+    if (!isOwner()) return;
+    const current = String(state.profile && state.profile.motto || '').trim();
+    const next = window.prompt('Edita tu frase motivadora', current || '"Ninguno de nosotros es tan listo como todos nosotros."');
+    if (next === null) return;
+    const motto = String(next || '').trim();
+    if (!motto) {
+      setStatus('La frase no puede estar vacia.');
+      return;
+    }
+
+    const ok = await updateDocument('user_profiles', uid, {
+      uid,
+      displayName: getAuthorName(),
+      avatarUrl: String(state.profile && state.profile.avatarUrl || '').trim(),
+      motto,
+      updatedAt: new Date().toISOString(),
+    });
+
+    if (!ok) {
+      setStatus('No se pudo guardar la frase.');
+      return;
+    }
+
+    state.profile = await getDocument('user_profiles', uid);
+    renderHeader();
+    setStatus('Frase actualizada.');
+  };
+
+  const handlePhotoSelected = async (event) => {
+    if (!isOwner()) return;
+    const file = event.target && event.target.files && event.target.files[0] ? event.target.files[0] : null;
+    if (!file) return;
+
+    setStatus('Subiendo foto...');
+    try {
+      const avatarUrl = await uploadAvatar(file);
+      const ok = await updateDocument('user_profiles', uid, {
+        uid,
+        displayName: getAuthorName(),
+        avatarUrl,
+        motto: String(state.profile && state.profile.motto || '').trim() || '"Ninguno de nosotros es tan listo como todos nosotros."',
+        updatedAt: new Date().toISOString(),
+      });
+
+      if (!ok) {
+        setStatus('No se pudo guardar la foto.');
+        return;
+      }
+
+      state.profile = await getDocument('user_profiles', uid);
+      renderHeader();
+      setStatus('Foto de perfil actualizada.');
+    } catch {
+      setStatus('No se pudo subir la foto.');
+    } finally {
+      if (el.photoInput) el.photoInput.value = '';
+    }
+  };
+
+  const attachActionEvents = () => {
+    if (el.followBtn) el.followBtn.addEventListener('click', handleFollowToggle);
+    if (el.dmBtn) el.dmBtn.addEventListener('click', handleSendDirectMessage);
+    if (el.editQuoteBtn) el.editQuoteBtn.addEventListener('click', handleEditQuote);
+    if (el.editPhotoBtn && el.photoInput) {
+      el.editPhotoBtn.addEventListener('click', () => el.photoInput.click());
+      el.photoInput.addEventListener('change', handlePhotoSelected);
+    }
+  };
+
   const init = async () => {
     if (!uid) {
       renderEmpty('Falta el usuario del perfil. Vuelve a Comunidad o Blog y pulsa un alias.');
       return;
     }
 
-    const [threads, replies, blogComments] = await Promise.all([
+    const [threads, replies, blogComments, follows, profile] = await Promise.all([
       getCollection('foro_hilos', 1200),
       getCollection('foro_respuestas', 2000),
       getCollection('blog_comentarios', 2000),
+      getCollection('profile_follows', 4000),
+      getDocument('user_profiles', uid),
     ]);
 
     state.threads = threads.filter((item) => item.authorUid === uid);
     state.replies = replies.filter((item) => item.authorUid === uid);
     state.blogComments = blogComments.filter((item) => item.authorUid === uid);
+    state.follows = follows;
+    state.profile = profile;
+    refreshFollowState();
 
     renderHeader();
     attachTabEvents();
+    attachActionEvents();
+    renderButtons();
     renderTab('activity');
+    state.loaded = true;
   };
 
   init().catch(() => {

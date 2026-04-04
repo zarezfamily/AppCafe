@@ -1199,7 +1199,15 @@ const createThread = async () => {
 
   try {
     const imageFile = el.threadImage.files && el.threadImage.files[0] ? el.threadImage.files[0] : null;
-    const imageUrl = imageFile ? await uploadImageToStorage(imageFile, 'foro_hilos') : '';
+    let imageUrl = '';
+    let imageUploadWarning = '';
+    if (imageFile) {
+      try {
+        imageUrl = await uploadImageToStorage(imageFile, 'foro_hilos');
+      } catch (uploadErr) {
+        imageUploadWarning = mapThreadPublishError(uploadErr);
+      }
+    }
 
     await addDocument('foro_hilos', {
       categoryId,
@@ -1224,7 +1232,11 @@ const createThread = async () => {
     el.threadImage.value = '';
     el.threadAccessLevel.value = 'public';
 
-    setStatus(el.threadStatus, 'Hilo publicado.', 'ok');
+    if (imageUploadWarning) {
+      setStatus(el.threadStatus, `Hilo publicado sin imagen. ${imageUploadWarning}`, 'error');
+    } else {
+      setStatus(el.threadStatus, 'Hilo publicado.', 'ok');
+    }
     await loadForum();
   } catch (e) {
     setStatus(el.threadStatus, mapThreadPublishError(e), 'error');

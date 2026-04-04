@@ -400,12 +400,21 @@ const renderInlineThreadEditor = (item, options = {}) => {
   const draft = editingThreadDraft || item;
   const categoryValue = String(draft.categoryId || item.categoryId || 'general');
   const accessValue = draft.accessLevel === 'registered_only' ? 'registered_only' : 'public';
+  const activeImageUrl = draft.imageRemoved ? '' : normalizeStorageImageUrl(draft.image || item.image || '');
+  const imageStatusKind = String(draft.imageStatusKind || '');
+  const imageStatusText = String(draft.imageStatus || (activeImageUrl ? 'Imagen actual del hilo.' : 'Este hilo no tiene imagen.'));
   return `
     <div class="thread-inline-editor${compact ? ' compact' : ''}">
       <div class="field"><select data-inline-edit-category="${item.id}">${FORUM_CATEGORIES.map((c) => `<option value="${c.id}" ${c.id === categoryValue ? 'selected' : ''}>${c.emoji} ${c.label}</option>`).join('')}</select></div>
       <div class="field"><select data-inline-edit-access="${item.id}"><option value="public" ${accessValue === 'public' ? 'selected' : ''}>Público (cualquiera puede leer)</option><option value="registered_only" ${accessValue === 'registered_only' ? 'selected' : ''}>Solo registrados</option></select></div>
       <div class="field"><input data-inline-edit-title="${item.id}" maxlength="120" value="${escapeHtml(draft.title || '')}" /></div>
       <div class="field"><textarea data-inline-edit-body="${item.id}" maxlength="1000">${escapeHtml(draft.body || '')}</textarea></div>
+      <div class="thread-inline-image-tools">
+        ${activeImageUrl ? `<img class="thread-inline-image-preview" src="${escapeHtml(activeImageUrl)}" alt="Imagen actual del hilo" loading="lazy" decoding="async" />` : ''}
+        <div class="field"><input type="file" accept="image/*" data-inline-edit-image="${item.id}" /></div>
+        <p class="file-note ${imageStatusKind}">${escapeHtml(imageStatusText)}</p>
+        ${activeImageUrl ? `<button class="btn ghost" data-inline-remove-image="${item.id}">Quitar imagen</button>` : ''}
+      </div>
       <div class="thread-inline-actions">
         <button class="btn primary" data-thread-save="${item.id}">Guardar cambios</button>
         <button class="btn ghost" data-thread-cancel="${item.id}">Cancelar</button>
@@ -422,6 +431,11 @@ const startThreadEdit = (item) => {
     body: item.body || '',
     categoryId: item.categoryId || 'general',
     accessLevel: item.accessLevel === 'registered_only' ? 'registered_only' : 'public',
+    image: item.image || '',
+    imageFile: null,
+    imageRemoved: false,
+    imageStatus: '',
+    imageStatusKind: '',
   };
   editingThreadFocusField = getActiveThreadId() === item.id ? 'body' : 'title';
   setStatus(el.threadStatus, `Editando: ${item.title || 'hilo sin título'}`, '');
@@ -984,7 +998,7 @@ const renderThreads = () => {
       </div>
       <article class="thread${editingThreadId === activeThread.id ? ' thread-is-editing' : ''}" data-thread-id="${activeThread.id}">
         ${detailBodyHtml}
-        ${normalizeStorageImageUrl(activeThread.image) ? `<img class="thread-image" src="${escapeHtml(normalizeStorageImageUrl(activeThread.image))}" alt="Imagen del hilo" loading="lazy" decoding="async" />` : ''}
+        ${editingThreadId !== activeThread.id && normalizeStorageImageUrl(activeThread.image) ? `<img class="thread-image" src="${escapeHtml(normalizeStorageImageUrl(activeThread.image))}" alt="Imagen del hilo" loading="lazy" decoding="async" />` : ''}
         <div class="thread-foot">
           <div class="actions-row">
             <button class="link-btn" data-vote="${activeThread.id}">${threadVoted ? 'Ya te interesa' : 'Me interesa'}</button>
@@ -1143,6 +1157,18 @@ const renderThreads = () => {
         return;
       }
 
+      const removeImageBtn = event.target.closest('[data-inline-remove-image]');
+      if (removeImageBtn && editingThreadDraft) {
+        event.preventDefault();
+        editingThreadDraft.imageRemoved = true;
+        editingThreadDraft.imageFile = null;
+        editingThreadDraft.imageStatus = 'Se quitará la imagen al guardar.';
+        editingThreadDraft.imageStatusKind = 'error';
+        renderThreads();
+        window.requestAnimationFrame(() => focusInlineThreadEditor());
+        return;
+      }
+
       const editBtn = event.target.closest('[data-thread-edit]');
       if (editBtn) {
         event.preventDefault();
@@ -1196,6 +1222,39 @@ const renderThreads = () => {
       const accessInput = event.target.closest('[data-inline-edit-access]');
       if (accessInput && editingThreadDraft) {
         editingThreadDraft.accessLevel = accessInput.value;
+        return;
+      }
+
+      const imageInput = event.target.closest('[data-inline-edit-image]');
+      if (imageInput && editingThreadDraft) {
+        const selected = imageInput.files && imageInput.files[0] ? imageInput.files[0] : null;
+        if (!selected) {
+          editingThreadDraft.imageFile = null;
+          editingThreadDraft.imageStatus = '';
+          editingThreadDraft.imageStatusKind = '';
+          return;
+        }
+
+        const fileType = String(selected.type || '').toLowerCase();
+        if (!IMAGE_ALLOWED_TYPES.has(fileType)) {
+          editingThreadDraft.imageFile = null;
+          editingThreadDraft.imageStatus = 'Formato no compatible. Usa JPG, PNG, WEBP, GIF o HEIC.';
+          editingThreadDraft.imageStatusKind = 'error';
+          imageInput.value = '';
+          renderThreads();
+          window.requestAnimationFrame(() => focusInlineThreadEditor());
+          return;
+        }
+
+        const sizeMb = (selected.size / (1024 * 1024)).toFixed(2);
+        editingThreadDraft.imageFile = selected;
+        editingThreadDraft.imageRemoved = false;
+        editingThreadDraft.imageStatus = selected.size > IMAGE_MAX_BYTES
+          ? `Imagen seleccionada (${sizeMb} MB). Se intentará comprimir al guardar.`
+          : `Imagen lista para reemplazar (${sizeMb} MB).`;
+        editingThreadDraft.imageStatusKind = selected.size > IMAGE_MAX_BYTES ? '' : 'ok';
+        renderThreads();
+        window.requestAnimationFrame(() => focusInlineThreadEditor());
       }
     });
 
@@ -1612,6 +1671,7 @@ const saveInlineThreadEdit = async (threadId) => {
   const categoryId = String(editingThreadDraft.categoryId || 'general').trim() || 'general';
   const category = FORUM_CATEGORIES.find((c) => c.id === categoryId);
   const accessLevel = editingThreadDraft.accessLevel === 'registered_only' ? 'registered_only' : 'public';
+  let image = String(item.image || '');
 
   if (title.length < 3 || body.length < 3) {
     setStatus(el.threadStatus, 'Título y contenido deben tener mínimo 3 caracteres.', 'error');
@@ -1621,11 +1681,26 @@ const saveInlineThreadEdit = async (threadId) => {
     return;
   }
 
+  if (editingThreadDraft.imageRemoved) {
+    image = '';
+  }
+
+  const imageFile = editingThreadDraft.imageFile || null;
+  if (imageFile) {
+    try {
+      image = await uploadImageWithRetry(imageFile, 'foro_hilos', 3);
+    } catch (uploadErr) {
+      setStatus(el.threadStatus, mapThreadPublishError(uploadErr), 'error');
+      return;
+    }
+  }
+
   const ok = await updateDocument('foro_hilos', threadId, {
     categoryId,
     categoryLabel: category ? category.label : 'General',
     title,
     body,
+    image,
     accessLevel,
     updatedAt: new Date().toISOString(),
   });

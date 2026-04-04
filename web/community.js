@@ -683,7 +683,6 @@ const uploadImageToStorage = async (file, folder) => {
     method: 'POST',
     headers: {
       'Content-Type': fileToUpload.type || 'image/jpeg',
-      'X-Ios-Bundle-Identifier': FIREBASE_IOS_BUNDLE_ID,
       Authorization: `Bearer ${auth.token}`,
     },
     body: fileToUpload,
@@ -1078,9 +1077,13 @@ const mapThreadPublishError = (errorLike) => {
   if (raw.includes('IMAGE_TOO_LARGE_UNCOMPRESSIBLE')) return 'La imagen supera 5MB y no se pudo comprimir automáticamente. Usa una imagen más ligera.';
   if (raw.includes('IMAGE_TOO_LARGE')) return 'La imagen supera el límite de 5MB.';
   if (raw.includes('UNAUTHENTICATED')) return 'La sesión caducó. Vuelve a iniciar sesión.';
+  if (raw.includes('STORAGE_UPLOAD_FAILED_401') || raw.includes('STORAGE_UPLOAD_FAILED_403')) return 'Firebase rechazó la subida (permisos/CORS). Cierra sesión y vuelve a entrar.';
+  if (raw.includes('STORAGE_UPLOAD_FAILED_429')) return 'Demasiados intentos de subida. Prueba otra vez en unos minutos.';
+  if (raw.includes('STORAGE_UPLOAD_FAILED_500') || raw.includes('STORAGE_UPLOAD_FAILED_503')) return 'Firebase Storage no está disponible temporalmente. Inténtalo de nuevo.';
   if (raw.includes('PERMISSION_DENIED') || raw.includes('UNAUTHORIZED')) return 'No hay permisos para subir imágenes con esta sesión.';
   if (raw.includes('STORAGE_UPLOAD_FAILED_413')) return 'La imagen es demasiado grande para subirla.';
-  if (raw.includes('NETWORK') || raw.includes('FETCH') || raw.includes('FAILED')) return 'Error de red al subir la imagen. Inténtalo de nuevo.';
+  if (raw.includes('NETWORK') || raw.includes('FETCH')) return 'Error de red al subir la imagen. Inténtalo de nuevo.';
+  if (raw.includes('STORAGE_UPLOAD_FAILED_')) return `Falló la subida de imagen (${raw.replace('STORAGE_UPLOAD_FAILED_', 'HTTP ')}).`;
   return 'No se pudo publicar el hilo. Revisa la imagen e inténtalo otra vez.';
 };
 

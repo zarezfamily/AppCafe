@@ -29,6 +29,21 @@ let auth = {
   token: localStorage.getItem('etiove_web_token') || '',
 };
 
+// Alias resuelto desde hilos previos de la app
+const getAuthorName = () =>
+  localStorage.getItem('etiove_web_alias') || auth.email.split('@')[0] || 'Catador';
+
+// Busca en foro_hilos un hilo del usuario para obtener su alias real
+const resolveAuthorAlias = async () => {
+  const stored = localStorage.getItem('etiove_web_alias');
+  if (stored) return; // ya lo tenemos
+  const allThreads = await getCollection('foro_hilos', 50);
+  const mine = allThreads.find((t) => t.authorUid === auth.uid && t.authorName && t.authorName !== auth.email.split('@')[0]);
+  if (mine) {
+    localStorage.setItem('etiove_web_alias', mine.authorName);
+  }
+};
+
 let selectedCategory = 'general';
 let threads = [];
 let replies = [];
@@ -469,6 +484,11 @@ const signIn = async (registerMode) => {
     localStorage.setItem('etiove_web_email', auth.email);
     localStorage.setItem('etiove_web_token', auth.token);
 
+    // Intentar recuperar el alias real del usuario desde sus hilos anteriores
+    try {
+      await resolveAuthorAlias();
+    } catch (_) { /* no bloquear el login */ }
+
     renderAuthState();
     setStatus(el.authStatus, registerMode ? 'Cuenta creada y sesión iniciada.' : 'Sesión iniciada.', 'ok');
     await loadForum();
@@ -482,6 +502,7 @@ const logout = async () => {
   localStorage.removeItem('etiove_web_uid');
   localStorage.removeItem('etiove_web_email');
   localStorage.removeItem('etiove_web_token');
+  localStorage.removeItem('etiove_web_alias');
   renderAuthState();
   await loadForum();
 };
@@ -514,7 +535,7 @@ const createThread = async () => {
       body,
       image: imageUrl,
       authorUid: auth.uid,
-      authorName: auth.email.split('@')[0],
+      authorName: getAuthorName(),
       authorLevel: 'Web',
       accessLevel,
       createdAt: new Date().toISOString(),
@@ -588,7 +609,7 @@ const sendReply = async (threadId) => {
       parentId: '',
       body,
       authorUid: auth.uid,
-      authorName: auth.email.split('@')[0],
+      authorName: getAuthorName(),
       authorLevel: 'Web',
       createdAt: new Date().toISOString(),
       upvotes: 0,
@@ -611,6 +632,11 @@ const sendReply = async (threadId) => {
 const init = async () => {
   renderCategories();
   renderAuthState();
+
+  // Si hay sesión guardada, resolver alias en background
+  if (auth.uid && auth.token) {
+    resolveAuthorAlias().catch(() => {});
+  }
 
   el.loginBtn.addEventListener('click', () => signIn(false));
   el.registerBtn.addEventListener('click', () => signIn(true));

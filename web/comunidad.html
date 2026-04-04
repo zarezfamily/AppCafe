@@ -1152,16 +1152,15 @@
     }
 
     /* ─── RESPONSIVE ─── */
-    @media (max-width: 860px) {
+    @media (max-width: 768px) {
       nav { padding: 16px 24px; }
-      .nav-links { gap: 20px; }
+      .nav-links { display: none; }
       .nav-cta { display: none; }
       footer { flex-direction: column; text-align: center; }
       .social-row { justify-content: center; }
     }
     @media (max-width: 560px) {
       nav { padding: 14px 20px; }
-      .nav-link:not(.nav-link--active) { display: none; }
     }
     @media (max-width: 960px) {
       .hero-title { font-size: 52px; }

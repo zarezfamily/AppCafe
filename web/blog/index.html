@@ -355,9 +355,9 @@
     .scroll-top.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
     .scroll-top:hover { background: var(--accent); }
 
-    @media (max-width: 860px) {
+    @media (max-width: 768px) {
       nav { padding: 16px 24px; }
-      .nav-links { gap: 20px; }
+      .nav-links { display: none; }
       .nav-cta { display: none; }
       .hero-title { letter-spacing: 5px; }
       .grid { grid-template-columns: 1fr; }
@@ -367,7 +367,6 @@
     }
     @media (max-width: 560px) {
       nav { padding: 14px 20px; }
-      .nav-link:not(.nav-link--active) { display: none; }
       .articles { padding: 60px 0 80px; }
     }
   </style>

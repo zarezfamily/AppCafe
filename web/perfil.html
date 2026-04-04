@@ -821,8 +821,13 @@
     .scroll-top:hover { background: var(--accent); }
 
     @media (max-width: 980px) {
+      .page { padding-top: 82px; }
+      .profile-pass-head { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
       nav {
-        padding: 14px 18px;
+        padding: 16px 20px;
         justify-content: center;
       }
       .nav-links { display: none !important; }
@@ -833,13 +838,6 @@
         top: 50%;
         transform: translateY(-50%);
       }
-      .page { padding-top: 82px; }
-      .profile-pass-head { grid-template-columns: 1fr; }
-    }
-
-    @media (max-width: 760px) {
-      nav { padding: 16px 24px; }
-      .nav-links { gap: 20px; }
       .nav-cta { display: none; }
       .feed-item { grid-template-columns: 1fr; }
       .feed-thumb { min-height: 76px; }

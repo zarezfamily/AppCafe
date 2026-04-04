@@ -42,7 +42,7 @@
 
   const el = {
     avatar: document.getElementById('profileAvatar'),
-    avatarHint: document.getElementById('avatarHint'),
+    avatarBadge: document.getElementById('avatarCameraBadge'),
     alias: document.getElementById('profileAlias'),
     name: document.getElementById('profileName'),
     level: document.getElementById('profileLevel'),
@@ -62,8 +62,6 @@
     actions: document.getElementById('profileActions'),
     followBtn: document.getElementById('followBtn'),
     dmBtn: document.getElementById('dmBtn'),
-    ownerTools: document.getElementById('ownerTools'),
-    editQuoteBtn: document.getElementById('editQuoteBtn'),
     photoInput: document.getElementById('photoInput'),
     content: document.getElementById('tabContent'),
     tabs: Array.from(document.querySelectorAll('[data-tab]')),
@@ -322,6 +320,17 @@
     }
   };
 
+  const getOwnerFullName = () => {
+    if (!isOwner()) return '';
+    const local = getStoredProfileLocal();
+    if (!local || typeof local !== 'object') return '';
+    return [local.nombre, local.apellidos]
+      .map((value) => String(value || '').trim())
+      .filter(Boolean)
+      .join(' ')
+      .trim();
+  };
+
   const fetchAuthPhotoUrl = async () => {
     if (!auth.token) return '';
     try {
@@ -384,7 +393,7 @@
       currentMotto,
       readMottoFromRecord(local),
       ...privateDocs.map((doc) => readMottoFromRecord(doc)),
-    ].find((value) => String(value || '').trim()) || '"Ninguno de nosotros es tan listo como todos nosotros."';
+    ].find((value) => String(value || '').trim()) || '';
 
     const fallbackName = [
       currentName,
@@ -483,13 +492,16 @@
   };
 
   const renderHeader = () => {
-    const name = getAuthorName();
-    const aliasHandle = `@${String(name || 'catador').replace(/^@+/, '').trim().replace(/\s+/g, '_')}`;
+    const aliasValue = getAuthorName();
+    const ownerFullName = getOwnerFullName();
+    const name = aliasValue;
+    const aliasHandle = `@${String(aliasValue || 'catador').replace(/^@+/, '').trim().replace(/\s+/g, '_')}`;
     const first = name.slice(0, 1).toUpperCase() || '?';
     const allDates = collectDates();
     const sinceText = allDates.length ? yearsSince(allDates[0].toISOString()) : 'Miembro reciente';
     const avatarUrl = resolvedProfileAvatar();
     const quote = String(state.profile && state.profile.motto || '').trim();
+    const quoteText = quote || (isOwner() ? 'Añade una frase' : '');
     const member = computeMemberStats();
     const currentLevel = getLevelFromXp(member.xp);
     const nextLevel = LEVELS.find((level) => level.minXp > member.xp) || null;
@@ -522,7 +534,10 @@
       }
     }
     if (el.alias) el.alias.textContent = aliasHandle;
-    if (el.name) el.name.textContent = name;
+    if (el.name) {
+      el.name.textContent = isOwner() ? ownerFullName : '';
+      el.name.style.display = isOwner() && ownerFullName ? '' : 'none';
+    }
     if (el.since) el.since.textContent = sinceText;
     if (el.level) el.level.textContent = `${currentLevel.icon} ${currentLevel.name}`;
     if (el.xp) el.xp.textContent = `${member.xp} XP acumulados`;
@@ -541,14 +556,19 @@
       el.followers.textContent = `${state.followersCount} ${suffix}`;
     }
     if (el.quote) {
-      el.quote.textContent = quote || '"Ninguno de nosotros es tan listo como todos nosotros."';
+      el.quote.textContent = quoteText;
+      el.quote.style.display = quoteText ? '' : 'none';
+      el.quote.classList.toggle('editable', isOwner());
+      el.quote.classList.toggle('placeholder', !quote);
+      el.quote.setAttribute('role', isOwner() ? 'button' : 'note');
+      el.quote.setAttribute('tabindex', isOwner() ? '0' : '-1');
+      el.quote.setAttribute('aria-label', isOwner() ? 'Editar frase de perfil' : 'Frase de perfil');
     }
     document.title = `${name} | Perfil Etiove`;
   };
 
   const renderButtons = () => {
     if (el.actions) el.actions.style.display = isOwner() ? 'none' : 'flex';
-    if (el.ownerTools) el.ownerTools.style.display = isOwner() ? 'flex' : 'none';
 
     if (el.avatar) {
       el.avatar.classList.toggle('editable', isOwner());
@@ -556,8 +576,8 @@
       el.avatar.setAttribute('tabindex', isOwner() ? '0' : '-1');
       el.avatar.setAttribute('aria-label', isOwner() ? 'Cambiar foto de perfil' : 'Foto de perfil');
     }
-    if (el.avatarHint) {
-      el.avatarHint.textContent = isOwner() ? 'Pulsa la foto para cambiarla' : '';
+    if (el.avatarBadge) {
+      el.avatarBadge.style.display = isOwner() ? 'inline-flex' : 'none';
     }
 
     if (el.followBtn) {
@@ -976,13 +996,9 @@
   const handleEditQuote = async () => {
     if (!isOwner()) return;
     const current = String(state.profile && state.profile.motto || '').trim();
-    const next = window.prompt('Edita tu frase motivadora', current || '"Ninguno de nosotros es tan listo como todos nosotros."');
+    const next = window.prompt('Edita tu frase', current);
     if (next === null) return;
     const motto = String(next || '').trim();
-    if (!motto) {
-      setStatus('La frase no puede estar vacia.');
-      return;
-    }
 
     const ok = await updateDocument('user_profiles', uid, {
       uid,
@@ -999,7 +1015,7 @@
 
     state.profile = await getDocument('user_profiles', uid);
     renderHeader();
-    setStatus('Frase actualizada.');
+    setStatus(motto ? 'Frase actualizada.' : 'Frase eliminada.');
   };
 
   const handlePhotoSelected = async (event) => {
@@ -1014,7 +1030,7 @@
         uid,
         displayName: getAuthorName(),
         avatarUrl,
-        motto: String(state.profile && state.profile.motto || '').trim() || '"Ninguno de nosotros es tan listo como todos nosotros."',
+        motto: String(state.profile && state.profile.motto || '').trim(),
         updatedAt: new Date().toISOString(),
       });
 
@@ -1036,7 +1052,6 @@
   const attachActionEvents = () => {
     if (el.followBtn) el.followBtn.addEventListener('click', handleFollowToggle);
     if (el.dmBtn) el.dmBtn.addEventListener('click', handleSendDirectMessage);
-    if (el.editQuoteBtn) el.editQuoteBtn.addEventListener('click', handleEditQuote);
     if (el.avatar && el.photoInput) {
       const openPicker = () => {
         if (!isOwner()) return;
@@ -1050,6 +1065,19 @@
         }
       });
       el.photoInput.addEventListener('change', handlePhotoSelected);
+    }
+    if (el.quote) {
+      el.quote.addEventListener('click', () => {
+        if (!isOwner()) return;
+        handleEditQuote();
+      });
+      el.quote.addEventListener('keydown', (event) => {
+        if (!isOwner()) return;
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          handleEditQuote();
+        }
+      });
     }
 
     if (el.content) {

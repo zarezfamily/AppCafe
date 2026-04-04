@@ -221,13 +221,21 @@ const normalizeText = (value) => String(value || '')
 const getActiveThreadId = () => {
   try {
     const params = new URLSearchParams(window.location.search || '');
-    return String(params.get('hilo') || '').trim();
+    const fromQuery = String(params.get('hilo') || '').trim();
+    if (fromQuery) return fromQuery;
+
+    const pathname = String(window.location.pathname || '');
+    const marker = '/comunidad/hilo/';
+    if (!pathname.startsWith(marker)) return '';
+
+    const rawId = pathname.slice(marker.length).split('/')[0];
+    return decodeURIComponent(String(rawId || '').trim());
   } catch {
     return '';
   }
 };
 
-const threadDetailUrl = (threadId) => `/comunidad.html?hilo=${encodeURIComponent(String(threadId || '').trim())}`;
+const threadDetailUrl = (threadId) => `/comunidad/hilo/${encodeURIComponent(String(threadId || '').trim())}`;
 
 const goToThreadDetail = (threadId) => {
   const safeId = String(threadId || '').trim();

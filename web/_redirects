@@ -4,5 +4,8 @@
 # Profile route normalization
 /perfil  /perfil/  301
 
+# Community thread detail slug
+/comunidad/hilo/*  /comunidad.html  200
+
 # Custom 404 fallback
 /*  /404.html  404

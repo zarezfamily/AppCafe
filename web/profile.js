@@ -474,9 +474,9 @@
     const dt = new Date(dateText);
     if (Number.isNaN(dt.getTime())) return 'Miembro reciente';
     const diffYears = Math.max(0, Math.floor((Date.now() - dt.getTime()) / (1000 * 60 * 60 * 24 * 365.25)));
-    if (diffYears === 0) return 'Miembro desde hace menos de 1 ano';
-    if (diffYears === 1) return 'Miembro desde hace 1 ano';
-    return `Miembro desde hace ${diffYears} anos`;
+    if (diffYears === 0) return 'Miembro desde hace menos de 1 año';
+    if (diffYears === 1) return 'Miembro desde hace 1 año';
+    return `Miembro desde hace ${diffYears} años`;
   };
 
   const getAuthorName = () => {

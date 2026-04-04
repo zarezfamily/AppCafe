@@ -193,7 +193,64 @@
       position: relative;
       z-index: 1;
       display: grid;
-      gap: 6px;
+      gap: 14px;
+    }
+
+    .profile-pass-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .profile-pass-main,
+    .profile-pass-side {
+      min-width: 0;
+      border-radius: 22px;
+      border: 1px solid rgba(255, 236, 217, 0.12);
+      background: linear-gradient(180deg, rgba(255, 248, 241, 0.06), rgba(255, 248, 241, 0.03));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+
+    .profile-pass-main {
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .profile-pass-side {
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+
+    .profile-pass-side-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .profile-pass-side-kicker {
+      margin: 0;
+      color: #f0c891;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.7px;
+      text-transform: uppercase;
+    }
+
+    .profile-pass-side-note {
+      margin: 0;
+      color: #cfb39a;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .profile-pass-stats {
+      display: grid;
+      gap: 8px;
     }
 
     .member-row {
@@ -751,6 +808,7 @@
         transform: translateY(-50%);
       }
       .page { padding-top: 82px; }
+      .profile-pass-head { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 760px) {
@@ -763,6 +821,8 @@
         border-radius: 22px;
         padding: 18px 14px;
       }
+      .profile-pass-main,
+      .profile-pass-side { border-radius: 18px; }
       .pill-btn { min-width: 100%; }
       .profile-stats-row { grid-template-columns: repeat(2, 1fr); display: grid; }
       .tabs { gap: 8px; padding: 7px; }
@@ -793,44 +853,56 @@
       <div class="brand-top-rule" aria-hidden="true"></div>
       <p class="member-kicker">Etiove member card</p>
       <div class="member-roast-content">
-        <div class="member-row">
-          <div class="member-identity">
-            <div class="avatar-wrap">
-              <div id="profileAvatar" class="avatar">?</div>
-              <span id="avatarCameraBadge" class="avatar-camera-badge" aria-hidden="true">📷</span>
+        <div class="profile-pass-head">
+          <div class="profile-pass-main">
+            <div class="member-row">
+              <div class="member-identity">
+                <div class="avatar-wrap">
+                  <div id="profileAvatar" class="avatar">?</div>
+                  <span id="avatarCameraBadge" class="avatar-camera-badge" aria-hidden="true">📷</span>
+                </div>
+                <div class="profile-member-copy">
+                  <p id="profileAlias" class="profile-alias">@catador</p>
+                  <h1 id="profileName" class="profile-name">Catador</h1>
+                  <p id="profileQuote" class="profile-quote">Perfil público de la comunidad Etiove</p>
+                </div>
+              </div>
+              <div class="profile-level-badge"><span id="profileLevel" class="profile-level-text">🌱 Novato</span></div>
             </div>
-            <div class="profile-member-copy">
-              <p id="profileAlias" class="profile-alias">@catador</p>
-              <h1 id="profileName" class="profile-name">Catador</h1>
-              <p id="profileQuote" class="profile-quote">Perfil público de la comunidad Etiove</p>
+
+            <div class="profile-pass-stats">
+              <p id="profileSince" class="profile-sub">Miembro desde hace poco</p>
+              <p id="profileXp" class="profile-xp">0 XP acumulados</p>
+
+              <div class="profile-meta-row">
+                <span id="profileNextLevel" class="profile-meta-text">Proximo nivel: Aficionado</span>
+                <span id="profileNextXp" class="profile-meta-text">220 XP</span>
+              </div>
+
+              <div class="profile-progress-track"><div id="profileProgressFill" class="profile-progress-fill"></div></div>
+
+              <div class="profile-stats-row">
+                <div class="profile-stat-card"><div id="statVotes" class="profile-stat-value">0</div><div class="profile-stat-label">Votos</div></div>
+                <div class="profile-stat-card"><div id="statPhotos" class="profile-stat-value">0</div><div class="profile-stat-label">Fotos</div></div>
+                <div class="profile-stat-card"><div id="statReviews" class="profile-stat-value">0</div><div class="profile-stat-label">Resenas</div></div>
+                <div class="profile-stat-card"><div id="statFavorites" class="profile-stat-value">0</div><div class="profile-stat-label">Favoritos</div></div>
+              </div>
             </div>
           </div>
-          <div class="profile-level-badge"><span id="profileLevel" class="profile-level-text">🌱 Novato</span></div>
-        </div>
 
-        <p id="profileSince" class="profile-sub">Miembro desde hace poco</p>
-        <p id="profileXp" class="profile-xp">0 XP acumulados</p>
-
-        <div class="profile-meta-row">
-          <span id="profileNextLevel" class="profile-meta-text">Proximo nivel: Aficionado</span>
-          <span id="profileNextXp" class="profile-meta-text">220 XP</span>
-        </div>
-
-        <div class="profile-progress-track"><div id="profileProgressFill" class="profile-progress-fill"></div></div>
-
-        <div class="profile-stats-row">
-          <div class="profile-stat-card"><div id="statVotes" class="profile-stat-value">0</div><div class="profile-stat-label">Votos</div></div>
-          <div class="profile-stat-card"><div id="statPhotos" class="profile-stat-value">0</div><div class="profile-stat-label">Fotos</div></div>
-          <div class="profile-stat-card"><div id="statReviews" class="profile-stat-value">0</div><div class="profile-stat-label">Resenas</div></div>
-          <div class="profile-stat-card"><div id="statFavorites" class="profile-stat-value">0</div><div class="profile-stat-label">Favoritos</div></div>
+          <aside class="profile-pass-side">
+            <div class="profile-pass-side-head">
+              <p class="profile-pass-side-kicker">Insignias del miembro</p>
+              <p id="profileFollowers" class="profile-pass-side-note">0 seguidores</p>
+            </div>
+            <div id="profileAchievements" class="profile-achievements" style="display:none;">
+              <p id="profileAchievementsMeta" class="profile-achievements-meta"></p>
+              <div id="profileAchievementsGrid" class="profile-achievements-grid"></div>
+            </div>
+          </aside>
         </div>
 
         <p id="profileCounters" class="profile-counts">0 hilos <span>•</span> 0 respuestas <span>•</span> 0 comentarios</p>
-        <p id="profileFollowers" class="profile-followers">0 seguidores</p>
-        <div id="profileAchievements" class="profile-achievements" style="display:none;">
-          <p id="profileAchievementsMeta" class="profile-achievements-meta"></p>
-          <div id="profileAchievementsGrid" class="profile-achievements-grid"></div>
-        </div>
       </div>
 
       <div id="profileActions" class="profile-actions">

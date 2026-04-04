@@ -713,20 +713,17 @@
       line-height: 1.35;
     }
     .thread-title-link {
-      border: 0;
-      background: transparent;
-      padding: 0;
-      margin: 0;
-      font: inherit;
-      color: inherit;
-      cursor: pointer;
+      color: var(--accent-deep);
+      text-decoration: underline;
+      text-decoration-color: rgba(95,58,37,0.42);
+      text-underline-offset: 3px;
       text-align: left;
-      transition: color 0.2s ease;
+      transition: color 0.2s ease, text-decoration-color 0.2s ease;
     }
     .thread-title-link:hover,
     .thread-title-link:focus-visible {
-      color: var(--accent-deep);
-      outline: none;
+      color: var(--ink);
+      text-decoration-color: var(--accent);
     }
     .meta {
       font-size: 12px;

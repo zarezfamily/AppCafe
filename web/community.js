@@ -468,6 +468,14 @@ const goToThreadList = () => {
   window.location.href = '/comunidad.html';
 };
 
+const goBackFromThreadDetail = () => {
+  if (window.history.length > 1) {
+    window.history.back();
+    return;
+  }
+  goToThreadList();
+};
+
 const goToProfilePage = (uid, name) => {
   const safeUid = String(uid || '').trim();
   if (!safeUid) return;
@@ -756,11 +764,6 @@ const renderThreads = () => {
   const usingFallback = list.length === 0 && fallbackList.length > 0;
   const displayList = usingFallback ? fallbackList : list;
 
-  if (displayList.length === 0) {
-    el.threadsWrap.innerHTML = '<p class="empty">Aún no hay hilos en esta categoría.</p>';
-    return;
-  }
-
   const fallbackNote = usingFallback
     ? '<p class="muted" style="margin-top:10px">No hay hilos en esta categoría ahora mismo. Mostrando los más recientes de toda la comunidad.</p>'
     : '';
@@ -769,9 +772,9 @@ const renderThreads = () => {
     const activeThread = threads.find((thread) => thread.id === activeThreadId);
     if (!activeThread || !isThreadVisible(activeThread)) {
       resetCommunityMeta();
-      el.threadsWrap.innerHTML = '<p class="empty">Este hilo no está disponible.</p><div style="margin-top:10px"><button class="btn ghost" data-back-list="1">Volver a todos los hilos</button></div>';
-      const backBtn = el.threadsWrap.querySelector('[data-back-list]');
-      if (backBtn) backBtn.addEventListener('click', goToThreadList);
+      el.threadsWrap.innerHTML = '<p class="empty">Este hilo no está disponible.</p><div style="margin-top:10px"><button class="btn ghost" data-back-detail="1">Volver atrás</button></div>';
+      const backBtn = el.threadsWrap.querySelector('[data-back-detail]');
+      if (backBtn) backBtn.addEventListener('click', goBackFromThreadDetail);
       return;
     }
 
@@ -803,7 +806,7 @@ const renderThreads = () => {
 
     el.threadsWrap.innerHTML = `
       <div class="thread-detail-top" style="margin-top:12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
-        <button class="btn ghost" data-back-list="1">← Volver a todos los hilos</button>
+        <button class="btn ghost" data-back-detail="1">← Volver atrás</button>
       </div>
       <article class="thread" data-thread-id="${activeThread.id}">
         <h3>${escapeHtml(activeThread.title || '')}</h3>
@@ -832,6 +835,11 @@ const renderThreads = () => {
       </article>
     `;
   } else {
+    if (displayList.length === 0) {
+      el.threadsWrap.innerHTML = '<p class="empty">Aún no hay hilos en esta categoría.</p>';
+      return;
+    }
+
     resetCommunityMeta();
 
     const visibleCount = Math.min(displayList.length, currentListPage * THREADS_PAGE_SIZE);
@@ -858,7 +866,7 @@ const renderThreads = () => {
 
     return `
       <article class="thread" data-thread-id="${t.id}" style="animation-delay:${delay}s">
-        <h3><button class="thread-title-link" data-open-thread="${t.id}" aria-label="Abrir hilo ${escapeHtml(t.title || '')}">${escapeHtml(t.title || '')}</button></h3>
+        <h3><a class="thread-title-link" href="${threadDetailUrl(t.id)}" aria-label="Abrir hilo ${escapeHtml(t.title || '')}">${escapeHtml(t.title || '')}</a></h3>
         <div class="meta">${escapeHtml(t.categoryLabel || '')} · <button class="link-btn author-btn" data-author-uid="${escapeHtml(t.authorUid || '')}" data-author-name="${escapeHtml(t.authorName || 'Catador')}" style="font-weight:600;">${escapeHtml(t.authorName || 'Catador')}</button> · ${fmt(t.createdAt)} · ${Number(t.upvotes || 0)} votos</div>
         <div class="thread-tags">
           <span class="pill category">${escapeHtml(t.categoryLabel || 'General')}</span>
@@ -886,10 +894,6 @@ const renderThreads = () => {
     btn.addEventListener('click', () => voteThread(btn.getAttribute('data-vote')));
   });
 
-  el.threadsWrap.querySelectorAll('[data-open-thread]').forEach((btn) => {
-    btn.addEventListener('click', () => goToThreadDetail(btn.getAttribute('data-open-thread')));
-  });
-
   const loadMoreBtn = el.threadsWrap.querySelector('[data-load-more]');
   if (loadMoreBtn) {
     loadMoreBtn.addEventListener('click', () => {
@@ -900,6 +904,9 @@ const renderThreads = () => {
 
   const backBtn = el.threadsWrap.querySelector('[data-back-list]');
   if (backBtn) backBtn.addEventListener('click', goToThreadList);
+
+  const backDetailBtn = el.threadsWrap.querySelector('[data-back-detail]');
+  if (backDetailBtn) backDetailBtn.addEventListener('click', goBackFromThreadDetail);
 
   el.threadsWrap.querySelectorAll('[data-reply-vote]').forEach((btn) => {
     btn.addEventListener('click', () => voteReply(btn.getAttribute('data-reply-vote')));

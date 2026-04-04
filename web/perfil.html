@@ -90,23 +90,51 @@
     }
 
     .profile-card::after {
-      content: '';
+      content: none;
+    }
+
+    .brand-decor-one {
       position: absolute;
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      right: -42px;
-      top: -56px;
-      background: rgba(209, 139, 74, 0.12);
+      position: absolute;
+      width: 94px;
+      height: 94px;
+      border-radius: 47px;
+      right: -20px;
+      top: -30px;
+      background: rgba(209, 139, 74, 0.13);
       pointer-events: none;
+      z-index: 0;
+    }
+
+    .brand-decor-two {
+      position: absolute;
+      width: 98px;
+      height: 98px;
+      border-radius: 49px;
+      left: -26px;
+      bottom: -48px;
+      background: rgba(255, 244, 234, 0.06);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .brand-top-rule {
+      position: absolute;
+      top: 0;
+      left: 14px;
+      right: 14px;
+      height: 1px;
+      background: rgba(255, 238, 220, 0.18);
+      pointer-events: none;
+      z-index: 0;
     }
 
     .member-kicker {
       margin: 0 0 8px;
       color: #d4a574;
-      letter-spacing: 1.5px;
-      font-size: 10px;
-      font-weight: 800;
+      letter-spacing: 1.1px;
+      font-size: 9px;
+      font-weight: 700;
       text-transform: uppercase;
       position: relative;
       z-index: 1;
@@ -117,20 +145,20 @@
       position: relative;
       z-index: 1;
       display: grid;
-      gap: 8px;
+      gap: 6px;
     }
 
     .member-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
+      gap: 8px;
     }
 
     .member-identity {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       min-width: 0;
       flex: 1;
     }
@@ -199,7 +227,7 @@
     .profile-level-badge {
       background-color: rgba(248, 225, 198, 0.12);
       border-radius: 999px;
-      padding: 4px 8px;
+      padding: 4px 7px;
       border: 1px solid rgba(248, 225, 198, 0.18);
       align-self: flex-start;
       white-space: nowrap;
@@ -337,7 +365,7 @@
       gap: 10px;
       justify-content: center;
       flex-wrap: wrap;
-      margin: 12px 0 0;
+      margin: 10px 0 0;
       position: relative;
       z-index: 1;
     }
@@ -358,8 +386,8 @@
       color: #fff5ea;
       border-radius: 999px;
       min-width: 210px;
-      padding: 9px 15px;
-      font-size: clamp(13px, 1.1vw, 16px);
+      padding: 8px 14px;
+      font-size: clamp(12px, 1.05vw, 15px);
       font-weight: 800;
       letter-spacing: 0.2px;
       cursor: pointer;
@@ -563,6 +591,9 @@
 
   <main class="page">
     <section class="profile-card">
+      <div class="brand-decor-one" aria-hidden="true"></div>
+      <div class="brand-decor-two" aria-hidden="true"></div>
+      <div class="brand-top-rule" aria-hidden="true"></div>
       <p class="member-kicker">Etiove member card</p>
       <div class="member-roast-content">
         <div class="member-row">

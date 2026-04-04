@@ -591,24 +591,113 @@ const uploadImageToStorage = async (file, folder) => {
   if (!file) return '';
   if (!auth.token) throw new Error('UNAUTHENTICATED');
 
+  const allowedTypes = new Set([
+    'image/jpeg',
+    'image/jpg',
+    'image/png',
+    'image/webp',
+    'image/gif',
+    'image/heic',
+    'image/heif',
+  ]);
+  if (!allowedTypes.has(String(file.type || '').toLowerCase())) {
+    throw new Error('UNSUPPORTED_IMAGE_TYPE');
+  }
+
+  const maxBytes = 5 * 1024 * 1024;
+
+  const compressImageIfNeeded = async (inputFile) => {
+    if (!inputFile || inputFile.size <= maxBytes) return inputFile;
+
+    const mime = String(inputFile.type || '').toLowerCase();
+    if (!['image/jpeg', 'image/jpg', 'image/png', 'image/webp'].includes(mime)) {
+      throw new Error('IMAGE_TOO_LARGE_UNCOMPRESSIBLE');
+    }
+
+    const dataUrl = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(new Error('IMAGE_READ_FAILED'));
+      reader.readAsDataURL(inputFile);
+    });
+
+    const img = await new Promise((resolve, reject) => {
+      const probe = new Image();
+      probe.onload = () => resolve(probe);
+      probe.onerror = () => reject(new Error('IMAGE_DECODE_FAILED'));
+      probe.src = String(dataUrl || '');
+    });
+
+    let width = img.naturalWidth || img.width;
+    let height = img.naturalHeight || img.height;
+    const maxDim = 1800;
+    if (width > maxDim || height > maxDim) {
+      const ratio = Math.min(maxDim / width, maxDim / height);
+      width = Math.max(1, Math.floor(width * ratio));
+      height = Math.max(1, Math.floor(height * ratio));
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('IMAGE_CANVAS_FAILED');
+    ctx.drawImage(img, 0, 0, width, height);
+
+    const outputType = mime === 'image/png' ? 'image/png' : 'image/jpeg';
+    let quality = 0.86;
+    let blob = null;
+    while (quality >= 0.5) {
+      blob = await new Promise((resolve) => canvas.toBlob(resolve, outputType, quality));
+      if (blob && blob.size <= maxBytes) break;
+      quality -= 0.08;
+    }
+
+    if (!blob || blob.size > maxBytes) {
+      throw new Error('IMAGE_TOO_LARGE');
+    }
+
+    const safeName = String(inputFile.name || 'upload').replace(/\.[^/.]+$/, '');
+    return new File([blob], `${safeName}.${outputType === 'image/png' ? 'png' : 'jpg'}`, { type: outputType });
+  };
+
+  const fileToUpload = await compressImageIfNeeded(file);
+  if (fileToUpload.size > maxBytes) throw new Error('IMAGE_TOO_LARGE');
+
   const safeFolder = String(folder || 'uploads').replace(/[^a-zA-Z0-9_\-/]/g, '');
-  const ext = String(file.type || '').includes('png') ? 'png' : 'jpg';
+  const mime = String(fileToUpload.type || 'image/jpeg').toLowerCase();
+  const extByMime = {
+    'image/png': 'png',
+    'image/webp': 'webp',
+    'image/gif': 'gif',
+    'image/heic': 'heic',
+    'image/heif': 'heif',
+    'image/jpg': 'jpg',
+    'image/jpeg': 'jpg',
+  };
+  const ext = extByMime[mime] || 'jpg';
   const fileName = `${safeFolder}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
 
   const uploadUrl = `https://firebasestorage.googleapis.com/v0/b/${FIREBASE_STORAGE_BUCKET}/o?uploadType=media&name=${encodeURIComponent(fileName)}&key=${FIREBASE_API_KEY}`;
   const res = await fetch(uploadUrl, {
     method: 'POST',
     headers: {
-      'Content-Type': file.type || 'image/jpeg',
+      'Content-Type': fileToUpload.type || 'image/jpeg',
       'X-Ios-Bundle-Identifier': FIREBASE_IOS_BUNDLE_ID,
       Authorization: `Bearer ${auth.token}`,
     },
-    body: file,
+    body: fileToUpload,
   });
 
-  const json = await res.json().catch(() => ({}));
+  const raw = await res.text();
+  let json = {};
+  try {
+    json = raw ? JSON.parse(raw) : {};
+  } catch {
+    json = {};
+  }
   if (!res.ok) {
-    throw new Error((json.error && json.error.message) || 'storage_upload_failed');
+    throw new Error((json.error && json.error.message) || `storage_upload_failed_${res.status}`);
   }
 
   const objectName = json.name || fileName;
@@ -983,6 +1072,18 @@ const mapAuthError = (errorLike) => {
   return `No se pudo completar la autenticación (${code}).`;
 };
 
+const mapThreadPublishError = (errorLike) => {
+  const raw = String((errorLike && errorLike.message) || errorLike || '').toUpperCase();
+  if (raw.includes('UNSUPPORTED_IMAGE_TYPE')) return 'Formato de imagen no compatible. Usa JPG, PNG, WEBP o HEIC.';
+  if (raw.includes('IMAGE_TOO_LARGE_UNCOMPRESSIBLE')) return 'La imagen supera 5MB y no se pudo comprimir automáticamente. Usa una imagen más ligera.';
+  if (raw.includes('IMAGE_TOO_LARGE')) return 'La imagen supera el límite de 5MB.';
+  if (raw.includes('UNAUTHENTICATED')) return 'La sesión caducó. Vuelve a iniciar sesión.';
+  if (raw.includes('PERMISSION_DENIED') || raw.includes('UNAUTHORIZED')) return 'No hay permisos para subir imágenes con esta sesión.';
+  if (raw.includes('STORAGE_UPLOAD_FAILED_413')) return 'La imagen es demasiado grande para subirla.';
+  if (raw.includes('NETWORK') || raw.includes('FETCH') || raw.includes('FAILED')) return 'Error de red al subir la imagen. Inténtalo de nuevo.';
+  return 'No se pudo publicar el hilo. Revisa la imagen e inténtalo otra vez.';
+};
+
 const signIn = async (registerMode) => {
   const email = (el.email.value || '').trim();
   const password = (el.password.value || '').trim();
@@ -1116,8 +1217,8 @@ const createThread = async () => {
 
     setStatus(el.threadStatus, 'Hilo publicado.', 'ok');
     await loadForum();
-  } catch {
-    setStatus(el.threadStatus, 'No se pudo publicar el hilo.', 'error');
+  } catch (e) {
+    setStatus(el.threadStatus, mapThreadPublishError(e), 'error');
   }
 };
 

@@ -32,7 +32,17 @@
   const el = {
     avatar: document.getElementById('profileAvatar'),
     avatarHint: document.getElementById('avatarHint'),
+    alias: document.getElementById('profileAlias'),
     name: document.getElementById('profileName'),
+    level: document.getElementById('profileLevel'),
+    xp: document.getElementById('profileXp'),
+    nextLevel: document.getElementById('profileNextLevel'),
+    nextXp: document.getElementById('profileNextXp'),
+    progressFill: document.getElementById('profileProgressFill'),
+    statVotes: document.getElementById('statVotes'),
+    statPhotos: document.getElementById('statPhotos'),
+    statReviews: document.getElementById('statReviews'),
+    statFavorites: document.getElementById('statFavorites'),
     since: document.getElementById('profileSince'),
     counters: document.getElementById('profileCounters'),
     followers: document.getElementById('profileFollowers'),
@@ -48,6 +58,22 @@
   };
 
   const isOwner = () => !!auth.uid && auth.uid === uid;
+
+  const XP_RULES = {
+    vote: 8,
+    photo: 15,
+    review: 14,
+    addCafe: 18,
+    favorite: 3,
+  };
+
+  const LEVELS = [
+    { name: 'Novato', icon: '🌱', minXp: 0 },
+    { name: 'Aficionado', icon: '☕', minXp: 220 },
+    { name: 'Catador', icon: '🎯', minXp: 700 },
+    { name: 'Experto', icon: '⭐', minXp: 1700 },
+    { name: 'Maestro', icon: '👑', minXp: 3400 },
+  ];
 
   const normalizeName = (value) => String(value || '')
     .normalize('NFD')
@@ -396,13 +422,52 @@
 
   const totalDownvotes = () => state.blogComments.reduce((acc, item) => acc + Number(item.downvotes || 0), 0);
 
+  const countPhotos = () => {
+    const authored = [...state.threads, ...state.replies, ...state.blogComments];
+    return authored.reduce((acc, item) => {
+      const hasPhoto = !!String(item.image || item.photoUrl || item.foto || item.authorPhoto || '').trim();
+      return acc + (hasPhoto ? 1 : 0);
+    }, 0);
+  };
+
+  const computeMemberStats = () => {
+    const votesCount = totalUpvotes();
+    const photosCount = countPhotos();
+    const reviewsCount = state.blogComments.length;
+    const cafesAddedCount = state.threads.length;
+    const favoritesMarkedCount = state.followingCount;
+    const xp = (
+      votesCount * XP_RULES.vote +
+      photosCount * XP_RULES.photo +
+      reviewsCount * XP_RULES.review +
+      cafesAddedCount * XP_RULES.addCafe +
+      favoritesMarkedCount * XP_RULES.favorite
+    );
+    return { votesCount, photosCount, reviewsCount, cafesAddedCount, favoritesMarkedCount, xp };
+  };
+
+  const getLevelFromXp = (xp) => {
+    let current = LEVELS[0];
+    LEVELS.forEach((level) => {
+      if (xp >= level.minXp) current = level;
+    });
+    return current;
+  };
+
   const renderHeader = () => {
     const name = getAuthorName();
+    const aliasHandle = `@${String(name || 'catador').replace(/^@+/, '').trim().replace(/\s+/g, '_')}`;
     const first = name.slice(0, 1).toUpperCase() || '?';
     const allDates = collectDates();
     const sinceText = allDates.length ? yearsSince(allDates[0].toISOString()) : 'Miembro reciente';
     const avatarUrl = resolvedProfileAvatar();
     const quote = String(state.profile && state.profile.motto || '').trim();
+    const member = computeMemberStats();
+    const currentLevel = getLevelFromXp(member.xp);
+    const nextLevel = LEVELS.find((level) => level.minXp > member.xp) || null;
+    const levelStartXp = currentLevel.minXp;
+    const levelRange = nextLevel ? Math.max(1, nextLevel.minXp - levelStartXp) : Math.max(1, member.xp);
+    const progress = nextLevel ? Math.max(0, Math.min(100, ((member.xp - levelStartXp) / levelRange) * 100)) : 100;
 
     if (el.avatar) {
       const paintInitial = () => {
@@ -428,8 +493,18 @@
         paintInitial();
       }
     }
+    if (el.alias) el.alias.textContent = aliasHandle;
     if (el.name) el.name.textContent = name;
     if (el.since) el.since.textContent = sinceText;
+    if (el.level) el.level.textContent = `${currentLevel.icon} ${currentLevel.name}`;
+    if (el.xp) el.xp.textContent = `${member.xp} XP acumulados`;
+    if (el.nextLevel) el.nextLevel.textContent = nextLevel ? `Proximo nivel: ${nextLevel.name}` : 'Nivel maximo alcanzado';
+    if (el.nextXp) el.nextXp.textContent = nextLevel ? `${nextLevel.minXp} XP` : '';
+    if (el.progressFill) el.progressFill.style.width = `${progress.toFixed(1)}%`;
+    if (el.statVotes) el.statVotes.textContent = String(member.votesCount);
+    if (el.statPhotos) el.statPhotos.textContent = String(member.photosCount);
+    if (el.statReviews) el.statReviews.textContent = String(member.reviewsCount);
+    if (el.statFavorites) el.statFavorites.textContent = String(member.favoritesMarkedCount);
     if (el.counters) {
       el.counters.innerHTML = `${state.threads.length} hilos <span>•</span> ${state.replies.length} respuestas <span>•</span> ${state.blogComments.length} comentarios`;
     }

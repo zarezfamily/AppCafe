@@ -110,13 +110,36 @@
       text-transform: uppercase;
       position: relative;
       z-index: 1;
+      text-align: left;
+    }
+
+    .member-roast-content {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 8px;
+    }
+
+    .member-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .member-identity {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      flex: 1;
     }
 
     .avatar {
       width: 90px;
       height: 90px;
       border-radius: 50%;
-      margin: 0 auto 8px;
+      margin: 0;
       border: 3px solid rgba(255, 248, 240, 0.94);
       box-shadow: 0 8px 20px rgba(0,0,0,0.22);
       background: linear-gradient(145deg, #6e5f4f, #aa967e);
@@ -143,37 +166,131 @@
 
     .profile-name {
       margin: 0;
-      font-size: clamp(24px, 3.2vw, 34px);
-      font-family: 'Playfair Display', serif;
-      font-weight: 700;
-      color: #fff8f0;
+      font-size: 10px;
+      color: #d2bead;
+      font-weight: 500;
       position: relative;
-      z-index: 1;
-      line-height: 1.1;
+      line-height: 1.25;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .profile-alias {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 800;
+      color: #fff4ea;
+      line-height: 1.2;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .profile-member-copy {
+      min-width: 0;
+      flex: 1;
+      display: grid;
+      gap: 2px;
+    }
+
+    .profile-level-badge {
+      background-color: rgba(248, 225, 198, 0.12);
+      border-radius: 999px;
+      padding: 4px 8px;
+      border: 1px solid rgba(248, 225, 198, 0.18);
+      align-self: flex-start;
+      white-space: nowrap;
+    }
+
+    .profile-level-text {
+      font-size: 10px;
+      font-weight: 800;
+      color: #fff4ea;
     }
 
     .profile-sub {
-      margin: 5px 0 7px;
+      margin: 1px 0 2px;
       color: #f4dfc8;
-      font-size: clamp(13px, 1.3vw, 17px);
+      font-size: 10px;
       font-weight: 700;
-      letter-spacing: 0.2px;
+      letter-spacing: 0.1px;
       position: relative;
       z-index: 1;
+      text-align: left;
+    }
+
+    .profile-xp {
+      margin: 0;
+      font-size: 11px;
+      color: #d4c1b1;
+      font-weight: 600;
+      text-align: left;
+    }
+
+    .profile-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .profile-meta-text {
+      font-size: 10px;
+      color: #c9ab90;
+      line-height: 1.2;
+    }
+
+    .profile-progress-track {
+      height: 6px;
+      border-radius: 999px;
+      background-color: rgba(255, 244, 234, 0.12);
+      overflow: hidden;
+    }
+
+    .profile-progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      background-color: #d18b4a;
+      width: 0%;
+      transition: width 0.35s ease;
+    }
+
+    .profile-stats-row {
+      display: flex;
+      gap: 6px;
+    }
+
+    .profile-stat-card {
+      flex: 1;
+      background-color: rgba(255, 248, 241, 0.06);
+      border-radius: 12px;
+      padding: 6px 4px;
+      border: 1px solid rgba(255, 234, 214, 0.08);
+      text-align: center;
+    }
+
+    .profile-stat-value {
+      color: #fff1e4;
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .profile-stat-label {
+      color: #cfb39a;
+      font-size: 9px;
+      margin-top: 1px;
     }
 
     .profile-counts {
-      margin: 3px auto 0;
-      font-size: clamp(12px, 1.1vw, 14px);
-      color: #fff7ec;
-      font-weight: 700;
-      border: 1px solid #6a4a37;
-      border-radius: 999px;
-      background: rgba(255, 245, 230, 0.08);
-      padding: 6px 12px;
-      width: fit-content;
-      position: relative;
-      z-index: 1;
+      margin: 4px 0 0;
+      font-size: 11px;
+      color: #e7cfb8;
+      text-align: left;
+      line-height: 1.25;
     }
 
     .profile-counts span {
@@ -183,23 +300,25 @@
     }
 
     .profile-followers {
-      margin-top: 6px;
+      margin-top: 2px;
       color: #f0dac2;
       font-size: 12px;
       font-weight: 700;
       position: relative;
       z-index: 1;
+      text-align: left;
     }
 
     .profile-quote {
-      margin: 12px auto 0;
-      max-width: 700px;
+      margin: 8px 0 0;
+      max-width: 100%;
       color: #fff6eb;
-      font-size: clamp(13px, 1.15vw, 17px);
+      font-size: 12px;
       font-weight: 500;
       position: relative;
       z-index: 1;
       line-height: 1.5;
+      text-align: left;
     }
 
     .avatar-hint {
@@ -218,7 +337,7 @@
       gap: 10px;
       justify-content: center;
       flex-wrap: wrap;
-      margin: 14px 0 0;
+      margin: 12px 0 0;
       position: relative;
       z-index: 1;
     }
@@ -422,6 +541,7 @@
         padding: 16px 13px;
       }
       .pill-btn { min-width: 100%; }
+      .profile-stats-row { grid-template-columns: repeat(2, 1fr); display: grid; }
     }
 
     @media (max-width: 560px) {
@@ -444,13 +564,41 @@
   <main class="page">
     <section class="profile-card">
       <p class="member-kicker">Etiove member card</p>
-      <div id="profileAvatar" class="avatar">?</div>
-      <p id="avatarHint" class="avatar-hint"></p>
-      <h1 id="profileName" class="profile-name">Catador</h1>
-      <p id="profileSince" class="profile-sub">Miembro desde hace poco</p>
-      <p id="profileCounters" class="profile-counts">0 hilos <span>•</span> 0 respuestas <span>•</span> 0 comentarios</p>
-      <p id="profileFollowers" class="profile-followers">0 seguidores</p>
-      <p id="profileQuote" class="profile-quote">"Perfil público de la comunidad Etiove"</p>
+      <div class="member-roast-content">
+        <div class="member-row">
+          <div class="member-identity">
+            <div id="profileAvatar" class="avatar">?</div>
+            <div class="profile-member-copy">
+              <p id="profileAlias" class="profile-alias">@catador</p>
+              <h1 id="profileName" class="profile-name">Catador</h1>
+            </div>
+          </div>
+          <div class="profile-level-badge"><span id="profileLevel" class="profile-level-text">🌱 Novato</span></div>
+        </div>
+
+        <p id="profileSince" class="profile-sub">Miembro desde hace poco</p>
+        <p id="profileXp" class="profile-xp">0 XP acumulados</p>
+
+        <div class="profile-meta-row">
+          <span id="profileNextLevel" class="profile-meta-text">Proximo nivel: Aficionado</span>
+          <span id="profileNextXp" class="profile-meta-text">220 XP</span>
+        </div>
+
+        <div class="profile-progress-track"><div id="profileProgressFill" class="profile-progress-fill"></div></div>
+
+        <div class="profile-stats-row">
+          <div class="profile-stat-card"><div id="statVotes" class="profile-stat-value">0</div><div class="profile-stat-label">Votos</div></div>
+          <div class="profile-stat-card"><div id="statPhotos" class="profile-stat-value">0</div><div class="profile-stat-label">Fotos</div></div>
+          <div class="profile-stat-card"><div id="statReviews" class="profile-stat-value">0</div><div class="profile-stat-label">Resenas</div></div>
+          <div class="profile-stat-card"><div id="statFavorites" class="profile-stat-value">0</div><div class="profile-stat-label">Favoritos</div></div>
+        </div>
+
+        <p id="profileCounters" class="profile-counts">0 hilos <span>•</span> 0 respuestas <span>•</span> 0 comentarios</p>
+        <p id="profileFollowers" class="profile-followers">0 seguidores</p>
+        <p id="profileQuote" class="profile-quote">"Perfil público de la comunidad Etiove"</p>
+        <p id="avatarHint" class="avatar-hint"></p>
+      </div>
+
       <div class="profile-actions">
         <button id="followBtn" class="pill-btn" type="button">Seguir</button>
         <button id="dmBtn" class="pill-btn" type="button">Mensaje directo</button>

@@ -324,6 +324,25 @@ const setThreadImageStatus = (text, kind = '') => {
   el.threadImageStatus.className = `file-note ${kind}`.trim();
 };
 
+const transitionThreadsView = (renderFn, afterRender) => {
+  if (!el.threadsWrap || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    renderFn();
+    if (typeof afterRender === 'function') afterRender();
+    return;
+  }
+
+  el.threadsWrap.classList.add('threads-is-switching');
+  window.setTimeout(() => {
+    renderFn();
+    el.threadsWrap.classList.remove('threads-is-switching');
+    el.threadsWrap.classList.add('threads-is-entering');
+    window.requestAnimationFrame(() => {
+      el.threadsWrap.classList.remove('threads-is-entering');
+      if (typeof afterRender === 'function') afterRender();
+    });
+  }, 110);
+};
+
 const resetThreadComposer = (options = {}) => {
   const { preserveStatus = false } = options;
   const wasEditing = !!editingThreadId;
@@ -544,16 +563,16 @@ const goToThreadDetail = (threadId) => {
   if (!safeId) return;
   window.history.replaceState({ ...(window.history.state || {}), communityScrollY: window.scrollY }, '', window.location.href);
   window.history.pushState({ communityView: 'thread', threadId: safeId, communityScrollY: window.scrollY }, '', threadDetailUrl(safeId));
-  renderThreads();
+  transitionThreadsView(() => renderThreads());
 };
 
 const goToThreadList = ({ replace = false, restoreScroll = true } = {}) => {
   const scrollY = Number((window.history.state && window.history.state.communityScrollY) || 0);
   window.history[replace ? 'replaceState' : 'pushState']({ communityView: 'list', communityScrollY: scrollY }, '', '/comunidad.html');
-  renderThreads();
-  if (restoreScroll) {
-    window.requestAnimationFrame(() => window.scrollTo({ top: scrollY, behavior: 'auto' }));
-  }
+  transitionThreadsView(
+    () => renderThreads(),
+    restoreScroll ? () => window.scrollTo({ top: scrollY, behavior: 'auto' }) : undefined,
+  );
 };
 
 const goBackFromThreadDetail = () => {
@@ -1669,11 +1688,12 @@ const init = async () => {
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeProfileModal(); });
 
   window.addEventListener('popstate', () => {
-    renderThreads();
-    if (!getActiveThreadId()) {
-      const scrollY = Number((window.history.state && window.history.state.communityScrollY) || 0);
-      window.requestAnimationFrame(() => window.scrollTo({ top: scrollY, behavior: 'auto' }));
-    }
+    transitionThreadsView(() => renderThreads(), () => {
+      if (!getActiveThreadId()) {
+        const scrollY = Number((window.history.state && window.history.state.communityScrollY) || 0);
+        window.scrollTo({ top: scrollY, behavior: 'auto' });
+      }
+    });
   });
 
   await loadForum();

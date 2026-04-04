@@ -434,6 +434,17 @@
       margin-bottom: 8px;
       color: var(--ink);
     }
+      #threadsWrap {
+        transform: translateY(0);
+        opacity: 1;
+        transition: opacity 0.2s ease, transform 0.24s ease;
+        will-change: opacity, transform;
+      }
+      #threadsWrap.threads-is-switching,
+      #threadsWrap.threads-is-entering {
+        opacity: 0;
+        transform: translateY(10px);
+      }
     .card-divider {
       height: 1px;
       background: var(--border);
@@ -447,6 +458,7 @@
       padding: 14px;
       background: linear-gradient(155deg, rgba(255,250,243,0.95), rgba(246,231,214,0.82));
       box-shadow: 0 10px 22px rgba(33,21,15,0.08);
+        #threadsWrap { transition: none; }
       position: relative;
       overflow: hidden;
     }

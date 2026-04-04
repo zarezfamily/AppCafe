@@ -807,7 +807,7 @@
     setStatus('Enviando mensaje...');
     const ok = await addDocument('direct_messages', {
       senderUid: auth.uid,
-      senderName: String(localStorage.getItem('etiove_web_alias') || auth.email.split('@')[0] || 'Catador'),
+      senderName: String(localStorage.getItem('etiove_web_alias') || 'Catador'),
       recipientUid: uid,
       recipientName: getAuthorName(),
       body,
@@ -846,7 +846,7 @@
 
     const ok = await addDocument('direct_messages', {
       senderUid: auth.uid,
-      senderName: String(localStorage.getItem('etiove_web_alias') || auth.email.split('@')[0] || 'Catador'),
+      senderName: String(localStorage.getItem('etiove_web_alias') || 'Catador'),
       recipientUid: safeTargetUid,
       recipientName: String(targetName || userNameByUid(safeTargetUid) || 'Catador'),
       body,

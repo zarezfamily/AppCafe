@@ -10,8 +10,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --ink: #1f1c18;
+      --ink: #1c120d;
       --ink-soft: #61584e;
+      --ink-muted: #9a7963;
       --muted: #8a8177;
       --line: #ddd7d0;
       --shell: #efefef;
@@ -30,40 +31,36 @@
       background: linear-gradient(180deg, #f6f6f7 0%, #ececed 260px, #f2f2f3 100%);
     }
 
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--line);
-      background: rgba(248, 248, 249, 0.92);
-      backdrop-filter: blur(8px);
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 40px;
+      background: rgba(246, 239, 231, 0.85);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(228, 211, 194, 0.5);
     }
-
-    .brand {
-      text-decoration: none;
-      color: var(--ink);
+    .nav-wordmark {
       font-family: 'Playfair Display', serif;
-      letter-spacing: 2px;
-      font-size: 18px;
-      font-weight: 700;
+      font-size: 22px; font-weight: 500; letter-spacing: 4px;
+      color: var(--ink); text-decoration: none; text-transform: uppercase;
     }
-
-    .top-links a {
-      text-decoration: none;
-      color: var(--ink-soft);
-      font-size: 13px;
-      font-weight: 700;
-      margin-left: 14px;
+    .nav-links { display: flex; align-items: center; gap: 32px; }
+    .nav-link {
+      font-size: 11px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--ink-muted); text-decoration: none; transition: color 0.3s;
     }
+    .nav-link:hover, .nav-link--active { color: var(--accent); }
+    .nav-cta {
+      font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+      color: #fffaf5; background: var(--ink); text-decoration: none;
+      padding: 10px 20px; border-radius: 3px; transition: background 0.3s;
+    }
+    .nav-cta:hover { background: #5d4030; }
 
     .page {
       max-width: 1120px;
       margin: 0 auto;
-      padding: 24px 16px 60px;
+      padding: 96px 16px 60px;
     }
 
     .profile-card {
@@ -408,6 +405,9 @@
     }
 
     @media (max-width: 760px) {
+      nav { padding: 16px 24px; }
+      .nav-links { gap: 20px; }
+      .nav-cta { display: none; }
       .feed-item { grid-template-columns: 1fr; }
       .feed-thumb { min-height: 76px; }
       .profile-card {
@@ -416,16 +416,23 @@
       }
       .pill-btn { min-width: 100%; }
     }
+
+    @media (max-width: 560px) {
+      nav { padding: 14px 20px; }
+      .nav-link:not(.nav-link--active) { display: none; }
+    }
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <a class="brand" href="/">Etiove</a>
-    <nav class="top-links" aria-label="Principal">
-      <a href="/comunidad.html">Comunidad</a>
-      <a href="/blog.html">Blog</a>
-    </nav>
-  </header>
+  <nav aria-label="Navegación principal">
+    <a class="nav-wordmark" href="/">ETIOVE</a>
+    <div class="nav-links">
+      <a class="nav-link" href="/">Inicio</a>
+      <a class="nav-link nav-link--active" href="/blog/">Blog</a>
+      <a class="nav-link" href="/comunidad.html">Comunidad</a>
+      <a class="nav-cta" href="/">Descargar app</a>
+    </div>
+  </nav>
 
   <main class="page">
     <section class="profile-card">

@@ -188,7 +188,7 @@
 
   const getStoredAlias = () => String(localStorage.getItem('etiove_web_alias') || '').trim();
 
-  const getFallbackAuthorName = () => getStoredAlias() || (auth.email || '').split('@')[0] || 'Catador';
+  const getFallbackAuthorName = () => getStoredAlias() || 'Catador';
 
   const rememberAlias = (alias) => {
     const safeAlias = String(alias || '').trim();

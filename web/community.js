@@ -29,19 +29,39 @@ let auth = {
   token: localStorage.getItem('etiove_web_token') || '',
 };
 
-// Alias resuelto desde hilos previos de la app
-const getAuthorName = () =>
-  localStorage.getItem('etiove_web_alias') || auth.email.split('@')[0] || 'Catador';
+let canonicalAlias = String(localStorage.getItem('etiove_web_alias') || '').trim();
+let aliasSyncDone = false;
+
+const setCanonicalAlias = (alias) => {
+  const safeAlias = String(alias || '').trim();
+  if (!safeAlias) return '';
+  canonicalAlias = safeAlias;
+  localStorage.setItem('etiove_web_alias', safeAlias);
+  return safeAlias;
+};
+
+// Nunca usar email/prefijo como nombre visible.
+const getAuthorName = () => canonicalAlias || String(localStorage.getItem('etiove_web_alias') || '').trim() || 'Catador';
 
 // Busca en foro_hilos un hilo del usuario para obtener su alias real
 const resolveAuthorAlias = async () => {
-  const stored = localStorage.getItem('etiove_web_alias');
-  if (stored) return; // ya lo tenemos
-  const allThreads = await getCollection('foro_hilos', 50);
-  const mine = allThreads.find((t) => t.authorUid === auth.uid && t.authorName && t.authorName !== auth.email.split('@')[0]);
-  if (mine) {
-    localStorage.setItem('etiove_web_alias', mine.authorName);
+  const stored = String(localStorage.getItem('etiove_web_alias') || '').trim();
+  if (stored) {
+    canonicalAlias = stored;
+    return stored;
   }
+
+  if (!auth.uid) return 'Catador';
+
+  const profile = await getDocument('user_profiles', auth.uid).catch(() => null);
+  const fromProfile = String((profile && (profile.displayName || profile.alias || profile.nickname)) || '').trim();
+  if (fromProfile) return setCanonicalAlias(fromProfile);
+
+  const allThreads = await getCollection('foro_hilos', 200).catch(() => []);
+  const mine = allThreads.find((t) => t.authorUid === auth.uid && String(t.authorName || '').trim());
+  if (mine) return setCanonicalAlias(mine.authorName);
+
+  return getAuthorName();
 };
 
 // ─── MODAL PERFIL ─────────────────────────────────────────────────────────────
@@ -251,6 +271,14 @@ const getCollection = async (name, pageSize = 400) => {
   if (!res.ok) throw new Error(`No se pudo cargar ${name}`);
   const json = await res.json();
   return (json.documents || []).map(docToObject);
+};
+
+const getDocument = async (name, id) => {
+  const res = await fetch(`${BASE_URL}/${name}/${id}?key=${FIREBASE_API_KEY}`, {
+    headers: authHeaders(),
+  });
+  if (res.status === 404 || !res.ok) return null;
+  return docToObject(await res.json());
 };
 
 const runStructuredQuery = async (structuredQuery) => {
@@ -522,9 +550,10 @@ const loadForum = async () => {
   renderThreadSkeletons(4);
   const isLogged = !!auth.token;
   // Ahora las reglas permiten lectura pública: siempre cargamos todo y filtramos en cliente.
-  const [hRes, rRes] = await Promise.allSettled([
+  const [hRes, rRes, pRes] = await Promise.allSettled([
     getCollection('foro_hilos', 500),
     getCollection('foro_respuestas', 1200),
+    getCollection('user_profiles', 2000),
   ]);
 
   if (hRes.status !== 'fulfilled') {
@@ -539,10 +568,48 @@ const loadForum = async () => {
   const visibleThreads = h.filter(isThreadVisible);
   const visibleIds = new Set(visibleThreads.map((t) => t.id));
 
-  threads = visibleThreads.map(normalizeThread);
+  const profiles = pRes.status === 'fulfilled' ? (pRes.value || []) : [];
+  const aliasByUid = new Map();
+  profiles.forEach((profile) => {
+    const safeUid = String(profile.uid || '').trim();
+    const safeAlias = String(profile.displayName || profile.alias || profile.nickname || '').trim();
+    if (safeUid && safeAlias) aliasByUid.set(safeUid, safeAlias);
+  });
+
+  if (auth.uid) {
+    const meAlias = aliasByUid.get(auth.uid) || getAuthorName();
+    if (meAlias) setCanonicalAlias(meAlias);
+  }
+
+  const applyCanonicalAlias = (item) => {
+    const safeUid = String(item.authorUid || '').trim();
+    if (!safeUid) return item;
+    const alias = aliasByUid.get(safeUid) || (safeUid === auth.uid ? getAuthorName() : '');
+    if (!alias) return item;
+    return { ...item, authorName: alias };
+  };
+
+  const normalizedVisibleThreads = visibleThreads.map((item) => normalizeThread(applyCanonicalAlias(item)));
+  threads = normalizedVisibleThreads;
   replies = rRes.status === 'fulfilled'
-    ? (rRes.value || []).filter((reply) => visibleIds.has(reply.threadId))
+    ? (rRes.value || []).filter((reply) => visibleIds.has(reply.threadId)).map((item) => applyCanonicalAlias(item))
     : [];
+
+  if (!aliasSyncDone && auth.uid && auth.token && getAuthorName() && getAuthorName() !== 'Catador') {
+    aliasSyncDone = true;
+    const targetAlias = getAuthorName();
+    const updateMyName = async (collectionName, items) => {
+      const mine = items.filter((row) => row.authorUid === auth.uid && String(row.authorName || '').trim() !== targetAlias);
+      await Promise.allSettled(mine.map((row) => updateDocument(collectionName, row.id, {
+        authorName: targetAlias,
+        updatedAt: new Date().toISOString(),
+      })));
+    };
+    await Promise.allSettled([
+      updateMyName('foro_hilos', normalizedVisibleThreads),
+      updateMyName('foro_respuestas', replies),
+    ]);
+  }
 
   renderThreads();
 
@@ -639,7 +706,7 @@ const signIn = async (registerMode) => {
       localStorage.removeItem('etiove_web_saved_pw');
     }
 
-    // Intentar recuperar el alias real del usuario desde sus hilos anteriores
+    // Resolver alias canónico del perfil para no exponer prefijos de email.
     try {
       await resolveAuthorAlias();
     } catch (_) { /* no bloquear el login */ }
@@ -658,6 +725,8 @@ const logout = async () => {
   localStorage.removeItem('etiove_web_email');
   localStorage.removeItem('etiove_web_token');
   localStorage.removeItem('etiove_web_alias');
+  canonicalAlias = '';
+  aliasSyncDone = false;
   // No borramos saved_email/saved_pw — son las credenciales de "Recordarme"
   renderAuthState();
   await loadForum();

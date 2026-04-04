@@ -205,7 +205,42 @@
       record.authorAvatar,
     ];
     const hit = candidates.find((value) => String(value || '').trim());
-    return String(hit || '').trim();
+    return normalizeAvatarUrl(String(hit || '').trim());
+  };
+
+  const normalizeAvatarUrl = (rawValue) => {
+    const raw = String(rawValue || '').trim();
+    if (!raw) return '';
+
+    // Local/mobile-only schemes are not reachable from web browsers.
+    if (/^(file:|content:|ph:|assets-library:|blob:)/i.test(raw)) return '';
+
+    if (raw.startsWith('gs://')) {
+      const withoutScheme = raw.replace(/^gs:\/\//i, '');
+      const slashIndex = withoutScheme.indexOf('/');
+      if (slashIndex > 0) {
+        const bucket = withoutScheme.slice(0, slashIndex);
+        const objectPath = withoutScheme.slice(slashIndex + 1);
+        return `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodeURIComponent(objectPath)}?alt=media`;
+      }
+      return '';
+    }
+
+    if (/^https?:\/\//i.test(raw)) {
+      try {
+        const url = new URL(raw);
+        const host = String(url.hostname || '').toLowerCase();
+        if (host.includes('firebasestorage.googleapis.com') && !url.searchParams.has('alt')) {
+          url.searchParams.set('alt', 'media');
+          return url.toString();
+        }
+        return url.toString();
+      } catch {
+        return '';
+      }
+    }
+
+    return '';
   };
 
   const readMottoFromRecord = (record) => {
@@ -364,10 +399,27 @@
     const quote = String(state.profile && state.profile.motto || '').trim();
 
     if (el.avatar) {
-      if (avatarUrl) {
-        el.avatar.innerHTML = `<img src="${esc(avatarUrl)}" alt="Foto de ${esc(name)}" style="width:100%;height:100%;object-fit:cover;display:block;" />`;
-      } else {
+      const paintInitial = () => {
+        el.avatar.innerHTML = '';
         el.avatar.textContent = first;
+      };
+
+      if (avatarUrl) {
+        const img = document.createElement('img');
+        img.src = avatarUrl;
+        img.alt = `Foto de ${name}`;
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'cover';
+        img.style.display = 'block';
+        img.loading = 'eager';
+        img.decoding = 'async';
+        img.referrerPolicy = 'no-referrer';
+        img.onerror = paintInitial;
+        el.avatar.innerHTML = '';
+        el.avatar.appendChild(img);
+      } else {
+        paintInitial();
       }
     }
     if (el.name) el.name.textContent = name;

@@ -67,11 +67,16 @@ export default function ProfileScreen({ onClose }) {
     setGuardando(true);
     try {
       let fotoPersistida = foto;
+      let avatarUrlParaWeb = String(foto || '').startsWith('http') ? String(foto).trim() : '';
+      let uploadPendiente = false;
+
       if (foto && !String(foto).startsWith('http')) {
         try {
           fotoPersistida = await uploadImageToStorage(foto, `profile_avatars/${user?.uid || 'anon'}`);
+          avatarUrlParaWeb = String(fotoPersistida || '').trim();
         } catch {
-          // Si falla la subida, mantenemos guardado local y avisamos luego.
+          // Si falla la subida, la app mantiene preview local, pero no guardamos file:// en Firestore.
+          uploadPendiente = true;
         }
       }
 
@@ -89,10 +94,11 @@ export default function ProfileScreen({ onClose }) {
         try {
           const existing = await getDocument('user_profiles', user.uid);
           const displayName = alias.trim() || nombre.trim() || email.trim().split('@')[0] || 'Catador';
+          const avatarCloud = avatarUrlParaWeb || String((existing && existing.avatarUrl) || '').trim();
           await setDocument('user_profiles', user.uid, {
             uid: user.uid,
             displayName,
-            avatarUrl: String(fotoPersistida || ''),
+            avatarUrl: avatarCloud,
             motto: String((existing && existing.motto) || '').trim() || '"Ninguno de nosotros es tan listo como todos nosotros."',
             updatedAt: new Date().toISOString(),
           });
@@ -102,7 +108,11 @@ export default function ProfileScreen({ onClose }) {
       }
 
       setFoto(fotoPersistida || null);
-      showDialog('Guardado', 'Tu perfil ha sido actualizado');
+      if (uploadPendiente) {
+        showDialog('Guardado parcial', 'Tu perfil se guardo en el movil, pero no se pudo subir la foto a la nube. Vuelve a intentarlo con buena conexion para que tambien salga en la web.');
+      } else {
+        showDialog('Guardado', 'Tu perfil ha sido actualizado');
+      }
       onClose();
     } catch { showDialog('Error', 'No se pudo guardar el perfil'); }
     finally { setGuardando(false); }

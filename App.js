@@ -673,6 +673,11 @@ function ProfileScreen({ isPremium, premiumDaysLeft, onClose }) {
         foto: fotoPersistida,
       }));
 
+      // Forzar recarga del perfil desde SecureStore y Firestore tras guardar
+      if (typeof refrescarPerfil === 'function') {
+        await refrescarPerfil();
+      }
+
       if (user?.uid) {
         try {
           const existing = await getDocument('user_profiles', user.uid);
@@ -1638,6 +1643,13 @@ function MainScreen({ onLogout }) {
   const [permission, requestPermission] = useCameraPermissions();
   const brandCardAnim = useRef(new Animated.Value(0)).current;
   const brandProgressAnim = useRef(new Animated.Value(0)).current;
+    // --- NUEVO: función para refrescar perfil desde SecureStore ---
+    const refrescarPerfil = async () => {
+      try {
+        const v = await SecureStore.getItemAsync(KEY_PROFILE);
+        if (v) setPerfil(JSON.parse(v));
+      } catch {}
+    };
   const {
     gamification,
     registrarEventoGamificacion,

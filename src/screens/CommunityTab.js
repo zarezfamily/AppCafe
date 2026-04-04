@@ -72,12 +72,15 @@ export default function CommunityTab({
   forumEditing,
   interactionFeedbackEnabled,
   interactionFeedbackMode,
-  // Gamificación
+  // Gamificacin
   gamification,
   getUserLevel,
   getAchievementDefs,
   LEVELS,
+  perfil, // Añadido: perfil del usuario para roles
 }) {
+  const isAdmin = perfil?.role === 'admin';
+  const isStaff = perfil?.role === 'staff';
   const [showMemberInfo, setShowMemberInfo] = useState(false);
   const communityHeroAnim = useRef(new Animated.Value(0)).current;
   const categoryRowAnimsRef = useRef([]);
@@ -291,65 +294,7 @@ export default function CommunityTab({
           <Animated.View style={{ opacity: communityHeroAnim }}>
             <ScrollView contentContainerStyle={{ paddingBottom: 110, gap: 0 }}>
               
-              {/* ─── PREMIUM HEADER ─── */}
-              <View style={{ backgroundColor: '#1f140f', paddingVertical: 24, paddingHorizontal: 16, gap: 16, overflow: 'hidden' }}>
-                <View style={{ position: 'absolute', width: 170, height: 170, borderRadius: 85, right: -44, top: -68, backgroundColor: 'rgba(209, 139, 74, 0.2)' }} />
-                <View style={{ position: 'absolute', width: 120, height: 120, borderRadius: 60, left: -30, bottom: -24, backgroundColor: 'rgba(255, 233, 210, 0.08)' }} />
-                {/* Logo + Eslogan */}
-                <View style={{ alignItems: 'center', gap: 4 }}>
-                  <Text style={{ fontSize: 36, fontWeight: '900', letterSpacing: 2.4, color: '#fff8f0' }}>ETIOVE</Text>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                    <View style={s.homeMiniSealOuter}>
-                      <View style={s.homeMiniSealMiddle}>
-                        <View style={s.homeMiniSealInner}>
-                          <Text style={s.homeMiniSealText}>E</Text>
-                        </View>
-                      </View>
-                    </View>
-                    <Text style={{ fontSize: 10, fontWeight: '800', letterSpacing: 1.8, color: '#d4a574' }}>SPECIALTY COFFEE COMMUNITY</Text>
-                  </View>
-                </View>
-
-                {/* User Rank Section */}
-                {gamification && (
-                  <TouchableOpacity
-                    activeOpacity={0.96}
-                    onLongPress={() => setShowMemberInfo(true)}
-                    delayLongPress={280}
-                    style={{ backgroundColor: '#faf8f5', borderRadius: 16, padding: 14, gap: 10, borderWidth: 1, borderColor: '#e8dcc8' }}
-                  >
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                      <Text style={{ fontSize: 32 }}>{getUserLevel(gamification.xp).icon}</Text>
-                      <View style={{ flex: 1 }}>
-                        <Text style={{ fontSize: 12, fontWeight: '700', color: '#d4a574', textTransform: 'uppercase', letterSpacing: 0.5 }}>Tu Rango</Text>
-                        <Text style={{ fontSize: 18, fontWeight: '900', color: '#1f140f' }}>{getUserLevel(gamification.xp).name}</Text>
-                      </View>
-                      <Text style={{ fontSize: 20, fontWeight: '800', color: '#1f140f' }}>{gamification.xp}</Text>
-                      <Text style={{ fontSize: 10, fontWeight: '600', color: '#d4a574' }}>XP</Text>
-                    </View>
-
-                    {/* XP Progress Bar */}
-                    <View style={{ gap: 6 }}>
-                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 2 }}>
-                        <Text style={{ fontSize: 10, fontWeight: '600', color: '#d4a574' }}>Siguiente Nivel</Text>
-                        {__getNextLevelXp(gamification.xp, LEVELS) && (
-                          <Text style={{ fontSize: 10, fontWeight: '700', color: '#1f140f' }}>
-                            {__getNextLevelXp(gamification.xp, LEVELS) - gamification.xp} XP restantes
-                          </Text>
-                        )}
-                      </View>
-                      <View style={{ height: 6, backgroundColor: '#e8dcc8', borderRadius: 3, overflow: 'hidden' }}>
-                        <View style={{ 
-                          height: '100%', 
-                          backgroundColor: '#d4a574',
-                          borderRadius: 3,
-                          width: `${__getXpProgressPercent(gamification.xp, LEVELS)}%`
-                        }} />
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-                )}
-              </View>
+              {/* ...header de comunidad eliminado por petición del usuario... */}
 
               {/* ─── ACHIEVEMENTS SECTION ─── */}
               {gamification && (
@@ -600,7 +545,7 @@ export default function CommunityTab({
                         </Text>
                       </View>
                     </View>
-                    {isForumOwner(forumThread) && (
+                    {(isForumOwner(forumThread) || isAdmin || isStaff) && (
                       <TouchableOpacity style={s.forumDotsBtn} onPress={() => abrirMenuAutorForo('foro_hilos', forumThread)}>
                         <Ionicons name="ellipsis-vertical" size={18} color={theme.brand.accentDeep} />
                       </TouchableOpacity>
@@ -652,7 +597,7 @@ export default function CommunityTab({
                     </View>
                     <View style={s.forumMetaActions}>
                       <Text style={s.forumMetaText}>{formatRelativeTime(reply.createdAt)}</Text>
-                      {isForumOwner(reply) && (
+                      {(isForumOwner(reply) || isAdmin || isStaff) && (
                         <TouchableOpacity style={s.forumDotsBtn} onPress={() => abrirMenuAutorForo('foro_respuestas', reply)}>
                           <Ionicons name="ellipsis-vertical" size={16} color={theme.brand.accentDeep} />
                         </TouchableOpacity>
@@ -674,7 +619,7 @@ export default function CommunityTab({
                         </View>
                         <View style={s.forumMetaActions}>
                           <Text style={s.forumMetaText}>{formatRelativeTime(child.createdAt)}</Text>
-                          {isForumOwner(child) && (
+                          {(isForumOwner(child) || isAdmin || isStaff) && (
                             <TouchableOpacity style={s.forumDotsBtn} onPress={() => abrirMenuAutorForo('foro_respuestas', child)}>
                               <Ionicons name="ellipsis-vertical" size={15} color={theme.brand.accentDeep} />
                             </TouchableOpacity>

@@ -1,3 +1,36 @@
+// Enviar código de verificación por SMS
+export const sendPhoneVerificationCode = async (phoneNumber, recaptchaToken) => {
+  // Firebase REST API para enviar SMS requiere reCAPTCHA, aquí se asume que el token se obtiene en el front
+  const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:sendVerificationCode?key=${FIREBASE_API_KEY}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ phoneNumber, recaptchaToken }),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error?.message || 'No se pudo enviar el SMS');
+  return json.sessionInfo;
+};
+
+// Verificar código SMS
+export const verifyPhoneCode = async (sessionInfo, code) => {
+  const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPhoneNumber?key=${FIREBASE_API_KEY}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sessionInfo, code }),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error?.message || 'Código incorrecto');
+  return json;
+};
+// Enviar email de verificación
+export const sendEmailVerification = async (idToken) => {
+  const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${FIREBASE_API_KEY}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ requestType: 'VERIFY_EMAIL', idToken }),
+  });
+  return res.ok;
+};
 // Configuración para API REST de Firestore
 // Usa Firebase Auth token (Bearer) para autenticar peticiones a Firestore
 

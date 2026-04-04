@@ -616,8 +616,17 @@ const goToThreadDetail = (threadId) => {
   transitionThreadsView(
     () => renderThreads(),
     () => {
-      const targetY = Number((window.history.state && window.history.state.communityAnchorY) || pendingThreadAnchorY);
-      if (Number.isFinite(targetY) && targetY >= 0) window.scrollTo({ top: targetY, behavior: 'auto' });
+      // Try to scroll the thread detail into view
+      const detailArticle = document.querySelector('.thread-detail-top');
+      if (detailArticle) {
+        // Scroll so the thread detail top is near the top, with a small offset
+        const y = detailArticle.getBoundingClientRect().top + window.scrollY - 12;
+        window.scrollTo({ top: y, behavior: 'auto' });
+      } else {
+        // Fallback to previous anchor logic
+        const targetY = Number((window.history.state && window.history.state.communityAnchorY) || pendingThreadAnchorY);
+        if (Number.isFinite(targetY) && targetY >= 0) window.scrollTo({ top: targetY, behavior: 'auto' });
+      }
       pendingThreadAnchorY = null;
     },
   );

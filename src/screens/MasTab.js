@@ -52,6 +52,9 @@ export default function MasTab({
   guardarFeedbackInteracciones,
   guardarModoFeedbackInteracciones,
 }) {
+  // Panel especial para admin/staff
+  const isAdmin = perfil?.role === 'admin';
+  const isStaff = perfil?.role === 'staff';
   const [showMemberInfo, setShowMemberInfo] = useState(false);
   const [dialogVisible, setDialogVisible] = useState(false);
   const [dialogConfig, setDialogConfig] = useState({ title: '', description: '', actions: [] });
@@ -246,6 +249,22 @@ export default function MasTab({
           </TouchableOpacity>
         </View>
 
+        {(isAdmin || isStaff) && (
+          <>
+            <Text style={mas.blockTitle}>Panel de Moderación</Text>
+            <View style={mas.listCard}>
+              <MasItem
+                icon="shield-checkmark-outline"
+                label={isAdmin ? 'Panel de administración' : 'Panel de staff'}
+                sub={isAdmin ? 'Gestión total del sistema' : 'Herramientas de moderación'}
+                onPress={() => setActiveTab('PanelAdmin')}
+                mas={mas}
+                premiumAccent={premiumAccent}
+                iconFaint={iconFaint}
+              />
+            </View>
+          </>
+        )}
         <Text style={mas.blockTitle}>Ajustes</Text>
         <View style={mas.listCard}>
           <MasItem

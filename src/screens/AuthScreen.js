@@ -7,10 +7,74 @@ import {
     ActivityIndicator, KeyboardAvoidingView, Platform,
     SafeAreaView, ScrollView, StatusBar, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View,
 } from 'react-native';
-import { loginUser, registerUser, resetPassword } from '../../firebaseConfig';
+import { loginUser, registerUser, resetPassword, sendPhoneVerificationCode, verifyPhoneCode, queryCollection, setDocument } from '../../firebaseConfig';
 import AppDialogModal from '../components/AppDialogModal';
 import { KEY_EMAIL, KEY_HAS_ACCOUNT, KEY_PASSWORD, KEY_REMEMBER } from '../constants/storageKeys';
 import { THEME } from '../constants/theme';
+  // --- Alias State ---
+  const [alias, setAlias] = useState('');
+  const [aliasChecking, setAliasChecking] = useState(false);
+  const [aliasAvailable, setAliasAvailable] = useState(null);
+  // --- SMS Verification State ---
+    // Validar alias único
+    const checkAlias = async (aliasValue) => {
+      setAliasChecking(true);
+      try {
+        const results = await queryCollection('user_profiles', 'alias', aliasValue.trim().toLowerCase());
+        setAliasAvailable(results.length === 0);
+      } catch {
+        setAliasAvailable(null);
+      }
+      setAliasChecking(false);
+    };
+
+    useEffect(() => {
+      if (modo === 'register' && alias.trim().length > 2) {
+        checkAlias(alias);
+      } else {
+        setAliasAvailable(null);
+      }
+    }, [alias, modo]);
+  const [telefono, setTelefono] = useState('');
+  const [smsVerificando, setSmsVerificando] = useState(false);
+  const [smsSessionInfo, setSmsSessionInfo] = useState(null);
+  const [smsCode, setSmsCode] = useState('');
+  const [smsVerified, setSmsVerified] = useState(false);
+  // Enviar SMS
+  const handleVerificarSMS = async () => {
+    if (!telefono.trim() || telefono.length < 8) {
+      showDialog('Teléfono requerido', 'Introduce un número de móvil válido.');
+      return;
+    }
+    setSmsVerificando(true);
+    try {
+      // TODO: Obtener recaptchaToken real en producción
+      const recaptchaToken = 'test';
+      const sessionInfo = await sendPhoneVerificationCode(telefono.trim(), recaptchaToken);
+      setSmsSessionInfo(sessionInfo);
+      showDialog('Código enviado', 'Te hemos enviado un SMS con el código de verificación.');
+    } catch (e) {
+      showDialog('Error', e.message || 'No se pudo enviar el SMS');
+    }
+    setSmsVerificando(false);
+  };
+
+  // Verificar código SMS
+  const handleConfirmarSMS = async () => {
+    if (!smsSessionInfo || !smsCode.trim()) {
+      showDialog('Código requerido', 'Introduce el código que recibiste por SMS.');
+      return;
+    }
+    setSmsVerificando(true);
+    try {
+      await verifyPhoneCode(smsSessionInfo, smsCode.trim());
+      setSmsVerified(true);
+      showDialog('Teléfono verificado', '¡Tu número ha sido verificado correctamente!');
+    } catch (e) {
+      showDialog('Error', e.message || 'Código incorrecto');
+    }
+    setSmsVerificando(false);
+  };
 
 export default function AuthScreen({ onAuth }) {
   const [modo, setModo]         = useState('login');
@@ -64,8 +128,12 @@ export default function AuthScreen({ onAuth }) {
   };
 
   const handleSubmit = async () => {
-    if (!email.trim() || (!password.trim() && modo !== 'reset')) {
+    if (!email.trim() || (!password.trim() && modo !== 'reset') || (modo === 'register' && !alias.trim())) {
       showDialog('Aviso', 'Rellena todos los campos');
+      return;
+    }
+    if (modo === 'register' && aliasAvailable === false) {
+      showDialog('Alias en uso', 'El alias elegido ya está registrado. Elige otro.');
       return;
     }
     setCargando(true);
@@ -76,8 +144,18 @@ export default function AuthScreen({ onAuth }) {
         if (recordar) await guardarCreds(email.trim(), password); else await borrarCreds();
         onAuth(user);
       } else if (modo === 'register') {
+        // Guardar alias en Firestore tras registro
         const user = await registerUser(email.trim(), password);
         await marcarCuenta();
+        // Guardar alias en perfil
+        await setDocument('user_profiles', user.uid, {
+          uid: user.uid,
+          alias: alias.trim().toLowerCase(),
+          email: email.trim(),
+          displayName: alias.trim(),
+          createdAt: new Date().toISOString(),
+          role: 'usuario', // Por defecto
+        });
         onAuth(user);
       } else {
         await resetPassword(email.trim());
@@ -170,6 +248,60 @@ export default function AuthScreen({ onAuth }) {
 
               <Text style={[styles.label, styles.authLabel]}>Email</Text>
               <TextInput style={[styles.input, styles.authInput]} placeholder="tu@email.com" placeholderTextColor="#9f9388" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" />
+              {modo === 'register' && (
+                <>
+                  <Text style={[styles.label, styles.authLabel]}>Alias *</Text>
+                  <TextInput
+                    style={[styles.input, styles.authInput, aliasAvailable === false && { borderColor: '#a44f45', backgroundColor: '#fff6f6' }]}
+                    placeholder="@tu_alias"
+                    placeholderTextColor="#9f9388"
+                    value={alias}
+                    onChangeText={setAlias}
+                    autoCapitalize="none"
+                  />
+                  {aliasChecking && <Text style={{ color: '#a47c1c', fontSize: 13, marginBottom: 6 }}>Comprobando alias...</Text>}
+                  {aliasAvailable === false && <Text style={{ color: '#a44f45', fontSize: 13, marginBottom: 6 }}>Este alias ya está en uso. Elige otro.</Text>}
+                  {aliasAvailable && <Text style={{ color: '#5f8f61', fontSize: 13, marginBottom: 6 }}>Alias disponible ✔️</Text>}
+                  <Text style={[styles.label, styles.authLabel]}>Teléfono (opcional, para verificar por SMS)</Text>
+                  <Text style={{ color: '#8d6d58', fontSize: 13, marginBottom: 6 }}>
+                    Si lo verificas por SMS, podrás recuperar tu cuenta aunque pierdas acceso al email.
+                  </Text>
+                  <TextInput style={[styles.input, styles.authInput]} placeholder="+34 600 000 000" placeholderTextColor="#9f9388" value={telefono} onChangeText={setTelefono} keyboardType="phone-pad" />
+                  {!smsVerified && !!telefono.trim() && (
+                    <Text style={{ color: '#a47c1c', fontSize: 13, marginBottom: 6 }}>
+                      Te enviaremos un SMS con un código de 6 dígitos. Introduce el código para completar la verificación.
+                    </Text>
+                    <>
+                      <TouchableOpacity
+                        style={[styles.authPrimaryBtn, { marginTop: 0, backgroundColor: '#f7b500' }]
+                        onPress={handleVerificarSMS}
+                        disabled={smsVerificando}
+                      >
+                        {smsVerificando ? <ActivityIndicator color="#fff" /> : <Text style={styles.authPrimaryBtnText}>Verificar por SMS</Text>}
+                      </TouchableOpacity>
+                      {smsSessionInfo && (
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+                          <TextInput
+                            style={[styles.input, { flex: 1, marginRight: 8 }]}
+                            placeholder="Código SMS"
+                            value={smsCode}
+                            onChangeText={setSmsCode}
+                            keyboardType="number-pad"
+                            maxLength={6}
+                          />
+                          <TouchableOpacity
+                            style={[styles.authPrimaryBtn, { paddingHorizontal: 16 }]
+                            onPress={handleConfirmarSMS}
+                            disabled={smsVerificando || !smsCode.trim()}
+                          >
+                            <Text style={styles.authPrimaryBtnText}>Confirmar</Text>
+                          </TouchableOpacity>
+                        </View>
+                      )}
+                    </>
+                  )}
+                </>
+              )}
               {modo !== 'reset' && (
                 <>
                   <Text style={[styles.label, styles.authLabel]}>Contraseña</Text>

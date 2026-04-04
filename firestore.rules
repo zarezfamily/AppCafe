@@ -64,6 +64,19 @@ service cloud.firestore {
         && (!('reportedCount' in request.resource.data) || isNonNegativeInt(request.resource.data.reportedCount));
     }
 
+      function isBlogCommentVotesUpdate() {
+        return request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'upvotes',
+          'downvotes',
+          'upvoterUids',
+          'downvoterUids'
+        ])
+        && isNonNegativeInt(request.resource.data.upvotes)
+        && (!('downvotes' in request.resource.data) || isNonNegativeInt(request.resource.data.downvotes))
+        && (!('upvoterUids' in request.resource.data) || request.resource.data.upvoterUids is string)
+        && (!('downvoterUids' in request.resource.data) || request.resource.data.downvoterUids is string);
+      }
+
     function isValidPremiumPlan(value) {
       return value is string && (value == 'monthly' || value == 'lifetime');
     }
@@ -147,7 +160,12 @@ service cloud.firestore {
         && hasString('postSlug', 1, 200)
         && hasString('body', 3, 1000)
         && request.resource.data.createdAt is string;
-      allow update, delete: if isSignedIn() && resource.data.authorUid == request.auth.uid;
+      allow update: if isSignedIn()
+        && (
+          (resource.data.authorUid == request.auth.uid)
+          || isBlogCommentVotesUpdate()
+        );
+      allow delete: if isSignedIn() && resource.data.authorUid == request.auth.uid;
     }
 
     match /newsletter_subscribers/{subscriberId} {

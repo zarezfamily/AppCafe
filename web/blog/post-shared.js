@@ -27,12 +27,57 @@
 
   const hasCommentUI = !!(el.commentHelp && el.commentBody && el.sendComment && el.commentStatus && el.commentList);
 
+  const BLOG_VOTE_MAX_IDS = 200;
+
   const escapeHtml = (text) => String(text || '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
+
+  const splitCsv = (value) => String(value || '')
+    .split(',')
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+
+  const uniqCsv = (value) => Array.from(new Set(splitCsv(value)));
+
+  const shortPreview = (text, max = 180) => {
+    const raw = String(text || '').trim();
+    if (raw.length <= max) return raw;
+    return `${raw.slice(0, max - 1)}…`;
+  };
+
+  const ensureBlogStyles = () => {
+    if (document.getElementById('etioveBlogSharedStyles')) return;
+    const style = document.createElement('style');
+    style.id = 'etioveBlogSharedStyles';
+    style.textContent = `
+      .comment-head { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:6px; flex-wrap:wrap; }
+      .comment-author-btn { border:0; background:transparent; color:#7b6049; font:inherit; font-weight:700; cursor:pointer; padding:0; }
+      .comment-author-btn:hover { color:#5d4030; text-decoration:underline; }
+      .comment-actions { display:flex; align-items:center; gap:10px; margin-top:10px; flex-wrap:wrap; }
+      .comment-vote-btn, .comment-manage-btn { border:0; background:transparent; color:#5d4030; font:inherit; font-size:13px; font-weight:700; cursor:pointer; padding:0; }
+      .comment-vote-btn[disabled] { opacity:0.5; cursor:not-allowed; }
+      .comment-manage-btn.delete { color:#8c3b2f; }
+      .blog-author-modal { position:fixed; inset:0; background:rgba(0,0,0,0.44); display:none; align-items:center; justify-content:center; z-index:900; padding:14px; }
+      .blog-author-modal.is-open { display:flex; }
+      .blog-author-panel { width:min(560px, 100%); max-height:85vh; overflow:auto; background:#fffaf5; border:1px solid #e4d3c2; border-radius:16px; box-shadow:0 18px 48px rgba(28,18,13,0.25); padding:18px; }
+      .blog-author-top { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px; }
+      .blog-author-name { font-family:'Playfair Display', serif; font-size:22px; color:#1c120d; }
+      .blog-author-close { border:0; background:transparent; color:#5d4030; font-size:24px; line-height:1; cursor:pointer; }
+      .blog-author-stats { display:flex; gap:14px; margin-bottom:12px; flex-wrap:wrap; }
+      .blog-author-stat { border:1px solid #e4d3c2; border-radius:12px; padding:8px 10px; background:#fff; min-width:102px; }
+      .blog-author-stat strong { display:block; font-size:20px; color:#1c120d; }
+      .blog-author-stat span { font-size:11px; text-transform:uppercase; letter-spacing:1.2px; color:#8b7355; }
+      .blog-author-list { display:grid; gap:8px; }
+      .blog-author-item { border:1px solid #e4d3c2; border-radius:10px; padding:10px; background:#fff; }
+      .blog-author-meta { font-size:12px; color:#8b7355; margin-bottom:4px; }
+      .blog-author-body { font-size:14px; color:#38251c; line-height:1.45; margin:0; }
+    `;
+    document.head.appendChild(style);
+  };
 
   const fromFirestoreValue = (val = {}) => {
     if ('stringValue' in val) return val.stringValue;
@@ -80,6 +125,25 @@
     return headers;
   };
 
+  const updateDocument = async (name, id, data) => {
+    const params = new URLSearchParams({ key: FIREBASE_API_KEY });
+    Object.keys(data).forEach((field) => params.append('updateMask.fieldPaths', field));
+    const res = await fetch(`${BASE_URL}/${name}/${id}?${params.toString()}`, {
+      method: 'PATCH',
+      headers: authHeaders(),
+      body: JSON.stringify(toFields(data)),
+    });
+    return res.ok;
+  };
+
+  const deleteDocument = async (name, id) => {
+    const res = await fetch(`${BASE_URL}/${name}/${id}?key=${FIREBASE_API_KEY}`, {
+      method: 'DELETE',
+      headers: authHeaders(),
+    });
+    return res.ok;
+  };
+
   const getStoredAlias = () => String(localStorage.getItem('etiove_web_alias') || '').trim();
 
   const getFallbackAuthorName = () => getStoredAlias() || (auth.email || '').split('@')[0] || 'Catador';
@@ -119,6 +183,84 @@
     if (el.commentStatus) el.commentStatus.textContent = text || '';
   };
 
+  const ensureAuthorModal = () => {
+    let modal = document.getElementById('blogAuthorModal');
+    if (modal) return modal;
+
+    modal = document.createElement('div');
+    modal.id = 'blogAuthorModal';
+    modal.className = 'blog-author-modal';
+    modal.innerHTML = `
+      <div class="blog-author-panel" role="dialog" aria-modal="true" aria-label="Perfil del autor">
+        <div class="blog-author-top">
+          <strong id="blogAuthorName" class="blog-author-name">Catador</strong>
+          <button id="blogAuthorClose" class="blog-author-close" type="button" aria-label="Cerrar">×</button>
+        </div>
+        <div id="blogAuthorStats" class="blog-author-stats"></div>
+        <div id="blogAuthorList" class="blog-author-list"></div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) modal.classList.remove('is-open');
+    });
+
+    const closeBtn = modal.querySelector('#blogAuthorClose');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        modal.classList.remove('is-open');
+      });
+    }
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') modal.classList.remove('is-open');
+    });
+
+    return modal;
+  };
+
+  const openAuthorModal = async (uid, name) => {
+    const safeUid = String(uid || '').trim();
+    if (!safeUid) return;
+
+    const modal = ensureAuthorModal();
+    const titleEl = modal.querySelector('#blogAuthorName');
+    const statsEl = modal.querySelector('#blogAuthorStats');
+    const listEl = modal.querySelector('#blogAuthorList');
+    if (!titleEl || !statsEl || !listEl) return;
+
+    titleEl.textContent = name || 'Catador';
+    statsEl.innerHTML = '<div class="blog-author-stat"><strong>…</strong><span>Cargando</span></div>';
+    listEl.innerHTML = '<div class="blog-author-item"><p class="blog-author-body">Buscando aportes recientes...</p></div>';
+    modal.classList.add('is-open');
+
+    const comments = await getCollection('blog_comentarios', 1000);
+    const mine = comments
+      .filter((item) => item.authorUid === safeUid)
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    const totalUp = mine.reduce((acc, item) => acc + Number(item.upvotes || 0), 0);
+    const totalDown = mine.reduce((acc, item) => acc + Number(item.downvotes || 0), 0);
+    statsEl.innerHTML = `
+      <div class="blog-author-stat"><strong>${mine.length}</strong><span>Comentarios</span></div>
+      <div class="blog-author-stat"><strong>${totalUp}</strong><span>Votos +</span></div>
+      <div class="blog-author-stat"><strong>${totalDown}</strong><span>Votos -</span></div>
+    `;
+
+    if (!mine.length) {
+      listEl.innerHTML = '<div class="blog-author-item"><p class="blog-author-body">Este usuario todavía no tiene comentarios públicos en el blog.</p></div>';
+      return;
+    }
+
+    listEl.innerHTML = mine.slice(0, 6).map((item) => `
+      <article class="blog-author-item">
+        <div class="blog-author-meta">${escapeHtml(item.postSlug || 'Post')} · ${escapeHtml(formatDate(item.createdAt))}</div>
+        <p class="blog-author-body">${escapeHtml(shortPreview(item.body || ''))}</p>
+      </article>
+    `).join('');
+  };
+
   const formatDate = (iso) => {
     try {
       return new Date(iso).toLocaleString('es-ES');
@@ -140,12 +282,158 @@
       return;
     }
 
-    el.commentList.innerHTML = comments.map((comment) => `
+    el.commentList.innerHTML = comments.map((comment) => {
+      const upvoters = uniqCsv(comment.upvoterUids || comment.voterUids);
+      const downvoters = uniqCsv(comment.downvoterUids);
+      const hasUp = auth.uid ? upvoters.includes(auth.uid) : false;
+      const hasDown = auth.uid ? downvoters.includes(auth.uid) : false;
+      const canManage = !!auth.uid && comment.authorUid === auth.uid;
+      const upvotes = Number(comment.upvotes || 0);
+      const downvotes = Number(comment.downvotes || 0);
+      const voteLocked = !auth.uid;
+
+      return `
       <article class="comment-item">
-        <div class="comment-meta">${escapeHtml(comment.authorName || 'Catador')} · ${escapeHtml(formatDate(comment.createdAt))}</div>
+        <div class="comment-head">
+          <div class="comment-meta"><button class="comment-author-btn" type="button" data-author-uid="${escapeHtml(comment.authorUid || '')}" data-author-name="${escapeHtml(comment.authorName || 'Catador')}">${escapeHtml(comment.authorName || 'Catador')}</button> · ${escapeHtml(formatDate(comment.createdAt))}</div>
+          ${canManage ? `<div class="comment-actions"><button class="comment-manage-btn" type="button" data-comment-edit="${comment.id}">Editar</button><button class="comment-manage-btn delete" type="button" data-comment-delete="${comment.id}">Eliminar</button></div>` : ''}
+        </div>
         <p class="comment-body">${escapeHtml(comment.body || '')}</p>
+        <div class="comment-actions">
+          <button class="comment-vote-btn" type="button" data-comment-vote-up="${comment.id}" ${voteLocked || hasUp ? 'disabled' : ''}>👍 ${upvotes}</button>
+          <button class="comment-vote-btn" type="button" data-comment-vote-down="${comment.id}" ${voteLocked || hasDown ? 'disabled' : ''}>👎 ${downvotes}</button>
+        </div>
       </article>
-    `).join('');
+    `;
+    }).join('');
+
+    el.commentList.querySelectorAll('[data-comment-vote-up]').forEach((btn) => {
+      btn.addEventListener('click', () => voteComment(btn.getAttribute('data-comment-vote-up'), 'up'));
+    });
+
+    el.commentList.querySelectorAll('[data-comment-vote-down]').forEach((btn) => {
+      btn.addEventListener('click', () => voteComment(btn.getAttribute('data-comment-vote-down'), 'down'));
+    });
+
+    el.commentList.querySelectorAll('[data-comment-edit]').forEach((btn) => {
+      btn.addEventListener('click', () => editComment(btn.getAttribute('data-comment-edit')));
+    });
+
+    el.commentList.querySelectorAll('[data-comment-delete]').forEach((btn) => {
+      btn.addEventListener('click', () => deleteComment(btn.getAttribute('data-comment-delete')));
+    });
+
+    el.commentList.querySelectorAll('[data-author-uid]').forEach((btn) => {
+      btn.addEventListener('click', () => openAuthorModal(btn.getAttribute('data-author-uid'), btn.getAttribute('data-author-name')));
+    });
+  };
+
+  const voteComment = async (commentId, direction) => {
+    if (!auth.token || !auth.uid) {
+      setStatus('Inicia sesión para votar comentarios.');
+      return;
+    }
+
+    const all = await getCollection('blog_comentarios', 1000);
+    const comment = all.find((item) => item.id === commentId && item.postSlug === postSlug);
+    if (!comment) {
+      setStatus('No se encontró ese comentario.');
+      return;
+    }
+
+    const upvoters = uniqCsv(comment.upvoterUids || comment.voterUids);
+    const downvoters = uniqCsv(comment.downvoterUids);
+
+    if (direction === 'up' && upvoters.includes(auth.uid)) {
+      setStatus('Ya votaste positivo este comentario.');
+      return;
+    }
+    if (direction === 'down' && downvoters.includes(auth.uid)) {
+      setStatus('Ya votaste negativo este comentario.');
+      return;
+    }
+
+    const nextUp = upvoters.filter((uid) => uid !== auth.uid);
+    const nextDown = downvoters.filter((uid) => uid !== auth.uid);
+
+    if (direction === 'up') nextUp.push(auth.uid);
+    if (direction === 'down') nextDown.push(auth.uid);
+
+    const ok = await updateDocument('blog_comentarios', commentId, {
+      upvotes: nextUp.length,
+      downvotes: nextDown.length,
+      upvoterUids: nextUp.slice(0, BLOG_VOTE_MAX_IDS).join(','),
+      downvoterUids: nextDown.slice(0, BLOG_VOTE_MAX_IDS).join(','),
+    });
+
+    if (!ok) {
+      setStatus('No se pudo guardar tu voto.');
+      return;
+    }
+
+    setStatus(direction === 'up' ? 'Voto positivo guardado.' : 'Voto negativo guardado.');
+    await loadComments();
+  };
+
+  const editComment = async (commentId) => {
+    if (!auth.token || !auth.uid) {
+      setStatus('Inicia sesión para editar.');
+      return;
+    }
+
+    const all = await getCollection('blog_comentarios', 1000);
+    const comment = all.find((item) => item.id === commentId && item.postSlug === postSlug);
+    if (!comment || comment.authorUid !== auth.uid) {
+      setStatus('Solo puedes editar tus propios comentarios.');
+      return;
+    }
+
+    const nextBody = window.prompt('Edita tu respuesta', comment.body || '');
+    if (nextBody === null) return;
+
+    const body = String(nextBody || '').trim();
+    if (body.length < 3) {
+      setStatus('La respuesta debe tener al menos 3 caracteres.');
+      return;
+    }
+
+    const ok = await updateDocument('blog_comentarios', commentId, {
+      body,
+      updatedAt: new Date().toISOString(),
+    });
+
+    if (!ok) {
+      setStatus('No se pudo actualizar la respuesta.');
+      return;
+    }
+
+    setStatus('Respuesta actualizada.');
+    await loadComments();
+  };
+
+  const deleteComment = async (commentId) => {
+    if (!auth.token || !auth.uid) {
+      setStatus('Inicia sesión para eliminar.');
+      return;
+    }
+
+    const all = await getCollection('blog_comentarios', 1000);
+    const comment = all.find((item) => item.id === commentId && item.postSlug === postSlug);
+    if (!comment || comment.authorUid !== auth.uid) {
+      setStatus('Solo puedes eliminar tus propios comentarios.');
+      return;
+    }
+
+    if (!window.confirm('Se eliminará tu respuesta.')) return;
+
+    const ok = await deleteDocument('blog_comentarios', commentId);
+    if (!ok) {
+      setStatus('No se pudo eliminar la respuesta.');
+      return;
+    }
+
+    setStatus('Respuesta eliminada.');
+    await loadComments();
   };
 
   const addComment = async () => {
@@ -178,6 +466,10 @@
         authorUid: auth.uid,
         authorName: authorName || getFallbackAuthorName(),
         createdAt: new Date().toISOString(),
+        upvotes: 0,
+        downvotes: 0,
+        upvoterUids: '',
+        downvoterUids: '',
       })),
     });
 
@@ -252,6 +544,8 @@
   };
 
   const init = async () => {
+    ensureBlogStyles();
+    ensureAuthorModal();
     setupShare();
     setupScrollTop();
 

@@ -775,17 +775,7 @@ const renderThreads = () => {
     .filter((t) => t.categoryId === selectedCategory)
     .filter(isThreadVisible)
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-  const fallbackList = threads
-    .filter(isThreadVisible)
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-  const usingFallback = list.length === 0 && fallbackList.length > 0;
-  const displayList = usingFallback ? fallbackList : list;
-
-  const fallbackNote = usingFallback
-    ? '<p class="muted" style="margin-top:10px">No hay hilos en esta categoría ahora mismo. Mostrando los más recientes de toda la comunidad.</p>'
-    : '';
+  const displayList = list;
 
   if (activeThreadId) {
     const activeThread = threads.find((thread) => thread.id === activeThreadId);
@@ -855,7 +845,12 @@ const renderThreads = () => {
     `;
   } else {
     if (displayList.length === 0) {
-      el.threadsWrap.innerHTML = '<p class="empty">Aún no hay hilos en esta categoría.</p>';
+      const category = FORUM_CATEGORIES.find((c) => c.id === selectedCategory);
+      const categoryLabel = (category && category.label) || 'esta categoría';
+      const cta = auth.token
+        ? `Todavía no hay hilos en ${categoryLabel}. Sé la primera voz y escribe el primer post de esta categoría.`
+        : `Todavía no hay hilos en ${categoryLabel}. Inicia sesión y abre el primer post de esta categoría.`;
+      el.threadsWrap.innerHTML = `<p class="empty">${escapeHtml(cta)}</p>`;
       return;
     }
 
@@ -871,7 +866,7 @@ const renderThreads = () => {
       </div>
     `;
 
-    el.threadsWrap.innerHTML = `${fallbackNote}${pagedList.map((t, idx) => {
+    el.threadsWrap.innerHTML = `${pagedList.map((t, idx) => {
     const delay = Math.min(idx * 0.03, 0.21);
     const threadReplies = replies
       .filter((r) => r.threadId === t.id)

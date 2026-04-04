@@ -649,6 +649,20 @@ function ProfileScreen({ isPremium, premiumDaysLeft, onClose }) {
 
     setGuardando(true);
     try {
+      let fotoPersistida = foto;
+      let avatarUrlParaWeb = String(foto || '').startsWith('http') ? String(foto).trim() : '';
+      let uploadPendiente = false;
+
+      if (foto && !String(foto).startsWith('http')) {
+        try {
+          fotoPersistida = await uploadImageToStorage(foto, `profile_avatars/${user?.uid || 'anon'}`);
+          avatarUrlParaWeb = String(fotoPersistida || '').trim();
+        } catch {
+          // Mantiene la foto local si falla la subida, sin bloquear guardado del perfil.
+          uploadPendiente = true;
+        }
+      }
+
       await SecureStore.setItemAsync(KEY_PROFILE, JSON.stringify({
         nombre: nombre.trim(),
         alias: alias.trim(),
@@ -656,9 +670,32 @@ function ProfileScreen({ isPremium, premiumDaysLeft, onClose }) {
         email: email.trim(),
         telefono,
         pais,
-        foto,
+        foto: fotoPersistida,
       }));
-      showDialog('Guardado', 'Tu perfil ha sido actualizado');
+
+      if (user?.uid) {
+        try {
+          const existing = await getDocument('user_profiles', user.uid);
+          const displayName = alias.trim() || nombre.trim() || email.trim().split('@')[0] || 'Catador';
+          const avatarCloud = avatarUrlParaWeb || String((existing && existing.avatarUrl) || '').trim();
+          await setDocument('user_profiles', user.uid, {
+            uid: user.uid,
+            displayName,
+            avatarUrl: avatarCloud,
+            motto: String((existing && existing.motto) || '').trim() || '"Ninguno de nosotros es tan listo como todos nosotros."',
+            updatedAt: new Date().toISOString(),
+          });
+        } catch {
+          // No bloqueamos al usuario si falla la sincronizacion web.
+        }
+      }
+
+      setFoto(fotoPersistida || null);
+      if (uploadPendiente) {
+        showDialog('Guardado parcial', 'Tu perfil se guardo en el movil, pero no se pudo subir la foto a la nube. Vuelve a intentarlo con buena conexion para que tambien salga en la web.');
+      } else {
+        showDialog('Guardado', 'Tu perfil ha sido actualizado');
+      }
       onClose();
     } catch { showDialog('Error', 'No se pudo guardar el perfil'); }
     finally { setGuardando(false); }

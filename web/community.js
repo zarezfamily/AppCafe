@@ -198,6 +198,13 @@ const normalizeText = (value) => String(value || '')
   .toLowerCase()
   .trim();
 
+const goToProfilePage = (uid, name) => {
+  const safeUid = String(uid || '').trim();
+  if (!safeUid) return;
+  const url = `/perfil.html?uid=${encodeURIComponent(safeUid)}&name=${encodeURIComponent(String(name || 'Catador'))}`;
+  window.location.href = url;
+};
+
 const inferCategoryId = (thread) => {
   const rawId = normalizeText(thread.categoryId);
   if (FORUM_CATEGORIES.some((c) => c.id === rawId)) return rawId;
@@ -385,7 +392,7 @@ const renderThreads = () => {
 
     const repliesHtml = threadReplies.slice(0, 4).map((r, replyIdx) => (
       `<div class="reply" style="animation-delay:${Math.min(delay + (replyIdx * 0.02), 0.26).toFixed(3)}s">
-        <div class="meta">${escapeHtml(r.authorName || 'Catador')} · ${fmt(r.createdAt)}</div>
+        <div class="meta"><button class="link-btn author-btn" data-author-uid="${escapeHtml(r.authorUid || '')}" data-author-name="${escapeHtml(r.authorName || 'Catador')}" style="font-weight:600;">${escapeHtml(r.authorName || 'Catador')}</button> · ${fmt(r.createdAt)}</div>
         <p>${escapeHtml(r.body || '')}</p>
         <div class="thread-foot">
           <div class="actions-row">
@@ -462,10 +469,9 @@ const renderThreads = () => {
   // Clic en nombre de autor → modal perfil (solo logueados)
   el.threadsWrap.querySelectorAll('.author-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
-      if (!auth.token) return;
-      openProfileModal(btn.getAttribute('data-author-uid'), btn.getAttribute('data-author-name'));
+      goToProfilePage(btn.getAttribute('data-author-uid'), btn.getAttribute('data-author-name'));
     });
-    if (auth.token) btn.style.cursor = 'pointer';
+    btn.style.cursor = 'pointer';
   });
 
   const markLoaded = (img) => img.classList.add('loaded');

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Perfil de la comunidad | Etiove</title>
+  <meta name="description" content="Perfil público de la comunidad Etiove con actividad en foro y blog." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #1f1c18;
+      --ink-soft: #61584e;
+      --muted: #8a8177;
+      --line: #ddd7d0;
+      --shell: #efefef;
+      --card: #f4f4f5;
+      --white: #ffffff;
+      --accent: #ff5f1f;
+      --accent-soft: #ffd8c7;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Manrope', sans-serif;
+      color: var(--ink);
+      background: linear-gradient(180deg, #f6f6f7 0%, #ececed 260px, #f2f2f3 100%);
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(248, 248, 249, 0.92);
+      backdrop-filter: blur(8px);
+    }
+
+    .brand {
+      text-decoration: none;
+      color: var(--ink);
+      font-family: 'Playfair Display', serif;
+      letter-spacing: 2px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .top-links a {
+      text-decoration: none;
+      color: var(--ink-soft);
+      font-size: 13px;
+      font-weight: 700;
+      margin-left: 14px;
+    }
+
+    .page {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+    }
+
+    .profile-card {
+      background: #e8e8ea;
+      border: 1px solid #e2e2e4;
+      border-radius: 24px;
+      padding: 28px 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .profile-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% -30px, rgba(255,255,255,0.76), transparent 54%);
+      pointer-events: none;
+    }
+
+    .avatar {
+      width: 116px;
+      height: 116px;
+      border-radius: 50%;
+      margin: 0 auto 14px;
+      border: 4px solid #f6f6f7;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      background: linear-gradient(145deg, #6e5f4f, #aa967e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-family: 'Playfair Display', serif;
+      font-size: 44px;
+      font-weight: 700;
+    }
+
+    .profile-name {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 40px);
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+    }
+
+    .profile-sub {
+      margin: 8px 0 8px;
+      color: var(--ink-soft);
+      font-size: 24px;
+      font-size: clamp(16px, 2vw, 24px);
+      font-weight: 600;
+    }
+
+    .profile-counts {
+      margin: 0;
+      font-size: 20px;
+      font-size: clamp(14px, 1.6vw, 20px);
+      color: #211e1a;
+      font-weight: 700;
+    }
+
+    .profile-counts span {
+      color: var(--muted);
+      font-weight: 500;
+      margin: 0 4px;
+    }
+
+    .profile-quote {
+      margin: 18px auto 0;
+      max-width: 760px;
+      color: #26221d;
+      font-size: clamp(15px, 1.6vw, 24px);
+      font-weight: 500;
+    }
+
+    .profile-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 18px 0 0;
+    }
+
+    .pill-btn {
+      border: 1px solid #cfc9c2;
+      background: #f7f7f8;
+      color: #70675d;
+      border-radius: 999px;
+      min-width: 220px;
+      padding: 10px 16px;
+      font-size: 24px;
+      font-size: clamp(14px, 1.4vw, 24px);
+      font-weight: 700;
+      cursor: not-allowed;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      overflow: auto;
+      scrollbar-width: none;
+      margin: 18px 0 14px;
+      border-bottom: 2px solid #d5d1cb;
+      padding-bottom: 2px;
+    }
+
+    .tabs::-webkit-scrollbar { display: none; }
+
+    .tab-btn {
+      border: 0;
+      background: transparent;
+      color: #6f665d;
+      padding: 12px 8px 10px;
+      font-weight: 700;
+      font-size: 17px;
+      white-space: nowrap;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+    }
+
+    .tab-btn.active {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .feed {
+      display: grid;
+      gap: 10px;
+    }
+
+    .feed-item {
+      background: #fafafa;
+      border: 1px solid #dfd9d2;
+      border-radius: 16px;
+      display: grid;
+      grid-template-columns: 108px 1fr;
+      overflow: hidden;
+      min-height: 110px;
+    }
+
+    .feed-thumb {
+      background: linear-gradient(165deg, #dad3ca, #f2ece4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #847765;
+      font-size: 32px;
+      font-weight: 800;
+    }
+
+    .feed-body {
+      padding: 14px 16px;
+    }
+
+    .feed-meta {
+      margin: 0 0 8px;
+      color: #75695d;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .feed-title {
+      margin: 0;
+      font-size: 19px;
+      font-size: clamp(14px, 1.4vw, 19px);
+      line-height: 1.45;
+      color: #1f1b16;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+    }
+
+    .stat-card {
+      background: #fafafa;
+      border: 1px solid #dfd9d2;
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .stat-label {
+      margin: 0;
+      color: #7f7468;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      font-weight: 700;
+    }
+
+    .stat-value {
+      margin: 6px 0 0;
+      font-size: 28px;
+      font-weight: 800;
+      color: #211e1a;
+    }
+
+    .empty-state {
+      border: 1px dashed #cebfb1;
+      background: #fff9f3;
+      color: #7b6b5d;
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    @media (max-width: 760px) {
+      .feed-item { grid-template-columns: 1fr; }
+      .feed-thumb { min-height: 76px; }
+      .profile-card { border-radius: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/">Etiove</a>
+    <nav class="top-links" aria-label="Principal">
+      <a href="/comunidad.html">Comunidad</a>
+      <a href="/blog.html">Blog</a>
+    </nav>
+  </header>
+
+  <main class="page">
+    <section class="profile-card">
+      <div id="profileAvatar" class="avatar">?</div>
+      <h1 id="profileName" class="profile-name">Catador</h1>
+      <p id="profileSince" class="profile-sub">Miembro desde hace poco</p>
+      <p id="profileCounters" class="profile-counts">0 hilos <span>•</span> 0 respuestas <span>•</span> 0 comentarios</p>
+      <p id="profileQuote" class="profile-quote">"Perfil público de la comunidad Etiove"</p>
+      <div class="profile-actions">
+        <button class="pill-btn" type="button" title="Próximamente">Seguir</button>
+        <button class="pill-btn" type="button" title="Próximamente">Mensaje directo</button>
+      </div>
+    </section>
+
+    <div class="tabs" role="tablist" aria-label="Secciones del perfil">
+      <button class="tab-btn active" type="button" data-tab="activity">Actividad reciente</button>
+      <button class="tab-btn" type="button" data-tab="threads">Hilos</button>
+      <button class="tab-btn" type="button" data-tab="replies">Respuestas</button>
+      <button class="tab-btn" type="button" data-tab="blog">Blog</button>
+      <button class="tab-btn" type="button" data-tab="stats">Estadisticas</button>
+    </div>
+
+    <section id="tabContent" class="feed" aria-live="polite"></section>
+  </main>
+
+  <script src="./profile.js"></script>
+</body>
+</html>

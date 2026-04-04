@@ -49,6 +49,13 @@
     return `${raw.slice(0, max - 1)}…`;
   };
 
+  const goToProfilePage = (uid, name) => {
+    const safeUid = String(uid || '').trim();
+    if (!safeUid) return;
+    const url = `/perfil.html?uid=${encodeURIComponent(safeUid)}&name=${encodeURIComponent(String(name || 'Catador'))}`;
+    window.location.href = url;
+  };
+
   const ensureBlogStyles = () => {
     if (document.getElementById('etioveBlogSharedStyles')) return;
     const style = document.createElement('style');
@@ -324,7 +331,7 @@
     });
 
     el.commentList.querySelectorAll('[data-author-uid]').forEach((btn) => {
-      btn.addEventListener('click', () => openAuthorModal(btn.getAttribute('data-author-uid'), btn.getAttribute('data-author-name')));
+      btn.addEventListener('click', () => goToProfilePage(btn.getAttribute('data-author-uid'), btn.getAttribute('data-author-name')));
     });
   };
 
@@ -545,7 +552,6 @@
 
   const init = async () => {
     ensureBlogStyles();
-    ensureAuthorModal();
     setupShare();
     setupScrollTop();
 

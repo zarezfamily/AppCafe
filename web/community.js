@@ -326,6 +326,8 @@ const setThreadImageStatus = (text, kind = '') => {
 
 const resetThreadComposer = (options = {}) => {
   const { preserveStatus = false } = options;
+  const wasEditing = !!editingThreadId;
+  const lastScrollY = window.scrollY;
   editingThreadId = '';
   if (el.threadComposerTitle) el.threadComposerTitle.textContent = 'Nuevo hilo';
   if (el.threadEditBanner) el.threadEditBanner.classList.remove('is-visible');
@@ -342,10 +344,15 @@ const resetThreadComposer = (options = {}) => {
   if (el.categorySelect && selectedCategory) el.categorySelect.value = selectedCategory;
   setThreadImageStatus('Imagen opcional para el hilo');
   if (!preserveStatus) setStatus(el.threadStatus, '', '');
+  if (wasEditing) {
+    renderThreads();
+    window.requestAnimationFrame(() => window.scrollTo({ top: lastScrollY, behavior: 'auto' }));
+  }
 };
 
 const startThreadEdit = (item) => {
   if (!item) return;
+  const lastScrollY = window.scrollY;
   editingThreadId = item.id;
   if (el.threadComposerTitle) el.threadComposerTitle.textContent = 'Editar hilo';
   if (el.threadEditBanner) el.threadEditBanner.classList.add('is-visible');
@@ -364,6 +371,8 @@ const startThreadEdit = (item) => {
   }
   setThreadImageStatus('La imagen actual se conserva. Aquí estás editando el texto del hilo.', '');
   setStatus(el.threadStatus, `Editando: ${item.title || 'hilo sin título'}`, '');
+  renderThreads();
+  window.requestAnimationFrame(() => window.scrollTo({ top: lastScrollY, behavior: 'auto' }));
 
   const newThreadSection = document.getElementById('newThreadSection');
   if (newThreadSection) newThreadSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -533,11 +542,18 @@ const updateCommunityMetaForThread = (thread) => {
 const goToThreadDetail = (threadId) => {
   const safeId = String(threadId || '').trim();
   if (!safeId) return;
-  window.location.href = threadDetailUrl(safeId);
+  window.history.replaceState({ ...(window.history.state || {}), communityScrollY: window.scrollY }, '', window.location.href);
+  window.history.pushState({ communityView: 'thread', threadId: safeId, communityScrollY: window.scrollY }, '', threadDetailUrl(safeId));
+  renderThreads();
 };
 
-const goToThreadList = () => {
-  window.location.href = '/comunidad.html';
+const goToThreadList = ({ replace = false, restoreScroll = true } = {}) => {
+  const scrollY = Number((window.history.state && window.history.state.communityScrollY) || 0);
+  window.history[replace ? 'replaceState' : 'pushState']({ communityView: 'list', communityScrollY: scrollY }, '', '/comunidad.html');
+  renderThreads();
+  if (restoreScroll) {
+    window.requestAnimationFrame(() => window.scrollTo({ top: scrollY, behavior: 'auto' }));
+  }
 };
 
 const goBackFromThreadDetail = () => {
@@ -545,7 +561,7 @@ const goBackFromThreadDetail = () => {
     window.history.back();
     return;
   }
-  goToThreadList();
+  goToThreadList({ replace: true });
 };
 
 const goToProfilePage = (uid, name) => {
@@ -896,7 +912,7 @@ const renderThreads = () => {
       <div class="thread-detail-top" style="margin-top:12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
         <button class="btn ghost" data-back-detail="1">← Volver atrás</button>
       </div>
-      <article class="thread" data-thread-id="${activeThread.id}">
+      <article class="thread${editingThreadId === activeThread.id ? ' thread-is-editing' : ''}" data-thread-id="${activeThread.id}">
         <h3>${escapeHtml(activeThread.title || '')}</h3>
         <div class="meta">${escapeHtml(activeThread.categoryLabel || '')} · <button class="link-btn author-btn" data-author-uid="${escapeHtml(activeThread.authorUid || '')}" data-author-name="${escapeHtml(activeThread.authorName || 'Catador')}" style="font-weight:600;">${escapeHtml(activeThread.authorName || 'Catador')}</button> · ${fmt(activeThread.createdAt)} · ${Number(activeThread.upvotes || 0)} votos</div>
         <div class="thread-tags">
@@ -980,15 +996,16 @@ const renderThreads = () => {
     const isLongBody = rawBody.length > 110;
 
     return `
-      <article class="thread" data-thread-id="${t.id}" style="animation-delay:${delay}s">
+      <article class="thread${editingThreadId === t.id ? ' thread-is-editing' : ''}" data-thread-id="${t.id}" style="animation-delay:${delay}s">
         <div class="thread-compact-head">
           <span class="pill category">${escapeHtml(t.categoryLabel || 'General')}</span>
+          ${editingThreadId === t.id ? '<span class="thread-edit-chip">Editando</span>' : ''}
           ${!!normalizeStorageImageUrl(t.image) ? '<span class="thread-img-badge" title="Incluye imagen">📷</span>' : ''}
         </div>
-        <h3><a class="thread-title-link" href="${threadDetailUrl(t.id)}" aria-label="Abrir hilo ${escapeHtml(t.title || '')}">${escapeHtml(t.title || '')}</a></h3>
+        <h3><a class="thread-title-link" data-thread-open="${t.id}" href="${threadDetailUrl(t.id)}" aria-label="Abrir hilo ${escapeHtml(t.title || '')}">${escapeHtml(t.title || '')}</a></h3>
         <div class="thread-preview-row">
           <p class="thread-body-preview">${escapeHtml(rawBody)}</p>
-          ${isLongBody ? `<a class="thread-read-more" href="${threadDetailUrl(t.id)}" aria-label="Seguir leyendo ${escapeHtml(t.title || '')}">Seguir leyendo</a>` : ''}
+          ${isLongBody ? `<a class="thread-read-more" data-thread-open="${t.id}" href="${threadDetailUrl(t.id)}" aria-label="Seguir leyendo ${escapeHtml(t.title || '')}">Seguir leyendo</a>` : ''}
         </div>
         <div class="thread-compact-foot">
           <span class="thread-compact-meta"><button class="link-btn author-btn" data-author-uid="${escapeHtml(t.authorUid || '')}" data-author-name="${escapeHtml(t.authorName || 'Catador')}">${escapeHtml(t.authorName || 'Catador')}</button> · ${fmt(t.createdAt)}</span>
@@ -1015,6 +1032,13 @@ const renderThreads = () => {
         renderThreads();
         el.threadsWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
+    });
+  });
+
+  el.threadsWrap.querySelectorAll('[data-thread-open]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+      goToThreadDetail(link.getAttribute('data-thread-open'));
     });
   });
 
@@ -1643,6 +1667,14 @@ const init = async () => {
   const modal = document.getElementById('profileModal');
   if (modal) modal.addEventListener('click', (e) => { if (e.target === modal) closeProfileModal(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeProfileModal(); });
+
+  window.addEventListener('popstate', () => {
+    renderThreads();
+    if (!getActiveThreadId()) {
+      const scrollY = Number((window.history.state && window.history.state.communityScrollY) || 0);
+      window.requestAnimationFrame(() => window.scrollTo({ top: scrollY, behavior: 'auto' }));
+    }
+  });
 
   await loadForum();
 };

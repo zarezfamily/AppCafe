@@ -722,11 +722,31 @@
       box-shadow: 0 8px 22px rgba(28,18,13,0.09);
       background: #fffefb;
     }
+    .thread.thread-is-editing {
+      border-left-color: var(--accent);
+      border-color: rgba(201,149,87,0.5);
+      background: linear-gradient(170deg, #fffaf2, #fffdf8);
+      box-shadow: 0 10px 24px rgba(158,106,66,0.12);
+    }
     .thread-compact-head {
       display: flex;
       align-items: center;
       gap: 7px;
       margin-bottom: 5px;
+    }
+    .thread-edit-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(201,149,87,0.12);
+      border: 1px solid rgba(201,149,87,0.28);
+      color: var(--accent-deep);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 800;
+      line-height: 1;
     }
     .thread-img-badge {
       font-size: 11px;

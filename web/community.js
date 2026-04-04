@@ -118,6 +118,7 @@ let threads = [];
 let replies = [];
 const THREADS_PAGE_SIZE = 12;
 let currentListPage = 1;
+let editingThreadId = '';
 const IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 const IMAGE_ALLOWED_TYPES = new Set([
   'image/jpeg',
@@ -143,7 +144,11 @@ const el = {
   threadBody: document.getElementById('threadBody'),
   threadImage: document.getElementById('threadImage'),
   threadImageStatus: document.getElementById('threadImageStatus'),
+  threadComposerTitle: document.getElementById('threadComposerTitle'),
+  threadEditBanner: document.getElementById('threadEditBanner'),
+  threadEditBannerText: document.getElementById('threadEditBannerText'),
   createThreadBtn: document.getElementById('createThreadBtn'),
+  cancelThreadEditBtn: document.getElementById('cancelThreadEditBtn'),
   threadStatus: document.getElementById('threadStatus'),
 
   categoryChips: document.getElementById('categoryChips'),
@@ -317,6 +322,52 @@ const setThreadImageStatus = (text, kind = '') => {
   if (!el.threadImageStatus) return;
   el.threadImageStatus.textContent = text || 'Imagen opcional para el hilo';
   el.threadImageStatus.className = `file-note ${kind}`.trim();
+};
+
+const resetThreadComposer = (options = {}) => {
+  const { preserveStatus = false } = options;
+  editingThreadId = '';
+  if (el.threadComposerTitle) el.threadComposerTitle.textContent = 'Nuevo hilo';
+  if (el.threadEditBanner) el.threadEditBanner.classList.remove('is-visible');
+  if (el.threadEditBannerText) el.threadEditBannerText.textContent = 'Aquí editarás el título y el mensaje del hilo seleccionado.';
+  if (el.createThreadBtn) el.createThreadBtn.textContent = 'Publicar hilo';
+  if (el.cancelThreadEditBtn) el.cancelThreadEditBtn.style.display = 'none';
+  if (el.threadTitle) el.threadTitle.value = '';
+  if (el.threadBody) el.threadBody.value = '';
+  if (el.threadImage) {
+    el.threadImage.value = '';
+    el.threadImage.disabled = false;
+  }
+  if (el.threadAccessLevel) el.threadAccessLevel.value = 'public';
+  if (el.categorySelect && selectedCategory) el.categorySelect.value = selectedCategory;
+  setThreadImageStatus('Imagen opcional para el hilo');
+  if (!preserveStatus) setStatus(el.threadStatus, '', '');
+};
+
+const startThreadEdit = (item) => {
+  if (!item) return;
+  editingThreadId = item.id;
+  if (el.threadComposerTitle) el.threadComposerTitle.textContent = 'Editar hilo';
+  if (el.threadEditBanner) el.threadEditBanner.classList.add('is-visible');
+  if (el.threadEditBannerText) {
+    el.threadEditBannerText.textContent = `Estás modificando "${String(item.title || 'Sin título').trim()}". Guarda aquí el título y el mensaje actualizados.`;
+  }
+  if (el.createThreadBtn) el.createThreadBtn.textContent = 'Guardar cambios';
+  if (el.cancelThreadEditBtn) el.cancelThreadEditBtn.style.display = 'inline-flex';
+  if (el.categorySelect) el.categorySelect.value = item.categoryId || 'general';
+  if (el.threadAccessLevel) el.threadAccessLevel.value = item.accessLevel === 'registered_only' ? 'registered_only' : 'public';
+  if (el.threadTitle) el.threadTitle.value = item.title || '';
+  if (el.threadBody) el.threadBody.value = item.body || '';
+  if (el.threadImage) {
+    el.threadImage.value = '';
+    el.threadImage.disabled = true;
+  }
+  setThreadImageStatus('La imagen actual se conserva. Aquí estás editando el texto del hilo.', '');
+  setStatus(el.threadStatus, `Editando: ${item.title || 'hilo sin título'}`, '');
+
+  const newThreadSection = document.getElementById('newThreadSection');
+  if (newThreadSection) newThreadSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  if (el.threadTitle) el.threadTitle.focus();
 };
 
 const hasUserVote = (item) => splitCsv(item && item.voterUids).includes(auth.uid);
@@ -772,6 +823,7 @@ const renderAuthState = () => {
   // Mostrar/ocultar bloque "Nuevo hilo"
   const newThreadSection = document.getElementById('newThreadSection');
   if (newThreadSection) newThreadSection.style.display = logged ? 'block' : 'none';
+  if (!logged) resetThreadComposer({ preserveStatus: true });
   if (!logged && el.memberEvolutionCard) el.memberEvolutionCard.style.display = 'none';
 };
 
@@ -1260,6 +1312,7 @@ const createThread = async () => {
     return;
   }
 
+  const isEditing = !!editingThreadId;
   const title = (el.threadTitle.value || '').trim();
   const body = (el.threadBody.value || '').trim();
   const categoryId = el.categorySelect.value;
@@ -1272,6 +1325,34 @@ const createThread = async () => {
   }
 
   try {
+    if (isEditing) {
+      const item = threads.find((thread) => thread.id === editingThreadId);
+      if (!canManageItem(item)) {
+        setStatus(el.threadStatus, 'Ya no puedes editar este hilo.', 'error');
+        resetThreadComposer({ preserveStatus: true });
+        return;
+      }
+
+      const ok = await updateDocument('foro_hilos', editingThreadId, {
+        categoryId,
+        categoryLabel: category ? category.label : 'General',
+        title,
+        body,
+        accessLevel,
+        updatedAt: new Date().toISOString(),
+      });
+
+      if (!ok) {
+        setStatus(el.threadStatus, 'No se pudieron guardar los cambios del hilo.', 'error');
+        return;
+      }
+
+      setStatus(el.threadStatus, `Cambios guardados en "${title}".`, 'ok');
+      resetThreadComposer({ preserveStatus: true });
+      await loadForum();
+      return;
+    }
+
     const imageFile = el.threadImage.files && el.threadImage.files[0] ? el.threadImage.files[0] : null;
     let imageUrl = '';
     let imageUploadWarning = '';
@@ -1306,11 +1387,7 @@ const createThread = async () => {
       reporterUids: '',
     });
 
-    el.threadTitle.value = '';
-    el.threadBody.value = '';
-    el.threadImage.value = '';
-    el.threadAccessLevel.value = 'public';
-    setThreadImageStatus('Imagen opcional para el hilo');
+    resetThreadComposer({ preserveStatus: true });
 
     if (imageUploadWarning) {
       setStatus(el.threadStatus, `Hilo publicado sin imagen. ${imageUploadWarning}`, 'error');
@@ -1386,32 +1463,7 @@ const voteReply = async (replyId) => {
 const editThread = async (threadId) => {
   const item = threads.find((thread) => thread.id === threadId);
   if (!canManageItem(item)) return;
-
-  const nextTitle = window.prompt('Editar título del hilo', item.title || '');
-  if (nextTitle === null) return;
-  const nextBody = window.prompt('Editar contenido del hilo', item.body || '');
-  if (nextBody === null) return;
-
-  const title = nextTitle.trim();
-  const body = nextBody.trim();
-  if (title.length < 3 || body.length < 3) {
-    setStatus(el.threadStatus, 'Título y contenido deben tener mínimo 3 caracteres.', 'error');
-    return;
-  }
-
-  const ok = await updateDocument('foro_hilos', threadId, {
-    title,
-    body,
-    updatedAt: new Date().toISOString(),
-  });
-
-  if (!ok) {
-    setStatus(el.threadStatus, 'No se pudo guardar el hilo.', 'error');
-    return;
-  }
-
-  setStatus(el.threadStatus, 'Hilo actualizado.', 'ok');
-  await loadForum();
+  startThreadEdit(item);
 };
 
 const deleteThread = async (threadId) => {
@@ -1432,6 +1484,7 @@ const deleteThread = async (threadId) => {
     return;
   }
 
+  if (editingThreadId === threadId) resetThreadComposer({ preserveStatus: true });
   setStatus(el.threadStatus, 'Hilo eliminado.', 'ok');
   if (getActiveThreadId() === threadId) {
     goToThreadList();
@@ -1543,7 +1596,19 @@ const init = async () => {
   el.registerBtn.addEventListener('click', () => signIn(true));
   el.logoutBtn.addEventListener('click', logout);
   el.createThreadBtn.addEventListener('click', createThread);
+  if (el.cancelThreadEditBtn) {
+    el.cancelThreadEditBtn.addEventListener('click', () => {
+      resetThreadComposer();
+      setStatus(el.threadStatus, 'Edición cancelada.', '');
+    });
+  }
   el.threadImage.addEventListener('change', () => {
+    if (editingThreadId) {
+      el.threadImage.value = '';
+      setThreadImageStatus('La imagen actual se conserva. Aquí estás editando el texto del hilo.', '');
+      return;
+    }
+
     const selected = el.threadImage.files && el.threadImage.files[0] ? el.threadImage.files[0] : null;
     if (!selected) {
       setThreadImageStatus('Imagen opcional para el hilo');

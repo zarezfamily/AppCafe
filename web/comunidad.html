@@ -645,6 +645,45 @@
     .status { margin-top: 10px; font-size: 12px; font-family: 'Manrope', sans-serif; }
     .status.error { color: var(--danger); }
     .status.ok { color: var(--success); }
+    .thread-composer-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .thread-edit-banner {
+      display: none;
+      margin-top: 10px;
+      margin-bottom: 12px;
+      padding: 10px 12px;
+      border: 1px solid rgba(201,149,87,0.38);
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(249,237,220,0.95), rgba(255,248,239,0.92));
+      color: var(--ink-soft);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+    }
+    .thread-edit-banner.is-visible { display: block; }
+    .thread-edit-banner strong {
+      display: block;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--accent-deep);
+      margin-bottom: 4px;
+    }
+    .thread-edit-banner span {
+      display: block;
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--ink-muted);
+    }
+    .thread-composer-actions {
+      margin-top: 14px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
 
     /* ─── CHIPS ─── */
     .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 16px; }
@@ -1135,7 +1174,13 @@
           <div class="card-divider"></div>
 
           <div id="newThreadSection" style="display:none;">
-          <h2>Nuevo hilo</h2>
+          <div class="thread-composer-title">
+            <h2 id="threadComposerTitle">Nuevo hilo</h2>
+          </div>
+          <div id="threadEditBanner" class="thread-edit-banner" aria-live="polite">
+            <strong>Editando hilo</strong>
+            <span id="threadEditBannerText">Aquí editarás el título y el mensaje del hilo seleccionado.</span>
+          </div>
           <div class="field"><select id="categorySelect"></select></div>
           <div class="field">
             <select id="threadAccessLevel">
@@ -1147,8 +1192,9 @@
           <div class="field"><textarea id="threadBody" maxlength="1000" placeholder="Contenido (3–1000 caracteres)"></textarea></div>
           <div class="field"><input id="threadImage" type="file" accept="image/*" /></div>
           <p class="file-note" id="threadImageStatus">Imagen opcional para el hilo</p>
-          <div style="margin-top:14px">
+          <div class="thread-composer-actions">
             <button class="btn primary" id="createThreadBtn">Publicar hilo</button>
+            <button class="btn ghost" id="cancelThreadEditBtn" style="display:none;">Cancelar edición</button>
           </div>
           <div id="threadStatus" class="status"></div>
           </div> <!-- /newThreadSection -->

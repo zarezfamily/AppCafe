@@ -4,6 +4,7 @@ const FIREBASE_IOS_BUNDLE_ID = 'com.zarezfamily.etiove';
 const AUTH_URL = 'https://identitytoolkit.googleapis.com/v1/accounts';
 const BASE_URL = `https://europe-west1-firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
 const FIREBASE_STORAGE_BUCKET = `${FIREBASE_PROJECT_ID}.appspot.com`;
+const UPLOAD_FUNCTION_URL = 'https://uploadforumimage-prvi3ma7nq-ew.a.run.app';
 
 const FORUM_CATEGORIES = [
   { id: 'general', emoji: '💬', label: 'General' },
@@ -712,45 +713,33 @@ const uploadImageToStorage = async (file, folder) => {
 
   const safeFolder = String(folder || 'uploads').replace(/[^a-zA-Z0-9_\-/]/g, '');
   const mime = String(fileToUpload.type || 'image/jpeg').toLowerCase();
-  const extByMime = {
-    'image/png': 'png',
-    'image/webp': 'webp',
-    'image/gif': 'gif',
-    'image/heic': 'heic',
-    'image/heif': 'heif',
-    'image/jpg': 'jpg',
-    'image/jpeg': 'jpg',
-  };
-  const ext = extByMime[mime] || 'jpg';
-  const fileName = `${safeFolder}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
 
-  const uploadUrl = `https://firebasestorage.googleapis.com/v0/b/${FIREBASE_STORAGE_BUCKET}/o?uploadType=media&name=${encodeURIComponent(fileName)}&key=${FIREBASE_API_KEY}`;
-  const res = await fetch(uploadUrl, {
+  // Convert file to base64 and send to Cloud Function (avoids browser CORS on Storage)
+  const base64 = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = String(reader.result || '');
+      const comma = dataUrl.indexOf(',');
+      resolve(comma >= 0 ? dataUrl.slice(comma + 1) : dataUrl);
+    };
+    reader.onerror = () => reject(new Error('IMAGE_READ_FAILED'));
+    reader.readAsDataURL(fileToUpload);
+  });
+
+  const res = await fetch(UPLOAD_FUNCTION_URL, {
     method: 'POST',
-    headers: {
-      'Content-Type': fileToUpload.type || 'image/jpeg',
-      Authorization: `Bearer ${auth.token}`,
-    },
-    body: fileToUpload,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ idToken: auth.token, base64, mimeType: mime, folder: safeFolder }),
   });
 
   const raw = await res.text();
   let json = {};
-  try {
-    json = raw ? JSON.parse(raw) : {};
-  } catch {
-    json = {};
-  }
+  try { json = raw ? JSON.parse(raw) : {}; } catch { json = {}; }
   if (!res.ok) {
-    throw new Error((json.error && json.error.message) || `storage_upload_failed_${res.status}`);
+    throw new Error((json.error) || `storage_upload_failed_${res.status}`);
   }
 
-  const objectName = json.name || fileName;
-  const encodedName = encodeURIComponent(objectName);
-  const token = json.downloadTokens || (json.metadata && json.metadata.downloadTokens) || '';
-  return token
-    ? `https://firebasestorage.googleapis.com/v0/b/${FIREBASE_STORAGE_BUCKET}/o/${encodedName}?alt=media&token=${token}`
-    : `https://firebasestorage.googleapis.com/v0/b/${FIREBASE_STORAGE_BUCKET}/o/${encodedName}?alt=media`;
+  return String(json.downloadUrl || '');
 };
 
 const uploadImageWithRetry = async (file, folder, maxAttempts = 3) => {

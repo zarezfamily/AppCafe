@@ -698,8 +698,37 @@
       font-size: 13px;
       color: var(--ink-muted);
       line-height: 1.55;
+      margin: 0;
+      flex: 1 1 auto;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .thread-preview-row {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
       margin-top: 3px;
       margin-bottom: 9px;
+      min-width: 0;
+    }
+    .thread-read-more {
+      flex: 0 0 auto;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 700;
+      white-space: nowrap;
+      opacity: 0.9;
+      transition: color 0.18s ease, opacity 0.18s ease;
+    }
+    .thread-read-more:hover,
+    .thread-read-more:focus-visible {
+      color: var(--accent-deep);
+      opacity: 1;
     }
     .thread-compact-foot {
       display: flex;

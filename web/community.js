@@ -924,6 +924,9 @@ const renderThreads = () => {
     const accessTagColor = t.accessLevel === 'registered_only' ? '#8f5e3b' : '#4f7a53';
     const accessTagBg = t.accessLevel === 'registered_only' ? '#f3e9de' : '#edf7ee';
 
+    const rawBody = String(t.body || '').replace(/\s+/g, ' ').trim();
+    const isLongBody = rawBody.length > 110;
+
     return `
       <article class="thread" data-thread-id="${t.id}" style="animation-delay:${delay}s">
         <div class="thread-compact-head">
@@ -931,7 +934,10 @@ const renderThreads = () => {
           ${!!normalizeStorageImageUrl(t.image) ? '<span class="thread-img-badge" title="Incluye imagen">📷</span>' : ''}
         </div>
         <h3><a class="thread-title-link" href="${threadDetailUrl(t.id)}" aria-label="Abrir hilo ${escapeHtml(t.title || '')}">${escapeHtml(t.title || '')}</a></h3>
-        <p class="thread-body-preview">${escapeHtml((() => { const b = String(t.body || ''); return b.length > 140 ? b.slice(0, 140) + '…' : b; })())}</p>
+        <div class="thread-preview-row">
+          <p class="thread-body-preview">${escapeHtml(rawBody)}</p>
+          ${isLongBody ? `<a class="thread-read-more" href="${threadDetailUrl(t.id)}" aria-label="Seguir leyendo ${escapeHtml(t.title || '')}">Seguir leyendo</a>` : ''}
+        </div>
         <div class="thread-compact-foot">
           <span class="thread-compact-meta"><button class="link-btn author-btn" data-author-uid="${escapeHtml(t.authorUid || '')}" data-author-name="${escapeHtml(t.authorName || 'Catador')}">${escapeHtml(t.authorName || 'Catador')}</button> · ${fmt(t.createdAt)}</span>
           <span class="thread-compact-stats">

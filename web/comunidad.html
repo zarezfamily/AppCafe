@@ -769,6 +769,10 @@
       font-family: 'Manrope', sans-serif;
     }
     .empty { margin-top: 16px; color: var(--ink-muted); font-size: 14px; }
+    .threads-pager {
+      border-top: 1px dashed var(--border);
+      padding-top: 12px;
+    }
 
     /* ─── SKELETON ─── */
     .thread-skeleton {
@@ -875,6 +879,7 @@
       .sidebar-card { position: static; }
       .forum-section { padding: 52px 0 56px; }
       .thread-foot { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .threads-pager { align-items: flex-start; }
     }
     @media (prefers-reduced-motion: reduce) {
       .hero-img, .hero-aura1, .hero-aura2,

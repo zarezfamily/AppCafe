@@ -115,6 +115,8 @@ const closeProfileModal = () => {
 let selectedCategory = 'general';
 let threads = [];
 let replies = [];
+const THREADS_PAGE_SIZE = 8;
+let currentListPage = 1;
 
 const el = {
   email: document.getElementById('email'),
@@ -644,6 +646,7 @@ const renderCategories = () => {
   el.categoryChips.querySelectorAll('[data-cat]').forEach((btn) => {
     btn.addEventListener('click', () => {
       selectedCategory = btn.getAttribute('data-cat');
+      currentListPage = 1;
       el.categorySelect.value = selectedCategory;
       renderCategories();
       renderThreads();
@@ -743,7 +746,17 @@ const renderThreads = () => {
   } else {
     resetCommunityMeta();
 
-    el.threadsWrap.innerHTML = `${fallbackNote}${displayList.map((t, idx) => {
+    const visibleCount = Math.min(displayList.length, currentListPage * THREADS_PAGE_SIZE);
+    const pagedList = displayList.slice(0, visibleCount);
+    const hasMore = visibleCount < displayList.length;
+    const pagerHtml = `
+      <div class="threads-pager" style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+        <p class="muted" style="margin:0;">Mostrando ${visibleCount} de ${displayList.length} hilos</p>
+        ${hasMore ? '<button class="btn ghost" data-load-more="1">Cargar más</button>' : ''}
+      </div>
+    `;
+
+    el.threadsWrap.innerHTML = `${fallbackNote}${pagedList.map((t, idx) => {
     const delay = Math.min(idx * 0.03, 0.21);
     const threadReplies = replies
       .filter((r) => r.threadId === t.id)
@@ -779,7 +792,7 @@ const renderThreads = () => {
         </div>
       </article>
     `;
-  }).join('')}`;
+  }).join('')}${pagerHtml}`;
   }
 
   el.threadsWrap.querySelectorAll('[data-vote]').forEach((btn) => {
@@ -789,6 +802,14 @@ const renderThreads = () => {
   el.threadsWrap.querySelectorAll('[data-open-thread]').forEach((btn) => {
     btn.addEventListener('click', () => goToThreadDetail(btn.getAttribute('data-open-thread')));
   });
+
+  const loadMoreBtn = el.threadsWrap.querySelector('[data-load-more]');
+  if (loadMoreBtn) {
+    loadMoreBtn.addEventListener('click', () => {
+      currentListPage += 1;
+      renderThreads();
+    });
+  }
 
   const backBtn = el.threadsWrap.querySelector('[data-back-list]');
   if (backBtn) backBtn.addEventListener('click', goToThreadList);
@@ -1323,6 +1344,7 @@ const init = async () => {
   el.refreshBtn.addEventListener('click', loadForum);
   el.categorySelect.addEventListener('change', () => {
     selectedCategory = el.categorySelect.value;
+    currentListPage = 1;
     renderCategories();
     renderThreads();
   });

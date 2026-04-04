@@ -724,6 +724,7 @@
     }
     .chip.active { background: var(--accent-deep); border-color: var(--accent-deep); color: #fff8f0; box-shadow: 0 8px 20px rgba(109,63,35,0.25); }
     .chip:hover { transform: translateY(-1px); border-color: var(--accent); }
+    #refreshBtn { display: none !important; }
 
     /* ─── THREADS ─── */
     .thread {
@@ -899,12 +900,32 @@
       border-color: #efcfaf;
     }
     .thread h3 {
-      font-size: 15.5px;
+      font-size: 19px;
       margin-bottom: 4px;
       color: var(--ink);
       font-family: 'Cormorant Garamond', serif;
       font-weight: 700;
       line-height: 1.35;
+    }
+    .thread-detail-title {
+      font-size: clamp(28px, 4.4vw, 40px);
+      line-height: 1.1;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+    .meta-cat {
+      display: inline-flex;
+      align-items: center;
+      margin-left: 2px;
+      padding: 1px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      background: rgba(255,255,255,0.66);
+      font-size: 10px;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      line-height: 1.6;
     }
     .thread-title-link {
       color: var(--accent-deep);

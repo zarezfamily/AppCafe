@@ -933,7 +933,7 @@ const renderCategories = () => {
       currentListPage = 1;
       el.categorySelect.value = selectedCategory;
       renderCategories();
-      renderThreads();
+      loadForum();
     });
   });
 };
@@ -984,10 +984,9 @@ const renderThreads = () => {
 
     const detailBodyHtml = editingThreadId === activeThread.id
       ? renderInlineThreadEditor(activeThread)
-      : `<h3>${escapeHtml(activeThread.title || '')}</h3>
-        <div class="meta">${escapeHtml(activeThread.categoryLabel || '')} · <button class="link-btn author-btn" data-author-uid="${escapeHtml(activeThread.authorUid || '')}" data-author-name="${escapeHtml(activeThread.authorName || 'Catador')}" style="font-weight:600;">${escapeHtml(activeThread.authorName || 'Catador')}</button> · ${fmt(activeThread.createdAt)} · ${Number(activeThread.upvotes || 0)} votos</div>
+      : `<h3 class="thread-detail-title">${escapeHtml(activeThread.title || '')}</h3>
+        <div class="meta"><button class="link-btn author-btn" data-author-uid="${escapeHtml(activeThread.authorUid || '')}" data-author-name="${escapeHtml(activeThread.authorName || 'Catador')}" style="font-weight:600;">${escapeHtml(activeThread.authorName || 'Catador')}</button> · ${fmt(activeThread.createdAt)} <span class="meta-cat">${escapeHtml(activeThread.categoryLabel || 'General')}</span> · ${Number(activeThread.upvotes || 0)} votos</div>
         <div class="thread-tags">
-          <span class="pill category">${escapeHtml(activeThread.categoryLabel || 'General')}</span>
           <span class="pill" style="background:${accessTagBg};color:${accessTagColor}">${escapeHtml(ACCESS_LABELS[activeThread.accessLevel] || 'Público')}</span>
         </div>
         <p>${escapeHtml(activeThread.body || '')}</p>`;
@@ -1077,7 +1076,6 @@ const renderThreads = () => {
       return `
         <article class="thread thread-is-editing" data-thread-id="${t.id}" style="animation-delay:${delay}s">
           <div class="thread-compact-head">
-            <span class="pill category">${escapeHtml(t.categoryLabel || 'General')}</span>
             <span class="thread-edit-chip">Editando</span>
             ${!!normalizeStorageImageUrl(t.image) ? '<span class="thread-img-badge" title="Incluye imagen">📷</span>' : ''}
           </div>
@@ -1089,7 +1087,6 @@ const renderThreads = () => {
     return `
       <article class="thread${editingThreadId === t.id ? ' thread-is-editing' : ''}" data-thread-id="${t.id}" style="animation-delay:${delay}s">
         <div class="thread-compact-head">
-          <span class="pill category">${escapeHtml(t.categoryLabel || 'General')}</span>
           ${editingThreadId === t.id ? '<span class="thread-edit-chip">Editando</span>' : ''}
           ${!!normalizeStorageImageUrl(t.image) ? '<span class="thread-img-badge" title="Incluye imagen">📷</span>' : ''}
         </div>
@@ -1099,7 +1096,7 @@ const renderThreads = () => {
           ${isLongBody ? `<a class="thread-read-more" data-thread-open="${t.id}" href="${threadDetailUrl(t.id)}" aria-label="Seguir leyendo ${escapeHtml(t.title || '')}">Seguir leyendo</a>` : ''}
         </div>
         <div class="thread-compact-foot">
-          <span class="thread-compact-meta"><button class="link-btn author-btn" data-author-uid="${escapeHtml(t.authorUid || '')}" data-author-name="${escapeHtml(t.authorName || 'Catador')}">${escapeHtml(t.authorName || 'Catador')}</button> · ${fmt(t.createdAt)}</span>
+          <span class="thread-compact-meta"><button class="link-btn author-btn" data-author-uid="${escapeHtml(t.authorUid || '')}" data-author-name="${escapeHtml(t.authorName || 'Catador')}">${escapeHtml(t.authorName || 'Catador')}</button> · ${fmt(t.createdAt)} <span class="meta-cat">${escapeHtml(t.categoryLabel || 'General')}</span></span>
           <span class="thread-compact-stats">
             <button class="link-btn" data-vote="${t.id}">${threadVoted ? '✓ Interesa' : 'Me interesa'}</button>
             <span class="muted">${Number(t.upvotes || 0)} votos · ${threadReplies.length} respuestas</span>
@@ -1871,12 +1868,12 @@ const init = async () => {
 
     setThreadImageStatus(`Imagen lista: ${selected.name} (${sizeMb} MB).`, 'ok');
   });
-  el.refreshBtn.addEventListener('click', loadForum);
+  if (el.refreshBtn) el.refreshBtn.addEventListener('click', loadForum);
   el.categorySelect.addEventListener('change', () => {
     selectedCategory = el.categorySelect.value;
     currentListPage = 1;
     renderCategories();
-    renderThreads();
+    loadForum();
   });
 
   // Cerrar modal de perfil

@@ -562,7 +562,7 @@
       }
       .section-app { padding: 80px 24px; }
       footer { padding: 40px 24px; flex-direction: column; align-items: flex-start; }
-      body { padding-bottom: 68px; }
+      body { padding-bottom: 0; }
     }
 
     /* ── MOBILE NAV BAR ── */
@@ -595,16 +595,7 @@
 
     @media (max-width: 768px) {
       .mobile-nav {
-        display: flex;
-        position: fixed;
-        bottom: 0; left: 0; right: 0;
-        z-index: 150;
-        background: rgba(246, 239, 231, 0.95);
-        backdrop-filter: blur(10px);
-        border-top: 1px solid var(--border-soft);
-        padding: 10px 20px;
-        padding-bottom: max(10px, env(safe-area-inset-bottom));
-        gap: 12px;
+        display: none !important;
       }
       .mobile-nav-link {
         flex: 1;

@@ -135,6 +135,13 @@ const el = {
   categoryChips: document.getElementById('categoryChips'),
   refreshBtn: document.getElementById('refreshBtn'),
   threadsWrap: document.getElementById('threadsWrap'),
+
+  memberEvolutionCard: document.getElementById('memberEvolutionCard'),
+  memberEvolutionName: document.getElementById('memberEvolutionName'),
+  memberEvolutionTier: document.getElementById('memberEvolutionTier'),
+  memberEvolutionStats: document.getElementById('memberEvolutionStats'),
+  memberEvolutionBadges: document.getElementById('memberEvolutionBadges'),
+  memberEvolutionEmpty: document.getElementById('memberEvolutionEmpty'),
 };
 
 const escapeHtml = (text) => String(text || '')
@@ -148,6 +155,99 @@ const splitCsv = (value) => String(value || '')
   .split(',')
   .map((entry) => entry.trim())
   .filter(Boolean);
+
+const BADGE_LIBRARY = {
+  first_thread: { icon: '🌱', label: 'Primer hilo' },
+  first_reply: { icon: '💬', label: 'Primera respuesta' },
+  curator: { icon: '🧠', label: 'Curador' },
+  active_voice: { icon: '⚡', label: 'Voz activa' },
+  top_contributor: { icon: '🏆', label: 'Top contribuidor' },
+  community_pillar: { icon: '🛡️', label: 'Pilar' },
+  espresso_scholar: { icon: '📚', label: 'Scholar' },
+};
+
+const normalizeBadgeId = (rawBadge) => normalizeText(rawBadge).replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+
+const deriveTierLabel = (xp) => {
+  if (xp >= 2500) return 'Reserve V';
+  if (xp >= 1600) return 'Reserve IV';
+  if (xp >= 900) return 'Reserve III';
+  if (xp >= 350) return 'Reserve II';
+  return 'Reserve I';
+};
+
+const fallbackBadgeIds = (stats) => {
+  const badges = [];
+  if (stats.threadCount >= 1) badges.push('first_thread');
+  if (stats.replyCount >= 1) badges.push('first_reply');
+  if (stats.voteReceived >= 12) badges.push('curator');
+  if (stats.replyCount >= 8) badges.push('active_voice');
+  if (stats.threadCount >= 6 || stats.replyCount >= 20) badges.push('top_contributor');
+  if ((stats.threadCount + stats.replyCount) >= 30) badges.push('community_pillar');
+  if (stats.xp >= 900) badges.push('espresso_scholar');
+  return badges;
+};
+
+const renderMemberEvolutionCard = ({ profile = null, allThreads = [], allReplies = [] } = {}) => {
+  if (!el.memberEvolutionCard) return;
+  if (!auth.uid || !auth.token) {
+    el.memberEvolutionCard.style.display = 'none';
+    return;
+  }
+
+  const myThreads = allThreads.filter((item) => item.authorUid === auth.uid);
+  const myReplies = allReplies.filter((item) => item.authorUid === auth.uid);
+  const votesFromThreads = myThreads.reduce((sum, item) => sum + Number(item.upvotes || 0), 0);
+  const votesFromReplies = myReplies.reduce((sum, item) => sum + Number(item.upvotes || 0), 0);
+  const voteReceived = votesFromThreads + votesFromReplies;
+
+  const profileXp = Number((profile && (profile.xp || profile.totalXp || profile.communityXp || 0)) || 0);
+  const calculatedXp = (myThreads.length * 40) + (myReplies.length * 18) + (voteReceived * 4);
+  const xp = Math.max(profileXp, calculatedXp);
+  const tier = String((profile && (profile.memberLevel || profile.tierLabel || profile.communityTier)) || '').trim() || deriveTierLabel(xp);
+
+  const rawAchievementCsv = String((profile && (profile.achievementCsv || profile.achievementsCsv || profile.badgeCsv)) || '').trim();
+  const parsedBadges = splitCsv(rawAchievementCsv).map(normalizeBadgeId).filter(Boolean);
+  const computedBadges = parsedBadges.length > 0 ? parsedBadges : fallbackBadgeIds({
+    threadCount: myThreads.length,
+    replyCount: myReplies.length,
+    voteReceived,
+    xp,
+  });
+  const uniqueBadges = Array.from(new Set(computedBadges)).slice(0, 8);
+
+  const displayName = String((profile && (profile.displayName || profile.alias || profile.nickname)) || getAuthorName() || 'Catador').trim();
+  el.memberEvolutionName.textContent = displayName || 'Catador';
+  el.memberEvolutionTier.textContent = tier;
+
+  el.memberEvolutionStats.innerHTML = [
+    { label: 'XP', value: Math.round(xp) },
+    { label: 'Hilos', value: myThreads.length },
+    { label: 'Respuestas', value: myReplies.length },
+    { label: 'Votos', value: voteReceived },
+  ].map((item) => `
+    <div class="member-evo-stat">
+      <p class="member-evo-stat-label">${escapeHtml(item.label)}</p>
+      <p class="member-evo-stat-value">${escapeHtml(String(item.value))}</p>
+    </div>
+  `).join('');
+
+  if (uniqueBadges.length === 0) {
+    el.memberEvolutionBadges.innerHTML = '';
+    el.memberEvolutionEmpty.style.display = 'block';
+  } else {
+    el.memberEvolutionBadges.innerHTML = uniqueBadges.map((badgeId) => {
+      const badge = BADGE_LIBRARY[badgeId] || {
+        icon: '✦',
+        label: badgeId.replace(/_/g, ' '),
+      };
+      return `<span class="member-evo-badge">${escapeHtml(badge.icon)} ${escapeHtml(badge.label)}</span>`;
+    }).join('');
+    el.memberEvolutionEmpty.style.display = 'none';
+  }
+
+  el.memberEvolutionCard.style.display = 'block';
+};
 
 const canManageItem = (item) => !!auth.uid && item && item.authorUid === auth.uid;
 
@@ -480,6 +580,7 @@ const renderAuthState = () => {
   // Mostrar/ocultar bloque "Nuevo hilo"
   const newThreadSection = document.getElementById('newThreadSection');
   if (newThreadSection) newThreadSection.style.display = logged ? 'block' : 'none';
+  if (!logged && el.memberEvolutionCard) el.memberEvolutionCard.style.display = 'none';
 };
 
 const renderCategories = () => {
@@ -718,6 +819,7 @@ const loadForum = async () => {
   if (hRes.status !== 'fulfilled') {
     threads = [];
     replies = [];
+    renderMemberEvolutionCard();
     setStatus(el.threadStatus, 'No se pudo cargar la comunidad.', 'error');
     el.threadsWrap.innerHTML = '<p class="empty">No se pudieron cargar los hilos en este momento.</p>';
     return;
@@ -728,6 +830,7 @@ const loadForum = async () => {
   const visibleIds = new Set(visibleThreads.map((t) => t.id));
 
   const profiles = pRes.status === 'fulfilled' ? (pRes.value || []) : [];
+  const allReplies = rRes.status === 'fulfilled' ? (rRes.value || []) : [];
   const aliasByUid = new Map();
   profiles.forEach((profile) => {
     const safeUid = String(profile.uid || '').trim();
@@ -753,6 +856,13 @@ const loadForum = async () => {
   replies = rRes.status === 'fulfilled'
     ? (rRes.value || []).filter((reply) => visibleIds.has(reply.threadId)).map((item) => applyCanonicalAlias(item))
     : [];
+
+  const myProfile = profiles.find((profile) => String(profile.uid || '').trim() === auth.uid) || null;
+  renderMemberEvolutionCard({
+    profile: myProfile,
+    allThreads: h.map((item) => applyCanonicalAlias(item)),
+    allReplies: allReplies.map((item) => applyCanonicalAlias(item)),
+  });
 
   if (!aliasSyncDone && auth.uid && auth.token && getAuthorName() && getAuthorName() !== 'Catador') {
     aliasSyncDone = true;

@@ -439,6 +439,96 @@
       background: var(--border);
       margin: 22px 0;
     }
+    .member-evo {
+      display: none;
+      margin-top: 14px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+      background: linear-gradient(155deg, rgba(255,250,243,0.95), rgba(246,231,214,0.82));
+      box-shadow: 0 10px 22px rgba(33,21,15,0.08);
+      position: relative;
+      overflow: hidden;
+    }
+    .member-evo::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--gold), transparent 75%);
+    }
+    .member-evo-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .member-evo-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 24px;
+      line-height: 1;
+      color: var(--ink);
+      font-weight: 700;
+    }
+    .member-evo-tier {
+      font-size: 10px;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 700;
+    }
+    .member-evo-stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .member-evo-stat {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 8px;
+      background: rgba(255,255,255,0.62);
+    }
+    .member-evo-stat-label {
+      font-size: 9px;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+    .member-evo-stat-value {
+      font-size: 14px;
+      color: var(--ink);
+      font-weight: 700;
+    }
+    .member-evo-badges {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .member-evo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border: 1px solid #d9bf9f;
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 11px;
+      background: #fff8ef;
+      color: var(--ink-soft);
+      line-height: 1;
+      white-space: nowrap;
+    }
+    .member-evo-empty {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--ink-muted);
+    }
 
     /* ─── MAIN ─── */
     .main-card {
@@ -853,6 +943,17 @@
             <button class="btn ghost" id="logoutBtn" style="display:none">Salir</button>
           </div>
           <div id="authStatus" class="status"></div>
+
+          <section id="memberEvolutionCard" class="member-evo" aria-live="polite">
+            <div class="member-evo-head">
+              <p id="memberEvolutionName" class="member-evo-name">Catador</p>
+              <span id="memberEvolutionTier" class="member-evo-tier">Reserve I</span>
+            </div>
+            <p class="muted">Tu evolución en la comunidad</p>
+            <div id="memberEvolutionStats" class="member-evo-stats"></div>
+            <div id="memberEvolutionBadges" class="member-evo-badges"></div>
+            <p id="memberEvolutionEmpty" class="member-evo-empty" style="display:none;">Publica tu primer hilo para desbloquear insignias.</p>
+          </section>
 
           <div class="card-divider"></div>
 

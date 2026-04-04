@@ -218,6 +218,27 @@ const normalizeText = (value) => String(value || '')
   .toLowerCase()
   .trim();
 
+const getActiveThreadId = () => {
+  try {
+    const params = new URLSearchParams(window.location.search || '');
+    return String(params.get('hilo') || '').trim();
+  } catch {
+    return '';
+  }
+};
+
+const threadDetailUrl = (threadId) => `/comunidad.html?hilo=${encodeURIComponent(String(threadId || '').trim())}`;
+
+const goToThreadDetail = (threadId) => {
+  const safeId = String(threadId || '').trim();
+  if (!safeId) return;
+  window.location.href = threadDetailUrl(safeId);
+};
+
+const goToThreadList = () => {
+  window.location.href = '/comunidad.html';
+};
+
 const goToProfilePage = (uid, name) => {
   const safeUid = String(uid || '').trim();
   if (!safeUid) return;
@@ -403,6 +424,7 @@ const renderCategories = () => {
 };
 
 const renderThreads = () => {
+  const activeThreadId = getActiveThreadId();
   const list = threads
     .filter((t) => t.categoryId === selectedCategory)
     .filter(isThreadVisible)
@@ -424,17 +446,25 @@ const renderThreads = () => {
     ? '<p class="muted" style="margin-top:10px">No hay hilos en esta categoría ahora mismo. Mostrando los más recientes de toda la comunidad.</p>'
     : '';
 
-  el.threadsWrap.innerHTML = `${fallbackNote}${displayList.map((t, idx) => {
-    const delay = Math.min(idx * 0.03, 0.21);
+  if (activeThreadId) {
+    const activeThread = threads.find((thread) => thread.id === activeThreadId);
+    if (!activeThread || !isThreadVisible(activeThread)) {
+      el.threadsWrap.innerHTML = '<p class="empty">Este hilo no está disponible.</p><div style="margin-top:10px"><button class="btn ghost" data-back-list="1">Volver a todos los hilos</button></div>';
+      const backBtn = el.threadsWrap.querySelector('[data-back-list]');
+      if (backBtn) backBtn.addEventListener('click', goToThreadList);
+      return;
+    }
+
     const threadReplies = replies
-      .filter((r) => r.threadId === t.id)
+      .filter((r) => r.threadId === activeThread.id)
       .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    const threadCanManage = canManageItem(activeThread);
+    const threadVoted = hasUserVote(activeThread);
+    const accessTagColor = activeThread.accessLevel === 'registered_only' ? '#8f5e3b' : '#4f7a53';
+    const accessTagBg = activeThread.accessLevel === 'registered_only' ? '#f3e9de' : '#edf7ee';
 
-    const threadCanManage = canManageItem(t);
-    const threadVoted = hasUserVote(t);
-
-    const repliesHtml = threadReplies.slice(0, 4).map((r, replyIdx) => (
-      `<div class="reply" style="animation-delay:${Math.min(delay + (replyIdx * 0.02), 0.26).toFixed(3)}s">
+    const repliesHtml = threadReplies.map((r) => (
+      `<div class="reply">
         <div class="meta"><button class="link-btn author-btn" data-author-uid="${escapeHtml(r.authorUid || '')}" data-author-name="${escapeHtml(r.authorName || 'Catador')}" style="font-weight:600;">${escapeHtml(r.authorName || 'Catador')}</button> · ${fmt(r.createdAt)}</div>
         <p>${escapeHtml(r.body || '')}</p>
         <div class="thread-foot">
@@ -448,6 +478,47 @@ const renderThreads = () => {
         </div>
       </div>`
     )).join('');
+
+    el.threadsWrap.innerHTML = `
+      <div class="thread-detail-top" style="margin-top:12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+        <button class="btn ghost" data-back-list="1">← Volver a todos los hilos</button>
+      </div>
+      <article class="thread" data-thread-id="${activeThread.id}">
+        <h3>${escapeHtml(activeThread.title || '')}</h3>
+        <div class="meta">${escapeHtml(activeThread.categoryLabel || '')} · <button class="link-btn author-btn" data-author-uid="${escapeHtml(activeThread.authorUid || '')}" data-author-name="${escapeHtml(activeThread.authorName || 'Catador')}" style="font-weight:600;">${escapeHtml(activeThread.authorName || 'Catador')}</button> · ${fmt(activeThread.createdAt)} · ${Number(activeThread.upvotes || 0)} votos</div>
+        <div class="thread-tags">
+          <span class="pill category">${escapeHtml(activeThread.categoryLabel || 'General')}</span>
+          <span class="pill" style="background:${accessTagBg};color:${accessTagColor}">${escapeHtml(ACCESS_LABELS[activeThread.accessLevel] || 'Público')}</span>
+        </div>
+        <p>${escapeHtml(activeThread.body || '')}</p>
+        ${activeThread.image ? `<img class="thread-image" src="${escapeHtml(activeThread.image)}" alt="Imagen del hilo" loading="lazy" decoding="async" />` : ''}
+        <div class="thread-foot">
+          <div class="actions-row">
+            <button class="link-btn" data-vote="${activeThread.id}">${threadVoted ? 'Ya te interesa' : 'Me interesa'}</button>
+            <span class="muted">${threadReplies.length} respuestas</span>
+          </div>
+          ${threadCanManage
+            ? `<div class="actions-row"><button class="link-btn" data-thread-edit="${activeThread.id}">Editar</button><button class="link-btn" data-thread-delete="${activeThread.id}">Eliminar</button></div>`
+            : ''}
+        </div>
+        <div class="reply-box">
+          ${repliesHtml || '<p class="muted">Sin respuestas aún.</p>'}
+          ${auth.token
+            ? `<div class="field"><textarea data-reply-input="${activeThread.id}" maxlength="1000" placeholder="Responder..."></textarea></div><button class="btn ghost" data-reply-send="${activeThread.id}">Enviar respuesta</button>`
+            : '<p class="muted">Inicia sesión para responder.</p>'}
+        </div>
+      </article>
+    `;
+  } else {
+
+    el.threadsWrap.innerHTML = `${fallbackNote}${displayList.map((t, idx) => {
+    const delay = Math.min(idx * 0.03, 0.21);
+    const threadReplies = replies
+      .filter((r) => r.threadId === t.id)
+      .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+
+    const threadCanManage = canManageItem(t);
+    const threadVoted = hasUserVote(t);
 
     const accessTagColor = t.accessLevel === 'registered_only' ? '#8f5e3b' : '#4f7a53';
     const accessTagBg = t.accessLevel === 'registered_only' ? '#f3e9de' : '#edf7ee';
@@ -467,23 +538,28 @@ const renderThreads = () => {
             <button class="link-btn" data-vote="${t.id}">${threadVoted ? 'Ya te interesa' : 'Me interesa'}</button>
             <span class="muted">${threadReplies.length} respuestas</span>
           </div>
-          ${threadCanManage
-            ? `<div class="actions-row"><button class="link-btn" data-thread-edit="${t.id}">Editar</button><button class="link-btn" data-thread-delete="${t.id}">Eliminar</button></div>`
-            : ''}
-        </div>
-        <div class="reply-box">
-          ${repliesHtml || '<p class="muted">Sin respuestas aún.</p>'}
-          ${auth.token
-            ? `<div class="field"><textarea data-reply-input="${t.id}" maxlength="1000" placeholder="Responder..."></textarea></div><button class="btn ghost" data-reply-send="${t.id}">Enviar respuesta</button>`
-            : '<p class="muted">Inicia sesión para responder.</p>'}
+          <div class="actions-row">
+            <button class="btn ghost" data-open-thread="${t.id}">Entrar al hilo</button>
+            ${threadCanManage
+              ? `<button class="link-btn" data-thread-edit="${t.id}">Editar</button><button class="link-btn" data-thread-delete="${t.id}">Eliminar</button>`
+              : ''}
+          </div>
         </div>
       </article>
     `;
   }).join('')}`;
+  }
 
   el.threadsWrap.querySelectorAll('[data-vote]').forEach((btn) => {
     btn.addEventListener('click', () => voteThread(btn.getAttribute('data-vote')));
   });
+
+  el.threadsWrap.querySelectorAll('[data-open-thread]').forEach((btn) => {
+    btn.addEventListener('click', () => goToThreadDetail(btn.getAttribute('data-open-thread')));
+  });
+
+  const backBtn = el.threadsWrap.querySelector('[data-back-list]');
+  if (backBtn) backBtn.addEventListener('click', goToThreadList);
 
   el.threadsWrap.querySelectorAll('[data-reply-vote]').forEach((btn) => {
     btn.addEventListener('click', () => voteReply(btn.getAttribute('data-reply-vote')));
@@ -893,6 +969,10 @@ const deleteThread = async (threadId) => {
   }
 
   setStatus(el.threadStatus, 'Hilo eliminado.', 'ok');
+  if (getActiveThreadId() === threadId) {
+    goToThreadList();
+    return;
+  }
   await loadForum();
 };
 

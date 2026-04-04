@@ -591,6 +591,8 @@
     }
     .thread p { font-size: 14px; color: var(--ink-soft); line-height: 1.63; white-space: pre-wrap; }
     .thread-foot { margin-top: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .thread-foot .actions-row .btn.ghost { padding: 8px 12px; font-size: 12px; }
+    .thread-detail-top .btn.ghost { padding: 8px 12px; font-size: 12px; }
     .link-btn {
       border: 0;
       background: transparent;
@@ -743,6 +745,7 @@
       .grid { grid-template-columns: 1fr; }
       .sidebar-card { position: static; }
       .forum-section { padding: 52px 0 56px; }
+      .thread-foot { flex-direction: column; align-items: flex-start; gap: 8px; }
     }
     @media (prefers-reduced-motion: reduce) {
       .hero-img, .hero-aura1, .hero-aura2,

@@ -715,6 +715,25 @@ const uploadImageToStorage = async (file, folder) => {
     : `https://firebasestorage.googleapis.com/v0/b/${FIREBASE_STORAGE_BUCKET}/o/${encodedName}?alt=media`;
 };
 
+const uploadImageWithRetry = async (file, folder, maxAttempts = 3) => {
+  let lastError = null;
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      return await uploadImageToStorage(file, folder);
+    } catch (err) {
+      lastError = err;
+      const message = String((err && err.message) || '').toUpperCase();
+      const nonRetryable = message.includes('UNSUPPORTED_IMAGE_TYPE')
+        || message.includes('IMAGE_TOO_LARGE')
+        || message.includes('IMAGE_TOO_LARGE_UNCOMPRESSIBLE')
+        || message.includes('UNAUTHENTICATED');
+      if (nonRetryable || attempt >= maxAttempts) break;
+      await new Promise((resolve) => setTimeout(resolve, 450 * attempt));
+    }
+  }
+  throw lastError || new Error('storage_upload_failed');
+};
+
 const renderAuthState = () => {
   const logged = !!auth.token;
   el.logoutBtn.style.display = logged ? 'inline-block' : 'none';
@@ -1203,7 +1222,7 @@ const createThread = async () => {
     let imageUploadWarning = '';
     if (imageFile) {
       try {
-        imageUrl = await uploadImageToStorage(imageFile, 'foro_hilos');
+        imageUrl = await uploadImageWithRetry(imageFile, 'foro_hilos', 3);
       } catch (uploadErr) {
         imageUploadWarning = mapThreadPublishError(uploadErr);
       }

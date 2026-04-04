@@ -221,7 +221,7 @@ const normalizeText = (value) => String(value || '')
 const goToProfilePage = (uid, name) => {
   const safeUid = String(uid || '').trim();
   if (!safeUid) return;
-  const url = `/perfil.html?uid=${encodeURIComponent(safeUid)}&name=${encodeURIComponent(String(name || 'Catador'))}`;
+  const url = `/perfil/?uid=${encodeURIComponent(safeUid)}&name=${encodeURIComponent(String(name || 'Catador'))}`;
   window.location.href = url;
 };
 

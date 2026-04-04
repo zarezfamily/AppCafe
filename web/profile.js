@@ -20,8 +20,8 @@
 
   if (!requestedUid && uid) {
     const desiredSearch = `?uid=${encodeURIComponent(uid)}${queryName ? `&name=${encodeURIComponent(queryName)}` : ''}`;
-    const nextUrl = `/perfil.html${desiredSearch}`;
-    if (window.location.pathname !== '/perfil.html' || window.location.search !== desiredSearch) {
+    const nextUrl = `/perfil/${desiredSearch}`;
+    if (window.location.pathname !== '/perfil/' || window.location.search !== desiredSearch) {
       window.history.replaceState(null, '', nextUrl);
     }
   }
@@ -243,8 +243,14 @@
     if (!record || typeof record !== 'object') return '';
     const candidates = [
       record.avatarUrl,
+      record.avatar,
+      record.photoURL,
       record.photoUrl,
+      record.photo,
+      record.image,
+      record.picture,
       record.foto,
+      record.fotoPerfil,
       record.authorPhoto,
       record.authorAvatar,
     ];
@@ -258,6 +264,11 @@
 
     // Local/mobile-only schemes are not reachable from web browsers.
     if (/^(file:|content:|ph:|assets-library:|blob:)/i.test(raw)) return '';
+
+    // Storage object path saved without full URL.
+    if (/^profile_avatars\//i.test(raw)) {
+      return `https://firebasestorage.googleapis.com/v0/b/${FIREBASE_STORAGE_BUCKET}/o/${encodeURIComponent(raw)}?alt=media`;
+    }
 
     if (raw.startsWith('gs://')) {
       const withoutScheme = raw.replace(/^gs:\/\//i, '');
@@ -278,6 +289,7 @@
           url.searchParams.set('alt', 'media');
           return url.toString();
         }
+        if (host.includes('firebasestorage.googleapis.com')) return url.toString();
         return url.toString();
       } catch {
         return '';
@@ -365,7 +377,7 @@
       currentAvatar,
       readAvatarFromRecord(local),
       ...privateDocs.map((doc) => readAvatarFromRecord(doc)),
-      authPhotoUrl,
+      normalizeAvatarUrl(authPhotoUrl),
     ].find((value) => String(value || '').trim());
 
     const fallbackMotto = [
@@ -383,13 +395,17 @@
 
     if (!fallbackAvatar && !fallbackMotto && !fallbackName) return;
 
-    const ok = await updateDocument('user_profiles', uid, {
+    const patch = {
       uid,
-      displayName: fallbackName,
-      avatarUrl: String(fallbackAvatar || '').trim(),
-      motto: fallbackMotto,
       updatedAt: new Date().toISOString(),
-    });
+    };
+
+    if (fallbackName) patch.displayName = fallbackName;
+    if (fallbackMotto) patch.motto = fallbackMotto;
+    if (fallbackAvatar) patch.avatarUrl = String(fallbackAvatar || '').trim();
+    if (Object.keys(patch).length <= 2) return;
+
+    const ok = await updateDocument('user_profiles', uid, patch);
 
     if (!ok) return;
     state.profile = await getDocument('user_profiles', uid);
@@ -609,7 +625,7 @@
   const openProfile = (targetUid, name) => {
     const safeUid = String(targetUid || '').trim();
     if (!safeUid) return;
-    const url = `/perfil.html?uid=${encodeURIComponent(safeUid)}&name=${encodeURIComponent(String(name || 'Catador'))}`;
+    const url = `/perfil/?uid=${encodeURIComponent(safeUid)}&name=${encodeURIComponent(String(name || 'Catador'))}`;
     window.location.href = url;
   };
 

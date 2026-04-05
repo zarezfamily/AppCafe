@@ -173,8 +173,9 @@ const escapeHtml = (text) => String(text || '')
   .replace(/"/g, '&quot;')
   .replace(/'/g, '&#39;');
 
+// Permite espacios entre palabras, solo limpia extremos y múltiples espacios
 const normalizeThreadTitle = (text) => String(text || '')
-  .replace(/\s+/g, ' ')
+  .replace(/\s{2,}/g, ' ')
   .trim()
   .toLocaleUpperCase('es-ES');
 
@@ -492,7 +493,10 @@ const authHeaders = () => {
     'Content-Type': 'application/json',
     'X-Ios-Bundle-Identifier': FIREBASE_IOS_BUNDLE_ID,
   };
-  if (auth.token) headers.Authorization = `Bearer ${auth.token}`;
+  // Solo enviar Authorization si hay token
+  if (auth.token) {
+    headers.Authorization = `Bearer ${auth.token}`;
+  }
   return headers;
 };
 
@@ -723,10 +727,28 @@ const normalizeStorageImageUrl = (rawUrl) => {
 
 const isThreadVisible = (thread) => thread.accessLevel !== 'registered_only' || !!auth.token;
 
+const clearAuthToken = () => {
+  try {
+    localStorage.removeItem('etiove_web_token');
+    localStorage.removeItem('etiove_web_uid');
+    localStorage.removeItem('etiove_web_email');
+    localStorage.removeItem('etiove_web_alias');
+  } catch (e) {}
+  auth = { uid: '', email: '', token: '' };
+  canonicalAlias = '';
+  aliasSyncDone = false;
+};
+
 const getCollection = async (name, pageSize = 400) => {
-  const res = await fetch(`${BASE_URL}/${name}?key=${FIREBASE_API_KEY}&pageSize=${pageSize}`, {
-    headers: authHeaders(),
-  });
+  const url = `${BASE_URL}/${name}?key=${FIREBASE_API_KEY}&pageSize=${pageSize}`;
+  let headers = auth.token ? authHeaders() : { 'Content-Type': 'application/json' };
+  let res = await fetch(url, { headers });
+  // Si 401, reintenta sin Authorization y limpia token
+  if (res.status === 401 && headers.Authorization) {
+    clearAuthToken();
+    headers = { 'Content-Type': 'application/json' };
+    res = await fetch(url, { headers });
+  }
   if (res.status === 404) return [];
   if (!res.ok) throw new Error(`No se pudo cargar ${name}`);
   const json = await res.json();
@@ -734,19 +756,35 @@ const getCollection = async (name, pageSize = 400) => {
 };
 
 const getDocument = async (name, id) => {
-  const res = await fetch(`${BASE_URL}/${name}/${id}?key=${FIREBASE_API_KEY}`, {
-    headers: authHeaders(),
-  });
+  const url = `${BASE_URL}/${name}/${id}?key=${FIREBASE_API_KEY}`;
+  let headers = auth.token ? authHeaders() : { 'Content-Type': 'application/json' };
+  let res = await fetch(url, { headers });
+  if (res.status === 401 && headers.Authorization) {
+    clearAuthToken();
+    headers = { 'Content-Type': 'application/json' };
+    res = await fetch(url, { headers });
+  }
   if (res.status === 404 || !res.ok) return null;
   return docToObject(await res.json());
 };
 
 const runStructuredQuery = async (structuredQuery) => {
-  const res = await fetch(`${BASE_URL}:runQuery?key=${FIREBASE_API_KEY}`, {
+  const url = `${BASE_URL}:runQuery?key=${FIREBASE_API_KEY}`;
+  let headers = auth.token ? authHeaders() : { 'Content-Type': 'application/json' };
+  let res = await fetch(url, {
     method: 'POST',
-    headers: authHeaders(),
+    headers,
     body: JSON.stringify({ structuredQuery }),
   });
+  if (res.status === 401 && headers.Authorization) {
+    clearAuthToken();
+    headers = { 'Content-Type': 'application/json' };
+    res = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ structuredQuery }),
+    });
+  }
   if (!res.ok) throw new Error(`runQuery_failed_${res.status}`);
   const json = await res.json();
   return (json || []).filter((row) => row.document).map((row) => docToObject(row.document));
@@ -937,8 +975,14 @@ const renderCategories = () => {
     .join('');
   el.categorySelect.value = selectedCategory;
 
+  // Buscador junto a Aprende
   el.categoryChips.innerHTML = FORUM_CATEGORIES
-    .map((c) => `<button class="chip ${selectedCategory === c.id ? 'active' : ''}" data-cat="${c.id}">${c.emoji} ${c.label}</button>`)
+    .map((c) => {
+      if (c.id === 'aprende') {
+        return `<button class="chip ${selectedCategory === c.id ? 'active' : ''}" data-cat="${c.id}">${c.emoji} ${c.label}</button><input id="threadSearchInput" type="search" placeholder="Buscar en hilos..." style="margin-left:12px;max-width:220px;padding:7px 12px;border-radius:8px;border:1px solid #e2c7a7;font-size:13px;">`;
+      }
+      return `<button class="chip ${selectedCategory === c.id ? 'active' : ''}" data-cat="${c.id}">${c.emoji} ${c.label}</button>`;
+    })
     .join('');
 
   el.categoryChips.querySelectorAll('[data-cat]').forEach((btn) => {
@@ -950,14 +994,28 @@ const renderCategories = () => {
       loadForum();
     });
   });
+
+  // Buscador funcional
+  const searchInput = document.getElementById('threadSearchInput');
+  if (searchInput) {
+    searchInput.addEventListener('input', () => {
+      renderThreads(searchInput.value);
+    });
+  }
 };
 
-const renderThreads = () => {
+const renderThreads = (searchTerm = '') => {
   const activeThreadId = getActiveThreadId();
-  const list = threads
-    .filter((t) => t.categoryId === selectedCategory)
-    .filter(isThreadVisible)
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  // Mostrar todos los hilos (públicos y privados)
+  let list = threads.filter((t) => t.categoryId === selectedCategory);
+  if (searchTerm) {
+    const term = searchTerm.trim().toLowerCase();
+    list = list.filter((t) =>
+      (t.title && t.title.toLowerCase().includes(term)) ||
+      (t.body && t.body.toLowerCase().includes(term))
+    );
+  }
+  list = list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   const displayList = list;
 
   if (activeThreadId) {
@@ -1110,7 +1168,7 @@ const renderThreads = () => {
           ${isLongBody ? `<a class="thread-read-more" data-thread-open="${t.id}" href="${threadDetailUrl(t.id)}" aria-label="Seguir leyendo ${escapeHtml(t.title || '')}">Seguir leyendo</a>` : ''}
         </div>
         <div class="thread-compact-foot">
-          <span class="thread-compact-meta"><button class="link-btn author-btn" data-author-uid="${escapeHtml(t.authorUid || '')}" data-author-name="${escapeHtml(t.authorName || 'Catador')}">${escapeHtml(t.authorName || 'Catador')}</button> · ${fmt(t.createdAt)} <span class="meta-cat">${escapeHtml(t.categoryLabel || 'General')}</span></span>
+          <span class="thread-compact-meta"><button class="link-btn author-btn" data-author-uid="${escapeHtml(t.authorUid || '')}" data-author-name="${escapeHtml(t.authorName || 'Catador')}">${escapeHtml(t.authorName || 'Catador')}</button> · ${fmt(t.createdAt)} <span class="meta-cat">${escapeHtml(t.categoryLabel || 'General')}</span> <span class="meta-access" style="margin-left:6px;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;background:${t.accessLevel === 'registered_only' ? '#f3e9de' : '#edf7ee'};color:${t.accessLevel === 'registered_only' ? '#8f5e3b' : '#4f7a53'};border:1px solid ${t.accessLevel === 'registered_only' ? '#e2c7a7' : '#b7e2c7'};">${t.accessLevel === 'registered_only' ? 'Privado' : 'Público'}</span></span>
           <span class="thread-compact-stats">
             <button class="link-btn" data-vote="${t.id}">${threadVoted ? '✓ Interesa' : 'Me interesa'}</button>
             <span class="muted">${Number(t.upvotes || 0)} votos · ${threadReplies.length} respuestas</span>
@@ -1865,6 +1923,7 @@ const init = async () => {
   }
   if (el.threadTitle) {
     el.threadTitle.addEventListener('input', () => {
+      // Solo limpiar espacios dobles y extremos, no eliminar espacios simples
       const normalizedTitle = normalizeThreadTitle(el.threadTitle.value || '');
       if (el.threadTitle.value !== normalizedTitle) el.threadTitle.value = normalizedTitle;
     });

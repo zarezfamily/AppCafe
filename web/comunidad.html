@@ -44,24 +44,20 @@
       --success: #4f7a53;
     }
     body {
-      font-family: 'Playfair Display', serif;
-      background:
-        radial-gradient(980px 390px at 6% -8%, rgba(201,149,87,0.14), transparent 62%),
-        radial-gradient(820px 320px at 95% 4%, rgba(95,58,37,0.10), transparent 64%),
-        linear-gradient(180deg, #faf5ec 0%, #f4ebde 44%, #f6efe5 100%);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: var(--cream);
       color: var(--ink);
       min-height: 100vh;
       overflow-x: hidden;
-      position: relative;
     }
     body::before {
       content: '';
       position: fixed;
       inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
       pointer-events: none;
       z-index: 0;
-      opacity: 0.22;
+      opacity: 0.6;
     }
 
     /* ─── NAV ─── */
@@ -171,19 +167,8 @@
       text-align: center;
       color: #fff;
       padding: 0 24px;
-      max-width: 930px;
-      text-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
-    }
-    .hero-plaque {
-      border: 1px solid rgba(239,213,173,0.3);
-      border-radius: 26px;
-      background: linear-gradient(170deg, rgba(24,15,11,0.5), rgba(24,15,11,0.2));
-      box-shadow: inset 0 0 0 1px rgba(255,245,228,0.1), 0 16px 38px rgba(0,0,0,0.32);
-      backdrop-filter: blur(2px);
-      -webkit-backdrop-filter: blur(2px);
-      padding: clamp(24px, 3.8vw, 38px);
       max-width: 760px;
-      margin: 0 auto;
+      text-shadow: 0 4px 24px rgba(0, 0, 0, 0.55);
     }
     .hero-eyebrow {
       font-family: 'Manrope', sans-serif;
@@ -195,7 +180,7 @@
       animation: fadeUp 0.8s ease both;
     }
     .hero-title {
-      font-family: 'Cormorant Garamond', serif;
+      font-family: 'Playfair Display', serif;
       font-size: clamp(50px, 8vw, 96px);
       font-weight: 700;
       line-height: 0.95;
@@ -273,6 +258,9 @@
       position: relative;
       z-index: 1;
       padding: 52px 0 92px;
+      background: radial-gradient(circle at 5% 10%, rgba(143,94,59,0.07) 0%, transparent 50%),
+                  radial-gradient(circle at 95% 80%, rgba(93,64,48,0.05) 0%, transparent 50%),
+                  var(--cream);
     }
     .container {
       width: min(1160px, 92vw);
@@ -306,7 +294,7 @@
       margin-bottom: 12px;
     }
     .section-lead h2 {
-      font-family: 'Cormorant Garamond', serif;
+      font-family: 'Playfair Display', serif;
       font-size: clamp(30px, 4vw, 46px);
       font-weight: 700;
       color: var(--ink);
@@ -405,7 +393,7 @@
       font-weight: 700;
     }
     .kpi-value {
-      font-family: 'Cormorant Garamond', serif;
+      font-family: 'Playfair Display', serif;
       font-size: 31px;
       line-height: 1;
       color: var(--ink);
@@ -436,7 +424,7 @@
       top: 90px;
     }
     .sidebar-card h2 {
-      font-family: 'Cormorant Garamond', serif;
+      font-family: 'Playfair Display', serif;
       font-size: 30px;
       font-weight: 700;
       margin-bottom: 8px;
@@ -487,7 +475,7 @@
       margin-bottom: 8px;
     }
     .member-evo-name {
-      font-family: 'Cormorant Garamond', serif;
+      font-family: 'Playfair Display', serif;
       font-size: 24px;
       line-height: 1;
       color: var(--ink);
@@ -609,7 +597,7 @@
       background: linear-gradient(90deg, transparent, var(--gold), transparent);
     }
     .main-card h2 {
-      font-family: 'Cormorant Garamond', serif;
+      font-family: 'Playfair Display', serif;
       font-size: 36px;
       font-weight: 700;
       margin-bottom: 6px;
@@ -911,7 +899,7 @@
       font-size: 19px;
       margin-bottom: 4px;
       color: var(--ink);
-      font-family: 'Cormorant Garamond', serif;
+      font-family: 'Playfair Display', serif;
       font-weight: 700;
       line-height: 1.35;
     }
@@ -1090,7 +1078,7 @@
       justify-content: space-between; gap: 24px; flex-wrap: wrap;
     }
     .footer-wordmark {
-      font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 700;
+      font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700;
       letter-spacing: 4px; text-transform: uppercase; color: rgba(255,248,241,0.55);
       text-decoration: none; transition: color 0.2s;
     }
@@ -1214,7 +1202,6 @@
     <div class="hero-aura1" aria-hidden="true"></div>
     <div class="hero-aura2" aria-hidden="true"></div>
     <div class="hero-content">
-      <div class="hero-plaque">
       <p class="hero-eyebrow">Etiove &middot; Comunidad</p>
       <h1 class="hero-title">El Salón<br><em>del Café</em></h1>
       <p class="hero-sub">Un espacio para conversar con calma sobre origen, método y cultura del café de especialidad.</p>
@@ -1225,7 +1212,6 @@
         <span style="flex:1;height:1px;background:rgba(255,248,241,0.22);"></span>
       </div>
       <p style="font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,248,241,0.45);animation:fadeUp 1s 0.55s ease both;">Conversación curada Etiove</p>
-      </div>
     </div>
     <div class="scroll-indicator" aria-hidden="true">
       <span>Scroll</span>

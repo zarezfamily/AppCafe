@@ -977,11 +977,7 @@ const renderAuthState = () => {
           const res = await fetch(`${AUTH_URL}:sendOobCode?key=${FIREBASE_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-Ios-Bundle-Identifier': FIREBASE_IOS_BUNDLE_ID },
-            body: JSON.stringify({
-              requestType: 'VERIFY_EMAIL',
-              idToken: auth.token,
-              continueUrl: 'https://etiove.com/comunidad.html',
-            }),
+            body: JSON.stringify({ requestType: 'VERIFY_EMAIL', idToken: auth.token }),
           });
           const json = await res.json().catch(() => ({}));
           if (res.ok) {
@@ -991,7 +987,7 @@ const renderAuthState = () => {
             if (code.includes('TOO_MANY_ATTEMPTS') || code.includes('too_many_attempts')) {
               resendBtn.textContent = 'Demasiados intentos. Espera unos minutos e inténtalo de nuevo.';
             } else {
-              resendBtn.textContent = `Error: ${code || res.status}`;
+              resendBtn.textContent = 'No se pudo enviar el email. Inténtalo más tarde.';
             }
             resendBtn.disabled = false;
           }

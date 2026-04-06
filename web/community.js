@@ -1992,9 +1992,26 @@ const init = async () => {
   renderCategories();
   renderAuthState();
 
-  // Si hay sesión guardada, resolver alias en background
+  // Si hay sesión guardada, refrescar emailVerified y resolver alias en background
   if (auth.uid && auth.token) {
     resolveAuthorAlias().catch(() => {});
+    fetch(`${AUTH_URL}:lookup?key=${FIREBASE_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Ios-Bundle-Identifier': FIREBASE_IOS_BUNDLE_ID },
+      body: JSON.stringify({ idToken: auth.token }),
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.users && data.users[0]) {
+          const verified = data.users[0].emailVerified === true;
+          if (verified !== auth.emailVerified) {
+            auth.emailVerified = verified;
+            localStorage.setItem('etiove_web_email_verified', verified ? 'true' : 'false');
+            renderAuthState();
+          }
+        }
+      })
+      .catch(() => {});
   }
 
   // Pre-rellenar campos de login si hay credenciales guardadas (Recordarme)

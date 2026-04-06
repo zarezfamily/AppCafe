@@ -965,6 +965,33 @@ const renderAuthState = () => {
   if (logged) {
     const badge = auth.emailVerified ? VERIFIED_BADGE : ' <span style="font-size:11px;color:#b07a52;margin-left:3px;">(sin verificar)</span>';
     el.authStatus.innerHTML = `<span style="color:var(--success);font-size:12px;">Sesión activa: <strong>${escapeHtml(getAuthorName())}</strong>${badge}</span>`;
+    if (!auth.emailVerified) {
+      const resendBtn = document.createElement('button');
+      resendBtn.className = 'btn ghost';
+      resendBtn.style.cssText = 'margin-top:8px;font-size:12px;width:100%;';
+      resendBtn.textContent = 'Reenviar email de verificación';
+      resendBtn.addEventListener('click', async () => {
+        resendBtn.disabled = true;
+        resendBtn.textContent = 'Enviando...';
+        try {
+          const res = await fetch(`${AUTH_URL}:sendOobCode?key=${FIREBASE_API_KEY}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ requestType: 'VERIFY_EMAIL', idToken: auth.token }),
+          });
+          if (res.ok) {
+            resendBtn.textContent = '✔ Email enviado — revisa tu bandeja de entrada';
+          } else {
+            resendBtn.textContent = 'Error al enviar. Inténtalo de nuevo.';
+            resendBtn.disabled = false;
+          }
+        } catch {
+          resendBtn.textContent = 'Error al enviar. Inténtalo de nuevo.';
+          resendBtn.disabled = false;
+        }
+      });
+      el.authStatus.appendChild(resendBtn);
+    }
   } else {
     el.authStatus.innerHTML = '<span style="color:var(--ink-muted);font-size:12px;">Sesión no iniciada</span>';
   }

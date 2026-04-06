@@ -28,7 +28,10 @@ let auth = {
   uid: localStorage.getItem('etiove_web_uid') || '',
   email: localStorage.getItem('etiove_web_email') || '',
   token: localStorage.getItem('etiove_web_token') || '',
+  emailVerified: localStorage.getItem('etiove_web_email_verified') === 'true',
 };
+
+const VERIFIED_BADGE = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-left:4px;flex-shrink:0;" aria-label="Email verificado" title="Email verificado"><circle cx="12" cy="12" r="12" fill="#1d9bf0"/><path d="M8.5 12.5l2.5 2.5 5-5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
 let canonicalAlias = String(localStorage.getItem('etiove_web_alias') || '').trim();
 let aliasSyncDone = false;
@@ -288,7 +291,7 @@ const renderMemberEvolutionCard = ({ profile = null, allThreads = [], allReplies
   const uniqueBadges = Array.from(new Set(computedBadges)).slice(0, 8);
 
   const displayName = String((profile && (profile.displayName || profile.alias || profile.nickname)) || getAuthorName() || 'Catador').trim();
-  el.memberEvolutionName.textContent = displayName || 'Catador';
+  el.memberEvolutionName.innerHTML = escapeHtml(displayName || 'Catador') + (auth.emailVerified ? VERIFIED_BADGE : '');
   el.memberEvolutionTier.textContent = tier;
 
   el.memberEvolutionStats.innerHTML = [
@@ -733,8 +736,9 @@ const clearAuthToken = () => {
     localStorage.removeItem('etiove_web_uid');
     localStorage.removeItem('etiove_web_email');
     localStorage.removeItem('etiove_web_alias');
+    localStorage.removeItem('etiove_web_email_verified');
   } catch (e) {}
-  auth = { uid: '', email: '', token: '' };
+  auth = { uid: '', email: '', token: '', emailVerified: false };
   canonicalAlias = '';
   aliasSyncDone = false;
 };
@@ -957,7 +961,13 @@ const renderAuthState = () => {
   el.loginBtn.disabled = logged;
   el.registerBtn.disabled = logged;
   el.createThreadBtn.disabled = !logged;
-  setStatus(el.authStatus, logged ? `Sesión activa: ${getAuthorName()}` : 'Sesión no iniciada', logged ? 'ok' : '');
+  el.authStatus.innerHTML = '';
+  if (logged) {
+    const badge = auth.emailVerified ? VERIFIED_BADGE : ' <span style="font-size:11px;color:#b07a52;margin-left:3px;">(sin verificar)</span>';
+    el.authStatus.innerHTML = `<span style="color:var(--success);font-size:12px;">Sesión activa: <strong>${escapeHtml(getAuthorName())}</strong>${badge}</span>`;
+  } else {
+    el.authStatus.innerHTML = '<span style="color:var(--ink-muted);font-size:12px;">Sesión no iniciada</span>';
+  }
 
   // Mostrar/ocultar bloque "Nuevo hilo"
   const newThreadSection = document.getElementById('newThreadSection');
@@ -1020,7 +1030,19 @@ const renderThreads = (searchTerm = '') => {
 
   if (activeThreadId) {
     const activeThread = threads.find((thread) => thread.id === activeThreadId);
-    if (!activeThread || !isThreadVisible(activeThread)) {
+
+    if (!auth.token) {
+      resetCommunityMeta();
+      el.threadsWrap.innerHTML = `
+        <div style="margin-top:12px;margin-bottom:10px;"><button class="btn ghost" data-back-detail="1">← Volver atrás</button></div>
+        <p class="empty" style="margin-top:16px;">Inicia sesión para leer los hilos de la comunidad.</p>
+      `;
+      const backBtn = el.threadsWrap.querySelector('[data-back-detail]');
+      if (backBtn) backBtn.addEventListener('click', goBackFromThreadDetail);
+      return;
+    }
+
+    if (!activeThread) {
       resetCommunityMeta();
       el.threadsWrap.innerHTML = '<p class="empty">Este hilo no está disponible.</p><div style="margin-top:10px"><button class="btn ghost" data-back-detail="1">Volver atrás</button></div>';
       const backBtn = el.threadsWrap.querySelector('[data-back-detail]');
@@ -1367,6 +1389,18 @@ const renderThreads = (searchTerm = '') => {
   if (editingThreadId) {
     window.requestAnimationFrame(() => focusInlineThreadEditor());
   }
+
+  // Estampar badge verificado en los botones del usuario actual
+  if (auth.uid && auth.emailVerified) {
+    el.threadsWrap.querySelectorAll(`.author-btn[data-author-uid="${auth.uid}"]`).forEach((btn) => {
+      if (!btn.querySelector('.verified-badge')) {
+        const badge = document.createElement('span');
+        badge.className = 'verified-badge';
+        badge.innerHTML = VERIFIED_BADGE;
+        btn.appendChild(badge);
+      }
+    });
+  }
 };
 
 const renderThreadSkeletons = (count = 3) => {
@@ -1561,7 +1595,7 @@ const signIn = async (registerMode) => {
       throw new Error('INVALID_AUTH_RESPONSE');
     }
 
-    auth = { uid: json.localId, email: json.email, token: json.idToken };
+    auth = { uid: json.localId, email: json.email, token: json.idToken, emailVerified: false };
     localStorage.setItem('etiove_web_uid', auth.uid);
     localStorage.setItem('etiove_web_email', auth.email);
     localStorage.setItem('etiove_web_token', auth.token);
@@ -1576,13 +1610,40 @@ const signIn = async (registerMode) => {
       localStorage.removeItem('etiove_web_saved_pw');
     }
 
+    // Comprobar si el email está verificado
+    try {
+      const lookupRes = await fetch(`${AUTH_URL}:lookup?key=${FIREBASE_API_KEY}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken: json.idToken }),
+      });
+      const lookupJson = await lookupRes.json();
+      if (lookupJson.users && lookupJson.users[0]) {
+        auth.emailVerified = lookupJson.users[0].emailVerified === true;
+        localStorage.setItem('etiove_web_email_verified', auth.emailVerified ? 'true' : 'false');
+      }
+    } catch (_) { /* no bloquear */ }
+
+    // Si es registro nuevo, enviar email de verificación
+    if (registerMode) {
+      try {
+        await fetch(`${AUTH_URL}:sendOobCode?key=${FIREBASE_API_KEY}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ requestType: 'VERIFY_EMAIL', idToken: json.idToken }),
+        });
+      } catch (_) { /* no bloquear */ }
+    }
+
     // Resolver alias canónico del perfil para no exponer prefijos de email.
     try {
       await resolveAuthorAlias();
     } catch (_) { /* no bloquear el login */ }
 
     renderAuthState();
-    setStatus(el.authStatus, registerMode ? 'Cuenta creada y sesión iniciada.' : 'Sesión iniciada.', 'ok');
+    if (registerMode) {
+      el.authStatus.innerHTML = `<span style="color:var(--success);font-size:12px;">✔ Cuenta creada. Hemos enviado un email de verificación a <strong>${escapeHtml(email)}</strong> — pulsa el enlace para activar la verificación.</span>`;
+    }
     await loadForum();
   } catch (e) {
     setStatus(el.authStatus, mapAuthError(e), 'error');
@@ -1590,11 +1651,12 @@ const signIn = async (registerMode) => {
 };
 
 const logout = async () => {
-  auth = { uid: '', email: '', token: '' };
+  auth = { uid: '', email: '', token: '', emailVerified: false };
   localStorage.removeItem('etiove_web_uid');
   localStorage.removeItem('etiove_web_email');
   localStorage.removeItem('etiove_web_token');
   localStorage.removeItem('etiove_web_alias');
+  localStorage.removeItem('etiove_web_email_verified');
   canonicalAlias = '';
   aliasSyncDone = false;
   // No borramos saved_email/saved_pw — son las credenciales de "Recordarme"

@@ -623,8 +623,13 @@ const goToThreadDetail = (threadId) => {
   transitionThreadsView(
     () => renderThreads(),
     () => {
-      // Siempre hacer scroll al top al abrir un hilo
-      window.scrollTo({ top: 0, behavior: 'auto' });
+      // Scroll al hilo abierto, no al top
+      const article = document.querySelector(`[data-thread-id='${safeId}']`);
+      if (article) {
+        article.scrollIntoView({ behavior: 'auto', block: 'start' });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'auto' });
+      }
       pendingThreadAnchorY = null;
     },
   );

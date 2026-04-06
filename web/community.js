@@ -1324,9 +1324,7 @@ const renderThreads = (searchTerm = '') => {
     el.threadsWrap.addEventListener('input', (event) => {
       const titleInput = event.target.closest('[data-inline-edit-title]');
       if (titleInput && editingThreadDraft) {
-        const normalizedTitle = normalizeThreadTitle(titleInput.value || '');
-        editingThreadDraft.title = normalizedTitle;
-        titleInput.value = normalizedTitle;
+        editingThreadDraft.title = titleInput.value;
         editingThreadFocusField = 'title';
         return;
       }
@@ -2024,13 +2022,7 @@ const init = async () => {
       resetThreadComposer();
     });
   }
-  if (el.threadTitle) {
-    el.threadTitle.addEventListener('input', () => {
-      // Solo limpiar espacios dobles y extremos, no eliminar espacios simples
-      const normalizedTitle = normalizeThreadTitle(el.threadTitle.value || '');
-      if (el.threadTitle.value !== normalizedTitle) el.threadTitle.value = normalizedTitle;
-    });
-  }
+  // No normalizar el título mientras escribe — se normaliza al guardar
   el.threadImage.addEventListener('change', () => {
     const selected = el.threadImage.files && el.threadImage.files[0] ? el.threadImage.files[0] : null;
     if (!selected) {

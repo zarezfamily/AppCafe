@@ -2,11 +2,12 @@ User-agent: *
 Allow: /
 
 Sitemap: https://etiove.com/sitemap.xml
+Icon: https://etiove.com/favicon.svg
 
-# Evitar rastreo de recursos internos/no públicos
+# Evitar rastreo de recursos internos/no pablicos
 Disallow: /node_modules/
 Disallow: /blog/_template-post.html
 Disallow: /404.html
 
-# Señal opcional para algunos crawlers
+# Seal opcional para algunos crawlers
 Host: etiove.com

@@ -2107,6 +2107,10 @@ const init = async () => {
   // No normalizar el título mientras escribe — se normaliza al guardar
   el.threadImage.addEventListener('change', () => {
     const selected = el.threadImage.files && el.threadImage.files[0] ? el.threadImage.files[0] : null;
+    // Remove previous preview if exists
+    let preview = document.getElementById('threadImagePreview');
+    if (preview) preview.remove();
+
     if (!selected) {
       setThreadImageStatus('Imagen opcional para el hilo');
       return;
@@ -2125,6 +2129,25 @@ const init = async () => {
     }
 
     setThreadImageStatus(`Imagen lista: ${selected.name} (${sizeMb} MB).`, 'ok');
+
+    // Show image preview
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = document.createElement('img');
+      img.id = 'threadImagePreview';
+      img.src = e.target.result;
+      img.alt = 'Vista previa de la imagen';
+      img.style.maxWidth = '120px';
+      img.style.maxHeight = '120px';
+      img.style.display = 'block';
+      img.style.marginTop = '10px';
+      img.style.borderRadius = '8px';
+      // Insert after the input
+      if (el.threadImage && el.threadImage.parentNode) {
+        el.threadImage.parentNode.insertBefore(img, el.threadImage.nextSibling);
+      }
+    };
+    reader.readAsDataURL(selected);
   });
   if (el.refreshBtn) el.refreshBtn.addEventListener('click', loadForum);
   el.categorySelect.addEventListener('change', () => {

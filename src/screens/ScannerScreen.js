@@ -1,16 +1,24 @@
 import { Ionicons } from '@expo/vector-icons';
 import { CameraView } from 'expo-camera';
+import * as Haptics from 'expo-haptics';
 import { useState } from 'react';
 import { StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { PREMIUM_ACCENT, W } from '../constants/theme';
 
 export default function ScannerScreen({ onScanned, onSkip, onBack }) {
   const [scanned, setScanned] = useState(false);
+  const handleBarcodeScanned = (r) => {
+    if (!scanned) {
+      setScanned(true);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+      onScanned(r);
+    }
+  };
   return (
     <View style={{ flex: 1, backgroundColor: '#000' }}>
       <StatusBar barStyle="light-content" />
       <CameraView
-        onBarcodeScanned={(r) => { if (!scanned) { setScanned(true); onScanned(r); } }}
+        onBarcodeScanned={handleBarcodeScanned}
         style={StyleSheet.absoluteFillObject}
         barcodeScannerSettings={{ barcodeTypes: ['ean13', 'ean8', 'qr', 'code128'] }}
       />

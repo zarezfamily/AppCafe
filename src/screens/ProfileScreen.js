@@ -7,6 +7,7 @@ import {
     ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View,
 } from 'react-native';
 import { getDocument, setDocument, uploadImageToStorage, sendEmailVerification, sendPhoneVerificationCode, verifyPhoneCode } from '../../firebaseConfig';
+import { getAchievementDefs, defaultGamification } from '../core/gamification';
   const [smsVerificando, setSmsVerificando] = useState(false);
   const [smsSessionInfo, setSmsSessionInfo] = useState(null);
   const [smsCode, setSmsCode] = useState('');
@@ -54,6 +55,15 @@ import { shared } from '../styles/sharedStyles';
 import PaisPicklist from './PaisPicklist';
 
   const { user } = useAuth();
+  // --- GAMIFICATION ---
+  const [gamification, setGamification] = useState(defaultGamification());
+
+  useEffect(() => {
+    // Cargar gamification del perfil local si existe
+    SecureStore.getItemAsync('gamification').then(v => {
+      if (v) setGamification(JSON.parse(v));
+    });
+  }, []);
     const [verificando, setVerificando] = useState(false);
     const [emailVerificado, setEmailVerificado] = useState(user?.emailVerified || false);
     // Refresca el estado de verificación si cambia el usuario
@@ -200,6 +210,23 @@ import PaisPicklist from './PaisPicklist';
           <View style={{ width: 40 }} />
         </View>
         <ScrollView contentContainerStyle={prf.body}>
+                    {/* --- MEDALLAS/LOGROS --- */}
+                    <View style={prf.achievementsSection}>
+                      <Text style={shared.sectionTitle}>Medallas y logros</Text>
+                      <Text style={shared.sectionSub}>¡Desbloquea logros por tu actividad cafetera!</Text>
+                      <View style={prf.achievementsRow}>
+                        {getAchievementDefs().map((ach) => {
+                          const unlocked = gamification.achievementIds?.includes(ach.id);
+                          return (
+                            <View key={ach.id} style={[prf.achievementBadge, unlocked ? prf.achievementUnlocked : prf.achievementLocked]}>
+                              <Text style={prf.achievementIcon}>{ach.icon}</Text>
+                              <Text style={prf.achievementTitle}>{ach.title}</Text>
+                              <Text style={prf.achievementDesc}>{ach.desc}</Text>
+                            </View>
+                          );
+                        })}
+                      </View>
+                    </View>
           <TouchableOpacity style={prf.avatarWrap} onPress={elegirFoto}>
             {foto
               ? <Image source={{ uri: foto }} style={prf.avatarImg} />
@@ -301,6 +328,14 @@ import PaisPicklist from './PaisPicklist';
 }
 
 const prf = StyleSheet.create({
+    achievementsSection: { marginBottom: 32 },
+    achievementsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, justifyContent: 'center', marginTop: 10 },
+    achievementBadge: { width: 110, minHeight: 90, borderRadius: 16, padding: 10, alignItems: 'center', margin: 4, borderWidth: 2 },
+    achievementUnlocked: { backgroundColor: '#fffbe9', borderColor: '#e4d3c2', opacity: 1 },
+    achievementLocked: { backgroundColor: '#f5f5f5', borderColor: '#ddd', opacity: 0.5 },
+    achievementIcon: { fontSize: 32, marginBottom: 2 },
+    achievementTitle: { fontWeight: '700', fontSize: 13, color: '#8f5e3b', marginBottom: 2, textAlign: 'center' },
+    achievementDesc: { fontSize: 11, color: '#888', textAlign: 'center' },
   header:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 0.5, borderBottomColor: THEME.border.soft },
   closeBtn:    { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
   title:       { fontSize: 18, fontWeight: '700', color: '#111' },

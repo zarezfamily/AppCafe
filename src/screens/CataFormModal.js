@@ -1,11 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import NetInfo from '@react-native-community/netinfo';
 import * as ImagePicker from 'expo-image-picker';
 import { useEffect, useRef, useState } from 'react';
 import {
     ActivityIndicator, Animated, Image, KeyboardAvoidingView, Modal, Platform,
     ScrollView, Text, TextInput, TouchableOpacity, View,
 } from 'react-native';
+import { saveCataOffline, syncPendingCatas } from '../core/offlineCatas';
 
 export default function CataFormModal({
   s,
@@ -89,7 +91,34 @@ export default function CataFormModal({
       alert('Ingresa el nombre del café');
       return;
     }
+    // Chequear conexión
+    const net = await NetInfo.fetch();
+    if (!net.isConnected) {
+      // Guardar offline
+      await saveCataOffline({
+        cafeNombre,
+        cafeId,
+        fechaHora,
+        metodoPreparacion,
+        dosis,
+        agua,
+        temperatura,
+        tiempoExtraccion,
+        puntuacion,
+        notas,
+        foto,
+        contexto,
+        isEditing,
+      });
+      alert('Sin conexión: tu cata se guardó en el dispositivo y se subirá automáticamente cuando vuelvas a tener internet.');
+      onClose();
+      return;
+    }
     await onSave();
+    // Intentar sincronizar pendientes después de guardar online
+    try {
+      await syncPendingCatas(onSave);
+    } catch {}
   };
 
   const fechaDisplay = new Date(fechaHora).toLocaleDateString('es-ES');

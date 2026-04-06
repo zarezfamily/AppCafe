@@ -1,9 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
     ActivityIndicator, Animated, Dimensions, FlatList,
     Image, ScrollView, Text, TouchableOpacity, View,
 } from 'react-native';
+import { getPendingCatas } from '../core/offlineCatas';
 
 const { width: W } = Dimensions.get('window');
 const CARD_SIZE = (W - 48) / 2; // 2 columns, 16px padding each side, 12px gap
@@ -21,6 +22,7 @@ export default function DiarioCatasSection({
   irAbrirDetail,
   cargando,
 }) {
+  const [pendientes, setPendientes] = useState(0);
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -29,6 +31,8 @@ export default function DiarioCatasSection({
       duration: 400,
       useNativeDriver: true,
     }).start();
+    // Cargar catas pendientes offline
+    getPendingCatas().then(arr => setPendientes(arr.length));
   }, [fadeAnim]);
 
   if (!catas || catas.length === 0) {
@@ -40,6 +44,13 @@ export default function DiarioCatasSection({
             <Ionicons name="add-circle" size={28} color={premiumAccent} />
           </TouchableOpacity>
         </View>
+        {pendientes > 0 && (
+          <View style={{ backgroundColor: '#ffe7c2', borderRadius: 8, padding: 10, marginBottom: 10 }}>
+            <Text style={{ color: '#8f5e3b', fontWeight: '700', fontSize: 13 }}>
+              {pendientes} cata(s) pendientes de sincronizar
+            </Text>
+          </View>
+        )}
         <View style={{ backgroundColor: '#f9f7f4', borderRadius: 12, padding: 20, alignItems: 'center' }}>
           <Ionicons name="book-outline" size={40} color={theme.text.muted} style={{ marginBottom: 10 }} />
           <Text style={{ fontSize: 14, fontWeight: '600', color: theme.text.muted, textAlign: 'center' }}>
@@ -72,7 +83,13 @@ export default function DiarioCatasSection({
             <Ionicons name="add-circle" size={28} color={premiumAccent} />
           </TouchableOpacity>
         </View>
-
+        {pendientes > 0 && (
+          <View style={{ backgroundColor: '#ffe7c2', borderRadius: 8, padding: 10, marginBottom: 10 }}>
+            <Text style={{ color: '#8f5e3b', fontWeight: '700', fontSize: 13 }}>
+              {pendientes} cata(s) pendientes de sincronizar
+            </Text>
+          </View>
+        )}
         {/* Stats Row */}
         <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
           <View style={{ flex: 1, backgroundColor: '#fff9f4', borderRadius: 8, padding: 10 }}>
@@ -88,7 +105,6 @@ export default function DiarioCatasSection({
             <Text style={{ fontSize: 10, fontWeight: '600', color: theme.text.secondary, marginTop: 2 }}>CAFÉS</Text>
           </View>
         </View>
-
         {/* Filtros */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
           {['hoy', 'semana', 'mes', 'todo'].map((periodo) => (
@@ -116,7 +132,6 @@ export default function DiarioCatasSection({
           ))}
         </ScrollView>
       </View>
-
       {/* Timeline Grid (2 columns estilo IG con foto + info superpuesta) */}
       {cargando ? (
         <View style={{ paddingHorizontal: 16, paddingBottom: 20 }}>

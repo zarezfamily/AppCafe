@@ -487,6 +487,28 @@
       color: var(--accent);
       font-weight: 700;
     }
+    .member-evo-avatar {
+      width: 48px !important;
+      height: 48px !important;
+      border-radius: 50% !important;
+      object-fit: cover !important;
+      border: 2px solid #e7d1b7 !important;
+      background: #fff8f0 !important;
+      display: block;
+    }
+    .member-evo-avatar-fallback {
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      width: 48px !important;
+      height: 48px !important;
+      border-radius: 50% !important;
+      background: #f3ece4 !important;
+      color: #b4743f !important;
+      font-size: 22px !important;
+      font-weight: 700 !important;
+      border: 2px solid #e7d1b7 !important;
+    }
     .member-evo-stats {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1260,9 +1282,9 @@
 
           <section id="memberEvolutionCard" class="member-evo member-evo-premium" aria-live="polite">
             <div class="member-evo-premium-row">
-              <div class="member-evo-avatar-wrap">
-                <img id="memberAvatarImg" class="member-evo-avatar" src="" alt="Foto de perfil" style="display:none;" loading="lazy" />
-                <span id="memberAvatarFallback" class="member-evo-avatar-fallback">C</span>
+              <div class="member-evo-avatar-wrap" style="width:54px;height:54px;display:flex;align-items:center;justify-content:center;">
+                <img id="memberAvatarImg" class="member-evo-avatar" src="" alt="Foto de perfil" style="display:none;width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid #e7d1b7;background:#fff8f0;" loading="lazy" />
+                <span id="memberAvatarFallback" class="member-evo-avatar-fallback" style="display:flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:50%;background:#f3ece4;color:#b4743f;font-size:22px;font-weight:700;border:2px solid #e7d1b7;">C</span>
               </div>
               <div class="member-evo-premium-main">
                 <div class="member-evo-head">

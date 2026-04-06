@@ -3,8 +3,8 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import {
-    PlayfairDisplay_700Bold,
-    PlayfairDisplay_800ExtraBold,
+  PlayfairDisplay_700Bold,
+  PlayfairDisplay_800ExtraBold,
 } from '@expo-google-fonts/playfair-display';
 import { Ionicons } from '@expo/vector-icons';
 import { CameraView, useCameraPermissions } from 'expo-camera';
@@ -18,55 +18,56 @@ import * as Notifications from 'expo-notifications';
 import * as SecureStore from 'expo-secure-store';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import {
-    ActivityIndicator, Animated, Dimensions,
-    Easing,
-    FlatList,
-    Image,
-    KeyboardAvoidingView,
-    Linking,
-    Modal,
-    Platform,
-    SafeAreaView,
-    ScrollView,
-    StatusBar, StyleSheet,
-    Switch,
-    Text, TextInput, TouchableOpacity,
-    View,
+  ActivityIndicator, Animated, Dimensions,
+  Easing,
+  FlatList,
+  Image,
+  KeyboardAvoidingView,
+  Linking,
+  Modal,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StatusBar, StyleSheet,
+  Switch,
+  Text, TextInput, TouchableOpacity,
+  View,
 } from 'react-native';
 
 import {
-    addDocument,
-    clearAuthToken,
-    deleteDocument,
-    getCollection,
-    getDocument,
-    getUserCafes,
-    loginUser,
-    queryCollection,
-    registerUser,
-    resetPassword,
-    restoreAuthTokenFromSecureStore,
-    setDocument,
-    updateDocument,
-    uploadImageToStorage
+  addDocument,
+  clearAuthToken,
+  deleteDocument,
+  getCollection,
+  getDocument,
+  getUserCafes,
+  loginUser,
+  queryCollection,
+  registerUser,
+  resetPassword,
+  restoreAuthTokenFromSecureStore,
+  setDocument,
+  updateDocument,
+  uploadImageToStorage
 } from './firebaseConfig';
 import AppDialogModal from './src/components/AppDialogModal';
 import OnboardingModal from './src/components/OnboardingModal';
+import { useUI } from './src/context/UIContext';
 import {
-    LEVELS,
-    getAchievementDefs,
-    getLevelFromXp,
+  LEVELS,
+  getAchievementDefs,
+  getLevelFromXp,
 } from './src/core/gamification';
 import { registerForPushNotificationsAsync, scheduleEtioveNotification } from './src/core/notifications';
 import { PAISES, getFlagForPais } from './src/core/paises';
 import { buildPlacesPhotoUrl, calcDistanceMeters, fetchNearbyPlaces, isGooglePlacesConfigured } from './src/core/places';
 import { FREE_LIMITS } from './src/core/premium';
 import {
-    csvToSet,
-    formatRelativeTime,
-    getCleanCoffeePhoto,
-    normalize,
-    setToCsv,
+  csvToSet,
+  formatRelativeTime,
+  getCleanCoffeePhoto,
+  normalize,
+  setToCsv,
 } from './src/core/utils';
 import useCoffeeData from './src/hooks/useCoffeeData';
 import useForumState from './src/hooks/useForumState';
@@ -598,6 +599,7 @@ function PaisPicklist({ value, onChange }) {
 // ─── PERFIL ───────────────────────────────────────────────────────────────────
 function ProfileScreen({ isPremium, premiumDaysLeft, onClose }) {
   const { user } = useAuth();
+  const { dialogVisible, setDialogVisible, dialogConfig, setDialogConfig } = useUI();
   const [nombre,    setNombre]    = useState('');
   const [alias,     setAlias]     = useState('');
   const [apellidos, setApellidos] = useState('');
@@ -697,12 +699,17 @@ function ProfileScreen({ isPremium, premiumDaysLeft, onClose }) {
 
       setFoto(fotoPersistida || null);
       if (uploadPendiente) {
-        showDialog('Guardado parcial', 'Tu perfil se guardo en el movil, pero no se pudo subir la foto a la nube. Vuelve a intentarlo con buena conexion para que tambien salga en la web.');
+        setDialogConfig({ title: 'Guardado parcial', description: 'Tu perfil se guardó en el móvil, pero no se pudo subir la foto a la nube. Vuelve a intentarlo con buena conexión para que también salga en la web.', actions: [{ label: 'Cerrar' }] });
+        setDialogVisible(true);
       } else {
-        showDialog('Guardado', 'Tu perfil ha sido actualizado');
+        setDialogConfig({ title: 'Guardado', description: 'Tu perfil ha sido actualizado', actions: [{ label: 'Cerrar' }] });
+        setDialogVisible(true);
       }
       onClose();
-    } catch { showDialog('Error', 'No se pudo guardar el perfil'); }
+    } catch {
+      setDialogConfig({ title: 'Error', description: 'No se pudo guardar el perfil', actions: [{ label: 'Cerrar' }] });
+      setDialogVisible(true);
+    }
     finally { setGuardando(false); }
   };
 
@@ -3231,6 +3238,8 @@ function MainScreen({ onLogout }) {
 }
 
 // ─── ROOT ─────────────────────────────────────────────────────────────────────
+import MainScreen from './src/screens/MainScreen';
+
 export default function App() {
   const [fontsLoaded] = useFonts({
     PlayfairDisplay_700Bold,
@@ -3242,19 +3251,21 @@ export default function App() {
   if (!fontsLoaded) return null;
   if (showWelcome) return <WelcomeScreen />;
   return (
-    <AuthContext.Provider value={{ user }}>
-      {user ? (
-        <MainScreen
-          onLogout={() => {
-            clearAuthToken();
-            SecureStore.deleteItemAsync('authToken').catch(() => {});
-            setUser(null);
-          }}
-        />
-      ) : (
-        <AuthScreen onAuth={setUser} />
-      )}
-    </AuthContext.Provider>
+    <UIProvider>
+      <AuthContext.Provider value={{ user }}>
+        {user ? (
+          <MainScreen
+            onLogout={() => {
+              clearAuthToken();
+              SecureStore.deleteItemAsync('authToken').catch(() => {});
+              setUser(null);
+            }}
+          />
+        ) : (
+          <AuthScreen onAuth={setUser} />
+        )}
+      </AuthContext.Provider>
+    </UIProvider>
   );
 }
 

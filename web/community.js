@@ -623,17 +623,8 @@ const goToThreadDetail = (threadId) => {
   transitionThreadsView(
     () => renderThreads(),
     () => {
-      // Try to scroll the thread detail into view
-      const detailArticle = document.querySelector('.thread-detail-top');
-      if (detailArticle) {
-        // Scroll so the thread detail top is near the top, with a small offset
-        const y = detailArticle.getBoundingClientRect().top + window.scrollY - 12;
-        window.scrollTo({ top: y, behavior: 'auto' });
-      } else {
-        // Fallback to previous anchor logic
-        const targetY = Number((window.history.state && window.history.state.communityAnchorY) || pendingThreadAnchorY);
-        if (Number.isFinite(targetY) && targetY >= 0) window.scrollTo({ top: targetY, behavior: 'auto' });
-      }
+      // Siempre hacer scroll al top al abrir un hilo
+      window.scrollTo({ top: 0, behavior: 'auto' });
       pendingThreadAnchorY = null;
     },
   );

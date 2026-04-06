@@ -977,16 +977,22 @@ const renderAuthState = () => {
           const res = await fetch(`${AUTH_URL}:sendOobCode?key=${FIREBASE_API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-Ios-Bundle-Identifier': FIREBASE_IOS_BUNDLE_ID },
-            body: JSON.stringify({ requestType: 'VERIFY_EMAIL', idToken: auth.token }),
+            body: JSON.stringify({
+              requestType: 'VERIFY_EMAIL',
+              idToken: auth.token,
+              continueUrl: 'https://etiove.com/comunidad.html',
+            }),
           });
+          const json = await res.json().catch(() => ({}));
           if (res.ok) {
             resendBtn.textContent = '✔ Email enviado — revisa tu bandeja de entrada';
           } else {
-            resendBtn.textContent = 'Error al enviar. Inténtalo de nuevo.';
+            const code = (json.error && json.error.message) || res.status;
+            resendBtn.textContent = `Error: ${code}`;
             resendBtn.disabled = false;
           }
-        } catch {
-          resendBtn.textContent = 'Error al enviar. Inténtalo de nuevo.';
+        } catch (err) {
+          resendBtn.textContent = `Error: ${err.message}`;
           resendBtn.disabled = false;
         }
       });

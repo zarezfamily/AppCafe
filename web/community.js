@@ -976,7 +976,7 @@ const renderAuthState = () => {
         try {
           const res = await fetch(`${AUTH_URL}:sendOobCode?key=${FIREBASE_API_KEY}`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'X-Ios-Bundle-Identifier': FIREBASE_IOS_BUNDLE_ID },
             body: JSON.stringify({ requestType: 'VERIFY_EMAIL', idToken: auth.token }),
           });
           if (res.ok) {
@@ -1641,7 +1641,7 @@ const signIn = async (registerMode) => {
     try {
       const lookupRes = await fetch(`${AUTH_URL}:lookup?key=${FIREBASE_API_KEY}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-Ios-Bundle-Identifier': FIREBASE_IOS_BUNDLE_ID },
         body: JSON.stringify({ idToken: json.idToken }),
       });
       const lookupJson = await lookupRes.json();
@@ -1656,7 +1656,7 @@ const signIn = async (registerMode) => {
       try {
         await fetch(`${AUTH_URL}:sendOobCode?key=${FIREBASE_API_KEY}`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', 'X-Ios-Bundle-Identifier': FIREBASE_IOS_BUNDLE_ID },
           body: JSON.stringify({ requestType: 'VERIFY_EMAIL', idToken: json.idToken }),
         });
       } catch (_) { /* no bloquear */ }

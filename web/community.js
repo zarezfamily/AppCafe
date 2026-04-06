@@ -1469,8 +1469,6 @@ const loadForum = async () => {
 
   const h = hRes.value || [];
   const activeThreadId = getActiveThreadId();
-  const visibleThreads = h.filter(isThreadVisible);
-  const visibleIds = new Set(visibleThreads.map((t) => t.id));
 
   const profiles = pRes.status === 'fulfilled' ? (pRes.value || []) : [];
   const allReplies = rRes.status === 'fulfilled' ? (rRes.value || []) : [];
@@ -1494,19 +1492,12 @@ const loadForum = async () => {
     return { ...item, authorName: alias };
   };
 
-  const normalizedVisibleThreads = visibleThreads.map((item) => normalizeThread(applyCanonicalAlias(item)));
-  threads = normalizedVisibleThreads;
+  // Guardamos TODOS los hilos — el acceso al detalle se controla en renderThreads
+  threads = h.map((item) => normalizeThread(applyCanonicalAlias(item)));
+  const allThreadIds = new Set(threads.map((t) => t.id));
 
-  if (activeThreadId && !threads.some((thread) => thread.id === activeThreadId)) {
-    const explicitThread = await getDocument('foro_hilos', activeThreadId).catch(() => null);
-    if (explicitThread && isThreadVisible(explicitThread)) {
-      const normalizedExplicit = normalizeThread(applyCanonicalAlias(explicitThread));
-      threads = [normalizedExplicit, ...threads.filter((thread) => thread.id !== activeThreadId)];
-      visibleIds.add(activeThreadId);
-    }
-  }
   replies = rRes.status === 'fulfilled'
-    ? (rRes.value || []).filter((reply) => visibleIds.has(reply.threadId)).map((item) => applyCanonicalAlias(item))
+    ? (rRes.value || []).filter((reply) => allThreadIds.has(reply.threadId)).map((item) => applyCanonicalAlias(item))
     : [];
 
   const myProfile = profiles.find((profile) => String(profile.uid || '').trim() === auth.uid) || null;

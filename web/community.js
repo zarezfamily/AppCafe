@@ -1064,20 +1064,20 @@ const renderThreads = (searchTerm = '') => {
   if (activeThreadId) {
     const activeThread = threads.find((thread) => thread.id === activeThreadId);
 
-    if (!auth.token) {
+    if (!activeThread) {
       resetCommunityMeta();
-      el.threadsWrap.innerHTML = `
-        <div style="margin-top:12px;margin-bottom:10px;"><button class="btn ghost" data-back-detail="1">← Volver atrás</button></div>
-        <p class="empty" style="margin-top:16px;">Inicia sesión para leer los hilos de la comunidad.</p>
-      `;
+      el.threadsWrap.innerHTML = '<p class="empty">Este hilo no está disponible.</p><div style="margin-top:10px"><button class="btn ghost" data-back-detail="1">Volver atrás</button></div>';
       const backBtn = el.threadsWrap.querySelector('[data-back-detail]');
       if (backBtn) backBtn.addEventListener('click', goBackFromThreadDetail);
       return;
     }
 
-    if (!activeThread) {
+    if (activeThread.accessLevel === 'registered_only' && !auth.token) {
       resetCommunityMeta();
-      el.threadsWrap.innerHTML = '<p class="empty">Este hilo no está disponible.</p><div style="margin-top:10px"><button class="btn ghost" data-back-detail="1">Volver atrás</button></div>';
+      el.threadsWrap.innerHTML = `
+        <div style="margin-top:12px;margin-bottom:10px;"><button class="btn ghost" data-back-detail="1">← Volver atrás</button></div>
+        <p class="empty" style="margin-top:16px;">Este hilo es solo para usuarios registrados. Inicia sesión para leerlo.</p>
+      `;
       const backBtn = el.threadsWrap.querySelector('[data-back-detail]');
       if (backBtn) backBtn.addEventListener('click', goBackFromThreadDetail);
       return;

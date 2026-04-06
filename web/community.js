@@ -991,7 +991,7 @@ const renderAuthState = () => {
             if (code.includes('TOO_MANY_ATTEMPTS') || code.includes('too_many_attempts')) {
               resendBtn.textContent = 'Demasiados intentos. Espera unos minutos e inténtalo de nuevo.';
             } else {
-              resendBtn.textContent = 'No se pudo enviar el email. Inténtalo más tarde.';
+              resendBtn.textContent = `Error: ${code || res.status}`;
             }
             resendBtn.disabled = false;
           }

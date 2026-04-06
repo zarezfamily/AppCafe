@@ -987,12 +987,16 @@ const renderAuthState = () => {
           if (res.ok) {
             resendBtn.textContent = '✔ Email enviado — revisa tu bandeja de entrada';
           } else {
-            const code = (json.error && json.error.message) || res.status;
-            resendBtn.textContent = `Error: ${code}`;
+            const code = (json.error && json.error.message) || '';
+            if (code.includes('TOO_MANY_ATTEMPTS') || code.includes('too_many_attempts')) {
+              resendBtn.textContent = 'Demasiados intentos. Espera unos minutos e inténtalo de nuevo.';
+            } else {
+              resendBtn.textContent = 'No se pudo enviar el email. Inténtalo más tarde.';
+            }
             resendBtn.disabled = false;
           }
-        } catch (err) {
-          resendBtn.textContent = `Error: ${err.message}`;
+        } catch {
+          resendBtn.textContent = 'No se pudo enviar el email. Inténtalo más tarde.';
           resendBtn.disabled = false;
         }
       });

@@ -77,10 +77,14 @@
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 40px;
+      gap: 32px;
     }
+    .nav-link {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 2px;
       text-transform: uppercase;
-      color: #9a7963;
+      color: var(--ink-muted);
       text-decoration: none;
       transition: color 0.3s;
     }
@@ -390,26 +394,32 @@
     <a class="nav-wordmark" href="/">Etiove</a>
     <div class="nav-links">
       <a class="nav-link" href="/">Inicio</a>
-      <a class="nav-link" href="/blog.html">Blog</a>
+      <a class="nav-link" href="/blog/index.html">Blog</a>
       <a class="nav-link" href="/comunidad.html">Comunidad</a>
+        <style>
+          .nav-link {
+            color: #9a7963 !important;
+            text-decoration: none !important;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: color 0.3s;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+          }
+          .nav-link:hover {
+            color: var(--accent) !important;
+          }
+        </style>
     </div>
   </nav>
 
-  <section class="hero">
-    <div class="hero-bg"></div>
-    <div class="hero-overlay"></div>
-    <div class="aura aura-1"></div>
-    <div class="aura aura-2"></div>
-    <div class="hero-content">
-      <p class="hero-eyebrow">Blog Etiove &middot; Caf&eacute; de Especialidad</p>
-      <h1 class="hero-title">El Arte<em>del Caf&eacute;</em></h1>
-      <p class="hero-tagline">Gu&iacute;as, tutoriales y an&aacute;lisis para entender el origen, la molienda y cada m&eacute;todo de preparaci&oacute;n</p>
-      <div class="hero-divider"><span></span></div>
-      <p class="hero-badge">4 art&iacute;culos publicados</p>
-    </div>
-    <div class="hero-scroll">
-      <span>Leer</span>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+  <!-- HERO reducido para menos espacio -->
+  <section class="hero" style="height:120px; min-height:unset; align-items:flex-start; justify-content:flex-end; background:none; box-shadow:none;">
+    <div class="hero-content" style="padding:0 24px; align-items:flex-start;">
+      <p class="hero-eyebrow" style="color:#9a7963; margin-bottom:8px;">Blog Etiove &middot; Caf&eacute; de Especialidad</p>
+      <h1 class="hero-title" style="font-size:2.2rem; font-weight:500; color:#1c120d; letter-spacing:2px; margin-bottom:0;">El Arte <em style="font-style:italic; color:#8f5e3b; font-size:1.1em; font-weight:400;">del Caf&eacute;</em></h1>
+      <p class="hero-tagline" style="font-size:1rem; color:#9a7963; margin:8px 0 0 0; font-style:italic;">Gu&iacute;as, tutoriales y an&aacute;lisis para entender el origen, la molienda y cada m&eacute;todo de preparaci&oacute;n</p>
     </div>
   </section>
 
@@ -438,7 +448,8 @@
 
       <div id="searchStatus" class="search-status"></div>
 
-      <div class="grid" id="postGrid">
+      <div class="grid" id="postGrid"></div>
+      <div id="blogPager"></div>
 
         <article class="card" data-category="analisis" data-post-url="/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html" data-search="vale la pena pagar mas por cafe de especialidad analisis precio calidad impacto social consumidor granos finca altura">
           <a class="card-link" href="/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html">
@@ -525,17 +536,20 @@
   </button>
 
   <script>
+
     const filterBtns = document.querySelectorAll('.filter-btn');
-    const cards = Array.from(document.querySelectorAll('.card'));
     const postGrid = document.getElementById('postGrid');
     const postSearch = document.getElementById('postSearch');
     const searchCount = document.getElementById('searchCount');
     const clearSearch = document.getElementById('clearSearch');
     const searchStatus = document.getElementById('searchStatus');
-    const originalOrder = cards.map((card, index) => ({ card, index }));
+    const blogPager = document.getElementById('blogPager');
+    let allCards = Array.from(document.querySelectorAll('.card'));
     let activeFilter = 'todos';
     let searchQuery = '';
     let searchIndexReady = false;
+    let currentPage = 1;
+    const PAGE_SIZE = 6;
 
     const escapeHtml = (value) => String(value || '')
       .replace(/&/g, '&amp;')
@@ -551,7 +565,7 @@
       .trim();
 
     const ensureCardBaseContent = () => {
-      cards.forEach((card) => {
+      allCards.forEach((card) => {
         const title = card.querySelector('.card-title');
         const excerpt = card.querySelector('.card-excerpt');
         if (title && !card.dataset.baseTitle) card.dataset.baseTitle = title.textContent || '';
@@ -632,7 +646,7 @@
       return html;
     };
 
-    const renderHighlights = () => {
+    const renderHighlights = (cards) => {
       cards.forEach((card) => {
         const title = card.querySelector('.card-title');
         const excerpt = card.querySelector('.card-excerpt');
@@ -737,26 +751,64 @@
       setSearchMeta(`${visibleCount} ${label}`);
     };
 
+    function renderPager(total, page, pageSize) {
+      if (total <= pageSize) {
+        blogPager.innerHTML = '';
+        return;
+      }
+      const totalPages = Math.ceil(total / pageSize);
+      let html = '<div class="threads-pager"><div class="pager-nav">';
+      html += `<button class="pager-btn pager-arrow" data-page="1" ${page === 1 ? 'disabled' : ''} aria-label="Primera página">«</button>`;
+      html += `<button class="pager-btn pager-arrow" data-page="${page - 1}" ${page === 1 ? 'disabled' : ''} aria-label="Página anterior">‹</button>`;
+      for (let p = 1; p <= totalPages; p++) {
+        if (totalPages > 11 && (p > 2 && p < page - 3)) { if (p === 3) html += '<span style="padding:0 6px;">…</span>'; continue; }
+        if (totalPages > 11 && (p < totalPages - 1 && p > page + 3)) { if (p === totalPages - 2) html += '<span style="padding:0 6px;">…</span>'; continue; }
+        html += `<button class="pager-btn${p === page ? ' active' : ''}" data-page="${p}">${p}</button>`;
+      }
+      html += `<button class="pager-btn pager-arrow" data-page="${page + 1}" ${page === totalPages ? 'disabled' : ''} aria-label="Página siguiente">›</button>`;
+      html += `<button class="pager-btn pager-arrow" data-page="${totalPages}" ${page === totalPages ? 'disabled' : ''} aria-label="Última página">»</button>`;
+      html += '</div>';
+      html += `<p class="pager-info">Mostrando posts del ${(page - 1) * pageSize + 1} al ${Math.min(page * pageSize, total)} de ${total}</p>`;
+      html += '</div>';
+      blogPager.innerHTML = html;
+      blogPager.querySelectorAll('[data-page]').forEach(btn => {
+        btn.addEventListener('click', e => {
+          const newPage = parseInt(btn.getAttribute('data-page'), 10);
+          if (!btn.disabled && newPage >= 1 && newPage <= Math.ceil(total / pageSize)) {
+            currentPage = newPage;
+            applyFilters();
+            window.scrollTo({ top: postGrid.offsetTop - 80, behavior: 'smooth' });
+          }
+        });
+      });
+    }
+
     const applyFilters = () => {
       const normalizedQuery = normalize(searchQuery);
-      let visibleCount = 0;
-
-      renderHighlights();
-      syncClearButton();
-      reorderCards(normalizedQuery);
-
-      cards.forEach((card) => {
+      let visibleCards = allCards.filter(card => {
         const category = card.getAttribute('data-category');
         const haystack = normalize(card.dataset.search || '');
         const categoryMatch = activeFilter === 'todos' || category === activeFilter;
         const queryMatch = !normalizedQuery || haystack.includes(normalizedQuery) || normalizedQuery.split(/\s+/).every((token) => haystack.includes(token));
-        const visible = categoryMatch && queryMatch;
-        card.style.display = visible ? '' : 'none';
-        if (visible) visibleCount += 1;
+        return categoryMatch && queryMatch;
       });
-
+      const visibleCount = visibleCards.length;
       updateSearchStatus(visibleCount);
       renderEmptyState(visibleCount);
+      syncClearButton();
+      reorderCards(normalizedQuery);
+      // PAGINACIÓN
+      let pagedCards = visibleCards;
+      if (visibleCount > PAGE_SIZE) {
+        const start = (currentPage - 1) * PAGE_SIZE;
+        pagedCards = visibleCards.slice(start, start + PAGE_SIZE);
+      } else {
+        currentPage = 1;
+      }
+      postGrid.innerHTML = '';
+      pagedCards.forEach(card => postGrid.appendChild(card));
+      renderHighlights(pagedCards);
+      renderPager(visibleCount, currentPage, PAGE_SIZE);
     };
 
     filterBtns.forEach((btn) => {
@@ -795,8 +847,7 @@
     window.addEventListener('scroll', () => st.classList.toggle('visible', window.scrollY > 320));
     st.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
     ensureCardBaseContent();
-    setSearchMeta(`${cards.length} posts`);
+    if (typeof cards !== 'undefined') setSearchMeta(`${cards.length} posts`);
     applyFilters();
   </script>
-</body>
-</html>
+        <!-- Eliminado style duplicado de nav-link -->

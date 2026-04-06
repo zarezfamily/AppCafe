@@ -92,14 +92,11 @@
       font-weight: 500;
       letter-spacing: 2px;
       text-transform: uppercase;
-      color: #9a7963;
+      color: var(--ink-muted);
       text-decoration: none;
       transition: color 0.3s;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     }
-    .nav-link:hover {
-      color: var(--accent);
-    }
+    .nav-link:hover { color: var(--accent); }
 
     /* ─── HERO ─── */
     .hero {
@@ -268,7 +265,10 @@
       position: relative;
     }
     .section-lead {
-      position: relative;
+      position: sticky;
+      top: 80px;
+      z-index: 10;
+      background: var(--cream);
       padding-top: 18px;
     }
     .section-lead::before {
@@ -1197,21 +1197,43 @@
 
   <!-- HERO -->
   <section class="hero" aria-label="Cabecera comunidad">
-    <div class="hero-img" id="heroImg"></div>
-    <div class="hero-overlay"></div>
-    <div class="hero-aura1" aria-hidden="true"></div>
-    <div class="hero-aura2" aria-hidden="true"></div>
-    <div class="hero-content">
-      <p class="hero-eyebrow">Etiove &middot; Comunidad</p>
-      <h1 class="hero-title">El Salón<br><em>del Café</em></h1>
-      <p class="hero-sub">Un espacio para conversar con calma sobre origen, método y cultura del café de especialidad.</p>
-      <a class="hero-btn" href="#forum">Explorar hilos</a>
-      <div style="display:flex;align-items:center;gap:16px;width:220px;margin:22px auto 18px;animation:fadeUp 1s 0.48s ease both;">
-        <span style="flex:1;height:1px;background:rgba(255,248,241,0.22);"></span>
-        <span style="width:5px;height:5px;border-radius:50%;background:rgba(255,215,170,0.75);display:block;"></span>
-        <span style="flex:1;height:1px;background:rgba(255,248,241,0.22);"></span>
+    <div class="aura aura-1"></div>
+    <div class="aura aura-2"></div>
+    <div class="aura aura-3"></div>
+    <div class="hero-seal">
+      <div class="seal-ring">
+        <div class="seal-ring-inner">
+          <div class="seal-ring-core">
+            <span class="seal-text">☕</span>
+          </div>
+        </div>
       </div>
-      <p style="font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,248,241,0.45);animation:fadeUp 1s 0.55s ease both;">Conversación curada Etiove</p>
+    </div>
+    <p class="hero-eyebrow">La mayor comunidad de café de especialidad</p>
+    <h1 class="hero-title">El Salón<br><em>del Café</em></h1>
+    <p class="hero-tagline">Donde nació el café</p>
+    <div class="divider-line">
+      <span class="divider-dot"></span>
+    </div>
+    <div class="download-group">
+      <a href="https://apps.apple.com/app/etiove" target="_blank" class="btn-download dark">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+        </svg>
+        <div class="btn-copy">
+          <span class="btn-copy-sub">Descarga en</span>
+          <span class="btn-copy-main">App Store</span>
+        </div>
+      </a>
+      <a href="https://play.google.com/store/apps/details?id=com.zarezfamily.etiove" target="_blank" class="btn-download light">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M3.18 23.76c.3.17.64.24.99.19l12.6-7.27-2.72-2.72-10.87 9.8zm16.11-9.37L5.83 6.93l2.72 2.72 10.74-9.65zm1.61.93c.32-.18.5-.5.5-.87s-.18-.69-.5-.87L18.1 12l-2.59 2.59 2.6 2.6 2.79-1.87zM3.18.24C2.86.07 2.5 0 2.17.19c-.33.18-.5.5-.5.87v21.88c0 .37.17.69.5.87.16.09.34.13.5.13.17 0 .33-.04.49-.13l.02-.01 10.85-9.73-2.7-2.7L3.18.24z"/>
+        </svg>
+        <div class="btn-copy">
+          <span class="btn-copy-sub">Disponible en</span>
+          <span class="btn-copy-main">Google Play</span>
+        </div>
+      </a>
     </div>
     <div class="scroll-indicator" aria-hidden="true">
       <span>Scroll</span>
@@ -1244,27 +1266,36 @@
       <div class="grid">
         <!-- SIDEBAR -->
         <aside class="sidebar-card">
-          <h2>Acceso</h2>
-          <p class="muted">Inicia sesión para crear hilos y responder. Usa el mismo email y contraseña de tu cuenta en la app (no el alias).</p>
-          <div class="field"><input id="email" type="email" placeholder="tu@email.com" autocomplete="username" /></div>
-          <div class="field"><input id="password" type="password" placeholder="Contraseña" autocomplete="current-password" /></div>
-          <div class="field" style="display:flex;align-items:center;gap:8px;">
-            <input type="checkbox" id="rememberMe" style="width:auto;margin:0;cursor:pointer;" />
-            <label for="rememberMe" style="font-size:13px;color:var(--ink-muted);cursor:pointer;user-select:none;">Recordarme</label>
-          </div>
-          <div class="auth-row">
-            <button class="btn primary" id="loginBtn">Entrar</button>
-            <button class="btn ghost" id="registerBtn">Crear cuenta</button>
-            <button class="btn ghost" id="logoutBtn" style="display:none">Salir</button>
-          </div>
-          <div id="authStatus" class="status"></div>
 
-          <section id="memberEvolutionCard" class="member-evo" aria-live="polite">
-            <div class="member-evo-head">
-              <p id="memberEvolutionName" class="member-evo-name">Catador</p>
-              <span id="memberEvolutionTier" class="member-evo-tier">Reserve I</span>
+          <div id="authSection">
+            <h2>Acceso</h2>
+            <p class="muted">Inicia sesión para crear hilos y responder. Usa el mismo email y contraseña de tu cuenta en la app (no el alias).</p>
+            <div class="field"><input id="email" type="email" placeholder="tu@email.com" autocomplete="username" /></div>
+            <div class="field"><input id="password" type="password" placeholder="Contraseña" autocomplete="current-password" /></div>
+            <div class="field" style="display:flex;align-items:center;gap:8px;">
+              <input type="checkbox" id="rememberMe" style="width:auto;margin:0;cursor:pointer;" />
+              <label for="rememberMe" style="font-size:13px;color:var(--ink-muted);cursor:pointer;user-select:none;">Recordarme</label>
             </div>
-            <p class="muted">Tu evolución en la comunidad</p>
+            <div class="auth-row">
+              <button class="btn primary" id="loginBtn">Entrar</button>
+              <button class="btn ghost" id="registerBtn">Crear cuenta</button>
+            </div>
+            <div id="authStatus" class="status"></div>
+          </div>
+
+          <section id="memberEvolutionCard" class="member-evo" aria-live="polite" style="display:none">
+            <div class="member-evo-head" style="display:flex;align-items:center;gap:14px;">
+              <div id="memberAvatar" style="width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#f6efe7 60%,#e4d3c2 100%);box-shadow:0 2px 12px #e4d3c2;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                <img id="memberAvatarImg" src="" alt="Avatar" style="width:100%;height:100%;object-fit:cover;display:none;" />
+                <span id="memberAvatarFallback" style="font-size:2.1rem;font-weight:700;color:#8f5e3b;">C</span>
+              </div>
+              <div>
+                <p id="memberEvolutionName" class="member-evo-name" style="font-size:1.15rem;font-weight:700;margin-bottom:2px;">Catador</p>
+                <span id="memberEvolutionTier" class="member-evo-tier" style="font-size:0.95rem;">Reserve I</span>
+              </div>
+              <button class="btn ghost" id="logoutBtn" style="margin-left:auto;">Salir</button>
+            </div>
+            <p class="muted" style="margin:8px 0 0 0;">Tu evolución en la comunidad</p>
             <div id="memberEvolutionStats" class="member-evo-stats"></div>
             <div id="memberEvolutionBadges" class="member-evo-badges"></div>
             <p id="memberEvolutionEmpty" class="member-evo-empty" style="display:none;">Publica tu primer hilo para desbloquear insignias.</p>

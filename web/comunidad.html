@@ -449,12 +449,11 @@
     .member-evo {
       display: none;
       margin-top: 14px;
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 14px;
-      background: linear-gradient(155deg, rgba(255,250,243,0.95), rgba(246,231,214,0.82));
-      box-shadow: 0 10px 22px rgba(33,21,15,0.08);
-        #threadsWrap { transition: none; }
+      border: 2px solid #c99557;
+      border-radius: 22px;
+      padding: 22px 18px 18px 18px;
+      background: linear-gradient(135deg, #fffaf5 0%, #f6efe5 100%);
+      box-shadow: 0 10px 32px rgba(201,149,87,0.10), 0 2px 8px rgba(33,21,15,0.06);
       position: relative;
       overflow: hidden;
     }
@@ -1259,13 +1258,21 @@
           </div>
           <div id="authStatus" class="status"></div>
 
-          <section id="memberEvolutionCard" class="member-evo" aria-live="polite">
-            <div class="member-evo-head">
-              <p id="memberEvolutionName" class="member-evo-name">Catador</p>
-              <span id="memberEvolutionTier" class="member-evo-tier">Reserve I</span>
+          <section id="memberEvolutionCard" class="member-evo member-evo-premium" aria-live="polite">
+            <div class="member-evo-premium-row">
+              <div class="member-evo-avatar-wrap">
+                <img id="memberAvatarImg" class="member-evo-avatar" src="" alt="Foto de perfil" style="display:none;" loading="lazy" />
+                <span id="memberAvatarFallback" class="member-evo-avatar-fallback">C</span>
+              </div>
+              <div class="member-evo-premium-main">
+                <div class="member-evo-head">
+                  <p id="memberEvolutionName" class="member-evo-name">Catador</p>
+                  <span id="memberEvolutionTier" class="member-evo-tier">Reserve I</span>
+                </div>
+                <p class="muted" style="margin-bottom:8px;">Tu evolución en la comunidad</p>
+                <div id="memberEvolutionStats" class="member-evo-stats"></div>
+              </div>
             </div>
-            <p class="muted">Tu evolución en la comunidad</p>
-            <div id="memberEvolutionStats" class="member-evo-stats"></div>
             <div id="memberEvolutionBadges" class="member-evo-badges"></div>
             <p id="memberEvolutionEmpty" class="member-evo-empty" style="display:none;">Publica tu primer hilo para desbloquear insignias.</p>
           </section>

@@ -280,6 +280,9 @@ const renderMemberEvolutionCard = ({ profile = null, allThreads = [], allReplies
   // Avatar premium
   let avatarUrl = (profile && (profile.photoURL || profile.avatarUrl || profile.avatar || profile.photo || '')) || '';
   let displayName = String((profile && (profile.displayName || profile.alias || profile.nickname)) || getAuthorName() || 'Catador').trim();
+  // Avatar premium: buscar nuevos elementos DOM
+  el.memberAvatarImg = document.getElementById('memberAvatarImg');
+  el.memberAvatarFallback = document.getElementById('memberAvatarFallback');
   if (el.memberAvatarImg && el.memberAvatarFallback) {
     if (avatarUrl) {
       el.memberAvatarImg.src = avatarUrl;
@@ -1177,9 +1180,6 @@ const renderThreads = (searchTerm = '') => {
 
     el.threadsWrap.innerHTML = `
       <article class="thread${editingThreadId === activeThread.id ? ' thread-is-editing' : ''}" data-thread-id="${activeThread.id}">
-        <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
-          <button class="btn ghost" data-back-detail="1">← Volver atrás</button>
-        </div>
         ${detailBodyHtml}
         ${editingThreadId !== activeThread.id && normalizeStorageImageUrl(activeThread.image) ? `<img class=\"thread-image\" src=\"${escapeHtml(normalizeStorageImageUrl(activeThread.image))}\" alt=\"Imagen del hilo\" loading=\"lazy\" decoding=\"async\" />` : ''}
         <div class="thread-foot">
@@ -1191,11 +1191,14 @@ const renderThreads = (searchTerm = '') => {
             ? `<div class=\"actions-row\"><button class=\"link-btn\" data-thread-edit=\"${activeThread.id}\">Editar</button><button class=\"link-btn\" data-thread-delete=\"${activeThread.id}\">Eliminar</button></div>`
             : ''}
         </div>
-        <div class="reply-box">
-          ${repliesHtml || '<p class="muted">Sin respuestas aún.</p>'}
-          ${auth.token
-            ? `<div class=\"field\"><textarea data-reply-input=\"${activeThread.id}\" maxlength=\"1000\" placeholder=\"Responder...\"></textarea></div><button class=\"btn ghost\" data-reply-send=\"${activeThread.id}\">Enviar respuesta</button>`
-            : '<p class=\"muted\">Inicia sesión para responder.</p>'}
+        <div class="reply-box" style="display:flex;align-items:flex-end;gap:10px;">
+          <div style="flex:1;">
+            ${repliesHtml || '<p class="muted">Sin respuestas aún.</p>'}
+            ${auth.token
+              ? `<div class=\"field\"><textarea data-reply-input=\"${activeThread.id}\" maxlength=\"1000\" placeholder=\"Responder...\"></textarea></div>`
+              : '<p class=\"muted\">Inicia sesión para responder.</p>'}
+          </div>
+          ${auth.token ? `<div style=\"display:flex;flex-direction:column;align-items:flex-end;gap:8px;min-width:140px;\"><button class=\"btn ghost\" data-reply-send=\"${activeThread.id}\">Enviar respuesta</button><button class=\"btn ghost\" data-back-detail=\"1\">← Volver atrás</button></div>` : ''}
         </div>
       </article>
     `;
@@ -1374,11 +1377,22 @@ const renderThreads = (searchTerm = '') => {
       const openLink = event.target.closest('[data-thread-open]');
       if (openLink) {
         event.preventDefault();
+        const threadId = openLink.getAttribute('data-thread-open');
+        const thread = threads.find((t) => t.id === threadId);
+        // If thread is private and user is not logged in, scroll to 'Hilos recientes' section
+        if (thread && thread.accessLevel === 'registered_only' && !auth.token) {
+          // Scroll to the forum section lead ("Hilos recientes")
+          const sectionLead = document.querySelector('.section-lead');
+          if (sectionLead) {
+            sectionLead.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+          return;
+        }
         const article = openLink.closest('[data-thread-id]');
         pendingThreadAnchorY = article
           ? Math.max(0, window.scrollY + article.getBoundingClientRect().top - 20)
           : window.scrollY;
-        goToThreadDetail(openLink.getAttribute('data-thread-open'));
+        goToThreadDetail(threadId);
       }
     });
     el.threadsWrap.dataset.boundDelegatedClicks = '1';

@@ -1490,6 +1490,7 @@ const loadForum = async () => {
     return { ...item, authorName: alias };
   };
 
+
   // Guardamos TODOS los hilos — el acceso al detalle se controla en renderThreads
   threads = h.map((item) => normalizeThread(applyCanonicalAlias(item)));
   const allThreadIds = new Set(threads.map((t) => t.id));
@@ -1497,6 +1498,9 @@ const loadForum = async () => {
   replies = rRes.status === 'fulfilled'
     ? (rRes.value || []).filter((reply) => allThreadIds.has(reply.threadId)).map((item) => applyCanonicalAlias(item))
     : [];
+
+  // Normalizar y filtrar los hilos visibles para el usuario
+  const normalizedVisibleThreads = threads.filter(isThreadVisible);
 
   const myProfile = profiles.find((profile) => String(profile.uid || '').trim() === auth.uid) || null;
   renderMemberEvolutionCard({

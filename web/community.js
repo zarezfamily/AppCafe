@@ -119,7 +119,8 @@ const closeProfileModal = () => {
 let selectedCategory = 'general';
 let threads = [];
 let replies = [];
-const THREADS_PAGE_SIZE = 12;
+// Ajusta el tamaño de página para que la paginación se adapte visualmente a la member card y sección de nuevo hilo
+const THREADS_PAGE_SIZE = 7;
 let currentListPage = 1;
 let editingThreadId = '';
 let editingThreadDraft = null;
@@ -162,6 +163,10 @@ const el = {
   threadsWrap: document.getElementById('threadsWrap'),
 
   memberEvolutionCard: document.getElementById('memberEvolutionCard'),
+  authSection: document.getElementById('authSection'),
+  memberAvatar: document.getElementById('memberAvatar'),
+  memberAvatarImg: document.getElementById('memberAvatarImg'),
+  memberAvatarFallback: document.getElementById('memberAvatarFallback'),
   memberEvolutionName: document.getElementById('memberEvolutionName'),
   memberEvolutionTier: document.getElementById('memberEvolutionTier'),
   memberEvolutionStats: document.getElementById('memberEvolutionStats'),
@@ -265,7 +270,32 @@ const renderMemberEvolutionCard = ({ profile = null, allThreads = [], allReplies
   if (!el.memberEvolutionCard) return;
   if (!auth.uid || !auth.token) {
     el.memberEvolutionCard.style.display = 'none';
+    if (el.authSection) el.authSection.style.display = 'block';
     return;
+  }
+  // Mostrar card premium, ocultar acceso
+  el.memberEvolutionCard.style.display = 'block';
+  if (el.authSection) el.authSection.style.display = 'none';
+
+  // Avatar premium
+  let avatarUrl = (profile && (profile.photoURL || profile.avatarUrl || profile.avatar || profile.photo || '')) || '';
+  let displayName = String((profile && (profile.displayName || profile.alias || profile.nickname)) || getAuthorName() || 'Catador').trim();
+  if (el.memberAvatarImg && el.memberAvatarFallback) {
+    if (avatarUrl) {
+      el.memberAvatarImg.src = avatarUrl;
+      el.memberAvatarImg.style.display = 'block';
+      el.memberAvatarFallback.style.display = 'none';
+      el.memberAvatarImg.onerror = function() {
+        el.memberAvatarImg.style.display = 'none';
+        el.memberAvatarFallback.textContent = displayName.charAt(0).toUpperCase();
+        el.memberAvatarFallback.style.display = 'block';
+      };
+    } else {
+      el.memberAvatarImg.src = '';
+      el.memberAvatarImg.style.display = 'none';
+      el.memberAvatarFallback.textContent = displayName.charAt(0).toUpperCase();
+      el.memberAvatarFallback.style.display = 'block';
+    }
   }
 
   const myThreads = allThreads.filter((item) => item.authorUid === auth.uid);
@@ -290,7 +320,6 @@ const renderMemberEvolutionCard = ({ profile = null, allThreads = [], allReplies
   });
   const uniqueBadges = Array.from(new Set(computedBadges)).slice(0, 8);
 
-  const displayName = String((profile && (profile.displayName || profile.alias || profile.nickname)) || getAuthorName() || 'Catador').trim();
   el.memberEvolutionName.innerHTML = escapeHtml(displayName || 'Catador') + (auth.emailVerified ? VERIFIED_BADGE : '');
   el.memberEvolutionTier.textContent = tier;
 
@@ -320,8 +349,31 @@ const renderMemberEvolutionCard = ({ profile = null, allThreads = [], allReplies
       const tooltip = unlockedAt
         ? `${badge.label} · ${badge.desc} · Desbloqueada ${unlockedAt}`
         : `${badge.label} · ${badge.desc}`;
-      return `<span class="member-evo-badge" data-tip="${escapeHtml(tooltip)}" tabindex="0">${escapeHtml(badge.icon)} ${escapeHtml(badge.label)}</span>`;
+      return `<span class="member-evo-badge" data-tip="${escapeHtml(tooltip)}" tabindex="0" style="position:relative;z-index:10;white-space:normal;max-width:140px;overflow-wrap:break-word;"><span>${escapeHtml(badge.icon)} ${escapeHtml(badge.label)}</span><span class='badge-tooltip' style='visibility:hidden;opacity:0;position:absolute;left:0;top:110%;background:#fff;box-shadow:0 2px 12px #e4d3c2;padding:8px 12px;border-radius:8px;font-size:13px;color:#21150f;min-width:120px;max-width:220px;pointer-events:none;transition:opacity 0.18s;z-index:99;'></span></span>`;
     }).join('');
+    // Tooltips accesibles y no cortados
+    setTimeout(() => {
+      document.querySelectorAll('.member-evo-badge').forEach(badge => {
+        badge.addEventListener('mouseenter', function() {
+          let tip = badge.querySelector('.badge-tooltip');
+          if (!tip) {
+            tip = document.createElement('span');
+            tip.className = 'badge-tooltip';
+            badge.appendChild(tip);
+          }
+          tip.textContent = badge.getAttribute('data-tip');
+          tip.style.visibility = 'visible';
+          tip.style.opacity = '1';
+        });
+        badge.addEventListener('mouseleave', function() {
+          const tip = badge.querySelector('.badge-tooltip');
+          if (tip) {
+            tip.style.visibility = 'hidden';
+            tip.style.opacity = '0';
+          }
+        });
+      });
+    }, 0);
     el.memberEvolutionEmpty.style.display = 'none';
   }
 
@@ -623,10 +675,12 @@ const goToThreadDetail = (threadId) => {
   transitionThreadsView(
     () => renderThreads(),
     () => {
-      // Scroll al hilo abierto, no al top
+      // Scroll al hilo abierto, centrado como en la foto
       const article = document.querySelector(`[data-thread-id='${safeId}']`);
       if (article) {
-        article.scrollIntoView({ behavior: 'auto', block: 'start' });
+        const rect = article.getBoundingClientRect();
+        const scrollY = window.scrollY + rect.top - 32;
+        window.scrollTo({ top: scrollY, behavior: 'auto' });
       } else {
         window.scrollTo({ top: 0, behavior: 'auto' });
       }
@@ -1058,6 +1112,13 @@ const renderThreads = (searchTerm = '') => {
   const displayList = list;
 
   if (activeThreadId) {
+    // Oculta encabezado y filtros al crear/editar hilo
+    const sectionLead = document.querySelector('.section-lead');
+    const categoryChips = document.getElementById('categoryChips');
+    const searchStatus = document.getElementById('searchStatus');
+    if (sectionLead) sectionLead.style.display = 'none';
+    if (categoryChips) categoryChips.style.display = 'none';
+    if (searchStatus) searchStatus.style.display = 'none';
     const activeThread = threads.find((thread) => thread.id === activeThreadId);
 
     if (!activeThread) {
@@ -1115,26 +1176,26 @@ const renderThreads = (searchTerm = '') => {
         <p>${escapeHtml(activeThread.body || '')}</p>`;
 
     el.threadsWrap.innerHTML = `
-      <div class="thread-detail-top" style="margin-top:12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
-        <button class="btn ghost" data-back-detail="1">← Volver atrás</button>
-      </div>
       <article class="thread${editingThreadId === activeThread.id ? ' thread-is-editing' : ''}" data-thread-id="${activeThread.id}">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
+          <button class="btn ghost" data-back-detail="1">← Volver atrás</button>
+        </div>
         ${detailBodyHtml}
-        ${editingThreadId !== activeThread.id && normalizeStorageImageUrl(activeThread.image) ? `<img class="thread-image" src="${escapeHtml(normalizeStorageImageUrl(activeThread.image))}" alt="Imagen del hilo" loading="lazy" decoding="async" />` : ''}
+        ${editingThreadId !== activeThread.id && normalizeStorageImageUrl(activeThread.image) ? `<img class=\"thread-image\" src=\"${escapeHtml(normalizeStorageImageUrl(activeThread.image))}\" alt=\"Imagen del hilo\" loading=\"lazy\" decoding=\"async\" />` : ''}
         <div class="thread-foot">
           <div class="actions-row">
             <button class="link-btn" data-vote="${activeThread.id}">${threadVoted ? 'Ya te interesa' : 'Me interesa'}</button>
             <span class="muted">${threadReplies.length} respuestas</span>
           </div>
           ${threadCanManage
-            ? `<div class="actions-row"><button class="link-btn" data-thread-edit="${activeThread.id}">Editar</button><button class="link-btn" data-thread-delete="${activeThread.id}">Eliminar</button></div>`
+            ? `<div class=\"actions-row\"><button class=\"link-btn\" data-thread-edit=\"${activeThread.id}\">Editar</button><button class=\"link-btn\" data-thread-delete=\"${activeThread.id}\">Eliminar</button></div>`
             : ''}
         </div>
         <div class="reply-box">
           ${repliesHtml || '<p class="muted">Sin respuestas aún.</p>'}
           ${auth.token
-            ? `<div class="field"><textarea data-reply-input="${activeThread.id}" maxlength="1000" placeholder="Responder..."></textarea></div><button class="btn ghost" data-reply-send="${activeThread.id}">Enviar respuesta</button>`
-            : '<p class="muted">Inicia sesión para responder.</p>'}
+            ? `<div class=\"field\"><textarea data-reply-input=\"${activeThread.id}\" maxlength=\"1000\" placeholder=\"Responder...\"></textarea></div><button class=\"btn ghost\" data-reply-send=\"${activeThread.id}\">Enviar respuesta</button>`
+            : '<p class=\"muted\">Inicia sesión para responder.</p>'}
         </div>
       </article>
     `;
@@ -1149,6 +1210,13 @@ const renderThreads = (searchTerm = '') => {
       return;
     }
 
+    // Mostrar encabezado y filtros si no hay hilo activo
+    const sectionLead = document.querySelector('.section-lead');
+    const categoryChips = document.getElementById('categoryChips');
+    const searchStatus = document.getElementById('searchStatus');
+    if (sectionLead) sectionLead.style.display = '';
+    if (categoryChips) categoryChips.style.display = '';
+    if (searchStatus) searchStatus.style.display = '';
     resetCommunityMeta();
 
     const totalPages = Math.max(1, Math.ceil(displayList.length / THREADS_PAGE_SIZE));

@@ -1,25 +1,3 @@
-    .nav-wordmark {
-      font-family: 'Playfair Display', serif;
-      font-size: 22px;
-      font-weight: 500;
-      letter-spacing: 4px;
-      color: var(--ink);
-      text-decoration: none;
-      text-transform: uppercase;
-    }
-    .nav-link {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: #9a7963;
-      text-decoration: none;
-      transition: color 0.3s;
-    }
-    .nav-link:hover {
-      color: var(--accent);
-    }
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -291,7 +269,39 @@
       .video-grid { grid-template-columns: 1fr; }
       figure { margin: 14px 0; }
     }
-  </style>
+  
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 40px;
+      background: rgba(246, 239, 231, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .nav-wordmark {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px; font-weight: 500;
+      letter-spacing: 4px; color: var(--ink);
+      text-decoration: none; text-transform: uppercase;
+    }
+    .nav-links {
+      display: flex; align-items: center; gap: 32px;
+    }
+    .nav-link {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      font-size: 11px; font-weight: 500;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--ink-muted); text-decoration: none;
+      transition: color 0.3s;
+    }
+    .nav-link:hover { color: var(--accent); }
+    @media (max-width: 768px) {
+      nav { padding: 16px 20px; }
+      .nav-links { display: none; }
+    }
+
+    </style>
 </head>
 <body>
 

@@ -622,6 +622,31 @@
       }
       .scroll-top { bottom: 80px; right: 16px; }
     }
+    /* ── SECTION: QUIZ DE SABOR ── */
+    .section-quiz {
+      position: relative;
+      z-index: 1;
+      background: var(--ink);
+      overflow: hidden;
+    }
+    .section-quiz::before {
+      content: '';
+      position: absolute;
+      top: -120px; right: -120px;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(143,94,59,0.12) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .section-quiz::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; left: -80px;
+      width: 360px; height: 360px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(93,64,48,0.1) 0%, transparent 65%);
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
@@ -684,7 +709,7 @@
   </section>
 
   <!-- QUIZ DE SABOR WEB -->
-  <section id="quizweb" style="background:var(--cream-alt);padding:48px 0 24px 0;">
+  <section id="quizweb" class="section-quiz">
     <div id="webQuizRoot"></div>
   </section>
 

@@ -270,15 +270,7 @@
       figure { margin: 14px 0; }
     }
   
-    /* ── NAV ── */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 20px 40px;
-      background: rgba(246, 239, 231, 0.85);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border-soft);
-    }
+    
     .nav-wordmark {
       font-family: 'Playfair Display', serif;
       font-size: 22px; font-weight: 500;
@@ -301,20 +293,47 @@
       .nav-links { display: none; }
     }
 
+        /* ── NAV ── */
+    .site-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 40px;
+      background: rgba(246, 239, 231, 0.92);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(228, 211, 194, 0.55);
+    }
+    .nav-wordmark {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px; font-weight: 500;
+      letter-spacing: 4px; text-transform: uppercase;
+      color: #1c120d; text-decoration: none;
+    }
+    .nav-links { display: flex; align-items: center; gap: 32px; }
+    .nav-link {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 11px; font-weight: 500; letter-spacing: 2px;
+      text-transform: uppercase; color: #9a7963;
+      text-decoration: none; transition: color 0.2s;
+    }
+    .nav-link:hover, .nav-link--active { color: #8f5e3b; }
+    @media (max-width: 768px) {
+      .site-nav { padding: 14px 20px; }
+      .nav-links { display: none; }
+    }
     </style>
 </head>
 <body>
-
-  <!-- NAV -->
   <nav class="site-nav" aria-label="Navegación principal">
     <a class="nav-wordmark" href="/">ETIOVE</a>
     <div class="nav-links">
       <a class="nav-link" href="/">Inicio</a>
       <a class="nav-link nav-link--active" href="/blog/">Blog</a>
       <a class="nav-link" href="/comunidad.html">Comunidad</a>
-
     </div>
   </nav>
+
+  <!-- NAV -->
+  
 
   <!-- HERO -->
   <header class="post-hero">
@@ -335,26 +354,9 @@
   <!-- CUERPO -->
   <main class="page-body">
 
-    <nav class="breadcrumb" aria-label="Ruta">
-      <a href="/">Inicio</a>
-      <span class="breadcrumb-sep">›</span>
-      <a href="/blog.html">Blog</a>
-      <span class="breadcrumb-sep">›</span>
-      <span class="breadcrumb-current">¿Vale la pena el café de especialidad?</span>
-    </nav>
+    
 
-    <nav class="toc" aria-label="Tabla de contenidos">
-      <p class="toc-label">En este artículo</p>
-      <ol>
-        <li><a href="#precio">Qué estás pagando realmente</a></li>
-        <li><a href="#taza">La diferencia en taza: ¿real o marketing?</a></li>
-        <li><a href="#impacto">Impacto social y ambiental</a></li>
-        <li><a href="#cuando">Cuándo sí conviene y cuándo no</a></li>
-        <li><a href="#veredicto">El veredicto</a></li>
-        <li><a href="#video">Aprende más en vídeo</a></li>
-        <li><a href="#comentarios">Respuestas y debate</a></li>
-      </ol>
-    </nav>
+    
 
     <article class="article">
 

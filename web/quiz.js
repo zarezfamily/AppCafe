@@ -1,128 +1,493 @@
-// Etiove Web Quiz de Sabor
-// Este archivo implementa el Quiz de Sabor como en la app, pero para la web.
-// Al finalizar, invita a descargar la app para ver resultados y cafés recomendados.
+// Etiove · Quiz de Sabor — web premium
 
-// Preguntas del quiz (idénticas a la app)
 const QUIZ = [
-  { id: 'tueste', pregunta: '¿Qué tueste prefieres?', emoji: '🔥',
+  {
+    id: 'tueste',
+    pregunta: '¿Qué tueste prefieres?',
+    nota: 'El tueste define el carácter de cada taza',
     opciones: [
-      { label: 'Claro',  desc: 'Más ácido y floral', value: 'claro',  icon: '☀️' },
-      { label: 'Medio',  desc: 'Equilibrado',         value: 'medio',  icon: '⚖️' },
-      { label: 'Oscuro', desc: 'Amargo y denso',      value: 'oscuro', icon: '🌑' },
+      { label: 'Claro',  desc: 'Floral · Ácido · Delicado',      value: 'claro'  },
+      { label: 'Medio',  desc: 'Equilibrado · Versátil · Limpio', value: 'medio'  },
+      { label: 'Oscuro', desc: 'Intenso · Denso · Ahumado',       value: 'oscuro' },
     ],
   },
-  { id: 'origen', pregunta: '¿De qué origen te gustan más?', emoji: '🌍',
+  {
+    id: 'origen',
+    pregunta: '¿Qué origen te atrae?',
+    nota: 'El origen marca el alma del grano',
     opciones: [
-      { label: 'África',      desc: 'Etiopía, Kenia, Ruanda',       value: 'africa',     icon: '🌺' },
-      { label: 'América',     desc: 'Colombia, Costa Rica, Panamá', value: 'america',    icon: '🫘' },
-      { label: 'Asia',        desc: 'Indonesia, Yemen, India',      value: 'asia',       icon: '🏔️' },
-      { label: 'Sorpréndeme', desc: 'Cualquier origen',             value: 'cualquiera', icon: '✨' },
+      { label: 'África',      desc: 'Etiopía · Kenia · Ruanda',       value: 'africa'     },
+      { label: 'América',     desc: 'Colombia · Costa Rica · Panamá', value: 'america'    },
+      { label: 'Asia',        desc: 'Indonesia · Yemen · India',       value: 'asia'       },
+      { label: 'Sorpréndeme', desc: 'Cualquier origen',               value: 'cualquiera' },
     ],
   },
-  { id: 'acidez', pregunta: '¿Cómo te gusta la acidez?', emoji: '⚡',
+  {
+    id: 'acidez',
+    pregunta: '¿Cómo te gusta la acidez?',
+    nota: 'La acidez es viveza, no agresividad',
     opciones: [
-      { label: 'Alta',  desc: 'Viva y brillante', value: 'alta',  icon: '⚡' },
-      { label: 'Media', desc: 'Equilibrada',       value: 'media', icon: '〰️' },
-      { label: 'Baja',  desc: 'Suave y redonda',  value: 'baja',  icon: '🌊' },
+      { label: 'Alta',  desc: 'Brillante · Viva · Expresiva',    value: 'alta'  },
+      { label: 'Media', desc: 'Equilibrada · Presente · Limpia', value: 'media' },
+      { label: 'Baja',  desc: 'Suave · Redonda · Envolvente',    value: 'baja'  },
     ],
   },
-  { id: 'sabor', pregunta: '¿Qué sabores te atraen?', emoji: '👅',
+  {
+    id: 'sabor',
+    pregunta: '¿Qué perfil te seduce?',
+    nota: 'Cada taza es un universo de matices',
     opciones: [
-      { label: 'Floral',    desc: 'Jazmín, rosa, bergamota',    value: 'floral',    icon: '🌸' },
-      { label: 'Frutal',    desc: 'Cereza, arándano, naranja',  value: 'frutal',    icon: '🍒' },
-      { label: 'Chocolate', desc: 'Cacao, caramelo, nuez',      value: 'chocolate', icon: '🍫' },
-      { label: 'Especias',  desc: 'Canela, cardamomo, vainilla', value: 'especias', icon: '🌶️' },
+      { label: 'Floral',    desc: 'Jazmín · Rosa · Bergamota',     value: 'floral'    },
+      { label: 'Frutal',    desc: 'Cereza · Arándano · Naranja',   value: 'frutal'    },
+      { label: 'Chocolate', desc: 'Cacao · Caramelo · Nuez',       value: 'chocolate' },
+      { label: 'Especias',  desc: 'Canela · Cardamomo · Vainilla', value: 'especias'  },
     ],
   },
 ];
 
+const STYLES = `
+  #webQuizRoot, #webQuizRoot * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  #webQuizRoot {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 100px 40px 120px;
+    background: #1a0f08;
+    color: #fff9f1;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  #webQuizRoot::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%,   rgba(143,94,59,0.20) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 50% at 15% 100%,  rgba(93,64,48,0.14) 0%, transparent 65%),
+      radial-gradient(ellipse 50% 40% at 90% 60%,   rgba(143,94,59,0.09) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  #webQuizRoot::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(228,195,164,0.3) 30%, rgba(228,195,164,0.3) 70%, transparent);
+    pointer-events: none;
+  }
+
+  .eq-inner {
+    width: 100%;
+    max-width: 700px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .eq-screen {
+    animation: eq-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes eq-rise {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .eq-eyebrow {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(205,165,120,0.7);
+    margin-bottom: 22px;
+    display: block;
+  }
+
+  .eq-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(40px, 6vw, 66px);
+    font-weight: 300;
+    color: #fff9f1;
+    line-height: 1.08;
+    letter-spacing: 0.5px;
+    margin-bottom: 22px;
+  }
+  .eq-title em {
+    font-style: italic;
+    color: rgba(228,195,164,0.9);
+  }
+
+  .eq-sub {
+    font-size: 15px;
+    color: rgba(255,249,241,0.5);
+    font-weight: 300;
+    line-height: 1.85;
+    max-width: 460px;
+    margin-bottom: 48px;
+    letter-spacing: 0.2px;
+  }
+
+  .eq-divider {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 48px;
+    max-width: 300px;
+  }
+  .eq-divider::before, .eq-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(228,195,164,0.2);
+  }
+  .eq-divider-glyph {
+    font-size: 12px;
+    color: rgba(205,165,120,0.5);
+  }
+
+  /* BOTÓN — grande, cálido, legible */
+  .eq-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    background: #e8d5be;
+    color: #1a0f08;
+    border: none;
+    padding: 20px 48px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+    font-family: inherit;
+    text-decoration: none;
+  }
+  .eq-btn-primary:hover {
+    background: #f5e6cf;
+    transform: translateY(-3px);
+    box-shadow: 0 20px 48px rgba(0,0,0,0.45);
+  }
+  .eq-btn-primary svg { transition: transform 0.3s; flex-shrink: 0; }
+  .eq-btn-primary:hover svg { transform: translateX(5px); }
+
+  .eq-btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    color: rgba(255,249,241,0.35);
+    border: none;
+    padding: 10px 0;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-family: inherit;
+    transition: color 0.25s;
+  }
+  .eq-btn-ghost:hover { color: rgba(255,249,241,0.7); }
+  .eq-btn-ghost:disabled { opacity: 0; pointer-events: none; }
+
+  /* PROGRESO */
+  .eq-progress {
+    display: flex;
+    align-items: center;
+    margin-bottom: 52px;
+    width: 100%;
+  }
+  .eq-prog-seg {
+    flex: 1;
+    height: 1px;
+    background: rgba(228,195,164,0.12);
+    transition: background 0.5s;
+  }
+  .eq-prog-seg.active { background: rgba(228,195,164,0.55); }
+  .eq-prog-node {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    border: 1px solid rgba(228,195,164,0.2);
+    background: transparent;
+    flex-shrink: 0;
+    transition: all 0.3s;
+  }
+  .eq-prog-node.done {
+    background: rgba(228,195,164,0.6);
+    border-color: rgba(228,195,164,0.6);
+  }
+  .eq-prog-node.current {
+    border-color: rgba(228,195,164,0.8);
+    box-shadow: 0 0 0 4px rgba(228,195,164,0.1);
+  }
+
+  /* PREGUNTA */
+  .eq-q-label {
+    font-size: 10px;
+    letter-spacing: 3.5px;
+    text-transform: uppercase;
+    color: rgba(205,165,120,0.65);
+    font-weight: 500;
+    margin-bottom: 14px;
+    display: block;
+  }
+  .eq-question {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(30px, 4.5vw, 44px);
+    font-weight: 400;
+    color: #fff9f1;
+    line-height: 1.18;
+    margin-bottom: 10px;
+    letter-spacing: 0.3px;
+  }
+  .eq-q-nota {
+    font-size: 13px;
+    color: rgba(255,249,241,0.32);
+    font-weight: 300;
+    font-style: italic;
+    margin-bottom: 36px;
+  }
+
+  /* OPCIONES — fondo cálido visible, borde legible */
+  .eq-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 36px;
+  }
+  .eq-options.cols-3 { grid-template-columns: repeat(3, 1fr); }
+
+  .eq-option {
+    background: rgba(228,195,164,0.10);
+    border: 1px solid rgba(228,195,164,0.32);
+    border-radius: 3px;
+    cursor: pointer;
+    text-align: left;
+    padding: 26px 24px 22px;
+    transition: border-color 0.25s, background 0.25s, transform 0.22s, box-shadow 0.25s;
+    font-family: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+  }
+  .eq-option::after {
+    content: '';
+    position: absolute;
+    top: 16px; bottom: 16px; left: 0;
+    width: 2px;
+    background: rgba(228,195,164,0.7);
+    border-radius: 0 2px 2px 0;
+    opacity: 0;
+    transition: opacity 0.22s, transform 0.22s;
+    transform: scaleY(0.4);
+    transform-origin: center;
+  }
+  .eq-option:hover {
+    border-color: rgba(228,195,164,0.7);
+    background: rgba(228,195,164,0.16);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 36px rgba(0,0,0,0.3);
+  }
+  .eq-option:hover::after { opacity: 1; transform: scaleY(1); }
+  .eq-option:active { transform: translateY(-1px); }
+
+  .eq-option-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 10px;
+    color: rgba(205,165,120,0.45);
+    letter-spacing: 2px;
+    font-weight: 400;
+  }
+  .eq-option-label {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(20px, 2.8vw, 24px);
+    font-weight: 400;
+    color: #fff9f1;
+    letter-spacing: 0.3px;
+    line-height: 1.1;
+  }
+  .eq-option-desc {
+    font-size: 12px;
+    color: rgba(255,249,241,0.65);
+    font-weight: 300;
+    letter-spacing: 0.6px;
+    line-height: 1.6;
+    margin-top: 2px;
+  }
+
+  /* PIE */
+  .eq-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid rgba(228,195,164,0.1);
+    padding-top: 22px;
+  }
+  .eq-foot-counter {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    color: rgba(255,249,241,0.18);
+    letter-spacing: 3px;
+    font-style: italic;
+  }
+
+  /* FINAL */
+  .eq-final-seal {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    border: 1px solid rgba(228,195,164,0.18);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 36px;
+    position: relative;
+  }
+  .eq-final-seal::after {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border-radius: 50%;
+    border: 1px solid rgba(228,195,164,0.32);
+  }
+  .eq-final-seal-core {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: rgba(228,195,164,0.08);
+    border: 1px solid rgba(228,195,164,0.35);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+
+  .eq-final-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+    margin-top: 48px;
+  }
+
+  .eq-btn-text {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,249,241,0.28);
+    font-family: inherit;
+    padding: 0;
+    transition: color 0.25s;
+  }
+  .eq-btn-text:hover { color: rgba(255,249,241,0.6); }
+
+  @media (max-width: 600px) {
+    #webQuizRoot { padding: 80px 24px 100px; min-height: auto; }
+    .eq-options, .eq-options.cols-3 { grid-template-columns: 1fr; }
+    .eq-btn-primary { padding: 18px 36px; width: 100%; justify-content: center; }
+  }
+`;
+
 function renderQuiz() {
   const root = document.getElementById('webQuizRoot');
   if (!root) return;
+
+  if (!document.getElementById('eq-styles')) {
+    const s = document.createElement('style');
+    s.id = 'eq-styles';
+    s.textContent = STYLES;
+    document.head.appendChild(s);
+  }
+
   let step = 0;
   let prefs = {};
+  const NUMS = ['I', 'II', 'III', 'IV'];
 
-  function showStep() {
+  function render() {
     root.innerHTML = '';
+    const inner = document.createElement('div');
+    inner.className = 'eq-inner eq-screen';
+    root.appendChild(inner);
+
     if (step === 0) {
-      const intro = document.createElement('div');
-      intro.className = 'quiz-intro';
-      intro.innerHTML = `
-        <div class="quiz-emoji">☕</div>
-        <h2 class="quiz-title">¿Qué café es para ti?</h2>
-        <div class="quiz-sub">4 preguntas y te recomendamos tu café ideal.</div>
-        <button class="quiz-btn" id="startQuizBtn">Empezar →</button>
+      inner.innerHTML = `
+        <span class="eq-eyebrow">Quiz de sabor · Etiove</span>
+        <h2 class="eq-title">¿Cuál es <em>tu</em> café ideal?</h2>
+        <p class="eq-sub">Cuatro preguntas. Tu perfil sensorial exacto.<br>Descubre en la app los cafés que están esperándote.</p>
+        <div class="eq-divider"><span class="eq-divider-glyph">✦</span></div>
+        <button class="eq-btn-primary" id="eq-start">
+          Comenzar el quiz
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
       `;
-      root.appendChild(intro);
-      document.getElementById('startQuizBtn').onclick = () => { step = 1; showStep(); };
+      inner.querySelector('#eq-start').onclick = () => { step = 1; render(); };
       return;
     }
-    if (step >= 1 && step <= QUIZ.length) {
-      const pq = QUIZ[step - 1];
-      const box = document.createElement('div');
-      box.className = 'quiz-box';
-      box.innerHTML = `
-        <div class="quiz-progress">${QUIZ.map((_, i) => `<span class="quiz-dot${i < step ? ' active' : ''}"></span>`).join('')}</div>
-        <div class="quiz-emoji">${pq.emoji}</div>
-        <div class="quiz-pregunta">${pq.pregunta}</div>
-        <div class="quiz-opciones"></div>
-        ${step > 1 ? '<button class="quiz-btn-back" id="quizBackBtn">← Anterior</button>' : ''}
+
+    if (step > QUIZ.length) {
+      inner.innerHTML = `
+        <div class="eq-final-seal"><div class="eq-final-seal-core">☕</div></div>
+        <span class="eq-eyebrow">Perfil completado</span>
+        <h2 class="eq-title">Tu café perfecto<br><em>te está esperando</em></h2>
+        <p class="eq-sub">Hemos trazado tu perfil sensorial. Descarga Etiove para ver tus resultados y descubrir los cafés de especialidad a tu medida.</p>
+        <div class="eq-final-actions">
+          <a class="eq-btn-primary" href="https://etiove.com/app" target="_blank">
+            Descargar Etiove
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+          <button class="eq-btn-text" id="eq-restart">Repetir el quiz</button>
+        </div>
       `;
-      root.appendChild(box);
-      const opcionesDiv = box.querySelector('.quiz-opciones');
-      pq.opciones.forEach(op => {
-        const btn = document.createElement('button');
-        btn.className = 'quiz-opcion';
-        btn.innerHTML = `<span class="quiz-opcion-icon">${op.icon}</span><span class="quiz-opcion-label">${op.label}</span><span class="quiz-opcion-desc">${op.desc}</span>`;
-        btn.onclick = () => {
-          prefs[pq.id] = op.value;
-          if (step < QUIZ.length) { step++; showStep(); }
-          else { step = QUIZ.length + 1; showStep(); }
-        };
-        opcionesDiv.appendChild(btn);
-      });
-      if (step > 1) document.getElementById('quizBackBtn').onclick = () => { step--; showStep(); };
+      inner.querySelector('#eq-restart').onclick = () => { step = 0; prefs = {}; render(); };
       return;
     }
-    // Paso final: resultado bloqueado
-    const fin = document.createElement('div');
-    fin.className = 'quiz-final';
-    fin.innerHTML = `
-      <div class="quiz-emoji">🎉</div>
-      <h2 class="quiz-title">¡Listo!</h2>
-      <div class="quiz-sub">Para ver tus resultados y cafés recomendados,<br><b>descarga la app Etiove</b>:</div>
-      <div class="quiz-app-links">
-        <a href="https://etiove.com/app" class="quiz-app-btn">Descargar App</a>
+
+    const q = QUIZ[step - 1];
+
+    let progHTML = '';
+    for (let i = 0; i <= QUIZ.length; i++) {
+      if (i > 0) progHTML += `<div class="eq-prog-seg${i <= step ? ' active' : ''}"></div>`;
+      const cls = i < step ? 'done' : i === step ? 'current' : '';
+      progHTML += `<div class="eq-prog-node${cls ? ' ' + cls : ''}"></div>`;
+    }
+
+    const cols = q.opciones.length === 3 ? 'cols-3' : '';
+    const optsHTML = q.opciones.map((op, i) => `
+      <button class="eq-option" data-value="${op.value}">
+        <span class="eq-option-num">${NUMS[i]}</span>
+        <span class="eq-option-label">${op.label}</span>
+        <span class="eq-option-desc">${op.desc}</span>
+      </button>
+    `).join('');
+
+    inner.innerHTML = `
+      <div class="eq-progress">${progHTML}</div>
+      <span class="eq-q-label">Pregunta ${step} de ${QUIZ.length}</span>
+      <h3 class="eq-question">${q.pregunta}</h3>
+      <p class="eq-q-nota">${q.nota}</p>
+      <div class="eq-options ${cols}">${optsHTML}</div>
+      <div class="eq-foot">
+        <button class="eq-btn-ghost" id="eq-back" ${step === 1 ? 'disabled' : ''}>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          Anterior
+        </button>
+        <span class="eq-foot-counter">${step} · ${QUIZ.length}</span>
       </div>
-      <div class="quiz-note">Tu progreso se guarda en este navegador.</div>
     `;
-    root.appendChild(fin);
+
+    inner.querySelectorAll('.eq-option').forEach(btn => {
+      btn.onclick = () => { prefs[q.id] = btn.dataset.value; step++; render(); };
+    });
+    const back = inner.querySelector('#eq-back');
+    if (back && !back.disabled) back.onclick = () => { step--; render(); };
   }
-  showStep();
+
+  render();
 }
 
 document.addEventListener('DOMContentLoaded', renderQuiz);
-
-// Estilos mínimos sugeridos para el quiz (añadir en CSS global o en línea)
-/*
-#webQuizRoot { max-width:400px;margin:32px auto;padding:24px;background:#fff;border-radius:18px;box-shadow:0 4px 24px #0001; }
-.quiz-emoji { font-size:38px;text-align:center;margin-bottom:10px; }
-.quiz-title { font-size:22px;font-weight:700;text-align:center;margin-bottom:8px; }
-.quiz-sub { font-size:15px;color:#8b7355;text-align:center;margin-bottom:18px; }
-.quiz-box { padding:10px 0; }
-.quiz-opciones { display:grid;gap:12px;margin:18px 0; }
-.quiz-opcion { background:#f6efe7;border:none;border-radius:12px;padding:14px 12px;text-align:left;display:flex;align-items:center;gap:14px;cursor:pointer;transition:background .2s; }
-.quiz-opcion:hover { background:#f0e8df; }
-.quiz-opcion-icon { font-size:22px; }
-.quiz-opcion-label { font-weight:600;font-size:16px; }
-.quiz-opcion-desc { font-size:13px;color:#8b7355;margin-left:8px; }
-.quiz-btn, .quiz-btn-back { background:#8f5e3b;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:16px;font-weight:600;cursor:pointer;margin:10px auto 0;display:block; }
-.quiz-btn-back { background:#e4d3c2;color:#8f5e3b;margin-top:0; }
-.quiz-progress { display:flex;gap:6px;justify-content:center;margin-bottom:12px; }
-.quiz-dot { width:10px;height:10px;border-radius:50%;background:#e4d3c2;display:inline-block; }
-.quiz-dot.active { background:#8f5e3b; }
-.quiz-final { text-align:center;padding:24px 0; }
-.quiz-app-links { margin:18px 0; }
-.quiz-app-btn { background:#8f5e3b;color:#fff;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:700;font-size:17px; }
-.quiz-note { font-size:12px;color:#9a7963;margin-top:18px; }
-*/

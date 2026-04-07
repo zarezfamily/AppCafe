@@ -7,6 +7,8 @@ import {
 } from 'react-native';
 import { updateDocument } from '../../firebaseConfig';
 import AppDialogModal from '../components/AppDialogModal';
+import Chip from '../components/Chip';
+import InfoRow from '../components/InfoRow';
 import PackshotImage from '../components/PackshotImage';
 import Stars from '../components/Stars';
 import { KEY_VOTES } from '../constants/storageKeys';

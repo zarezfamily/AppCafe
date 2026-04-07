@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from 'react';
 import {
-    Animated, Image, Modal, Platform, ScrollView, Text, TouchableOpacity, View,
+  Animated, Image, Modal, Platform, ScrollView, Text, TouchableOpacity, View,
 } from 'react-native';
 
 export default function CataDetailModal({

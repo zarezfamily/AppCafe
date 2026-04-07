@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
 import { ActivityIndicator, Image, Linking, Switch, Text, TouchableOpacity, View } from 'react-native';
 import AppDialogModal from '../components/AppDialogModal';
 import MemberInfoModal from '../components/MemberInfoModal';

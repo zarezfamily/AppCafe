@@ -1,14 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as Location from 'expo-location';
 import { useEffect, useState } from 'react';
-import {
-  ActivityIndicator, FlatList, Image, Linking, Modal,
-  Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet,
-  Text, TouchableOpacity, View,
-} from 'react-native';
-import { GOOGLE_PLACES_KEY, PREMIUM_ACCENT, PREMIUM_ACCENT_DEEP, THEME, H } from '../constants/theme';
+import { ActivityIndicator, Image, Modal, Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { GOOGLE_PLACES_KEY, H, PREMIUM_ACCENT, PREMIUM_ACCENT_DEEP, THEME } from '../constants/theme';
 import { buildPlacesPhotoUrl, calcDistanceMeters, fetchNearbyPlaces, isGooglePlacesConfigured } from '../core/places';
-import { shared } from '../styles/sharedStyles';
 
 export default function CafeteriasScreen() {
   const [cafeterias, setCafeterias]     = useState([]);

@@ -166,7 +166,9 @@ export default function PaywallModal({
               <Text style={styles.restoreBtnText}>{restoring ? 'Restaurando compras...' : 'Restaurar compras'}</Text>
             </TouchableOpacity>
 
-            {!revenueCatReady ? <Text style={styles.setupNote}>Configura las claves públicas de RevenueCat y usa una build nativa para habilitar compras reales.</Text> : null}
+            {!revenueCatReady ? (
+              <Text style={styles.setupNote}>Configura las claves públicas de RevenueCat y usa una build nativa para habilitar compras reales.</Text>
+            ) : null}
 
             <Text style={styles.legal}>
               El pago se procesará a través de App Store o Google Play. La suscripción mensual se renueva automáticamente. Puedes cancelar en cualquier momento desde los ajustes de tu cuenta.

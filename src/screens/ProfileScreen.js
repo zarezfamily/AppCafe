@@ -1,13 +1,15 @@
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Image, Modal, SafeAreaView, StatusBar, ActivityIndicator } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as SecureStore from 'expo-secure-store';
-import { useEffect, useState } from 'react';
-import {
-    ActivityIndicator, Image, Modal, SafeAreaView,
-    ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View,
-} from 'react-native';
-import { getDocument, setDocument, uploadImageToStorage, sendEmailVerification, sendPhoneVerificationCode, verifyPhoneCode } from '../../firebaseConfig';
-import { getAchievementDefs, defaultGamification } from '../core/gamification';
+import { Ionicons } from '@expo/vector-icons';
+import { useUI } from '../context/UIContext';
+import { useAuth } from '../../App';
+import PremiumBadge from './PremiumBadge';
+import PaisPicklist from '../components/PaisPicklist';
+import { uploadImageToStorage, getDocument, setDocument } from '../../firebaseConfig';
+
+const ProfileScreen = ({ onClose }) => {
   const [smsVerificando, setSmsVerificando] = useState(false);
   const [smsSessionInfo, setSmsSessionInfo] = useState(null);
   const [smsCode, setSmsCode] = useState('');

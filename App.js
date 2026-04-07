@@ -87,6 +87,8 @@ import PaywallModal from './src/screens/PaywallModal';
 import PremiumBadge from './src/screens/PremiumBadge';
 import TopCafesTab from './src/screens/TopCafesTab';
 import UltimosAnadidosTab from './src/screens/UltimosAnadidosTab';
+import { useProfileRealtimeSync } from './src/api/profileSync';
+import linking from './src/navigation/linking';
 
 const { width: W, height: H } = Dimensions.get('window');
 const APP_VERSION = '2.1.0';
@@ -799,12 +801,12 @@ function CafeteriasScreen() {
     setCargando(true); setError(null);
     try {
       if (!isGooglePlacesConfigured(GOOGLE_PLACES_KEY)) {
-        setError('Configura una Google Places API key valida para habilitar cafeterias cercanas.');
+        setError('Configura una Google Places API key valida para habilitar cafeterías cercanas.');
         setCargando(false);
         return;
       }
       const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') { setError('Activa la ubicacion para ver cafeterias cerca de ti'); setCargando(false); return; }
+      if (status !== 'granted') { setError('Activa la ubicacion para ver cafeterías cerca de ti'); setCargando(false); return; }
       const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
       const { latitude: lat, longitude: lon } = loc.coords;
 
@@ -865,15 +867,15 @@ function CafeteriasScreen() {
       });
 
       setCafeterias(result);
-      if (result.length === 0) setError('No encontramos cafeterias cerca. Prueba en otra zona.');
+      if (result.length === 0) setError('No encontramos cafeterías cerca. Prueba en otra zona.');
     } catch (e) {
       const msg = String(e?.message || '');
       if (msg.includes('GOOGLE_PLACES_KEY_NOT_CONFIGURED')) {
-        setError('Configura una Google Places API key valida para habilitar cafeterias cercanas.');
+        setError('Configura una Google Places API key valida para habilitar cafeterías cercanas.');
       } else if (msg.includes('GOOGLE_PLACES_API_ERROR')) {
         setError('Google Places no esta disponible: revisa permisos de API key y facturacion en Google Cloud.');
       } else {
-        setError('Error al buscar cafeterias: ' + msg);
+        setError('Error al buscar cafeterías: ' + msg);
       }
     } finally {
       setCargando(false);
@@ -1146,7 +1148,7 @@ ${seleccionada.barrio}` : ''}</Text>
               </View>
               {/* Tags */}
               <View style={caf.cardTags}>
-                <View style={caf.cardTag}><Ionicons name="location-outline" size={11} color={PREMIUM_ACCENT} /><Text style={caf.cardTagText}>{item.distancia < 1000 ? `${item.distancia}m` : `${(item.distancia/1000).toFixed(1)}km`}</Text></View>
+                <View style={caf.cardTag}><Ionicons name="location-outline" size={11} color={PREMIUM_ACCENT} /><Text style={caf.cardTagText}>
                 {item.wifi     && <View style={caf.cardTag}><Ionicons name="wifi-outline"       size={11} color={THEME.text.tertiary} /><Text style={caf.cardTagText}>WiFi</Text></View>}
                 {item.terraza  && <View style={caf.cardTag}><Ionicons name="sunny-outline"      size={11} color={THEME.text.tertiary} /><Text style={caf.cardTagText}>Terraza</Text></View>}
                 {item.takeaway && <View style={caf.cardTag}><Ionicons name="bag-handle-outline" size={11} color={THEME.text.tertiary} /><Text style={caf.cardTagText}>Para llevar</Text></View>}
@@ -1298,9 +1300,7 @@ function WelcomeScreen() {
       <StatusBar barStyle="dark-content" backgroundColor="#f6efe7" />
       <View style={s.welcomeAuraOne} />
       <View style={s.welcomeAuraTwo} />
-      <Animated.View style={[s.welcomeCard, { transform: [{ translateY: floatTranslateY }] }]}> 
-        <View style={s.welcomeTypeBox}>
-          <Text style={s.welcomeLineTop}>{topRaw}{showCursorTop ? '|' : ' '}</Text>
+      <Animated.View style={[s.welcome
           <Text style={s.welcomeLineBottom}>{bottomRaw}{showCursorBottom ? '|' : ' '}</Text>
         </View>
       </Animated.View>
@@ -1595,7 +1595,7 @@ function FormScreen({ onSave, onBack, onCafeAdded }) {
         <TouchableOpacity style={foto ? {} : s.fotoEmpty} onPress={hacerFoto}>
           {foto ? <Image source={{ uri: foto }} style={s.fotoFull} /> : <><Ionicons name="camera-outline" size={32} color={THEME.text.muted} /><Text style={s.fotoEmptyText}>Añadir foto</Text></>}
         </TouchableOpacity>
-        {foto && <TouchableOpacity onPress={hacerFoto}><Text style={s.retake}>Cambiar foto</Text></TouchableOpacity>}
+        {foto && <TouchableOpacity style={hacerFoto}><Text style={s.retake}>Cambiar foto</Text></TouchableOpacity>}
         <Text style={s.label}>Nombre del café</Text>
         <TextInput style={s.input} placeholder="Ej: Yirgacheffe Etiopía" placeholderTextColor="#bbb" value={nombreCafe} onChangeText={setNombreCafe} />
         <Text style={s.label}>Origen / Tostado</Text>
@@ -2872,8 +2872,8 @@ function MainScreen({ onLogout }) {
     forumEditOpen,
     setForumEditOpen,
     forumEditCollection,
-    forumEditTitle,
-    setForumEditTitle,
+    forumEditTarget,
+    setForumEditTarget,
     forumEditBody,
     setForumEditBody,
     guardarEdicionForo,
@@ -3247,23 +3247,18 @@ export default function App() {
   });
   const [user, setUser]               = useState(null);
   const [showWelcome, setShowWelcome] = useState(true);
+  const [perfil, setPerfil] = useState(null);
+  // Asegúrate de tener acceso a 'user' (usuario autenticado)
+  useProfileRealtimeSync(user, setPerfil);
   useEffect(() => { const t = setTimeout(() => setShowWelcome(false), 4000); return () => clearTimeout(t); }, []);
   if (!fontsLoaded) return null;
   if (showWelcome) return <WelcomeScreen />;
   return (
     <UIProvider>
-      <AuthContext.Provider value={{ user }}>
-        {user ? (
-          <MainScreen
-            onLogout={() => {
-              clearAuthToken();
-              SecureStore.deleteItemAsync('authToken').catch(() => {});
-              setUser(null);
-            }}
-          />
-        ) : (
-          <AuthScreen onAuth={setUser} />
-        )}
+      <AuthContext.Provider value={{ user, perfil }}>
+        <NavigationContainer linking={linking}>
+          <RootNavigator />
+        </NavigationContainer>
       </AuthContext.Provider>
     </UIProvider>
   );

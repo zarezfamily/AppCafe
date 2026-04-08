@@ -386,9 +386,6 @@
       .hero-title { font-size: clamp(2rem, 11vw, 2.8rem); }
       .hero-tagline { font-size: 12px; letter-spacing: 1.4px; }
       .hero-scroll { display: none; }
-      .filter-bar { justify-content: flex-start; }
-      .article-card { padding: 18px; }
-      .article-title { font-size: 26px; }
       .scroll-top { bottom: 80px; right: 16px; }
     }
   </style>
@@ -399,23 +396,8 @@
     <a class="nav-wordmark" href="/">Etiove</a>
     <div class="nav-links">
       <a class="nav-link" href="/">Inicio</a>
-      <a class="nav-link" href="/blog/index.html">Blog</a>
+      <a class="nav-link" href="/blog/">Blog</a>
       <a class="nav-link" href="/comunidad.html">Comunidad</a>
-        <style>
-          .nav-link {
-            color: #9a7963 !important;
-            text-decoration: none !important;
-            font-size: 11px;
-            font-weight: 500;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            transition: color 0.3s;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-          }
-          .nav-link:hover {
-            color: var(--accent) !important;
-          }
-        </style>
     </div>
   </nav>
 
@@ -456,20 +438,49 @@
             placeholder="Busca palabras o frases dentro de los posts"
             aria-label="Buscar dentro de los posts"
           />
-          <span id="searchCount" class="search-count">4 posts</span>
+          <span id="searchCount" class="search-count">6 posts</span>
           <button id="clearSearch" class="search-clear" type="button" aria-label="Limpiar búsqueda">×</button>
         </div>
       </div>
 
       <div id="searchStatus" class="search-status"></div>
 
-      <div class="grid" id="postGrid"></div>
-      <div id="blogPager"></div>
+      <div class="grid" id="postGrid">
+
+        <article class="card" data-category="analisis" data-post-url="/blog/cafe-de-especialidad-vs-cafe-normal.html" data-search="cafe de especialidad vs cafe normal diferencia que es especialidad sca puntuacion 80 puntos origen single origin trazabilidad tueste frescura precio productor sabor comparacion">
+          <a class="card-link" href="/blog/cafe-de-especialidad-vs-cafe-normal.html">
+            <div class="card-thumb">
+              <img src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=900&q=80&auto=format&fit=crop" alt="Granos de café de especialidad de distintos orígenes" loading="lazy" width="900" height="248" />
+              <span class="card-tag">An&aacute;lisis</span>
+            </div>
+            <div class="card-body">
+              <p class="card-date">09 abril 2026</p>
+              <h2 class="card-title">Caf&eacute; de Especialidad vs Caf&eacute; Normal: &iquest;Cu&aacute;l es la diferencia real?</h2>
+              <p class="card-excerpt">Puntuaci&oacute;n SCA, trazabilidad, sabor y precio. Todo lo que diferencia un caf&eacute; de especialidad de uno del supermercado, explicado sin tecnicismos.</p>
+              <span class="read-link">Leer art&iacute;culo <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+            </div>
+          </a>
+        </article>
+
+        <article class="card" data-category="guia" data-post-url="/blog/por-que-mi-cafe-sabe-amargo.html" data-search="por que mi cafe sabe amargo causas soluciones sobreextraccion molienda temperatura agua cafetera italiana metodo preparacion amargor astringente">
+          <a class="card-link" href="/blog/por-que-mi-cafe-sabe-amargo.html">
+            <div class="card-thumb">
+              <img src="https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=900&q=80&auto=format&fit=crop" alt="Taza de café con vapor, preparación en casa" loading="lazy" width="900" height="248" />
+              <span class="card-tag">Gu&iacute;a</span>
+            </div>
+            <div class="card-body">
+              <p class="card-date">08 abril 2026</p>
+              <h2 class="card-title">&iquest;Por qu&eacute; mi caf&eacute; sabe amargo? 7 causas y sus soluciones</h2>
+              <p class="card-excerpt">Sobreextracci&oacute;n, molienda incorrecta, agua demasiado caliente&hellip; Descubre las 7 causas reales de que tu caf&eacute; sepa amargo y c&oacute;mo solucionarlas hoy.</p>
+              <span class="read-link">Leer art&iacute;culo <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+            </div>
+          </a>
+        </article>
 
         <article class="card" data-category="analisis" data-post-url="/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html" data-search="vale la pena pagar mas por cafe de especialidad analisis precio calidad impacto social consumidor granos finca altura">
           <a class="card-link" href="/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html">
             <div class="card-thumb">
-              <img src="https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=900&q=80&auto=format&fit=crop" alt="Granos de caf&eacute; seleccionados a mano en una finca de altura" loading="lazy" />
+              <img src="https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=900&q=80&auto=format&fit=crop" alt="Granos de caf&eacute; seleccionados a mano en una finca de altura" loading="lazy" width="900" height="248" />
               <span class="card-tag">An&aacute;lisis</span>
             </div>
             <div class="card-body">
@@ -484,7 +495,7 @@
         <article class="card" data-category="noticia" data-post-url="/blog/cafe-de-especialidad-crece-en-espana-2026.html" data-search="cafe de especialidad crece espana 2026 noticia mercado consumo cafeteria barista crecimiento">
           <a class="card-link" href="/blog/cafe-de-especialidad-crece-en-espana-2026.html">
             <div class="card-thumb">
-              <img src="https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=900&q=80&auto=format&fit=crop" alt="Barista preparando caf&eacute; de especialidad en una cafeter&iacute;a moderna" loading="lazy" />
+              <img src="https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=900&q=80&auto=format&fit=crop" alt="Barista preparando caf&eacute; de especialidad en una cafeter&iacute;a moderna" loading="lazy" width="900" height="248" />
               <span class="card-tag">Noticia</span>
             </div>
             <div class="card-body">
@@ -499,7 +510,7 @@
         <article class="card" data-category="tutorial" data-post-url="/blog/guia-de-molienda-por-metodo.html" data-search="guia de molienda por metodo tutorial v60 espresso aeropress chemex french press molinillo">
           <a class="card-link" href="/blog/guia-de-molienda-por-metodo.html">
             <div class="card-thumb">
-              <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=900&q=80&auto=format&fit=crop" alt="Molinillo de caf&eacute; manual con granos de especialidad" loading="lazy" />
+              <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=900&q=80&auto=format&fit=crop" alt="Molinillo de caf&eacute; manual con granos de especialidad" loading="lazy" width="900" height="248" />
               <span class="card-tag">Tutorial</span>
             </div>
             <div class="card-body">
@@ -514,7 +525,7 @@
         <article class="card" data-category="guia" data-post-url="/blog/como-elegir-el-mejor-cafe-de-etiopia.html" data-search="como elegir el mejor cafe de etiopia guia yirgacheffe guji origen proceso lavado natural altitud">
           <a class="card-link" href="/blog/como-elegir-el-mejor-cafe-de-etiopia.html">
             <div class="card-thumb">
-              <img src="https://images.unsplash.com/photo-1461988091159-192b6df7054f?w=900&q=80&auto=format&fit=crop" alt="Cafetales en las tierras altas de Etiop&iacute;a" loading="lazy" />
+              <img src="https://images.unsplash.com/photo-1461988091159-192b6df7054f?w=900&q=80&auto=format&fit=crop" alt="Cafetales en las tierras altas de Etiop&iacute;a" loading="lazy" width="900" height="248" />
               <span class="card-tag">Gu&iacute;a</span>
             </div>
             <div class="card-body">
@@ -526,7 +537,8 @@
           </a>
         </article>
 
-      </div>
+      </div><!-- /postGrid -->
+      <div id="blogPager"></div>
     </div>
   </section>
 

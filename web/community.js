@@ -726,12 +726,29 @@ const goToThreadDetail = (threadId) => {
   );
 };
 
-const goToThreadList = ({ replace = false, restoreScroll = true } = {}) => {
+const goToThreadList = ({ replace = false, restoreScroll = true, scrollToThreadId = null } = {}) => {
   const scrollY = Number((window.history.state && window.history.state.communityScrollY) || 0);
-  window.history[replace ? 'replaceState' : 'pushState']({ communityView: 'list', communityScrollY: scrollY }, '', '/comunidad.html');
+  // Always replaceState first to clear the thread URL, so getActiveThreadId() returns ''
+  window.history.replaceState({ communityView: 'list', communityScrollY: scrollY }, '', '/comunidad.html');
+  if (!replace) {
+    window.history.pushState({ communityView: 'list', communityScrollY: scrollY }, '', '/comunidad.html');
+  }
   transitionThreadsView(
     () => renderThreads(),
-    restoreScroll ? () => window.scrollTo({ top: scrollY, behavior: 'auto' }) : undefined,
+    () => {
+      if (scrollToThreadId) {
+        // Scroll to the specific thread in the list
+        setTimeout(() => {
+          const article = document.querySelector(`[data-thread-id="${scrollToThreadId}"]`);
+          if (article) {
+            const rect = article.getBoundingClientRect();
+            window.scrollTo({ top: window.scrollY + rect.top - 120, behavior: 'smooth' });
+          }
+        }, 300);
+      } else if (restoreScroll) {
+        window.scrollTo({ top: scrollY, behavior: 'auto' });
+      }
+    }
   );
 };
 
@@ -2105,6 +2122,8 @@ const sendReply = async (threadId) => {
 };
 
 const showProfileGate = () => {
+  // Capture the active thread at the moment the alias was clicked
+  const activeThreadId = getActiveThreadId();
   el.threadsWrap.innerHTML = `
     <div class="thread-gate private">
       <div class="thread-gate-icon">👤</div>
@@ -2115,7 +2134,9 @@ const showProfileGate = () => {
     </div>`;
   const actionBtn = el.threadsWrap.querySelector('#profileGateAction');
   const backBtn   = el.threadsWrap.querySelector('#profileGateBack');
-  if (backBtn)   backBtn.addEventListener('click', goBackFromThreadDetail);
+  if (backBtn) backBtn.addEventListener('click', () => {
+    goToThreadList({ replace: false, restoreScroll: false, scrollToThreadId: activeThreadId || null });
+  });
   if (actionBtn) actionBtn.addEventListener('click', () => {
     const loginSection = document.querySelector('.login-section');
     if (loginSection) { loginSection.style.display = ''; loginSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
@@ -2142,17 +2163,7 @@ const showPrivateThreadGate = (thread) => {
   const actionBtn = el.threadsWrap.querySelector('#threadGateAction');
   const backBtn = el.threadsWrap.querySelector('#threadGateBack');
   if (backBtn) backBtn.addEventListener('click', () => {
-    goToThreadList({ replace: false, restoreScroll: false });
-    // After list renders, scroll to the thread that was clicked
-    if (threadId) {
-      setTimeout(() => {
-        const article = document.querySelector(`[data-thread-id="${threadId}"]`);
-        if (article) {
-          const rect = article.getBoundingClientRect();
-          window.scrollTo({ top: window.scrollY + rect.top - 120, behavior: 'smooth' });
-        }
-      }, 300);
-    }
+    goToThreadList({ replace: false, restoreScroll: false, scrollToThreadId: threadId || null });
   });
   if (actionBtn) {
     if (isPrivate) {

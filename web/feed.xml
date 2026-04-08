@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Blog Etiove — Café de Especialidad</title>
+    <link>https://etiove.com/blog/</link>
+    <description>Guías, análisis y novedades sobre café de especialidad en España. Por el equipo de Etiove.</description>
+    <language>es-ES</language>
+    <copyright>© 2026 Etiove</copyright>
+    <lastBuildDate>Wed, 09 Apr 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://etiove.com/feed.xml" rel="self" type="application/rss+xml" />
+    <image>
+      <url>https://etiove.com/og-image.jpg</url>
+      <title>Blog Etiove</title>
+      <link>https://etiove.com/blog/</link>
+    </image>
+
+    <item>
+      <title>Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real?</title>
+      <link>https://etiove.com/blog/cafe-de-especialidad-vs-cafe-normal.html</link>
+      <description>¿Qué diferencia hay entre un café de especialidad y uno del supermercado? Puntuación SCA, trazabilidad, sabor y precio explicados sin tecnicismos.</description>
+      <pubDate>Wed, 09 Apr 2026 00:00:00 +0000</pubDate>
+      <guid isPermaLink="true">https://etiove.com/blog/cafe-de-especialidad-vs-cafe-normal.html</guid>
+    </item>
+
+    <item>
+      <title>¿Por qué mi café sabe amargo? Causas y soluciones</title>
+      <link>https://etiove.com/blog/por-que-mi-cafe-sabe-amargo.html</link>
+      <description>Sobreextracción, molienda incorrecta, agua demasiado caliente… Descubre las 7 causas reales de que tu café sepa amargo y cómo solucionarlas hoy.</description>
+      <pubDate>Wed, 08 Apr 2026 00:00:00 +0000</pubDate>
+      <guid isPermaLink="true">https://etiove.com/blog/por-que-mi-cafe-sabe-amargo.html</guid>
+    </item>
+
+    <item>
+      <title>¿Vale la Pena Pagar Más por Café de Especialidad?</title>
+      <link>https://etiove.com/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html</link>
+      <description>Un análisis honesto de qué hay detrás del precio del café de especialidad: calidad real, impacto social y cuándo merece la pena el desembolso.</description>
+      <pubDate>Sat, 04 Apr 2026 00:00:00 +0000</pubDate>
+      <guid isPermaLink="true">https://etiove.com/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html</guid>
+    </item>
+
+    <item>
+      <title>El Café de Especialidad Crece un 34% en España</title>
+      <link>https://etiove.com/blog/cafe-de-especialidad-crece-en-espana-2026.html</link>
+      <description>El mercado del café de especialidad en España supera los 220 millones de euros en 2025. Analizamos los datos, las causas y lo que significa para el consumidor.</description>
+      <pubDate>Thu, 03 Apr 2026 00:00:00 +0000</pubDate>
+      <guid isPermaLink="true">https://etiove.com/blog/cafe-de-especialidad-crece-en-espana-2026.html</guid>
+    </item>
+
+    <item>
+      <title>Guía de Molienda por Método: de V60 a Espresso</title>
+      <link>https://etiove.com/blog/guia-de-molienda-por-metodo.html</link>
+      <description>Aprende el punto de molienda ideal para V60, Chemex, AeroPress, French Press y espresso sin perder dulzor ni claridad.</description>
+      <pubDate>Wed, 02 Apr 2026 00:00:00 +0000</pubDate>
+      <guid isPermaLink="true">https://etiove.com/blog/guia-de-molienda-por-metodo.html</guid>
+    </item>
+
+    <item>
+      <title>Cómo Elegir el Mejor Café de Etiopía: Guía Completa</title>
+      <link>https://etiove.com/blog/como-elegir-el-mejor-cafe-de-etiopia.html</link>
+      <description>Guía completa de Etiove para elegir café de Etiopía según región, proceso y altitud.</description>
+      <pubDate>Wed, 01 Apr 2026 00:00:00 +0000</pubDate>
+      <guid isPermaLink="true">https://etiove.com/blog/como-elegir-el-mejor-cafe-de-etiopia.html</guid>
+    </item>
+
+  </channel>
+</rss>

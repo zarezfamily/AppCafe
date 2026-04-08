@@ -2188,6 +2188,107 @@ const showPrivateThreadGate = (thread) => {
 };
 
 
+// ─── TOKEN REFRESH ────────────────────────────────────────────────────────────
+const refreshFirebaseToken = async () => {
+  const refreshToken = localStorage.getItem('etiove_web_refresh_token');
+  if (!refreshToken) return;
+  try {
+    const res = await fetch(
+      `https://securetoken.googleapis.com/v1/token?key=${FIREBASE_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `grant_type=refresh_token&refresh_token=${encodeURIComponent(refreshToken)}`,
+      }
+    );
+    if (!res.ok) {
+      // Token inválido o revocado → mostrar banner y limpiar sesión
+      showSessionExpiredBanner();
+      clearAuthToken();
+      renderAuthState();
+      return;
+    }
+    const json = await res.json();
+    if (json.id_token && json.user_id) {
+      auth.token = json.id_token;
+      auth.uid   = json.user_id;
+      localStorage.setItem('etiove_web_token', json.id_token);
+      localStorage.setItem('etiove_web_uid',   json.user_id);
+      if (json.refresh_token) localStorage.setItem('etiove_web_refresh_token', json.refresh_token);
+    }
+  } catch (_) { /* red caída — no limpiar sesión */ }
+};
+
+// ─── BANNER SESIÓN CADUCADA ───────────────────────────────────────────────────
+const showSessionExpiredBanner = () => {
+  if (document.getElementById('sessionExpiredBanner')) return;
+  const banner = document.createElement('div');
+  banner.id = 'sessionExpiredBanner';
+  banner.style.cssText = [
+    'position:fixed;top:0;left:0;right:0;z-index:9999',
+    'background:#5f3a25;color:#fff9f1',
+    'padding:12px 20px',
+    'display:flex;align-items:center;justify-content:space-between;gap:16px',
+    'font-size:13px;font-family:-apple-system,BlinkMacSystemFont,sans-serif',
+    'box-shadow:0 2px 12px rgba(0,0,0,0.25)',
+  ].join(';');
+  banner.innerHTML = `
+    <span>⏱ Tu sesión ha caducado. Vuelve a iniciar sesión para seguir participando.</span>
+    <div style="display:flex;gap:10px;align-items:center;flex-shrink:0;">
+      <button id="sessionExpiredLogin"
+        style="background:#e8d5be;color:#1a0f08;border:none;padding:7px 16px;border-radius:6px;
+               font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+               cursor:pointer;font-family:inherit;">
+        Iniciar sesión
+      </button>
+      <button id="sessionExpiredClose"
+        style="background:transparent;color:rgba(255,249,241,0.6);border:none;
+               font-size:18px;line-height:1;cursor:pointer;padding:0 4px;">
+        ×
+      </button>
+    </div>`;
+  document.body.prepend(banner);
+  document.getElementById('sessionExpiredClose').onclick = () => banner.remove();
+  document.getElementById('sessionExpiredLogin').onclick = () => {
+    banner.remove();
+    const loginSection = document.querySelector('.login-section');
+    if (loginSection) { loginSection.style.display = ''; loginSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    const emailInput = document.getElementById('email');
+    if (emailInput) setTimeout(() => emailInput.focus(), 400);
+  };
+};
+
+// ─── NOTIFICACIONES CON BADGE ─────────────────────────────────────────────────
+const checkNotifications = async () => {
+  if (!auth.uid || !auth.token) return;
+
+  try {
+    const [allReplies] = await Promise.all([
+      getCollection('foro_respuestas', 400),
+    ]);
+
+    // Respuestas nuevas en mis hilos (desde la última visita)
+    const lastCheck = Number(localStorage.getItem('etiove_notif_last_check') || 0);
+    const myThreadIds = new Set(threads.filter((t) => t.authorUid === auth.uid).map((t) => t.id));
+    const unread = allReplies.filter((r) => {
+      if (r.authorUid === auth.uid) return false; // mis propias respuestas no cuentan
+      if (!myThreadIds.has(r.threadId)) return false;
+      return new Date(r.createdAt).getTime() > lastCheck;
+    }).length;
+
+    // Actualizar badge en nav
+    const badge = document.getElementById('communityNavBadge');
+    if (badge) {
+      if (unread > 0) {
+        badge.textContent = unread > 9 ? '9+' : String(unread);
+        badge.style.display = 'inline-flex';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+  } catch (_) { /* silencioso */ }
+};
+
 const init = async () => {
   initializeMetaDefaults();
   renderCategories();
@@ -2304,6 +2405,10 @@ const init = async () => {
   });
 
   await loadForum();
+
+  // Marcar momento de visita y comprobar notificaciones
+  localStorage.setItem('etiove_notif_last_check', String(Date.now()));
+  checkNotifications();
 };
 
 init();

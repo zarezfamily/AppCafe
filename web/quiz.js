@@ -339,30 +339,6 @@ const STYLES = `
   }
 
   /* FINAL */
-  .eq-final-seal {
-    width: 80px; height: 80px;
-    border-radius: 50%;
-    border: 1px solid rgba(228,195,164,0.18);
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 36px;
-    position: relative;
-  }
-  .eq-final-seal::after {
-    content: '';
-    position: absolute;
-    inset: 8px;
-    border-radius: 50%;
-    border: 1px solid rgba(228,195,164,0.32);
-  }
-  .eq-final-seal-core {
-    width: 44px; height: 44px;
-    border-radius: 50%;
-    background: rgba(228,195,164,0.08);
-    border: 1px solid rgba(228,195,164,0.35);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 20px;
-  }
-
   .eq-final-actions {
     display: flex;
     flex-direction: column;
@@ -431,7 +407,6 @@ function renderQuiz() {
 
     if (step > QUIZ.length) {
       inner.innerHTML = `
-        <div class="eq-final-seal"><div class="eq-final-seal-core">☕</div></div>
         <span class="eq-eyebrow">Perfil completado</span>
         <h2 class="eq-title">Tu café perfecto<br><em>te está esperando</em></h2>
         <p class="eq-sub">Hemos trazado tu perfil sensorial. Descarga Etiove para ver tus resultados y descubrir los cafés de especialidad a tu medida.</p>

@@ -323,8 +323,32 @@ const renderMemberEvolutionCard = ({ profile = null, allThreads = [], allReplies
   });
   const uniqueBadges = Array.from(new Set(computedBadges)).slice(0, 8);
 
-  el.memberEvolutionName.innerHTML = escapeHtml(displayName || 'Catador') + (auth.emailVerified ? VERIFIED_BADGE : '');
+  const aliasDisplay = '@' + String(displayName || 'catador').replace(/^@+/, '').trim().toLowerCase().replace(/\s+/g, '_');
+  const verifyBadgeOrBtn = auth.emailVerified
+    ? VERIFIED_BADGE
+    : ` <button id="communityVerifyBtn" style="margin-left:5px;font-size:10px;letter-spacing:1px;text-transform:uppercase;background:rgba(201,149,87,0.15);border:1px solid rgba(201,149,87,0.4);color:#9e6a42;border-radius:6px;padding:2px 7px;cursor:pointer;font-family:inherit;vertical-align:middle;">Verificar email</button>`;
+  el.memberEvolutionName.innerHTML = escapeHtml(aliasDisplay) + verifyBadgeOrBtn;
+  // Wire verify button
+  setTimeout(() => {
+    const vBtn = document.getElementById('communityVerifyBtn');
+    if (vBtn) vBtn.addEventListener('click', () => {
+      vBtn.disabled = true; vBtn.textContent = 'Enviando...';
+      fetch('https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=' + FIREBASE_API_KEY, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Ios-Bundle-Identifier': FIREBASE_IOS_BUNDLE_ID },
+        body: JSON.stringify({ requestType: 'VERIFY_EMAIL', idToken: auth.token }),
+      }).then(() => { vBtn.textContent = '✔ Email enviado'; }).catch(() => { vBtn.textContent = 'Error, reintenta'; vBtn.disabled = false; });
+    });
+  }, 0);
+  const TIER_DESC = {
+    'Reserve I':   'Nivel 1 de 5 · 0–349 XP\nEstás comenzando tu viaje en la comunidad Etiove.',
+    'Reserve II':  'Nivel 2 de 5 · 350–899 XP\nMiembro activo con criterio en crecimiento.',
+    'Reserve III': 'Nivel 3 de 5 · 900–1599 XP\nVoz reconocida en el Salón Etiove.',
+    'Reserve IV':  'Nivel 4 de 5 · 1600–2499 XP\nReferente de la comunidad.',
+    'Reserve V':   'Nivel 5 de 5 · 2500+ XP\nÉlite del café de especialidad.',
+  };
   el.memberEvolutionTier.textContent = tier;
+  el.memberEvolutionTier.setAttribute('data-tooltip', TIER_DESC[tier] || tier);
 
   el.memberEvolutionStats.innerHTML = [
     { label: 'XP', value: Math.round(xp) },
@@ -342,7 +366,39 @@ const renderMemberEvolutionCard = ({ profile = null, allThreads = [], allReplies
     el.memberEvolutionBadges.innerHTML = '';
     el.memberEvolutionEmpty.style.display = 'block';
   } else {
-    el.memberEvolutionBadges.innerHTML = uniqueBadges.map((badgeId) => {
+    // Barra de progreso XP
+  const XP_TIERS = [
+    { label: 'Reserve I',   min: 0    },
+    { label: 'Reserve II',  min: 350  },
+    { label: 'Reserve III', min: 900  },
+    { label: 'Reserve IV',  min: 1600 },
+    { label: 'Reserve V',   min: 2500 },
+  ];
+  const currentTierIdx = XP_TIERS.reduce((acc, t, i) => xp >= t.min ? i : acc, 0);
+  const nextTier = XP_TIERS[currentTierIdx + 1] || null;
+  const currentMin = XP_TIERS[currentTierIdx].min;
+  const progressPct = nextTier
+    ? Math.min(100, Math.round(((xp - currentMin) / (nextTier.min - currentMin)) * 100))
+    : 100;
+  const xpLeft = nextTier ? (nextTier.min - Math.round(xp)) : 0;
+
+  let progressEl = document.getElementById('memberEvoProgressWrap');
+  if (!progressEl) {
+    progressEl = document.createElement('div');
+    progressEl.id = 'memberEvoProgressWrap';
+    progressEl.className = 'member-evo-progress-wrap';
+    el.memberEvolutionCard.insertBefore(progressEl, el.memberEvolutionBadges);
+  }
+  progressEl.innerHTML = `
+    <div class="member-evo-progress-labels">
+      <span class="member-evo-progress-xp">${Math.round(xp)} XP</span>
+      <span class="member-evo-progress-next">${nextTier ? xpLeft + ' XP para ' + nextTier.label : 'Nivel máximo'}</span>
+    </div>
+    <div class="member-evo-progress-track">
+      <div class="member-evo-progress-fill" style="width:${progressPct}%"></div>
+    </div>`;
+
+  el.memberEvolutionBadges.innerHTML = uniqueBadges.map((badgeId) => {
       const badge = BADGE_LIBRARY[badgeId] || {
         icon: '✦',
         label: badgeId.replace(/_/g, ' '),
@@ -352,31 +408,9 @@ const renderMemberEvolutionCard = ({ profile = null, allThreads = [], allReplies
       const tooltip = unlockedAt
         ? `${badge.label} · ${badge.desc} · Desbloqueada ${unlockedAt}`
         : `${badge.label} · ${badge.desc}`;
-      return `<span class="member-evo-badge" data-tip="${escapeHtml(tooltip)}" tabindex="0" style="position:relative;z-index:10;white-space:normal;max-width:140px;overflow-wrap:break-word;"><span>${escapeHtml(badge.icon)} ${escapeHtml(badge.label)}</span><span class='badge-tooltip' style='visibility:hidden;opacity:0;position:absolute;left:0;top:110%;background:#fff;box-shadow:0 2px 12px #e4d3c2;padding:8px 12px;border-radius:8px;font-size:13px;color:#21150f;min-width:120px;max-width:220px;pointer-events:none;transition:opacity 0.18s;z-index:99;'></span></span>`;
+      return `<span class="member-evo-badge" data-tip="${escapeHtml(tooltip)}" tabindex="0"><span>${escapeHtml(badge.icon)} ${escapeHtml(badge.label)}</span></span>`;
     }).join('');
-    // Tooltips accesibles y no cortados
-    setTimeout(() => {
-      document.querySelectorAll('.member-evo-badge').forEach(badge => {
-        badge.addEventListener('mouseenter', function() {
-          let tip = badge.querySelector('.badge-tooltip');
-          if (!tip) {
-            tip = document.createElement('span');
-            tip.className = 'badge-tooltip';
-            badge.appendChild(tip);
-          }
-          tip.textContent = badge.getAttribute('data-tip');
-          tip.style.visibility = 'visible';
-          tip.style.opacity = '1';
-        });
-        badge.addEventListener('mouseleave', function() {
-          const tip = badge.querySelector('.badge-tooltip');
-          if (tip) {
-            tip.style.visibility = 'hidden';
-            tip.style.opacity = '0';
-          }
-        });
-      });
-    }, 0);
+    // Tooltips: handled via CSS ::after data-tip attribute
     el.memberEvolutionEmpty.style.display = 'none';
   }
 
@@ -678,14 +712,14 @@ const goToThreadDetail = (threadId) => {
   transitionThreadsView(
     () => renderThreads(),
     () => {
-      // Scroll al hilo abierto, centrado como en la foto
-      const article = document.querySelector(`[data-thread-id='${safeId}']`);
-      if (article) {
-        const rect = article.getBoundingClientRect();
-        const scrollY = window.scrollY + rect.top - 32;
-        window.scrollTo({ top: scrollY, behavior: 'auto' });
+      // Scroll to top of main-card so thread is fully visible from the start
+      const mainCard = document.querySelector('.main-card');
+      if (mainCard) {
+        const rect = mainCard.getBoundingClientRect();
+        const scrollY = window.scrollY + rect.top - 90;
+        window.scrollTo({ top: Math.max(0, scrollY), behavior: 'smooth' });
       } else {
-        window.scrollTo({ top: 0, behavior: 'auto' });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
       pendingThreadAnchorY = null;
     },
@@ -702,11 +736,7 @@ const goToThreadList = ({ replace = false, restoreScroll = true } = {}) => {
 };
 
 const goBackFromThreadDetail = () => {
-  if (window.history.length > 1) {
-    window.history.back();
-    return;
-  }
-  goToThreadList({ replace: true });
+  goToThreadList({ replace: false });
 };
 
 const goToProfilePage = (uid, name) => {
@@ -1010,9 +1040,15 @@ const uploadImageWithRetry = async (file, folder, maxAttempts = 3) => {
 
 const renderAuthState = () => {
   const logged = !!auth.token;
-  el.logoutBtn.style.display = logged ? 'inline-block' : 'none';
+  // Ocultar bloque login completo si está logueado
+  const loginSection = document.querySelector('.login-section');
+  if (loginSection) loginSection.style.display = logged ? 'none' : '';
+  el.logoutBtn.style.display = 'none'; // siempre oculto en auth-row; se mueve a member card
   el.loginBtn.disabled = logged;
   el.registerBtn.disabled = logged;
+  // Botón salir en member card
+  const cardLogout = document.getElementById('memberCardLogoutBtn');
+  if (cardLogout) cardLogout.style.display = logged ? 'block' : 'none';
   el.createThreadBtn.disabled = !logged;
   el.authStatus.innerHTML = '';
   if (logged) {
@@ -1075,11 +1111,24 @@ const renderCategories = () => {
   el.categoryChips.innerHTML = FORUM_CATEGORIES
     .map((c) => {
       if (c.id === 'aprende') {
-        return `<button class="chip ${selectedCategory === c.id ? 'active' : ''}" data-cat="${c.id}">${c.emoji} ${c.label}</button><input id="threadSearchInput" type="search" placeholder="Buscar en hilos..." style="margin-left:12px;max-width:220px;padding:7px 12px;border-radius:8px;border:1px solid #e2c7a7;font-size:13px;">`;
+        return `<button class="chip ${selectedCategory === c.id ? 'active' : ''}" data-cat="${c.id}">${c.emoji} ${c.label}</button>`;
+        // search input is injected separately below
       }
       return `<button class="chip ${selectedCategory === c.id ? 'active' : ''}" data-cat="${c.id}">${c.emoji} ${c.label}</button>`;
     })
     .join('');
+
+  // Inject search input below chips in its wrapper
+  const chipsWrap = el.categoryChips.closest('.chips-search-wrap') || el.categoryChips.parentElement;
+  let searchInput = document.getElementById('threadSearchInput');
+  if (!searchInput) {
+    searchInput = document.createElement('input');
+    searchInput.id = 'threadSearchInput';
+    searchInput.type = 'search';
+    searchInput.placeholder = 'Buscar en hilos...';
+    searchInput.className = 'thread-search-input';
+    chipsWrap.appendChild(searchInput);
+  }
 
   el.categoryChips.querySelectorAll('[data-cat]').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -1092,11 +1141,12 @@ const renderCategories = () => {
   });
 
   // Buscador funcional
-  const searchInput = document.getElementById('threadSearchInput');
-  if (searchInput) {
-    searchInput.addEventListener('input', () => {
-      renderThreads(searchInput.value);
+  const searchInputEl = document.getElementById('threadSearchInput');
+  if (searchInputEl && !searchInputEl.dataset.bound) {
+    searchInputEl.addEventListener('input', () => {
+      renderThreads(searchInputEl.value);
     });
+    searchInputEl.dataset.bound = '1';
   }
 };
 
@@ -1116,11 +1166,9 @@ const renderThreads = (searchTerm = '') => {
 
   if (activeThreadId) {
     // Oculta encabezado y filtros al crear/editar hilo
-    const sectionLead = document.querySelector('.section-lead');
-    const categoryChips = document.getElementById('categoryChips');
+    const sectionLead = document.getElementById('mainCardHeader');
     const searchStatus = document.getElementById('searchStatus');
     if (sectionLead) sectionLead.style.display = 'none';
-    if (categoryChips) categoryChips.style.display = 'none';
     if (searchStatus) searchStatus.style.display = 'none';
     const activeThread = threads.find((thread) => thread.id === activeThreadId);
 
@@ -1134,12 +1182,7 @@ const renderThreads = (searchTerm = '') => {
 
     if (activeThread.accessLevel === 'registered_only' && !auth.token) {
       resetCommunityMeta();
-      el.threadsWrap.innerHTML = `
-        <div style="margin-top:12px;margin-bottom:10px;"><button class="btn ghost" data-back-detail="1">← Volver atrás</button></div>
-        <p class="empty" style="margin-top:16px;">Este hilo es solo para usuarios registrados. Inicia sesión para leerlo.</p>
-      `;
-      const backBtn = el.threadsWrap.querySelector('[data-back-detail]');
-      if (backBtn) backBtn.addEventListener('click', goBackFromThreadDetail);
+      showPrivateThreadGate(activeThread);
       return;
     }
 
@@ -1172,10 +1215,7 @@ const renderThreads = (searchTerm = '') => {
     const detailBodyHtml = editingThreadId === activeThread.id
       ? renderInlineThreadEditor(activeThread)
       : `<h3 class="thread-detail-title">${escapeHtml(normalizeThreadTitle(activeThread.title || ''))}</h3>
-        <div class="meta"><button class="link-btn author-btn" data-author-uid="${escapeHtml(activeThread.authorUid || '')}" data-author-name="${escapeHtml(activeThread.authorName || 'Catador')}" style="font-weight:600;">${escapeHtml(activeThread.authorName || 'Catador')}</button> · ${fmt(activeThread.createdAt)} <span class="meta-cat">${escapeHtml(activeThread.categoryLabel || 'General')}</span> · ${Number(activeThread.upvotes || 0)} votos</div>
-        <div class="thread-tags">
-          <span class="pill" style="background:${accessTagBg};color:${accessTagColor}">${escapeHtml(ACCESS_LABELS[activeThread.accessLevel] || 'Público')}</span>
-        </div>
+        <div class="meta"><button class="link-btn author-btn" data-author-uid="${escapeHtml(activeThread.authorUid || '')}" data-author-name="${escapeHtml(activeThread.authorName || 'Catador')}" style="font-weight:600;">${escapeHtml(activeThread.authorName || 'Catador')}</button> · ${fmt(activeThread.createdAt)} <span class="meta-cat">${escapeHtml(activeThread.categoryLabel || 'General')}</span> <span class="meta-access" style="margin-left:4px;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;background:${accessTagBg};color:${accessTagColor};border:1px solid ${activeThread.accessLevel === 'registered_only' ? '#e2c7a7' : '#b7e2c7'};">${escapeHtml(ACCESS_LABELS[activeThread.accessLevel] || 'Público')}</span> · ${Number(activeThread.upvotes || 0)} votos</div>
         <p>${escapeHtml(activeThread.body || '')}</p>`;
 
     el.threadsWrap.innerHTML = `
@@ -1191,14 +1231,21 @@ const renderThreads = (searchTerm = '') => {
             ? `<div class=\"actions-row\"><button class=\"link-btn\" data-thread-edit=\"${activeThread.id}\">Editar</button><button class=\"link-btn\" data-thread-delete=\"${activeThread.id}\">Eliminar</button></div>`
             : ''}
         </div>
-        <div class="reply-box" style="display:flex;align-items:flex-end;gap:10px;">
-          <div style="flex:1;">
-            ${repliesHtml || '<p class="muted">Sin respuestas aún.</p>'}
-            ${auth.token
-              ? `<div class=\"field\"><textarea data-reply-input=\"${activeThread.id}\" maxlength=\"1000\" placeholder=\"Responder...\"></textarea></div>`
-              : '<p class=\"muted\">Inicia sesión para responder.</p>'}
-          </div>
-          ${auth.token ? `<div style=\"display:flex;flex-direction:column;align-items:flex-end;gap:8px;min-width:140px;\"><button class=\"btn ghost\" data-reply-send=\"${activeThread.id}\">Enviar respuesta</button><button class=\"btn ghost\" data-back-detail=\"1\">← Volver atrás</button></div>` : ''}
+        <div class="reply-box">
+          ${repliesHtml || '<p class="muted">Sin respuestas aún.</p>'}
+          ${auth.token ? `
+            <div class="reply-composer">
+              <textarea data-reply-input="${activeThread.id}" maxlength="1000" placeholder="Escribe tu respuesta..." class="reply-textarea"></textarea>
+              <div class="reply-actions">
+                <button class="btn ghost" data-back-detail="1">← Volver</button>
+                <button class="btn primary" data-reply-send="${activeThread.id}">Enviar respuesta</button>
+              </div>
+            </div>
+          ` : `
+            <div class="reply-actions" style="margin-top:16px;">
+              <button class="btn ghost" data-back-detail="1">← Volver</button>
+            </div>
+          `}
         </div>
       </article>
     `;
@@ -1214,11 +1261,9 @@ const renderThreads = (searchTerm = '') => {
     }
 
     // Mostrar encabezado y filtros si no hay hilo activo
-    const sectionLead = document.querySelector('.section-lead');
-    const categoryChips = document.getElementById('categoryChips');
+    const sectionLead = document.getElementById('mainCardHeader');
     const searchStatus = document.getElementById('searchStatus');
     if (sectionLead) sectionLead.style.display = '';
-    if (categoryChips) categoryChips.style.display = '';
     if (searchStatus) searchStatus.style.display = '';
     resetCommunityMeta();
 
@@ -1379,13 +1424,9 @@ const renderThreads = (searchTerm = '') => {
         event.preventDefault();
         const threadId = openLink.getAttribute('data-thread-open');
         const thread = threads.find((t) => t.id === threadId);
-        // If thread is private and user is not logged in, scroll to 'Hilos recientes' section
+        // Hilo privado sin login → gate premium
         if (thread && thread.accessLevel === 'registered_only' && !auth.token) {
-          // Scroll to the forum section lead ("Hilos recientes")
-          const sectionLead = document.querySelector('.section-lead');
-          if (sectionLead) {
-            sectionLead.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
+          showPrivateThreadGate(thread);
           return;
         }
         const article = openLink.closest('[data-thread-id]');
@@ -1474,6 +1515,11 @@ const renderThreads = (searchTerm = '') => {
   // Clic en nombre de autor → modal perfil (solo logueados)
   el.threadsWrap.querySelectorAll('.author-btn').forEach((btn) => {
     btn.addEventListener('click', async () => {
+      // Bloquear acceso al perfil si no está logueado
+      if (!auth.token) {
+        showProfileGate();
+        return;
+      }
       const authorName = btn.getAttribute('data-author-name') || 'Catador';
       const resolvedUid = await resolveUidByAlias(btn.getAttribute('data-author-uid'), authorName);
       if (!resolvedUid) {
@@ -2057,6 +2103,73 @@ const sendReply = async (threadId) => {
     setStatus(el.threadStatus, 'No se pudo enviar la respuesta.', 'error');
   }
 };
+
+const showProfileGate = () => {
+  el.threadsWrap.innerHTML = `
+    <div class="thread-gate private">
+      <div class="thread-gate-icon">👤</div>
+      <h3 class="thread-gate-title">Perfil privado</h3>
+      <p class="thread-gate-text">Los perfiles de la comunidad son exclusivos para miembros registrados. Crea tu cuenta gratis o inicia sesión para verlos.</p>
+      <button class="thread-gate-btn" id="profileGateAction">Crear cuenta · Es gratis</button>
+      <button class="thread-gate-back" id="profileGateBack">← Volver a los hilos</button>
+    </div>`;
+  const actionBtn = el.threadsWrap.querySelector('#profileGateAction');
+  const backBtn   = el.threadsWrap.querySelector('#profileGateBack');
+  if (backBtn)   backBtn.addEventListener('click', goBackFromThreadDetail);
+  if (actionBtn) actionBtn.addEventListener('click', () => {
+    const loginSection = document.querySelector('.login-section');
+    if (loginSection) { loginSection.style.display = ''; loginSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    const emailInput = document.getElementById('email');
+    if (emailInput) setTimeout(() => emailInput.focus(), 400);
+  });
+};
+
+
+const showPrivateThreadGate = (thread) => {
+  const isPrivate = thread && thread.accessLevel === 'registered_only';
+  // Save the thread element's scroll position so Back restores it
+  const threadId = thread && thread.id;
+  el.threadsWrap.innerHTML = `
+    <div class="thread-gate ${isPrivate ? 'private' : 'public'}">
+      <div class="thread-gate-icon">${isPrivate ? '🔒' : '📖'}</div>
+      <h3 class="thread-gate-title">${isPrivate ? 'Hilo privado' : escapeHtml(thread && thread.title || '')}</h3>
+      <p class="thread-gate-text">${isPrivate
+        ? 'Este hilo es exclusivo para miembros registrados. Crea tu cuenta gratis o inicia sesión para leerlo.'
+        : 'Este es un hilo público. Puedes leerlo sin registro.'}</p>
+      <button class="thread-gate-btn" id="threadGateAction">${isPrivate ? 'Crear cuenta · Es gratis' : 'Leer hilo'}</button>
+      <button class="thread-gate-back" id="threadGateBack">← Volver a los hilos</button>
+    </div>`;
+  const actionBtn = el.threadsWrap.querySelector('#threadGateAction');
+  const backBtn = el.threadsWrap.querySelector('#threadGateBack');
+  if (backBtn) backBtn.addEventListener('click', () => {
+    goToThreadList({ replace: false, restoreScroll: false });
+    // After list renders, scroll to the thread that was clicked
+    if (threadId) {
+      setTimeout(() => {
+        const article = document.querySelector(`[data-thread-id="${threadId}"]`);
+        if (article) {
+          const rect = article.getBoundingClientRect();
+          window.scrollTo({ top: window.scrollY + rect.top - 120, behavior: 'smooth' });
+        }
+      }, 300);
+    }
+  });
+  if (actionBtn) {
+    if (isPrivate) {
+      actionBtn.addEventListener('click', () => {
+        const loginSection = document.querySelector('.login-section');
+        if (loginSection) { loginSection.style.display = ''; loginSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        const emailInput = document.getElementById('email');
+        if (emailInput) emailInput.focus();
+      });
+    } else {
+      actionBtn.addEventListener('click', () => {
+        if (thread && thread.id) goToThreadDetail(thread.id);
+      });
+    }
+  }
+};
+
 
 const init = async () => {
   initializeMetaDefaults();

@@ -13,6 +13,7 @@
     uid: localStorage.getItem('etiove_web_uid') || '',
     email: localStorage.getItem('etiove_web_email') || '',
     token: localStorage.getItem('etiove_web_token') || '',
+    emailVerified: localStorage.getItem('etiove_web_email_verified') === 'true',
   };
 
   const uid = requestedUid || auth.uid || '';
@@ -601,7 +602,35 @@
         paintInitial();
       }
     }
-    if (el.alias) el.alias.textContent = aliasHandle;
+    if (el.alias) {
+      const VERIFIED_SVG = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-left:5px;flex-shrink:0;" aria-label="Email verificado" title="Email verificado"><circle cx="12" cy="12" r="12" fill="#1d9bf0"/><path d="M8.5 12.5l2.5 2.5 5-5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+      if (isOwner()) {
+        // Owner: show alias + verified badge or verify button
+        if (auth.emailVerified) {
+          el.alias.innerHTML = esc(aliasHandle) + VERIFIED_SVG;
+        } else {
+          el.alias.innerHTML = esc(aliasHandle) + ` <button id="profileVerifyBtn" style="margin-left:7px;font-size:9px;letter-spacing:1px;text-transform:uppercase;background:rgba(255,232,198,0.18);border:1px solid rgba(245,202,156,0.4);color:#f4dfc8;border-radius:6px;padding:2px 8px;cursor:pointer;font-family:inherit;vertical-align:middle;transition:all 0.2s;" title="Verifica tu email">Verificar</button>`;
+          setTimeout(() => {
+            const vBtn = document.getElementById('profileVerifyBtn');
+            if (!vBtn) return;
+            vBtn.addEventListener('click', async () => {
+              vBtn.disabled = true; vBtn.textContent = 'Enviando...';
+              try {
+                const res = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=AIzaSyA1BcU0iRk3HyFtV92CLrnalHFKLaOWH24', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json', 'X-Ios-Bundle-Identifier': 'com.zarezfamily.etiove' },
+                  body: JSON.stringify({ requestType: 'VERIFY_EMAIL', idToken: auth.token }),
+                });
+                if (res.ok) { vBtn.textContent = '✔ Email enviado'; }
+                else { vBtn.textContent = 'Error — reintenta'; vBtn.disabled = false; }
+              } catch { vBtn.textContent = 'Error — reintenta'; vBtn.disabled = false; }
+            });
+          }, 0);
+        }
+      } else {
+        el.alias.textContent = aliasHandle;
+      }
+    }
     if (el.name) {
       el.name.textContent = isOwner() ? ownerFullName : '';
       el.name.style.display = isOwner() && ownerFullName ? '' : 'none';
@@ -747,7 +776,11 @@
 
   const renderEmpty = (message) => {
     if (!el.content) return;
-    el.content.innerHTML = `<div class="empty-state">${esc(message)}</div>`;
+    el.content.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">☕</div>
+        <p class="empty-state-text">${esc(message)}</p>
+      </div>`;
   };
 
   const renderActivity = () => {
@@ -762,15 +795,22 @@
       return;
     }
 
-    el.content.innerHTML = mixed.slice(0, 40).map((item) => `
-      <article class="feed-item">
-        <div class="feed-thumb">${item.emoji}</div>
-        <div class="feed-body">
-          <p class="feed-meta">Actividad: ${esc(item.type)} · ${esc(fmtDate(item.createdAt))}</p>
-          <p class="feed-title">${esc(item.title)} — ${esc(short(item.body, 200))}</p>
+    el.content.innerHTML = mixed.slice(0, 40).map((item) => {
+      const typeClass = item.type === 'hilo' ? 'hilo' : item.type === 'respuesta' ? 'reply' : 'blog';
+      const typeLabel = item.type === 'hilo' ? 'Hilo' : item.type === 'respuesta' ? 'Respuesta' : 'Comentario';
+      return `
+      <article class="post-card">
+        <div class="post-icon">${item.emoji}</div>
+        <div class="post-body">
+          <div class="post-meta">
+            <span class="post-type-pill ${typeClass}">${typeLabel}</span>
+            <span class="post-date">${esc(fmtDate(item.createdAt))}</span>
+          </div>
+          <p class="post-title">${esc(item.title)}</p>
+          ${item.body ? `<p class="post-body-text">${esc(item.body)}</p>` : ''}
         </div>
-      </article>
-    `).join('');
+      </article>`;
+    }).join('');
   };
 
   const renderThreadList = () => {
@@ -782,11 +822,15 @@
     el.content.innerHTML = state.threads
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .map((item) => `
-        <article class="feed-item">
-          <div class="feed-thumb">💬</div>
-          <div class="feed-body">
-            <p class="feed-meta">Hilo · ${esc(fmtDate(item.createdAt))}</p>
-            <p class="feed-title">${esc(item.title || 'Sin titulo')} — ${esc(short(item.body, 220))}</p>
+        <article class="post-card">
+          <div class="post-icon">💬</div>
+          <div class="post-body">
+            <div class="post-meta">
+              <span class="post-type-pill hilo">Hilo</span>
+              <span class="post-date">${esc(fmtDate(item.createdAt))}</span>
+            </div>
+            <p class="post-title">${esc(item.title || 'Sin título')}</p>
+            ${item.body ? `<p class="post-body-text">${esc(short(item.body, 220))}</p>` : ''}
           </div>
         </article>
       `).join('');
@@ -801,11 +845,14 @@
     el.content.innerHTML = state.replies
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .map((item) => `
-        <article class="feed-item">
-          <div class="feed-thumb">☕</div>
-          <div class="feed-body">
-            <p class="feed-meta">Respuesta en foro · ${esc(fmtDate(item.createdAt))}</p>
-            <p class="feed-title">${esc(short(item.body, 260))}</p>
+        <article class="post-card">
+          <div class="post-icon">☕</div>
+          <div class="post-body">
+            <div class="post-meta">
+              <span class="post-type-pill reply">Respuesta</span>
+              <span class="post-date">${esc(fmtDate(item.createdAt))}</span>
+            </div>
+            <p class="post-body-text" style="-webkit-line-clamp:4;">${esc(short(item.body, 260))}</p>
           </div>
         </article>
       `).join('');
@@ -820,11 +867,15 @@
     el.content.innerHTML = state.blogComments
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .map((item) => `
-        <article class="feed-item">
-          <div class="feed-thumb">📝</div>
-          <div class="feed-body">
-            <p class="feed-meta">Comentario de blog · ${esc(item.postSlug || 'post')} · ${esc(fmtDate(item.createdAt))}</p>
-            <p class="feed-title">${esc(short(item.body, 260))}</p>
+        <article class="post-card">
+          <div class="post-icon">📝</div>
+          <div class="post-body">
+            <div class="post-meta">
+              <span class="post-type-pill blog">Blog</span>
+              ${item.postSlug ? `<span class="post-date">${esc(item.postSlug)}</span>` : ''}
+              <span class="post-date">${esc(fmtDate(item.createdAt))}</span>
+            </div>
+            <p class="post-body-text" style="-webkit-line-clamp:4;">${esc(short(item.body, 260))}</p>
           </div>
         </article>
       `).join('');
@@ -838,12 +889,11 @@
       <div class="stats-grid">
         <article class="stat-card"><p class="stat-label">Hilos</p><p class="stat-value">${state.threads.length}</p></article>
         <article class="stat-card"><p class="stat-label">Respuestas</p><p class="stat-value">${state.replies.length}</p></article>
-        <article class="stat-card"><p class="stat-label">Comentarios blog</p><p class="stat-value">${state.blogComments.length}</p></article>
-        <article class="stat-card"><p class="stat-label">Votos positivos recibidos</p><p class="stat-value">${totalUpvotes()}</p></article>
-        <article class="stat-card"><p class="stat-label">Votos negativos en blog</p><p class="stat-value">${totalDownvotes()}</p></article>
+        <article class="stat-card"><p class="stat-label">Comentarios</p><p class="stat-value">${state.blogComments.length}</p></article>
+        <article class="stat-card"><p class="stat-label">Votos recibidos</p><p class="stat-value">${totalUpvotes()}</p></article>
         <article class="stat-card"><p class="stat-label">Seguidores</p><p class="stat-value">${state.followersCount}</p></article>
         <article class="stat-card"><p class="stat-label">Siguiendo</p><p class="stat-value">${state.followingCount}</p></article>
-        <article class="stat-card"><p class="stat-label">Antigüedad</p><p class="stat-value" style="font-size:20px;line-height:1.3;">${esc(memberFor)}</p></article>
+        <article class="stat-card" style="grid-column:span 2;"><p class="stat-label">Antigüedad</p><p class="stat-value small">${esc(memberFor)}</p></article>
       </div>
     `;
   };
@@ -862,13 +912,13 @@
         const avatar = avatarByUid(row.followerUid);
         const initial = (name || '?').slice(0, 1).toUpperCase();
         return `
-          <article class="feed-item">
-            <div class="feed-thumb">${avatar ? `<img src="${esc(avatar)}" alt="${esc(name)}" style="width:100%;height:100%;object-fit:cover;display:block;" />` : esc(initial)}</div>
-            <div class="feed-body">
-              <p class="feed-meta">Seguidor desde ${esc(fmtDate(row.createdAt))}</p>
-              <p class="feed-title">${esc(name)}</p>
-              <div class="feed-aux"><button class="mini-btn" type="button" data-open-profile="${esc(row.followerUid)}" data-open-name="${esc(name)}">Ver perfil</button></div>
+          <article class="people-card">
+            <div class="people-avatar">${avatar ? `<img src="${esc(avatar)}" alt="${esc(name)}" />` : esc(initial)}</div>
+            <div class="people-info">
+              <p class="people-name">${esc(name)}</p>
+              <p class="people-since">Seguidor desde ${esc(fmtDate(row.createdAt))}</p>
             </div>
+            <button class="mini-btn" type="button" data-open-profile="${esc(row.followerUid)}" data-open-name="${esc(name)}">Ver perfil</button>
           </article>
         `;
       }).join('');
@@ -888,13 +938,13 @@
         const avatar = avatarByUid(row.targetUid);
         const initial = (name || '?').slice(0, 1).toUpperCase();
         return `
-          <article class="feed-item">
-            <div class="feed-thumb">${avatar ? `<img src="${esc(avatar)}" alt="${esc(name)}" style="width:100%;height:100%;object-fit:cover;display:block;" />` : esc(initial)}</div>
-            <div class="feed-body">
-              <p class="feed-meta">Siguiendo desde ${esc(fmtDate(row.createdAt))}</p>
-              <p class="feed-title">${esc(name)}</p>
-              <div class="feed-aux"><button class="mini-btn" type="button" data-open-profile="${esc(row.targetUid)}" data-open-name="${esc(name)}">Ver perfil</button></div>
+          <article class="people-card">
+            <div class="people-avatar">${avatar ? `<img src="${esc(avatar)}" alt="${esc(name)}" />` : esc(initial)}</div>
+            <div class="people-info">
+              <p class="people-name">${esc(name)}</p>
+              <p class="people-since">Siguiendo desde ${esc(fmtDate(row.createdAt))}</p>
             </div>
+            <button class="mini-btn" type="button" data-open-profile="${esc(row.targetUid)}" data-open-name="${esc(name)}">Ver perfil</button>
           </article>
         `;
       }).join('');
@@ -927,15 +977,16 @@
         const otherUid = mine ? row.recipientUid : row.senderUid;
         const otherName = mine ? (row.recipientName || userNameByUid(otherUid)) : (row.senderName || userNameByUid(otherUid));
         return `
-          <article class="feed-item">
-            <div class="feed-thumb">${mine ? '↗' : '↘'}</div>
-            <div class="feed-body">
-              <p class="feed-meta">${mine ? 'Enviado a' : 'Recibido de'} ${esc(otherName)} · ${esc(fmtDate(row.createdAt))}</p>
-              <p class="feed-title">${esc(short(row.body || '', 400))}</p>
-              <div class="feed-aux">
-                <button class="mini-btn" type="button" data-reply-dm="${esc(otherUid)}" data-reply-name="${esc(otherName)}">Responder</button>
-                <button class="mini-btn" type="button" data-open-profile="${esc(otherUid)}" data-open-name="${esc(otherName)}">Ver perfil</button>
-              </div>
+          <article class="msg-card">
+            <div class="msg-direction">
+              <div class="msg-arrow ${mine ? 'out' : 'in'}">${mine ? '↗' : '↘'}</div>
+              <span class="msg-who">${mine ? 'Para' : 'De'} ${esc(otherName)}</span>
+              <span class="msg-date">${esc(fmtDate(row.createdAt))}</span>
+            </div>
+            <p class="msg-text">${esc(short(row.body || '', 400))}</p>
+            <div class="msg-footer">
+              <button class="mini-btn" type="button" data-reply-dm="${esc(otherUid)}" data-reply-name="${esc(otherName)}">Responder</button>
+              <button class="mini-btn" type="button" data-open-profile="${esc(otherUid)}" data-open-name="${esc(otherName)}">Ver perfil</button>
             </div>
           </article>
         `;

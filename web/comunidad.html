@@ -23,8 +23,10 @@
   <meta name="twitter:image" content="https://etiove.com/og-image.jpg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="icon" type="image/png" href="/favicon.png" />
-  <link rel="apple-touch-icon" href="/favicon.png" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/favicon.svg" />
+  <meta name="theme-color" content="#fffaf5" />
+  <link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700;800&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -411,6 +413,7 @@
       padding: 16px;
       background: linear-gradient(170deg, rgba(255,250,243,0.62), rgba(255,246,236,0.34));
       box-shadow: inset 0 0 0 1px rgba(255,255,255,0.62), 0 14px 40px rgba(38,21,14,0.07);
+      overflow: visible;
     }
 
     /* ─── SIDEBAR ─── */
@@ -422,6 +425,7 @@
       box-shadow: 0 12px 36px rgba(28,18,13,0.07);
       position: sticky;
       top: 90px;
+      overflow: visible;
     }
     .sidebar-card h2 {
       font-family: 'Playfair Display', serif;
@@ -455,7 +459,7 @@
       background: linear-gradient(135deg, #fffaf5 0%, #f6efe5 100%);
       box-shadow: 0 10px 32px rgba(201,149,87,0.10), 0 2px 8px rgba(33,21,15,0.06);
       position: relative;
-      overflow: hidden;
+      overflow: visible;
     }
     .member-evo::before {
       content: '';
@@ -465,6 +469,12 @@
       right: 0;
       height: 2px;
       background: linear-gradient(90deg, var(--gold), transparent 75%);
+    }
+    .member-evo-identity-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 0;
     }
     .member-evo-head {
       display: flex;
@@ -486,6 +496,36 @@
       text-transform: uppercase;
       color: var(--accent);
       font-weight: 700;
+      cursor: help;
+      border-bottom: 1px dotted rgba(158,106,66,0.45);
+      position: relative;
+    }
+    .member-evo-tier::after {
+      content: attr(data-tooltip);
+      position: fixed;
+      background: rgba(30,18,12,0.96);
+      color: #f9ead5;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.2px;
+      text-transform: none;
+      line-height: 1.6;
+      white-space: pre-line;
+      width: 220px;
+      padding: 10px 13px;
+      border-radius: 10px;
+      border: 1px solid rgba(201,149,87,0.35);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.3);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 9999;
+      /* positioned via JS below */
+      top: auto;
+      left: auto;
+    }
+    .member-evo-tier:hover::after {
+      opacity: 1;
     }
     .member-evo-avatar {
       width: 48px !important;
@@ -508,6 +548,12 @@
       font-size: 22px !important;
       font-weight: 700 !important;
       border: 2px solid #e7d1b7 !important;
+      /* never show as a second circle — only visible when img is hidden */
+    }
+    /* when img is visible, hide fallback completely */
+    #memberAvatarImg[style*="display: block"] ~ #memberAvatarFallback,
+    #memberAvatarImg:not([style*="display:none"]):not([style*="display: none"]) ~ #memberAvatarFallback {
+      display: none !important;
     }
     .member-evo-stats {
       display: grid;
@@ -563,35 +609,8 @@
       border-color: #c99557;
       box-shadow: 0 8px 16px rgba(33,21,15,0.12);
     }
-    .member-evo-badge::after {
-      content: attr(data-tip);
-      position: absolute;
-      left: 50%;
-      bottom: calc(100% + 8px);
-      transform: translate(-50%, 6px);
-      min-width: 140px;
-      max-width: 220px;
-      padding: 8px 10px;
-      border-radius: 10px;
-      border: 1px solid rgba(201,149,87,0.45);
-      background: rgba(30,18,12,0.95);
-      color: #f9ead5;
-      font-size: 10px;
-      line-height: 1.35;
-      letter-spacing: 0.2px;
-      white-space: normal;
-      text-align: center;
-      box-shadow: 0 10px 24px rgba(0,0,0,0.34);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.18s ease, transform 0.18s ease;
-      z-index: 40;
-    }
-    .member-evo-badge:hover::after,
-    .member-evo-badge:focus-visible::after {
-      opacity: 1;
-      transform: translate(-50%, 0);
-    }
+    .member-evo-badge::after { display: none; }
+    /* badge tooltips handled via JS floating div */
     .member-evo-empty {
       margin-top: 10px;
       font-size: 12px;
@@ -606,7 +625,7 @@
       padding: 28px 26px;
       box-shadow: 0 10px 30px rgba(28,18,13,0.07);
       position: relative;
-      overflow: hidden;
+      overflow: visible;
     }
     .main-card::before {
       content: '';
@@ -726,7 +745,9 @@
     }
 
     /* ─── CHIPS ─── */
-    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 16px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 8px; }
+    .chips-search-wrap { display: flex; flex-direction: column; gap: 8px; margin: 12px 0 16px; }
+    .chips-search-wrap .chips { margin: 0; }
     .chip {
       border: 1px solid var(--border);
       border-radius: 999px;
@@ -1092,6 +1113,210 @@
     .skeleton-line.w40 { width: 40%; }
     .skeleton-line:last-child { margin-bottom: 0; }
 
+
+    /* ─── THREAD GATE ─── */
+    .thread-gate {
+      margin-top: 12px;
+      padding: 36px 28px;
+      border-radius: 20px;
+      text-align: center;
+      animation: threadIn 0.4s ease forwards;
+    }
+    .thread-gate.private {
+      background: linear-gradient(135deg, rgba(34,21,15,0.97), rgba(58,36,24,0.94));
+      border: 1px solid rgba(201,149,87,0.4);
+      box-shadow: 0 16px 40px rgba(26,15,10,0.25);
+    }
+    .thread-gate.public {
+      background: linear-gradient(135deg, rgba(255,251,246,0.98), rgba(244,232,216,0.92));
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 30px rgba(28,18,13,0.07);
+    }
+    .thread-gate-icon { font-size: 36px; margin-bottom: 14px; }
+    .thread-gate-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(20px, 3vw, 26px);
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .thread-gate.private .thread-gate-title { color: #fdf2e4; }
+    .thread-gate.public  .thread-gate-title { color: var(--ink); }
+    .thread-gate-text {
+      font-size: 14px;
+      line-height: 1.65;
+      margin-bottom: 24px;
+      max-width: 360px;
+      margin-left: auto;
+      margin-right: auto;
+      font-family: 'Manrope', sans-serif;
+    }
+    .thread-gate.private .thread-gate-text { color: rgba(253,242,228,0.75); }
+    .thread-gate.public  .thread-gate-text { color: var(--ink-muted); }
+    .thread-gate-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 30px;
+      border-radius: 12px;
+      font-family: 'Manrope', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .thread-gate.private .thread-gate-btn {
+      background: linear-gradient(130deg, #c99557, #e8b87a);
+      color: #1f130d;
+      box-shadow: 0 8px 22px rgba(201,149,87,0.35);
+    }
+    .thread-gate.private .thread-gate-btn:hover { filter: brightness(1.06); transform: translateY(-1px); }
+    .thread-gate.public  .thread-gate-btn {
+      background: linear-gradient(130deg, #5f3a25, #9e6a42);
+      color: #fff8f0;
+      box-shadow: 0 8px 22px rgba(95,58,37,0.25);
+    }
+    .thread-gate.public  .thread-gate-btn:hover { filter: brightness(1.04); transform: translateY(-1px); }
+    .thread-gate-back {
+      display: block;
+      margin-top: 14px;
+      font-size: 12px;
+      font-family: 'Manrope', sans-serif;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      transition: color 0.2s;
+    }
+    .thread-gate.private .thread-gate-back { color: rgba(201,149,87,0.55); }
+    .thread-gate.private .thread-gate-back:hover { color: var(--gold); }
+    .thread-gate.public  .thread-gate-back { color: var(--ink-muted); }
+    .thread-gate.public  .thread-gate-back:hover { color: var(--accent); }
+
+    /* ─── MEMBER CARD LOGOUT BTN ─── */
+    .member-evo-logout {
+      display: none;
+      width: 100%;
+      margin-top: 14px;
+      background: transparent;
+      border: 1px solid rgba(201,149,87,0.3);
+      border-radius: 10px;
+      padding: 9px 14px;
+      font-family: 'Manrope', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--ink-muted);
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+    .member-evo-logout:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+      background: rgba(164,79,69,0.06);
+    }
+
+    /* ─── SEARCH INPUT ─── */
+    .thread-search-input {
+      flex: 1;
+      min-width: 0;
+      max-width: 240px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.86);
+      font-size: 13px;
+      font-family: 'Manrope', sans-serif;
+      color: var(--ink);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .thread-search-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(158,106,66,0.10);
+    }
+    .thread-search-input::placeholder { color: var(--ink-muted); }
+
+    /* ─── MEMBER EVO PROGRESS ─── */
+    .member-evo-progress-wrap {
+      margin: 12px 0 4px;
+    }
+    .member-evo-progress-labels {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 6px;
+    }
+    .member-evo-progress-xp {
+      font-family: 'Playfair Display', serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .member-evo-progress-next {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      color: var(--ink-muted);
+      text-transform: uppercase;
+    }
+    .member-evo-progress-track {
+      height: 5px;
+      border-radius: 999px;
+      background: rgba(201,149,87,0.15);
+      overflow: hidden;
+    }
+    .member-evo-progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #c99557, #f0c98d);
+      transition: width 0.6s cubic-bezier(0.22,1,0.36,1);
+    }
+
+    /* ─── REPLY COMPOSER ─── */
+    .reply-box { margin-top: 16px; }
+    .reply-composer {
+      margin-top: 16px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.7);
+      overflow: hidden;
+    }
+    .reply-textarea {
+      width: 100%;
+      min-height: 80px;
+      max-height: 200px;
+      border: none !important;
+      border-radius: 0 !important;
+      border-bottom: 1px solid var(--border) !important;
+      background: transparent !important;
+      padding: 14px 16px !important;
+      font-size: 14px;
+      resize: vertical;
+      box-shadow: none !important;
+    }
+    .reply-textarea:focus {
+      outline: none !important;
+      box-shadow: none !important;
+      border-color: var(--border) !important;
+    }
+    .reply-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 10px 12px;
+    }
+    .reply-actions .btn {
+      padding: 8px 18px;
+      font-size: 12px;
+      width: auto !important;
+    }
+
     /* ─── FOOTER ─── */
     footer {
       position: relative; z-index: 1; background: var(--ink);
@@ -1265,6 +1490,7 @@
       <div class="grid">
         <!-- SIDEBAR -->
         <aside class="sidebar-card">
+          <div class="login-section">
           <h2>Acceso</h2>
           <p class="muted">Inicia sesión para crear hilos y responder. Usa el mismo email y contraseña de tu cuenta en la app (no el alias).</p>
           <div class="field"><input id="email" type="email" placeholder="tu@email.com" autocomplete="username" /></div>
@@ -1279,24 +1505,26 @@
             <button class="btn ghost" id="logoutBtn" style="display:none">Salir</button>
           </div>
           <div id="authStatus" class="status"></div>
+          </div><!-- /login-section -->
 
           <section id="memberEvolutionCard" class="member-evo member-evo-premium" aria-live="polite">
-            <div class="member-evo-premium-row">
-              <div class="member-evo-avatar-wrap" style="width:54px;height:54px;display:flex;align-items:center;justify-content:center;">
-                <img id="memberAvatarImg" class="member-evo-avatar" src="" alt="Foto de perfil" style="display:none;width:48px;height:48px;border-radius:50%;object-fit:cover;border:2px solid #e7d1b7;background:#fff8f0;" loading="lazy" />
-                <span id="memberAvatarFallback" class="member-evo-avatar-fallback" style="display:flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:50%;background:#f3ece4;color:#b4743f;font-size:22px;font-weight:700;border:2px solid #e7d1b7;">C</span>
+            <div class="member-evo-identity-row">
+              <div style="flex-shrink:0;position:relative;">
+                <img id="memberAvatarImg" class="member-evo-avatar" src="" alt="Foto de perfil" style="display:none;" loading="lazy" />
+                <span id="memberAvatarFallback" class="member-evo-avatar-fallback">C</span>
               </div>
-              <div class="member-evo-premium-main">
+              <div style="min-width:0;flex:1;">
                 <div class="member-evo-head">
-                  <p id="memberEvolutionName" class="member-evo-name">Catador</p>
+                  <p id="memberEvolutionName" class="member-evo-name">@catador</p>
                   <span id="memberEvolutionTier" class="member-evo-tier">Reserve I</span>
                 </div>
-                <p class="muted" style="margin-bottom:8px;">Tu evolución en la comunidad</p>
-                <div id="memberEvolutionStats" class="member-evo-stats"></div>
+                <p class="muted">Tu evolución en la comunidad</p>
               </div>
             </div>
+            <div id="memberEvolutionStats" class="member-evo-stats" style="margin-top:14px;"></div>
             <div id="memberEvolutionBadges" class="member-evo-badges"></div>
             <p id="memberEvolutionEmpty" class="member-evo-empty" style="display:none;">Publica tu primer hilo para desbloquear insignias.</p>
+          <button class="member-evo-logout" id="memberCardLogoutBtn" type="button">Cerrar sesión</button>
           </section>
 
           <div class="card-divider"></div>
@@ -1330,11 +1558,14 @@
 
         <!-- MAIN -->
         <main class="main-card">
-          <h2>Hilos recientes</h2>
-          <p class="muted">Filtra por categoría o explora todo lo que comparte la comunidad.</p>
-
-          <div class="chips" id="categoryChips"></div>
-          <button class="btn ghost" id="refreshBtn">↻ Recargar</button>
+          <div class="section-lead" id="mainCardHeader" style="text-align:left;margin-bottom:16px;padding-top:0;">
+            <h2>Hilos recientes</h2>
+            <p class="muted" style="margin-top:4px;">Filtra por categoría o explora todo lo que comparte la comunidad.</p>
+            <div class="chips-search-wrap">
+              <div class="chips" id="categoryChips"></div>
+            </div>
+            <button class="btn ghost" id="refreshBtn">↻ Recargar</button>
+          </div>
 
           <div id="threadsWrap"></div>
         </main>
@@ -1368,6 +1599,56 @@
   </button>
 
   <script src="./community.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // Wire logout
+      setTimeout(function() {
+        var cardLogout = document.getElementById("memberCardLogoutBtn");
+        var mainLogout = document.getElementById("logoutBtn");
+        if (cardLogout && mainLogout) {
+          cardLogout.addEventListener("click", function() { mainLogout.click(); });
+        }
+      }, 800);
+
+      // Floating tooltip for tier (escapes overflow:hidden)
+      var floatTip = document.createElement('div');
+      floatTip.id = 'floatTip';
+      floatTip.style.cssText = 'position:fixed;background:rgba(30,18,12,0.96);color:#f9ead5;font-size:11px;font-weight:500;line-height:1.6;white-space:pre-line;width:220px;padding:10px 13px;border-radius:10px;border:1px solid rgba(201,149,87,0.35);box-shadow:0 10px 24px rgba(0,0,0,0.3);pointer-events:none;z-index:9999;opacity:0;transition:opacity 0.18s;';
+      document.body.appendChild(floatTip);
+
+      function showFloatTip(el, text) {
+        floatTip.textContent = text;
+        floatTip.style.opacity = '1';
+        posFloatTip(el);
+      }
+      function posFloatTip(el) {
+        var r = el.getBoundingClientRect();
+        var tipW = 220, tipH = floatTip.offsetHeight || 60;
+        var top = r.top - tipH - 10;
+        var left = r.left + r.width / 2 - tipW / 2;
+        if (left < 8) left = 8;
+        if (left + tipW > window.innerWidth - 8) left = window.innerWidth - tipW - 8;
+        if (top < 8) top = r.bottom + 10;
+        floatTip.style.top = top + 'px';
+        floatTip.style.left = left + 'px';
+      }
+      function hideFloatTip() { floatTip.style.opacity = '0'; }
+
+      // Badge tooltips via floating div (since overflow:hidden clips ::after)
+      document.addEventListener('mouseover', function(e) {
+        var badge = e.target.closest('.member-evo-badge[data-tip]');
+        if (badge) { showFloatTip(badge, badge.getAttribute('data-tip')); return; }
+        var tier = e.target.closest('.member-evo-tier[data-tooltip]');
+        if (tier) { showFloatTip(tier, tier.getAttribute('data-tooltip')); return; }
+      });
+      document.addEventListener('mouseout', function(e) {
+        if (e.target.closest('.member-evo-badge[data-tip]') || e.target.closest('.member-evo-tier[data-tooltip]')) {
+          hideFloatTip();
+        }
+      });
+      document.addEventListener('scroll', hideFloatTip, true);
+    });
+  </script>
   <script>
     // Scroll-top button
     const scrollTopBtn = document.getElementById('scrollTopBtn');

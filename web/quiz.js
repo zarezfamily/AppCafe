@@ -386,6 +386,36 @@ const STYLES = `
   }
   .eq-btn-text:hover { color: rgba(255,249,241,0.6); }
 
+  .eq-summary-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 24px;
+  }
+  .eq-summary-pill {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 10px 18px;
+    background: rgba(255,249,241,0.06);
+    border: 1px solid rgba(228,195,164,0.22);
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #f4dfc8;
+    min-width: 80px;
+  }
+  .eq-summary-key {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(205,165,120,0.6);
+    display: block;
+  }
+
   @media (max-width: 600px) {
     #webQuizRoot { padding: 80px 24px 100px; min-height: auto; }
     .eq-options, .eq-options.cols-3 { grid-template-columns: 1fr; }
@@ -415,6 +445,52 @@ function renderQuiz() {
     root.appendChild(inner);
 
     if (step === 0) {
+      // Recuperar perfil previo si existe
+      let savedPrefs = null;
+      try {
+        const raw = localStorage.getItem('etiove_quiz_prefs');
+        if (raw) savedPrefs = JSON.parse(raw);
+      } catch (_) {}
+
+      const hasProfile = savedPrefs && Object.keys(savedPrefs).length === QUIZ.length;
+
+      if (hasProfile) {
+        // Mostrar perfil guardado con opción de rehacerlo
+        const LABELS = {
+          tueste:  { claro: 'Claro', medio: 'Medio', oscuro: 'Oscuro' },
+          origen:  { africa: 'África', america: 'América', asia: 'Asia', cualquiera: 'Sorpréndeme' },
+          acidez:  { alta: 'Alta', media: 'Media', baja: 'Baja' },
+          sabor:   { floral: 'Floral', frutal: 'Frutal', chocolate: 'Chocolate', especias: 'Especias' },
+        };
+        const summaryHTML = Object.entries(savedPrefs).map(([key, val]) => {
+          const label = (LABELS[key] && LABELS[key][val]) || val;
+          const names = { tueste: 'Tueste', origen: 'Origen', acidez: 'Acidez', sabor: 'Perfil' };
+          return `<span class="eq-summary-pill"><span class="eq-summary-key">${names[key] || key}</span>${label}</span>`;
+        }).join('');
+
+        inner.innerHTML = `
+          <span class="eq-eyebrow">Tu perfil guardado · Etiove</span>
+          <h2 class="eq-title">Ya conocemos <em>tu café ideal</em></h2>
+          <div class="eq-summary-row">${summaryHTML}</div>
+          <p class="eq-sub" style="margin-top:20px;">Descarga Etiove para ver los cafés que encajan exactamente con tu perfil.</p>
+          <div class="eq-divider"><span class="eq-divider-glyph">✦</span></div>
+          <div class="eq-final-actions">
+            <a class="eq-btn-primary" href="https://etiove.com/app" target="_blank">
+              Descargar Etiove
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+            <button class="eq-btn-text" id="eq-redo">Rehacer el quiz</button>
+          </div>
+        `;
+        inner.querySelector('#eq-redo').onclick = () => {
+          try { localStorage.removeItem('etiove_quiz_prefs'); localStorage.removeItem('etiove_quiz_saved_at'); } catch(_) {}
+          prefs = {};
+          step = 1;
+          render();
+        };
+        return;
+      }
+
       inner.innerHTML = `
         <span class="eq-eyebrow">Quiz de sabor · Etiove</span>
         <h2 class="eq-title">¿Cuál es <em>tu</em> café ideal?</h2>
@@ -430,10 +506,31 @@ function renderQuiz() {
     }
 
     if (step > QUIZ.length) {
+      // Guardar perfil en localStorage
+      const savedAt = new Date().toISOString();
+      try {
+        localStorage.setItem('etiove_quiz_prefs', JSON.stringify(prefs));
+        localStorage.setItem('etiove_quiz_saved_at', savedAt);
+      } catch (_) {}
+
+      // Etiquetas legibles para mostrar el resumen
+      const LABELS = {
+        tueste:  { claro: 'Claro', medio: 'Medio', oscuro: 'Oscuro' },
+        origen:  { africa: 'África', america: 'América', asia: 'Asia', cualquiera: 'Sorpréndeme' },
+        acidez:  { alta: 'Alta', media: 'Media', baja: 'Baja' },
+        sabor:   { floral: 'Floral', frutal: 'Frutal', chocolate: 'Chocolate', especias: 'Especias' },
+      };
+      const summaryHTML = Object.entries(prefs).map(([key, val]) => {
+        const label = (LABELS[key] && LABELS[key][val]) || val;
+        const names = { tueste: 'Tueste', origen: 'Origen', acidez: 'Acidez', sabor: 'Perfil' };
+        return `<span class="eq-summary-pill"><span class="eq-summary-key">${names[key] || key}</span>${label}</span>`;
+      }).join('');
+
       inner.innerHTML = `
         <span class="eq-eyebrow">Perfil completado</span>
         <h2 class="eq-title">Tu café perfecto<br><em>te está esperando</em></h2>
-        <p class="eq-sub">Hemos trazado tu perfil sensorial. Descarga Etiove para ver tus resultados y descubrir los cafés de especialidad a tu medida.</p>
+        <div class="eq-summary-row">${summaryHTML}</div>
+        <p class="eq-sub" style="margin-top:20px;">Hemos guardado tu perfil sensorial. Descarga Etiove para ver los cafés que encajan exactamente con él.</p>
         <div class="eq-final-actions">
           <a class="eq-btn-primary" href="https://etiove.com/app" target="_blank">
             Descargar Etiove

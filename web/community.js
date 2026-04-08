@@ -1158,11 +1158,15 @@ const renderCategories = () => {
     });
   });
 
-  // Buscador funcional
+  // Buscador funcional con debounce (200ms)
   const searchInputEl = document.getElementById('threadSearchInput');
   if (searchInputEl && !searchInputEl.dataset.bound) {
+    let searchDebounceTimer = null;
     searchInputEl.addEventListener('input', () => {
-      renderThreads(searchInputEl.value);
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(() => {
+        renderThreads(searchInputEl.value);
+      }, 200);
     });
     searchInputEl.dataset.bound = '1';
   }

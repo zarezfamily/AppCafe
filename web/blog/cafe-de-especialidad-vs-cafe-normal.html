@@ -5,9 +5,12 @@
   <link rel="apple-touch-icon" href="/favicon.svg" />
   <meta name="theme-color" content="#fffaf5" />
   <link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml" />
-  <meta itemprop="image" content="https://etiove.com/favicon.svg" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=Source+Serif+4:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
   <title>Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real? | Blog Etiove</title>
   <meta name="author" content="Etiove" />
   <meta name="description" content="¿Qué diferencia hay entre un café de especialidad y uno del supermercado? Puntuación SCA, trazabilidad, sabor y precio explicados sin tecnicismos." />
@@ -40,320 +43,114 @@
     "mainEntityOfPage": { "@type": "WebPage", "@id": "https://etiove.com/blog/cafe-de-especialidad-vs-cafe-normal.html" }
   }
   </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Source+Serif+4:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --ink:         #1c120d;
-      --ink-soft:    #5d4030;
-      --ink-muted:   #9a7963;
-      --cream:       #f6efe7;
-      --cream-alt:   #fffaf5;
-      --accent:      #8f5e3b;
-      --accent-deep: #5d4030;
-      --border:      #e4d3c2;
-      --border-soft: rgba(228,211,194,0.5);
-    }
+    :root { --ink: #1c120d; --ink-soft: #5d4030; --ink-muted: #9a7963; --cream: #f6efe7; --cream-alt: #fffaf5; --accent: #8f5e3b; --accent-deep: #5d4030; --border: #e4d3c2; --border-soft: rgba(228,211,194,0.5); }
     html { scroll-behavior: smooth; }
-    body {
-      font-family: 'Source Serif 4', Georgia, serif;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at 10% -10%, rgba(143,94,59,0.12) 0%, transparent 45%),
-        radial-gradient(circle at 100% 20%, rgba(93,64,48,0.07) 0%, transparent 42%),
-        var(--cream);
-      min-height: 100vh;
-      line-height: 1.75;
-    }
-    body::before {
-      content: '';
-      position: fixed; inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none; z-index: 0; opacity: 0.6;
-    }
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 20px 40px;
-      background: rgba(246,239,231,0.88);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border-soft);
-    }
-    .nav-wordmark {
-      font-family: 'Playfair Display', serif;
-      font-size: 22px; font-weight: 500; letter-spacing: 4px;
-      color: var(--ink); text-decoration: none; text-transform: uppercase;
-    }
+    body { font-family: 'Source Serif 4', Georgia, serif; color: var(--ink); background: radial-gradient(circle at 10% -10%, rgba(143,94,59,.12) 0%, transparent 45%), radial-gradient(circle at 100% 20%, rgba(93,64,48,.07) 0%, transparent 42%), var(--cream); min-height: 100vh; line-height: 1.75; }
+    body > nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 20px 40px; background: rgba(246,239,231,.97); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-soft); }
+    .nav-wordmark { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 500; letter-spacing: 4px; color: var(--ink); text-decoration: none; text-transform: uppercase; }
     .nav-links { display: flex; align-items: center; gap: 32px; }
-    .nav-link {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      font-size: 11px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase;
-      color: var(--ink-muted); text-decoration: none; transition: color 0.3s;
-    }
+    .nav-link { font-family: -apple-system, sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-muted); text-decoration: none; transition: color .3s; }
     .nav-link:hover { color: var(--accent); }
-    @media (max-width: 768px) { nav { padding: 16px 20px; } .nav-links { display: none; } }
-
-    .container {
-      width: min(760px, 92vw);
-      margin: 0 auto;
-      padding: 112px 0 80px;
-      position: relative; z-index: 1;
-    }
-
-    .post-header { margin-bottom: 40px; }
-    .eyebrow {
-      display: inline-flex; align-items: center; gap: 10px;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
-      color: var(--accent); margin-bottom: 20px;
-    }
-    .eyebrow::before {
-      content: ''; display: block; width: 24px; height: 1px;
-      background: var(--accent); flex-shrink: 0;
-    }
-    h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(36px, 6vw, 58px);
-      line-height: 1.06; font-weight: 500;
-      color: var(--ink); margin-bottom: 22px; letter-spacing: -0.3px;
-    }
-    .lead {
-      font-size: clamp(18px, 2.4vw, 22px);
-      line-height: 1.65; color: var(--ink-soft); margin-bottom: 10px;
-      border-left: 3px solid var(--border); padding-left: 20px;
-    }
-    .post-meta {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      font-size: 12px; color: var(--ink-muted); letter-spacing: 0.5px; margin-top: 18px;
-    }
-    .divider {
-      display: flex; align-items: center; gap: 16px; margin: 36px 0;
-    }
-    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-    .divider span { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
-
+    @media (max-width: 768px) { body > nav { padding: 16px 20px; } .nav-links { display: none; } }
+    .post-hero { position: relative; margin-top: 62px; height: min(500px, 55vw); min-height: 240px; overflow: hidden; }
+    .hero-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(28,18,13,.06) 0%, rgba(28,18,13,.5) 55%, rgba(28,18,13,.82) 100%); }
+    .hero-content { position: absolute; bottom: 0; left: 0; right: 0; padding: clamp(16px,4vw,44px); }
+    .hero-tag { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,236,210,.85); background: rgba(143,94,59,.65); border-radius: 999px; padding: 4px 10px; margin-bottom: 10px; }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(22px,3.5vw,44px); font-weight: 800; line-height: 1.12; color: #fff9f1; margin-bottom: 7px; }
+    .hero-meta { font-size: 12px; color: rgba(255,249,241,.6); }
+    .container { width: min(760px, 92vw); margin: 0 auto; padding: 40px 0 80px; position: relative; z-index: 1; }
     .post-body { font-size: clamp(17px, 2vw, 19px); color: #2e1e15; }
-    h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(24px, 3.5vw, 34px); font-weight: 500; color: var(--ink);
-      margin: 48px 0 14px; line-height: 1.2;
-    }
-    h3 {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(19px, 2.5vw, 24px); font-weight: 500; color: var(--ink-soft);
-      margin: 32px 0 10px; line-height: 1.3;
-    }
+    h2 { font-family: 'Playfair Display', serif; font-size: clamp(24px,3.5vw,34px); font-weight: 500; color: var(--ink); margin: 48px 0 14px; line-height: 1.2; }
+    h3 { font-family: 'Playfair Display', serif; font-size: clamp(19px,2.5vw,24px); font-weight: 500; color: var(--ink-soft); margin: 32px 0 10px; }
     p { margin-bottom: 18px; }
-
-    /* SCORE VISUAL */
-    .score-visual {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin: 28px 0 36px;
-    }
-    .score-card {
-      border-radius: 16px;
-      padding: 24px;
-      text-align: center;
-    }
-    .score-card.specialty {
-      background: linear-gradient(145deg, #1f130d, #2d1a10);
-      border: 1px solid rgba(201,149,87,0.35);
-    }
-    .score-card.regular {
-      background: var(--cream-alt);
-      border: 1px solid var(--border);
-    }
-    .score-label {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase;
-      margin-bottom: 12px;
-    }
-    .score-card.specialty .score-label { color: rgba(205,165,120,0.7); }
+    .causes { display: grid; gap: 16px; margin: 28px 0 36px; }
+    .cause-card { background: var(--cream-alt); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; display: grid; grid-template-columns: 48px 1fr; gap: 16px; align-items: start; transition: box-shadow .2s, transform .2s; }
+    .cause-card:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(28,18,13,.08); }
+    .cause-num { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 300; color: var(--border); line-height: 1; text-align: center; padding-top: 2px; }
+    .cause-body h3 { margin: 0 0 6px; font-size: 17px; color: var(--ink); }
+    .cause-body p { margin: 0; font-size: 15px; line-height: 1.65; color: var(--ink-soft); }
+    .cause-fix { margin-top: 10px; padding: 8px 12px; background: rgba(143,94,59,.07); border-radius: 8px; font-size: 13px; color: var(--accent-deep); font-weight: 600; }
+    .cause-fix::before { content: '→ '; }
+    .tip { border-left: 4px solid var(--accent); background: rgba(143,94,59,.07); border-radius: 0 12px 12px 0; padding: 18px 20px; margin: 32px 0; font-size: 17px; line-height: 1.7; }
+    .tip strong { color: var(--accent-deep); }
+    .table-wrap { overflow-x: auto; margin: 28px 0 36px; }
+    table { width: 100%; border-collapse: collapse; font-size: 15px; }
+    thead tr { background: var(--ink); color: #fff9f1; }
+    thead th { padding: 12px 16px; text-align: left; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; font-family: -apple-system, sans-serif; font-weight: 600; }
+    tbody tr { border-bottom: 1px solid var(--border); }
+    tbody tr:nth-child(even) { background: rgba(246,239,231,.5); }
+    tbody td { padding: 12px 16px; color: var(--ink-soft); line-height: 1.5; }
+    tbody td:first-child { color: var(--ink); font-weight: 600; }
+    .score-visual { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 28px 0 36px; }
+    .score-card { border-radius: 16px; padding: 24px; text-align: center; }
+    .score-card.specialty { background: linear-gradient(145deg,#1f130d,#2d1a10); border: 1px solid rgba(201,149,87,.35); }
+    .score-card.regular { background: var(--cream-alt); border: 1px solid var(--border); }
+    .score-label { font-family: -apple-system, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 12px; }
+    .score-card.specialty .score-label { color: rgba(205,165,120,.7); }
     .score-card.regular .score-label { color: var(--ink-muted); }
-    .score-number {
-      font-family: 'Playfair Display', serif;
-      font-size: 52px; font-weight: 300; line-height: 1;
-      margin-bottom: 6px;
-    }
+    .score-number { font-family: 'Playfair Display', serif; font-size: 52px; font-weight: 300; line-height: 1; margin-bottom: 6px; }
     .score-card.specialty .score-number { color: #f4dfc8; }
     .score-card.regular .score-number { color: var(--ink); }
-    .score-desc {
-      font-size: 13px; line-height: 1.5;
-    }
-    .score-card.specialty .score-desc { color: rgba(255,244,234,0.55); }
+    .score-desc { font-size: 13px; line-height: 1.5; }
+    .score-card.specialty .score-desc { color: rgba(255,244,234,.55); }
     .score-card.regular .score-desc { color: var(--ink-muted); }
-
-    /* COMPARISON TABLE */
-    .table-wrap { overflow-x: auto; margin: 28px 0 36px; }
-    table {
-      width: 100%; border-collapse: collapse;
-      font-size: 15px; font-family: 'Source Serif 4', serif;
-    }
-    thead tr { background: var(--ink); color: #fff9f1; }
-    thead th {
-      padding: 12px 16px; text-align: left;
-      font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-weight: 600;
-    }
-    tbody tr { border-bottom: 1px solid var(--border); }
-    tbody tr:nth-child(even) { background: rgba(246,239,231,0.5); }
-    tbody td { padding: 12px 16px; color: var(--ink-soft); line-height: 1.5; vertical-align: top; }
-    tbody td:first-child { color: var(--ink); font-weight: 600; width: 28%; }
     .check { color: #4f7a53; font-weight: 700; }
     .cross { color: #a44f45; font-weight: 700; }
-
-    /* MYTH CARDS */
     .myths { display: grid; gap: 14px; margin: 24px 0 36px; }
-    .myth-card {
-      background: var(--cream-alt);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px 22px;
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 14px;
-      align-items: start;
-    }
+    .myth-card { background: var(--cream-alt); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: start; }
     .myth-icon { font-size: 22px; padding-top: 2px; }
-    .myth-label {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
-      margin-bottom: 4px;
-    }
+    .myth-label { font-family: -apple-system, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
     .myth-label.false { color: #a44f45; }
-    .myth-label.true  { color: #4f7a53; }
+    .myth-label.true { color: #4f7a53; }
     .myth-card h3 { margin: 0 0 6px; font-size: 16px; color: var(--ink); }
-    .myth-card p  { margin: 0; font-size: 15px; color: var(--ink-soft); line-height: 1.6; }
-
-    /* ORIGIN PILLS */
-    .origins {
-      display: flex; flex-wrap: wrap; gap: 10px;
-      margin: 20px 0 32px;
-    }
-    .origin-pill {
-      display: inline-flex; flex-direction: column;
-      align-items: center; gap: 4px;
-      padding: 14px 18px;
-      background: var(--cream-alt);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      min-width: 100px;
-      transition: all 0.2s;
-    }
+    .myth-card p { margin: 0; font-size: 15px; color: var(--ink-soft); line-height: 1.6; }
+    .origins { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0 32px; }
+    .origin-pill { display: inline-flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px 18px; background: var(--cream-alt); border: 1px solid var(--border); border-radius: 14px; min-width: 100px; transition: all .2s; }
     .origin-pill:hover { border-color: var(--accent); transform: translateY(-2px); }
     .origin-flag { font-size: 22px; }
-    .origin-name {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
-      color: var(--ink-soft); text-align: center;
-    }
+    .origin-name { font-family: -apple-system, sans-serif; font-size: 11px; font-weight: 700; color: var(--ink-soft); text-align: center; }
     .origin-note { font-size: 10px; color: var(--ink-muted); text-align: center; }
-
-    .tip {
-      border-left: 4px solid var(--accent);
-      background: rgba(143,94,59,0.07);
-      border-radius: 0 12px 12px 0;
-      padding: 18px 20px; margin: 32px 0;
-      font-size: 17px; line-height: 1.7;
-    }
-    .tip strong { color: var(--accent-deep); }
-
-    /* CTA */
-    .cta-box {
-      background: linear-gradient(145deg, #1f130d, #2d1a10);
-      border-radius: 20px; padding: 36px 32px;
-      text-align: center; margin: 48px 0 0;
-      position: relative; overflow: hidden;
-    }
-    .cta-box::before {
-      content: ''; position: absolute; inset: 0;
-      background: radial-gradient(ellipse 70% 60% at 80% -10%, rgba(201,149,87,0.2) 0%, transparent 60%);
-      pointer-events: none;
-    }
-    .cta-box::after {
-      content: ''; position: absolute;
-      top: 0; left: 40px; right: 40px; height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255,228,190,0.25), transparent);
-      pointer-events: none;
-    }
-    .cta-eyebrow {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      font-size: 10px; font-weight: 700; letter-spacing: 3.5px; text-transform: uppercase;
-      color: rgba(205,165,120,0.7); margin-bottom: 14px; position: relative; z-index: 1;
-    }
-    .cta-title {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(24px, 4vw, 34px); font-weight: 400;
-      color: #fff4ea; line-height: 1.15; margin-bottom: 14px; position: relative; z-index: 1;
-    }
-    .cta-title em { font-style: italic; color: rgba(228,195,164,0.9); }
-    .cta-sub {
-      font-size: 15px; color: rgba(255,249,241,0.5); line-height: 1.7;
-      max-width: 420px; margin: 0 auto 28px; position: relative; z-index: 1;
-    }
-    .cta-btns {
-      display: flex; gap: 12px; justify-content: center;
-      flex-wrap: wrap; position: relative; z-index: 1;
-    }
-    .cta-btn-primary {
-      display: inline-flex; align-items: center; gap: 10px;
-      background: #e8d5be; color: #1a0f08; border: none; border-radius: 2px;
-      padding: 14px 32px; font-size: 11px; font-weight: 700;
-      letter-spacing: 2px; text-transform: uppercase; text-decoration: none;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      transition: background 0.3s, transform 0.2s;
-    }
+    .post-actions { margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border); }
+    .share-row { display: flex; gap: 9px; flex-wrap: wrap; margin-bottom: 24px; }
+    .share-btn { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--border); border-radius: 999px; padding: 8px 16px; font-size: 12px; font-weight: 700; color: var(--ink-soft); background: var(--cream-alt); text-decoration: none; cursor: pointer; font-family: inherit; transition: border-color .2s, color .2s; }
+    .share-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .share-btn svg { width: 14px; height: 14px; fill: currentColor; flex-shrink: 0; }
+    .comment-help { margin-bottom: 10px; color: var(--ink-soft); font-size: 14px; }
+    .comment-help a { color: var(--accent); font-weight: 700; text-decoration: none; }
+    .comment-box { width: 100%; min-height: 90px; resize: vertical; border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; font-size: 15px; font-family: inherit; background: rgba(255,255,255,.92); color: var(--ink); transition: border-color .2s; }
+    .comment-box:focus { outline: none; border-color: var(--accent); }
+    .comment-send { margin-top: 10px; padding: 10px 22px; background: var(--ink); color: #fff9f1; border: none; border-radius: 10px; font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer; transition: background .2s; }
+    .comment-send:hover { background: var(--accent-deep); }
+    .comment-send:disabled { opacity: .45; cursor: not-allowed; }
+    .comment-status { margin-top: 10px; font-size: 13px; color: var(--ink-soft); }
+    .comment-list { margin-top: 18px; display: grid; gap: 9px; }
+    .comment-item { border: 1px solid var(--border); border-radius: 12px; background: rgba(255,250,245,.75); padding: 13px; }
+    .comment-meta { font-size: 12px; color: #7b6049; margin-bottom: 5px; }
+    .comment-body { margin: 0; font-size: 15px; color: #38251c; line-height: 1.65; white-space: pre-wrap; }
+    .cta-box { background: linear-gradient(145deg,#1f130d,#2d1a10); border-radius: 20px; padding: 36px 32px; text-align: center; margin: 48px 0 0; position: relative; overflow: hidden; }
+    .cta-box::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 60% at 80% -10%,rgba(201,149,87,.2) 0%,transparent 60%); pointer-events: none; }
+    .cta-eyebrow { font-family: -apple-system, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 3.5px; text-transform: uppercase; color: rgba(205,165,120,.7); margin-bottom: 14px; position: relative; z-index: 1; }
+    .cta-title { font-family: 'Playfair Display', serif; font-size: clamp(22px,4vw,32px); font-weight: 400; color: #fff4ea; line-height: 1.15; margin-bottom: 14px; position: relative; z-index: 1; }
+    .cta-title em { font-style: italic; color: rgba(228,195,164,.9); }
+    .cta-sub { font-size: 15px; color: rgba(255,249,241,.5); line-height: 1.7; max-width: 420px; margin: 0 auto 28px; position: relative; z-index: 1; }
+    .cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; position: relative; z-index: 1; }
+    .cta-btn-primary { display: inline-flex; align-items: center; gap: 10px; background: #e8d5be; color: #1a0f08; border: none; border-radius: 2px; padding: 14px 32px; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; font-family: -apple-system, sans-serif; transition: background .3s, transform .2s; }
     .cta-btn-primary:hover { background: #f5e6cf; transform: translateY(-2px); }
-    .cta-btn-ghost {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: transparent; color: rgba(255,249,241,0.5);
-      border: 1px solid rgba(228,195,164,0.2); border-radius: 2px;
-      padding: 14px 28px; font-size: 11px; font-weight: 600;
-      letter-spacing: 2px; text-transform: uppercase; text-decoration: none;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      transition: all 0.3s;
-    }
-    .cta-btn-ghost:hover { border-color: rgba(228,195,164,0.45); color: rgba(255,249,241,0.8); }
-
+    .cta-btn-ghost { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: rgba(255,249,241,.5); border: 1px solid rgba(228,195,164,.2); border-radius: 2px; padding: 14px 28px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; font-family: -apple-system, sans-serif; transition: all .3s; }
+    .cta-btn-ghost:hover { border-color: rgba(228,195,164,.45); color: rgba(255,249,241,.8); }
     .post-nav { display: flex; gap: 16px; margin-top: 48px; flex-wrap: wrap; }
-    .post-nav-link {
-      flex: 1; min-width: 200px; padding: 18px 20px;
-      background: var(--cream-alt); border: 1px solid var(--border);
-      border-radius: 14px; text-decoration: none; transition: all 0.2s;
-    }
-    .post-nav-link:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(28,18,13,0.08); border-color: var(--accent); }
-    .post-nav-label {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
-      color: var(--ink-muted); margin-bottom: 6px;
-    }
+    .post-nav-link { flex: 1; min-width: 200px; padding: 18px 20px; background: var(--cream-alt); border: 1px solid var(--border); border-radius: 14px; text-decoration: none; transition: all .2s; }
+    .post-nav-link:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(28,18,13,.08); border-color: var(--accent); }
+    .post-nav-label { font-family: -apple-system, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 6px; }
     .post-nav-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 500; color: var(--ink); line-height: 1.35; }
-
-    .scroll-top {
-      position: fixed; bottom: 24px; right: 20px;
-      width: 44px; height: 44px; border-radius: 50%;
-      background: var(--accent-deep); color: #fff9f1; border: none;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 18px rgba(28,18,13,0.22);
-      opacity: 0; transform: translateY(12px);
-      transition: opacity 0.3s, transform 0.3s, background 0.2s;
-      pointer-events: none; z-index: 200;
-    }
+    .scroll-top { position: fixed; bottom: 24px; right: 20px; width: 44px; height: 44px; border-radius: 50%; background: var(--accent-deep); color: #fff9f1; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 18px rgba(28,18,13,.22); opacity: 0; transform: translateY(12px); transition: opacity .3s, transform .3s, background .2s; pointer-events: none; z-index: 200; }
     .scroll-top.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
     .scroll-top:hover { background: var(--accent); }
-
-    @media (max-width: 600px) {
-      .container { padding-top: 88px; }
-      .score-visual { grid-template-columns: 1fr; }
-      .cta-box { padding: 28px 20px; }
-      .myth-card { grid-template-columns: 1fr; gap: 6px; }
-    }
+    @media (max-width: 600px) { .cause-card { grid-template-columns: 1fr; gap: 8px; } .score-visual { grid-template-columns: 1fr; } .myth-card { grid-template-columns: 1fr; gap: 6px; } .cta-box { padding: 28px 20px; } }
   </style>
-  <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
 </head>
 <body>
 
@@ -366,16 +163,17 @@
     </div>
   </nav>
 
+  <header class="post-hero">
+    <img class="hero-img" src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=1400&q=80&auto=format&fit=crop" alt="Granos de café de especialidad de distintos orígenes" loading="eager" width="1400" height="700" />
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <span class="hero-tag">Análisis · 09 abril 2026 · 9 min de lectura</span>
+      <h1 class="hero-title">Café de especialidad vs café normal</h1>
+      <div class="hero-meta">Por el equipo de Etiove · Foto: Unsplash</div>
+    </div>
+  </header>
+
   <div class="container">
-
-    <header class="post-header">
-      <p class="eyebrow">Análisis · 09 abril 2026</p>
-      <h1>Café de especialidad vs café normal: ¿cuál es la diferencia real?</h1>
-      <p class="lead">No es solo una cuestión de precio. Hay diferencias objetivas y medibles entre los dos, y entenderlas cambia para siempre la forma en que eliges tu café.</p>
-      <p class="post-meta">9 minutos de lectura · Etiove</p>
-    </header>
-
-    <div class="divider"><span></span></div>
 
     <div class="post-body">
 
@@ -562,18 +360,29 @@
       <p>No se trata de snobismo ni de gastar más. Se trata de entender que el café tiene un potencial aromático y sensorial enorme que el mercado masivo ha ocultado durante décadas detrás del amargor y la uniformidad.</p>
 
       <p>Una vez que lo descubres, es difícil volver atrás.</p>
-
     </div>
+
+    <section class="post-actions" id="comentarios">
+      <p style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:16px;">Comparte este artículo</p>
+      <div class="share-row">
+        <a id="shareX" class="share-btn" target="_blank" rel="noopener noreferrer" href="#"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg> Compartir en X</a>
+        <button id="shareInstagram" class="share-btn" type="button"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg> Instagram</button>
+        <button id="copyLink" class="share-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg> Copiar enlace</button>
+      </div>
+      <p style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:12px;">Respuestas</p>
+      <p id="commentHelp" class="comment-help"></p>
+      <textarea id="commentBody" class="comment-box" maxlength="1000" placeholder="¿Cuándo fue tu primer café de especialidad? ¿Qué cambió?"></textarea>
+      <button id="sendComment" class="comment-send" type="button">Publicar respuesta</button>
+      <div id="commentStatus" class="comment-status"></div>
+      <div id="commentList" class="comment-list"></div>
+    </section>
 
     <div class="cta-box">
       <p class="cta-eyebrow">Comunidad Etiove</p>
       <h2 class="cta-title">Descubre tu primer café<br><em>de especialidad</em></h2>
-      <p class="cta-sub">En Etiove encontrarás recomendaciones, catadores y una comunidad que lleva años explorando orígenes. El quiz de sabor te dice exactamente por dónde empezar.</p>
+      <p class="cta-sub">En Etiove encontrarás recomendaciones, catadores y una comunidad que lleva años explorando orígenes.</p>
       <div class="cta-btns">
-        <a class="cta-btn-primary" href="/#quizweb">
-          Hacer el quiz de sabor
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </a>
+        <a class="cta-btn-primary" href="/#quizweb">Hacer el quiz de sabor <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
         <a class="cta-btn-ghost" href="/comunidad.html">Ver la comunidad</a>
       </div>
     </div>
@@ -583,26 +392,15 @@
         <p class="post-nav-label">← Anterior</p>
         <p class="post-nav-title">¿Por qué mi café sabe amargo? 7 causas y sus soluciones</p>
       </a>
-      <a class="post-nav-link" href="/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html">
-        <p class="post-nav-label">Siguiente →</p>
-        <p class="post-nav-title">¿Vale la Pena Pagar Más por Café de Especialidad?</p>
-      </a>
     </nav>
 
   </div>
 
   <button class="scroll-top" id="scrollTopBtn" aria-label="Volver arriba">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="18 15 12 9 6 15"></polyline>
-    </svg>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
   </button>
 
-  <script>
-    window.ETIOVE_BLOG_POST_CONFIG = { postSlug: 'cafe-de-especialidad-vs-cafe-normal' };
-    const st = document.getElementById('scrollTopBtn');
-    window.addEventListener('scroll', () => st.classList.toggle('visible', window.scrollY > 320));
-    st.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-  </script>
+  <script>window.ETIOVE_BLOG_POST_CONFIG = { postSlug: 'cafe-de-especialidad-vs-cafe-normal' };</script>
   <script src="/blog/post-shared.js"></script>
 
 </body>

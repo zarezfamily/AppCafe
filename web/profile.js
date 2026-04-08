@@ -1265,7 +1265,21 @@
 
   const init = async () => {
     if (!uid) {
-      renderEmpty('Falta el usuario del perfil. Vuelve a Comunidad o Blog y pulsa un alias.');
+      // No uid en la URL y no hay sesión — redirigir a comunidad con mensaje amable
+      if (!el.content) {
+        window.location.replace('/comunidad.html');
+        return;
+      }
+      el.content.innerHTML = `
+        <div class="empty-state" style="padding:48px 24px;text-align:center;">
+          <div class="empty-state-icon" style="font-size:40px;margin-bottom:16px;">☕</div>
+          <p style="font-family:'Playfair Display',serif;font-size:22px;font-weight:500;color:#1c120d;margin-bottom:10px;">Perfil no encontrado</p>
+          <p style="font-size:15px;color:#5d4030;margin-bottom:24px;line-height:1.6;">Para ver un perfil, pulsa sobre el alias de cualquier miembro en la comunidad o el blog.</p>
+          <a href="/comunidad.html" style="display:inline-flex;align-items:center;gap:8px;background:#1c120d;color:#fff9f1;text-decoration:none;padding:12px 24px;border-radius:10px;font-size:13px;font-weight:700;font-family:-apple-system,sans-serif;letter-spacing:1px;text-transform:uppercase;">
+            Ir a la comunidad
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+        </div>`;
       return;
     }
 

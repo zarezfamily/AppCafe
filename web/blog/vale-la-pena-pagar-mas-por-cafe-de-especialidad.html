@@ -321,6 +321,39 @@
       .site-nav { padding: 14px 20px; }
       .nav-links { display: none; }
     }
+        .cta-box {
+      background: linear-gradient(145deg, #1f130d, #2d1a10);
+      border-radius: 20px; padding: 36px 32px; text-align: center;
+      margin: 48px 0 0; position: relative; overflow: hidden;
+    }
+    .cta-box::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 60% at 80% -10%, rgba(201,149,87,0.2) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .cta-box::after {
+      content: ''; position: absolute; top: 0; left: 40px; right: 40px; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,228,190,0.25), transparent);
+      pointer-events: none;
+    }
+    .cta-eyebrow { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 3.5px; text-transform: uppercase; color: rgba(205,165,120,0.7); margin-bottom: 14px; position: relative; z-index: 1; }
+    .cta-title { font-family: 'Playfair Display', serif; font-size: clamp(22px, 4vw, 32px); font-weight: 400; color: #fff4ea; line-height: 1.15; margin-bottom: 14px; position: relative; z-index: 1; }
+    .cta-title em { font-style: italic; color: rgba(228,195,164,0.9); }
+    .cta-sub { font-size: 15px; color: rgba(255,249,241,0.5); line-height: 1.7; max-width: 420px; margin: 0 auto 28px; position: relative; z-index: 1; }
+    .cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; position: relative; z-index: 1; }
+    .cta-btn-primary { display: inline-flex; align-items: center; gap: 10px; background: #e8d5be; color: #1a0f08; border: none; border-radius: 2px; padding: 14px 32px; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; transition: background 0.3s, transform 0.2s; }
+    .cta-btn-primary:hover { background: #f5e6cf; transform: translateY(-2px); }
+    .cta-btn-ghost { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: rgba(255,249,241,0.5); border: 1px solid rgba(228,195,164,0.2); border-radius: 2px; padding: 14px 28px; font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; text-decoration: none; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; transition: all 0.3s; }
+    .cta-btn-ghost:hover { border-color: rgba(228,195,164,0.45); color: rgba(255,249,241,0.8); }
+        .post-nav { display: flex; gap: 16px; margin-top: 48px; flex-wrap: wrap; }
+    .post-nav-link {
+      flex: 1; min-width: 200px; padding: 18px 20px;
+      background: var(--cream-alt); border: 1px solid var(--border);
+      border-radius: 14px; text-decoration: none; transition: all 0.2s;
+    }
+    .post-nav-link:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(28,18,13,0.08); border-color: var(--accent); }
+    .post-nav-label { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 6px; }
+    .post-nav-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 500; color: var(--ink); line-height: 1.35; }
     </style>
   <script type="application/ld+json">
   {
@@ -576,13 +609,38 @@
 
         <p class="section-label">Respuestas</p>
         <p id="commentHelp" class="comment-help"></p>
-        <textarea id="commentBody" class="comment-box" maxlength="1000" placeholder="¿Pagas más por café de especialidad? ¿Crees que vale la pena? Cuéntanos tu experiencia..."></textarea>
+        <textarea id="commentBody" class="comment-box" maxlength="1000" placeholder="¿Cuánto pagas por tu café y crees que vale la pena? Comparte tu experiencia."></textarea>
         <button id="sendComment" class="comment-send" type="button">Publicar respuesta</button>
         <div id="commentStatus" class="comment-status"></div>
         <div id="commentList" class="comment-list"></div>
       </section>
 
     </article>
+
+    <div class="cta-box">
+      <p class="cta-eyebrow">Comunidad Etiove</p>
+      <h2 class="cta-title">¿Quieres saber qué cafés<br><em>merecen realmente su precio?</em></h2>
+      <p class="cta-sub">En Etiove la comunidad cata y debate sobre calidad y precio. Encuentra los cafés que otros catadores ya han validado.</p>
+      <div class="cta-btns">
+        <a class="cta-btn-primary" href="/comunidad.html">
+          Ver recomendaciones
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+        <a class="cta-btn-ghost" href="/blog/">← Más artículos</a>
+      </div>
+    </div>
+
+    <nav class="post-nav" aria-label="Otros artículos">
+      <a class="post-nav-link" href="/blog/cafe-de-especialidad-crece-en-espana-2026.html">
+        <p class="post-nav-label">← Anterior</p>
+        <p class="post-nav-title">El Café de Especialidad Crece un 34% en España</p>
+      </a>
+      <a class="post-nav-link" href="/blog/por-que-mi-cafe-sabe-amargo.html">
+        <p class="post-nav-label">Siguiente →</p>
+        <p class="post-nav-title">¿Por qué mi café sabe amargo? 7 causas y sus soluciones</p>
+      </a>
+    </nav>
+
   </main>
 
   <button class="scroll-top" id="scrollTopBtn" aria-label="Volver arriba">

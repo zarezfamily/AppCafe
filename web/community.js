@@ -837,6 +837,7 @@ const clearAuthToken = () => {
     localStorage.removeItem('etiove_web_email');
     localStorage.removeItem('etiove_web_alias');
     localStorage.removeItem('etiove_web_email_verified');
+    localStorage.removeItem('etiove_web_refresh_token');
   } catch (e) {}
   auth = { uid: '', email: '', token: '', emailVerified: false };
   canonicalAlias = '';
@@ -1766,6 +1767,7 @@ const signIn = async (registerMode) => {
     localStorage.setItem('etiove_web_uid', auth.uid);
     localStorage.setItem('etiove_web_email', auth.email);
     localStorage.setItem('etiove_web_token', auth.token);
+    if (json.refreshToken) localStorage.setItem('etiove_web_refresh_token', json.refreshToken);
 
     // Recordar credenciales si el checkbox está marcado
     const rememberChk = document.getElementById('rememberMe');
@@ -2301,3 +2303,10 @@ const init = async () => {
 };
 
 init();
+
+// Refresca el token cada 55 minutos mientras la página está abierta
+setInterval(async () => {
+  if (auth.token && localStorage.getItem('etiove_web_refresh_token')) {
+    await refreshFirebaseToken();
+  }
+}, 55 * 60 * 1000);

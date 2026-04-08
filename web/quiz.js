@@ -339,6 +339,30 @@ const STYLES = `
   }
 
   /* FINAL */
+  .eq-footer-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(228,195,164,0.15);
+  }
+  .eq-footer-link {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255,249,241,0.45);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .eq-footer-link:hover { color: rgba(255,249,241,0.85); }
+  .eq-footer-sep {
+    font-size: 10px;
+    color: rgba(255,249,241,0.2);
+  }
   .eq-final-actions {
     display: flex;
     flex-direction: column;
@@ -417,6 +441,13 @@ function renderQuiz() {
           </a>
           <button class="eq-btn-text" id="eq-restart">Repetir el quiz</button>
         </div>
+        <nav class="eq-footer-nav">
+          <a class="eq-footer-link" href="/comunidad.html">Comunidad</a>
+          <span class="eq-footer-sep">·</span>
+          <a class="eq-footer-link" href="/blog/">Blog</a>
+          <span class="eq-footer-sep">·</span>
+          <a class="eq-footer-link" href="/">Inicio</a>
+        </nav>
       `;
       inner.querySelector('#eq-restart').onclick = () => { step = 0; prefs = {}; render(); };
       return;

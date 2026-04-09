@@ -70,6 +70,8 @@
     quote: document.getElementById('profileQuote'),
     status: document.getElementById('profileStatus'),
     actions: document.getElementById('profileActions'),
+    ownerActions: document.getElementById('ownerActions'),
+    exportDataBtn: document.getElementById('exportDataBtn'),
     followBtn: document.getElementById('followBtn'),
     dmBtn: document.getElementById('dmBtn'),
     photoInput: document.getElementById('photoInput'),
@@ -734,6 +736,15 @@
         el.dmBtn.textContent = 'Mensaje directo';
       }
     }
+
+    // Owner-only actions
+    if (el.ownerActions) {
+      el.ownerActions.style.display = isOwner() ? 'block' : 'none';
+    }
+    if (el.exportDataBtn && !el.exportDataBtn.dataset.wired) {
+      el.exportDataBtn.addEventListener('click', exportMyData);
+      el.exportDataBtn.dataset.wired = '1';
+    }
   };
 
   const refreshFollowState = () => {
@@ -964,6 +975,53 @@
       }).join('');
   };
 
+
+
+  // ─── EXPORTAR MIS DATOS (RGPD Art. 20 — Portabilidad) ───────────────────
+  const exportMyData = () => {
+    if (!isOwner() || !auth.uid) return;
+
+    const data = {
+      exportDate: new Date().toISOString(),
+      user: {
+        uid: auth.uid,
+        email: auth.email || '',
+        alias: String(localStorage.getItem('etiove_web_alias') || ''),
+        emailVerified: auth.emailVerified,
+      },
+      profile: state.profile || {},
+      threads: state.threads.map((t) => ({
+        id: t.id, title: t.title, body: t.body,
+        categoryId: t.categoryId, createdAt: t.createdAt,
+        upvotes: t.upvotes, accessLevel: t.accessLevel,
+      })),
+      replies: state.replies.map((r) => ({
+        id: r.id, threadId: r.threadId, body: r.body,
+        createdAt: r.createdAt, upvotes: r.upvotes,
+      })),
+      messages: state.messages
+        .filter((m) => m.senderUid === auth.uid || m.recipientUid === auth.uid)
+        .map((m) => ({
+          id: m.id, body: m.body, createdAt: m.createdAt,
+          direction: m.senderUid === auth.uid ? 'sent' : 'received',
+          otherUser: m.senderUid === auth.uid ? m.recipientName : m.senderName,
+        })),
+      quizProfile: (() => {
+        try { return JSON.parse(localStorage.getItem('etiove_quiz_prefs') || 'null'); }
+        catch { return null; }
+      })(),
+    };
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `etiove-mis-datos-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
   // ─── BADGE DE MENSAJES NO LEÍDOS ─────────────────────────────────────────
   const updateUnreadBadge = (messages) => {
@@ -1245,6 +1303,18 @@
     overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
     document.addEventListener('keydown', function esc(e) {
       if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); }
+    });
+
+    // Focus trap
+    const focusEls = [input, cancelBtn, confirmBtn].filter(Boolean);
+    const firstEl = focusEls[0], lastEl = focusEls[focusEls.length - 1];
+    overlay.addEventListener('keydown', (e) => {
+      if (e.key !== 'Tab') return;
+      if (e.shiftKey) {
+        if (document.activeElement === firstEl) { e.preventDefault(); lastEl.focus(); }
+      } else {
+        if (document.activeElement === lastEl) { e.preventDefault(); firstEl.focus(); }
+      }
     });
 
     confirmBtn.addEventListener('click', () => {

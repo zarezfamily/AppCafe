@@ -928,6 +928,7 @@
     ]
   }
   </script>
+  <link rel="search" type="application/opensearchdescription+xml" title="Blog Etiove" href="/opensearch.xml" />
 </head>
 <body>
   <a class="skip-to-content" href="#main-content">Saltar al contenido</a>
@@ -941,6 +942,7 @@
       <a class="nav-link" href="#app">La app</a>
       <a class="nav-link" href="/blog.html">Blog</a>
       <a class="nav-link" href="/comunidad.html">Comunidad</a>
+      <a class="nav-link" href="/sobre.html">Sobre</a>
     </div>
   </nav>
 
@@ -1081,6 +1083,7 @@
         <a class="footer-nav-link" href="/blog/">Blog</a>
         <a class="footer-nav-link" href="/comunidad.html">Comunidad</a>
         <a class="footer-nav-link" href="/#quizweb">Quiz de sabor</a>
+        <a class="footer-nav-link" href="/sobre.html">Sobre Etiove</a>
       </div>
     </nav>
 
@@ -1183,6 +1186,20 @@
       if (acceptBtn) acceptBtn.addEventListener('click', function () { dismiss('accepted'); });
       if (rejectBtn) rejectBtn.addEventListener('click', function () { dismiss('essential'); });
     })();
+  </script>
+
+  <script>
+    // ── Service Worker Registration ────────────────────────────────────────────
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/sw.js')
+          .then(function (reg) {
+            // Check for updates on every page load
+            reg.update();
+          })
+          .catch(function () { /* SW not critical — fail silently */ });
+      });
+    }
   </script>
 </body>
 </html>

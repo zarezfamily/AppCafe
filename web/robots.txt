@@ -10,3 +10,4 @@ Disallow: /api/
 # Sitemap
 Sitemap: https://etiove.com/sitemap.xml
 Sitemap: https://etiove.com/feed.xml
+Sitemap: https://etiove.com/sitemap-images.xml

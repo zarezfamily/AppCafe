@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://etiove.com/blog/cafe-de-especialidad-vs-cafe-normal.html</loc>
+    <image:image>
+      <image:loc>https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=1400&q=80&auto=format&fit=crop</image:loc>
+      <image:caption>Granos de café de especialidad de distintos orígenes</image:caption>
+      <image:title>Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real?</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://etiove.com/blog/como-elegir-el-mejor-cafe-de-etiopia.html</loc>
+    <image:image>
+      <image:loc>https://images.unsplash.com/photo-1461988091159-192b6df7054f?w=1400&q=80&auto=format&fit=crop</image:loc>
+      <image:caption>Cafetales en las tierras altas de Etiopía</image:caption>
+      <image:title>Cómo Elegir el Mejor Café de Etiopía: Guía Completa</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://etiove.com/blog/guia-de-molienda-por-metodo.html</loc>
+    <image:image>
+      <image:loc>https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1400&q=80&auto=format&fit=crop</image:loc>
+      <image:caption>Molinillo manual y granos de café de especialidad</image:caption>
+      <image:title>Guía de Molienda por Método: de V60 a Espresso</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://etiove.com/blog/cafe-de-especialidad-crece-en-espana-2026.html</loc>
+    <image:image>
+      <image:loc>https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=1400&q=80&auto=format&fit=crop</image:loc>
+      <image:caption>Barista preparando café de especialidad en una cafetería moderna</image:caption>
+      <image:title>El Café de Especialidad Crece un 34% en España</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://etiove.com/blog/por-que-mi-cafe-sabe-amargo.html</loc>
+    <image:image>
+      <image:loc>https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=1400&q=80&auto=format&fit=crop</image:loc>
+      <image:caption>Taza de café con vapor en mesa de madera</image:caption>
+      <image:title>¿Por qué mi café sabe amargo? Causas y soluciones</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://etiove.com/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html</loc>
+    <image:image>
+      <image:loc>https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=1400&q=80&auto=format&fit=crop</image:loc>
+      <image:caption>Granos de café seleccionados a mano en una finca de altura</image:caption>
+      <image:title>¿Vale la Pena Pagar Más por Café de Especialidad?</image:title>
+    </image:image>
+  </url>
+</urlset>

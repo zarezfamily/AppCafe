@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+  <ShortName>Etiove Blog</ShortName>
+  <Description>Busca artículos sobre café de especialidad en el blog de Etiove</Description>
+  <InputEncoding>UTF-8</InputEncoding>
+  <Image width="16" height="16" type="image/svg+xml">https://etiove.com/favicon.svg</Image>
+  <Url type="text/html" method="get"
+       template="https://etiove.com/blog/?q={searchTerms}"/>
+  <Url type="application/opensearchdescription+xml" rel="self"
+       template="https://etiove.com/opensearch.xml"/>
+  <Contact>hola@etiove.com</Contact>
+  <Tags>café especialidad blog España comunidad</Tags>
+  <LongName>Blog Etiove — Café de Especialidad</LongName>
+  <Query role="example" searchTerms="café de etiopía"/>
+</OpenSearchDescription>

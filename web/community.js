@@ -2744,6 +2744,21 @@ const showConfirmModal = ({ title, message, confirmLabel = 'Confirmar', danger =
   const close = () => overlay.remove();
   overlay.querySelector('#etioveConfirmCancel').onclick = close;
   overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+
+  // Focus trap — keep focus inside modal
+  const focusables = overlay.querySelectorAll('button');
+  const firstF = focusables[0];
+  const lastF  = focusables[focusables.length - 1];
+  setTimeout(() => { if (lastF) lastF.focus(); }, 0);
+  overlay.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab') return;
+    if (e.shiftKey) {
+      if (document.activeElement === firstF) { e.preventDefault(); lastF.focus(); }
+    } else {
+      if (document.activeElement === lastF) { e.preventDefault(); firstF.focus(); }
+    }
+  });
+
   document.addEventListener('keydown', function esc(e) {
     if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); }
   });

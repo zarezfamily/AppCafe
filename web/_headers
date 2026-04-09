@@ -1,0 +1,69 @@
+# Etiove — Cloudflare Pages _headers
+# Cache-Control optimizado para cada tipo de asset
+
+# ── JavaScript y CSS ──────────────────────────────────────────────────────────
+# Versionados implícitamente por nombre de fichero — cache agresivo
+/community.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/profile.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/quiz.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/blog/post-shared.js
+  Cache-Control: public, max-age=31536000, immutable
+
+# ── Imágenes y favicon ────────────────────────────────────────────────────────
+/favicon.svg
+  Cache-Control: public, max-age=31536000, immutable
+
+/favicon.ico
+  Cache-Control: public, max-age=31536000, immutable
+
+/favicon-96x96.png
+  Cache-Control: public, max-age=31536000, immutable
+
+/apple-touch-icon.png
+  Cache-Control: public, max-age=31536000, immutable
+
+/web-app-manifest-192x192.png
+  Cache-Control: public, max-age=31536000, immutable
+
+/web-app-manifest-512x512.png
+  Cache-Control: public, max-age=31536000, immutable
+
+# ── Manifest y feed ───────────────────────────────────────────────────────────
+/site.webmanifest
+  Cache-Control: public, max-age=86400
+  Content-Type: application/manifest+json; charset=utf-8
+
+/feed.xml
+  Cache-Control: public, max-age=3600
+  Content-Type: application/rss+xml; charset=utf-8
+
+/sitemap.xml
+  Cache-Control: public, max-age=86400
+  Content-Type: application/xml; charset=utf-8
+
+/robots.txt
+  Cache-Control: public, max-age=86400
+
+# ── HTML — revalidar siempre ──────────────────────────────────────────────────
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+
+/
+  Cache-Control: public, max-age=0, must-revalidate
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+
+# ── Service Worker ────────────────────────────────────────────────────────────
+/sw.js
+  Cache-Control: no-cache, no-store, must-revalidate
+  Service-Worker-Allowed: /

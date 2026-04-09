@@ -799,7 +799,12 @@
       return;
     }
 
-    el.content.innerHTML = mixed.slice(0, 40).map((item) => {
+    const PAGE_SIZE = 20;
+    let actPage = 0;
+    const renderActivityPage = () => {
+      const page = mixed.slice(0, (actPage + 1) * PAGE_SIZE);
+      const hasMore = page.length < mixed.length;
+      el.content.innerHTML = page.map((item) => {
       const typeClass = item.type === 'hilo' ? 'hilo' : item.type === 'respuesta' ? 'reply' : 'blog';
       const typeLabel = item.type === 'hilo' ? 'Hilo' : item.type === 'respuesta' ? 'Respuesta' : 'Comentario';
       return `
@@ -814,7 +819,12 @@
           ${item.body ? `<p class="post-body-text">${esc(item.body)}</p>` : ''}
         </div>
       </article>`;
-    }).join('');
+      }).join('')
+      + (hasMore ? `<div style="text-align:center;padding:20px 0;"><button class="mini-btn" id="actLoadMore" style="padding:10px 24px;font-size:13px;">Ver más</button></div>` : '');
+      const loadMoreBtn = document.getElementById('actLoadMore');
+      if (loadMoreBtn) loadMoreBtn.addEventListener('click', () => { actPage++; renderActivityPage(); });
+    };
+    renderActivityPage();
   };
 
   const renderThreadList = () => {
@@ -1025,10 +1035,13 @@
       return;
     }
 
-    el.content.innerHTML = rows
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-      .slice(0, 120)
-      .map((row) => {
+    const MSG_PAGE = 30;
+    let msgPage = 0;
+    const renderMsgPage = () => {
+      const sorted = rows.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      const page = sorted.slice(0, (msgPage + 1) * MSG_PAGE);
+      const hasMoreMsgs = page.length < sorted.length;
+      el.content.innerHTML = page.map((row) => {
         const mine = row.senderUid === auth.uid;
         const isUnread = !mine && !row.read;
         const otherUid = mine ? row.recipientUid : row.senderUid;
@@ -1047,7 +1060,19 @@
             </div>
           </article>
         `;
-      }).join('');
+        }).join('')
+        + (hasMoreMsgs ? `<div style="text-align:center;padding:20px 0;"><button class="mini-btn" id="msgLoadMore" style="padding:10px 24px;font-size:13px;">Ver más mensajes</button></div>` : '');
+      const lmBtn = document.getElementById('msgLoadMore');
+      if (lmBtn) lmBtn.addEventListener('click', () => { msgPage++; renderMsgPage(); });
+      // Re-wire DM reply buttons
+      el.content.querySelectorAll('[data-reply-dm]').forEach((btn) => {
+        btn.addEventListener('click', () => replyDirectMessage(btn.dataset.replyDm, btn.dataset.replyName));
+      });
+      el.content.querySelectorAll('[data-open-profile]').forEach((btn) => {
+        btn.addEventListener('click', () => openProfile(btn.dataset.openProfile, btn.dataset.openName));
+      });
+    };
+    renderMsgPage();
   };
 
   const renderTab = (tabName) => {

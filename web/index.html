@@ -31,7 +31,8 @@
   <link rel="manifest" href="/site.webmanifest" /><meta itemprop="image" content="https://etiove.com/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -853,6 +854,42 @@
     ]
   }
   </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "Quiz de Sabor Etiove: Descubre tu café ideal",
+    "description": "Responde 4 preguntas sobre tus preferencias de tueste, origen, acidez y perfil de sabor para descubrir qué café de especialidad encaja con tu paladar.",
+    "totalTime": "PT2M",
+    "tool": { "@type": "HowToTool", "name": "App Etiove" },
+    "step": [
+      {
+        "@type": "HowToStep",
+        "position": 1,
+        "name": "Elige tu tueste preferido",
+        "text": "Selecciona entre tueste claro, medio u oscuro según el carácter que buscas en tu taza."
+      },
+      {
+        "@type": "HowToStep",
+        "position": 2,
+        "name": "Elige tu origen favorito",
+        "text": "África (Etiopía, Kenia), América (Colombia, Costa Rica) o Asia (Indonesia, Yemen)."
+      },
+      {
+        "@type": "HowToStep",
+        "position": 3,
+        "name": "Define cómo te gusta la acidez",
+        "text": "Alta (brillante y expresiva), media (equilibrada) o baja (suave y redonda)."
+      },
+      {
+        "@type": "HowToStep",
+        "position": 4,
+        "name": "Elige tu perfil de sabor",
+        "text": "Floral, frutal, chocolate o especias. Obtendrás tu perfil sensorial exacto."
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
 
@@ -883,9 +920,9 @@
       </div>
     </div>
 
-    <p class="hero-eyebrow">La mayor comunidad de café de especialidad</p>
+    <p class="hero-eyebrow">Café de especialidad</p>
     <h1 class="hero-title">Etiove</h1>
-    <p class="hero-tagline">Donde nació el café</p>
+    <p class="hero-tagline">La mayor comunidad de café de especialidad.<br>Descubre, cata, colecciona y conecta.</p>
 
     <div class="divider-line">
       <span class="divider-dot"></span>

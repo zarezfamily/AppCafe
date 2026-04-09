@@ -1568,6 +1568,19 @@ const renderThreads = () => {
     if (typeof wireAutoResize === 'function') wireAutoResize(ta);
   });
 
+  // Ctrl+Enter / Cmd+Enter to submit reply
+  el.threadsWrap.querySelectorAll('.reply-textarea').forEach((ta) => {
+    if (ta.dataset.ctrlEnter) return;
+    ta.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        const threadId = ta.getAttribute('data-reply-input');
+        if (threadId) sendReply(threadId);
+      }
+    });
+    ta.dataset.ctrlEnter = '1';
+  });
+
   if (!el.threadsWrap.dataset.boundDelegatedClicks) {
     el.threadsWrap.addEventListener('click', (event) => {
       const saveBtn = event.target.closest('[data-thread-save]');
@@ -2293,9 +2306,13 @@ const saveInlineThreadEdit = async (threadId) => {
 const deleteThread = async (threadId) => {
   const item = threads.find((thread) => thread.id === threadId);
   if (!canManageItem(item)) return;
-  if (!window.confirm('Se eliminará el hilo y sus respuestas.')) return;
-
-  const relatedReplies = replies.filter((reply) => reply.threadId === threadId);
+  showConfirmModal({
+    title: 'Eliminar hilo',
+    message: 'Se eliminará el hilo y todas sus respuestas. Esta acción no se puede deshacer.',
+    confirmLabel: 'Eliminar',
+    danger: true,
+    onConfirm: async () => {
+      const relatedReplies = replies.filter((reply) => reply.threadId === threadId);
   const replyResults = await Promise.allSettled(relatedReplies.map((reply) => deleteDocument('foro_respuestas', reply.id)));
   if (replyResults.some((result) => result.status === 'rejected' || !result.value)) {
     setStatus(el.threadStatus, 'No se pudieron borrar todas las respuestas del hilo.', 'error');
@@ -2309,13 +2326,15 @@ const deleteThread = async (threadId) => {
   }
 
   if (editingThreadId === threadId) resetInlineThreadEdit({ preserveStatus: true, rerender: false });
-  setStatus(el.threadStatus, 'Hilo eliminado.', 'ok');
-  if (getActiveThreadId() === threadId) {
-    applyLocalUpdate({ removeThreadId: threadId });
-    goToThreadList();
-    return;
-  }
-  applyLocalUpdate({ removeThreadId: threadId });
+      setStatus(el.threadStatus, 'Hilo eliminado.', 'ok');
+      if (getActiveThreadId() === threadId) {
+        applyLocalUpdate({ removeThreadId: threadId });
+        goToThreadList();
+        return;
+      }
+      applyLocalUpdate({ removeThreadId: threadId });
+    },
+  });
 };
 
 const editReply = (replyId) => {
@@ -2371,16 +2390,22 @@ const cancelReplyEdit = () => {
 const deleteReply = async (replyId) => {
   const item = replies.find((reply) => reply.id === replyId);
   if (!canManageItem(item)) return;
-  if (!window.confirm('Se eliminará esta respuesta.')) return;
-
-  const ok = await deleteDocument('foro_respuestas', replyId);
+  showConfirmModal({
+    title: 'Eliminar respuesta',
+    message: 'Se eliminará esta respuesta. Esta acción no se puede deshacer.',
+    confirmLabel: 'Eliminar',
+    danger: true,
+    onConfirm: async () => {
+      const ok = await deleteDocument('foro_respuestas', replyId);
   if (!ok) {
     setStatus(el.threadStatus, 'No se pudo borrar la respuesta.', 'error');
     return;
   }
 
-  setStatus(el.threadStatus, 'Respuesta eliminada.', 'ok');
-  applyLocalUpdate({ removeReplyId: replyId });
+      setStatus(el.threadStatus, 'Respuesta eliminada.', 'ok');
+      applyLocalUpdate({ removeReplyId: replyId });
+    },
+  });
 };
 
 const sendReply = async (threadId) => {
@@ -2641,6 +2666,49 @@ const clearDraft = () => {
   try { localStorage.removeItem(DRAFT_KEY); } catch (_) {}
 };
 
+// ─── MODAL DE CONFIRMACIÓN (reemplaza window.confirm) ────────────────────────
+const showConfirmModal = ({ title, message, confirmLabel = 'Confirmar', danger = false, onConfirm }) => {
+  const existing = document.getElementById('etioveConfirmModal');
+  if (existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'etioveConfirmModal';
+  overlay.style.cssText = [
+    'position:fixed', 'inset:0', 'z-index:10001',
+    'background:rgba(28,18,13,0.52)', 'backdrop-filter:blur(4px)',
+    'display:flex', 'align-items:center', 'justify-content:center', 'padding:24px',
+  ].join(';');
+
+  const confirmColor = danger ? '#a44f45' : 'var(--accent-deep, #5f3a25)';
+  overlay.innerHTML = `
+    <div style="background:#fdf8f1;border-radius:12px;padding:28px 24px;max-width:380px;
+                width:100%;box-shadow:0 24px 64px rgba(28,18,13,0.22);font-family:-apple-system,sans-serif;">
+      <p style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;
+                color:#1c120d;margin-bottom:10px;">${escapeHtml(title)}</p>
+      <p style="font-size:14px;color:#5d4030;line-height:1.65;margin-bottom:24px;">${escapeHtml(message)}</p>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button id="etioveConfirmCancel"
+          style="background:transparent;border:1px solid #deccb6;border-radius:8px;
+                 padding:9px 20px;font-size:13px;font-weight:600;color:#5d4030;
+                 cursor:pointer;font-family:inherit;">Cancelar</button>
+        <button id="etioveConfirmOk"
+          style="background:${confirmColor};border:none;border-radius:8px;
+                 padding:9px 20px;font-size:13px;font-weight:700;color:#fff9f1;
+                 cursor:pointer;font-family:inherit;">${escapeHtml(confirmLabel)}</button>
+      </div>
+    </div>`;
+
+  document.body.appendChild(overlay);
+
+  const close = () => overlay.remove();
+  overlay.querySelector('#etioveConfirmCancel').onclick = close;
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+  document.addEventListener('keydown', function esc(e) {
+    if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); }
+  });
+  overlay.querySelector('#etioveConfirmOk').onclick = () => { close(); onConfirm(); };
+};
+
 // ─── ACTUALIZACIÓN LOCAL DE ESTADO (evita recargar todo el foro) ─────────────
 // Después de operaciones que ya conocemos el resultado, actualizamos el estado
 // local y re-renderizamos sin ir a Firestore.
@@ -2696,27 +2764,25 @@ const reportItem = async (collection, itemId, itemType) => {
     return;
   }
 
-  if (!window.confirm(`¿Reportar este ${itemType} como contenido inapropiado?\n\nEl equipo de Etiove lo revisará.`)) return;
-
-  reporters.add(auth.uid);
-  const newCount = Number(item.reportedCount || 0) + 1;
-
-  const ok = await updateDocument(collection, itemId, {
-    reportedCount: newCount,
-    reporterUids: Array.from(reporters).join(','),
+  showConfirmModal({
+    title: `Reportar ${itemType}`,
+    message: '¿Reportar este contenido como inapropiado? El equipo de Etiove lo revisará.',
+    confirmLabel: 'Reportar',
+    danger: false,
+    onConfirm: async () => {
+      reporters.add(auth.uid);
+      const newCount = Number(item.reportedCount || 0) + 1;
+      const ok = await updateDocument(collection, itemId, {
+        reportedCount: newCount,
+        reporterUids: Array.from(reporters).join(','),
+      });
+      if (!ok) { setStatus(el.threadStatus, 'No se pudo enviar el reporte.', 'error'); return; }
+      item.reportedCount = newCount;
+      item.reporterUids  = Array.from(reporters).join(',');
+      setStatus(el.threadStatus, 'Reporte enviado. Gracias por ayudar a mantener la comunidad.', 'ok');
+      renderThreads();
+    },
   });
-
-  if (!ok) {
-    setStatus(el.threadStatus, 'No se pudo enviar el reporte.', 'error');
-    return;
-  }
-
-  // Optimistic local update
-  item.reportedCount = newCount;
-  item.reporterUids  = Array.from(reporters).join(',');
-
-  setStatus(el.threadStatus, 'Reporte enviado. Gracias por ayudar a mantener la comunidad.', 'ok');
-  renderThreads();
 };
 
 const init = async () => {
@@ -2775,6 +2841,16 @@ const init = async () => {
     ta.dataset.autoResize = '1';
   };
   wireAutoResize(el.threadBody);
+
+  // Ctrl+Enter to publish thread
+  if (el.threadBody) {
+    el.threadBody.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        if (el.createThreadBtn && !el.createThreadBtn.disabled) createThread();
+      }
+    });
+  }
 
   // ─── DRAFT AUTO-SAVE ──────────────────────────────────────────────────────
   if (el.threadTitle) el.threadTitle.addEventListener('input', saveDraft);

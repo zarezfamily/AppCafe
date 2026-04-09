@@ -16,6 +16,8 @@
   <meta name="description" content="Sobreextracción, molienda incorrecta, agua demasiado caliente… Descubre las 7 causas reales de que tu café sepa amargo y cómo solucionarlas hoy." />
   <link rel="canonical" href="https://etiove.com/blog/por-que-mi-cafe-sabe-amargo.html" />
   <link rel="alternate" type="application/rss+xml" title="Blog Etiove - RSS" href="https://etiove.com/feed.xml" />
+  <link rel="prev" href="https://etiove.com/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html" />
+  <link rel="next" href="https://etiove.com/blog/cafe-de-especialidad-vs-cafe-normal.html" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Etiove" />
   <meta property="og:locale" content="es_ES" />
@@ -40,9 +42,32 @@
     "description": "Sobreextracción, molienda incorrecta, agua demasiado caliente… Descubre las causas reales de que tu café sepa amargo y cómo solucionarlas.",
     "datePublished": "2026-04-08",
     "dateModified": "2026-04-08",
-    "author": { "@type": "Organization", "name": "Etiove" },
-    "publisher": { "@type": "Organization", "name": "Etiove", "url": "https://etiove.com" },
-    "mainEntityOfPage": { "@type": "WebPage", "@id": "https://etiove.com/blog/por-que-mi-cafe-sabe-amargo.html" }
+    "author": {
+      "@type": "Organization",
+      "name": "Etiove"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Etiove",
+      "url": "https://etiove.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://etiove.com/favicon.svg",
+        "width": 512,
+        "height": 512
+      }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://etiove.com/blog/por-que-mi-cafe-sabe-amargo.html"
+    },
+    "image": {
+      "@type": "ImageObject",
+      "url": "https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=1400&q=80&auto=format&fit=crop",
+      "width": 1400,
+      "height": 700,
+      "caption": "Taza de café con vapor en mesa de madera"
+    }
   }
   </script>
   <style>
@@ -55,7 +80,28 @@
     .nav-links { display: flex; align-items: center; gap: 32px; }
     .nav-link { font-family: -apple-system, sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-muted); text-decoration: none; transition: color .3s; }
     .nav-link:hover { color: var(--accent); }
-    @media (max-width: 768px) { body > nav { padding: 16px 20px; } .nav-links { display: none; } }
+    
+    /* ─── HAMBURGER NAV MÓVIL ─── */
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+    }
+    .nav-hamburger span { display: block; width: 22px; height: 2px; background: var(--ink); border-radius: 2px; transition: transform 0.25s, opacity 0.25s; }
+    .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-hamburger.open span:nth-child(2) { opacity: 0; }
+    .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    @media (max-width: 768px) {
+      .nav-hamburger { display: flex; }
+      .nav-links { display: none !important; flex-direction: column !important; position: fixed !important; inset: 0 !important; background: rgba(246,239,231,0.98) !important; backdrop-filter: blur(16px) !important; z-index: 150 !important; align-items: center !important; justify-content: center !important; gap: 32px !important; padding: 40px 24px !important; }
+      .nav-links.open { display: flex !important; }
+      .nav-link { font-size: 16px !important; letter-spacing: 3px !important; }
+    }
+@media (max-width: 768px) { body > nav { padding: 16px 20px; } .nav-links { display: none; } }
     .post-hero { position: relative; margin-top: 62px; height: min(500px, 55vw); min-height: 240px; overflow: hidden; }
     .hero-img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(28,18,13,.06) 0%, rgba(28,18,13,.5) 55%, rgba(28,18,13,.82) 100%); }
@@ -158,7 +204,8 @@
 
   <nav>
     <a class="nav-wordmark" href="/">Etiove</a>
-    <div class="nav-links">
+    <button class="nav-hamburger" id="navHamburger" aria-label="Menú" aria-expanded="false" aria-controls="navLinks"><span></span><span></span><span></span></button>
+    <div class="nav-links" id="navLinks">
       <a class="nav-link" href="/">Inicio</a>
       <a class="nav-link" href="/blog/">Blog</a>
       <a class="nav-link" href="/comunidad.html">Comunidad</a>
@@ -368,5 +415,32 @@
   <script>window.ETIOVE_BLOG_POST_CONFIG = { postSlug: 'por-que-mi-cafe-sabe-amargo' };</script>
   <script src="/blog/post-shared.js"></script>
 
+  <script>
+    (function () {
+      var btn = document.getElementById('navHamburger');
+      var links = document.getElementById('navLinks');
+      if (!btn || !links) return;
+      btn.addEventListener('click', function () {
+        var open = links.classList.toggle('open');
+        btn.classList.toggle('open', open);
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        document.body.style.overflow = open ? 'hidden' : '';
+      });
+      links.querySelectorAll('.nav-link').forEach(function (a) {
+        a.addEventListener('click', function () {
+          links.classList.remove('open'); btn.classList.remove('open');
+          btn.setAttribute('aria-expanded', 'false');
+          document.body.style.overflow = '';
+        });
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && links.classList.contains('open')) {
+          links.classList.remove('open'); btn.classList.remove('open');
+          btn.setAttribute('aria-expanded', 'false');
+          document.body.style.overflow = '';
+        }
+      });
+    })();
+  </script>
 </body>
 </html>

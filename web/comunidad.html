@@ -1395,10 +1395,37 @@
       }
     }
 
+
+    /* ─── HAMBURGER NAV MÓVIL ─── */
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      z-index: 200;
+    }
+    .nav-hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--ink);
+      border-radius: 2px;
+      transition: transform 0.25s, opacity 0.25s;
+    }
+    .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-hamburger.open span:nth-child(2) { opacity: 0; }
+    .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
     /* ─── RESPONSIVE ─── */
     @media (max-width: 768px) {
       nav { padding: 16px 24px; }
-      .nav-links { display: none; }
+      .nav-hamburger { display: flex; }
+      .nav-links { display: none; flex-direction: column; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(246,239,231,0.98); backdrop-filter: blur(16px); z-index: 150; align-items: center; justify-content: center; gap: 32px; padding: 40px 24px; }
+      .nav-links.open { display: flex; }
+      .nav-link { font-size: 16px; letter-spacing: 3px; }
       footer { flex-direction: column; text-align: center; }
       .social-row { justify-content: center; }
       .hero-title { font-size: 52px; }
@@ -1437,7 +1464,8 @@
 
   <nav>
     <a class="nav-wordmark" href="/">Etiove</a>
-    <div class="nav-links">
+    <button class="nav-hamburger" id="navHamburger" aria-label="Menú" aria-expanded="false" aria-controls="navLinks"><span></span><span></span><span></span></button>
+    <div class="nav-links" id="navLinks">
       <a class="nav-link" href="/">Inicio</a>
       <a class="nav-link" href="/blog.html">Blog</a>
       <a class="nav-link" href="/comunidad.html" style="position:relative;">Comunidad<span id="communityNavBadge" style="display:none;position:absolute;top:-6px;right:-14px;background:#c0392b;color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;padding:0 4px;align-items:center;justify-content:center;font-family:-apple-system,sans-serif;letter-spacing:0;"></span></a>
@@ -1676,6 +1704,37 @@
       const probe = new Image();
       probe.onload = () => heroImg.classList.add('loaded');
       probe.src = src;
+    })();
+  </script>
+
+  <script>
+    // ─── NAV HAMBURGER ───────────────────────────────────────────────────────
+    (function () {
+      const btn = document.getElementById('navHamburger');
+      const links = document.getElementById('navLinks');
+      if (!btn || !links) return;
+      btn.addEventListener('click', function () {
+        const open = links.classList.toggle('open');
+        btn.classList.toggle('open', open);
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        document.body.style.overflow = open ? 'hidden' : '';
+      });
+      links.querySelectorAll('.nav-link').forEach(function (a) {
+        a.addEventListener('click', function () {
+          links.classList.remove('open');
+          btn.classList.remove('open');
+          btn.setAttribute('aria-expanded', 'false');
+          document.body.style.overflow = '';
+        });
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && links.classList.contains('open')) {
+          links.classList.remove('open');
+          btn.classList.remove('open');
+          btn.setAttribute('aria-expanded', 'false');
+          document.body.style.overflow = '';
+        }
+      });
     })();
   </script>
 </body>

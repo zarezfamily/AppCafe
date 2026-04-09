@@ -31,6 +31,31 @@ let auth = {
   emailVerified: localStorage.getItem('etiove_web_email_verified') === 'true',
 };
 
+// ─── ANTI-SPAM / SUBMIT GUARD ─────────────────────────────────────────────────
+// Prevents double-submits on threads, replies, votes and edits while an
+// async operation is in flight. Each key is independent so e.g. voting
+// doesn't block typing a reply.
+const _submitting = {
+  thread: false,
+  reply: false,
+  vote: false,
+  edit: false,
+};
+
+const withSubmitGuard = async (key, btn, loadingText, fn) => {
+  if (_submitting[key]) return;
+  _submitting[key] = true;
+  const originalText = btn ? btn.textContent : '';
+  const originalDisabled = btn ? btn.disabled : false;
+  if (btn) { btn.disabled = true; if (loadingText) btn.textContent = loadingText; }
+  try {
+    await fn();
+  } finally {
+    _submitting[key] = false;
+    if (btn) { btn.disabled = originalDisabled; btn.textContent = originalText; }
+  }
+};
+
 const VERIFIED_BADGE = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-left:4px;flex-shrink:0;" aria-label="Email verificado" title="Email verificado"><circle cx="12" cy="12" r="12" fill="#1d9bf0"/><path d="M8.5 12.5l2.5 2.5 5-5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
 let canonicalAlias = String(localStorage.getItem('etiove_web_alias') || '').trim();
@@ -125,6 +150,11 @@ let currentListPage = 1;
 let editingThreadId = '';
 let editingThreadDraft = null;
 let editingThreadFocusField = 'title';
+// Búsqueda persistente: se mantiene al paginar y al cambiar de categoría
+let activeSearchTerm = '';
+// Edición inline de respuestas
+let editingReplyId = '';
+let editingReplyDraft = '';
 let pendingThreadAnchorY = null;
 const IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 const IMAGE_ALLOWED_TYPES = new Set([
@@ -1158,26 +1188,34 @@ const renderCategories = () => {
     });
   });
 
-  // Buscador funcional con debounce (200ms)
+  // Restore persisted search term on re-render
   const searchInputEl = document.getElementById('threadSearchInput');
+  if (searchInputEl) searchInputEl.value = activeSearchTerm;
+
+  // Buscador funcional con debounce (200ms) — persiste término y busca en todas las categorías
   if (searchInputEl && !searchInputEl.dataset.bound) {
     let searchDebounceTimer = null;
     searchInputEl.addEventListener('input', () => {
       clearTimeout(searchDebounceTimer);
       searchDebounceTimer = setTimeout(() => {
-        renderThreads(searchInputEl.value);
+        activeSearchTerm = searchInputEl.value.trim();
+        currentListPage = 1;
+        renderThreads();
       }, 200);
     });
     searchInputEl.dataset.bound = '1';
   }
 };
 
-const renderThreads = (searchTerm = '') => {
+const renderThreads = () => {
   const activeThreadId = getActiveThreadId();
-  // Mostrar todos los hilos (públicos y privados)
-  let list = threads.filter((t) => t.categoryId === selectedCategory);
+  const searchTerm = activeSearchTerm;
+  // Si hay búsqueda activa, buscar en TODAS las categorías; si no, solo en la seleccionada
+  let list = searchTerm
+    ? threads.slice()
+    : threads.filter((t) => t.categoryId === selectedCategory);
   if (searchTerm) {
-    const term = searchTerm.trim().toLowerCase();
+    const term = searchTerm.toLowerCase();
     list = list.filter((t) =>
       (t.title && t.title.toLowerCase().includes(term)) ||
       (t.body && t.body.toLowerCase().includes(term))
@@ -1218,8 +1256,19 @@ const renderThreads = (searchTerm = '') => {
     const accessTagColor = activeThread.accessLevel === 'registered_only' ? '#8f5e3b' : '#4f7a53';
     const accessTagBg = activeThread.accessLevel === 'registered_only' ? '#f3e9de' : '#edf7ee';
 
-    const repliesHtml = threadReplies.map((r) => (
-      `<div class="reply">
+    const repliesHtml = threadReplies.map((r) => {
+      const isEditingThis = editingReplyId === r.id;
+      if (isEditingThis) {
+        return `<div class="reply reply-is-editing">
+          <div class="meta"><span style="font-weight:600;">${escapeHtml(r.authorName || 'Catador')}</span> · ${fmt(r.createdAt)}</div>
+          <textarea data-reply-edit-body="${r.id}" maxlength="1000" style="width:100%;min-height:90px;resize:vertical;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;font-family:inherit;background:rgba(255,255,255,.9);color:var(--ink);margin:8px 0;">${escapeHtml(editingReplyDraft)}</textarea>
+          <div class="actions-row" style="margin-top:6px;gap:10px;">
+            <button class="btn primary" data-reply-save="${r.id}" style="font-size:12px;padding:8px 18px;">Guardar</button>
+            <button class="btn ghost" data-reply-cancel-edit="${r.id}" style="font-size:12px;padding:8px 18px;">Cancelar</button>
+          </div>
+        </div>`;
+      }
+      return `<div class="reply">
         <div class="meta"><button class="link-btn author-btn" data-author-uid="${escapeHtml(r.authorUid || '')}" data-author-name="${escapeHtml(r.authorName || 'Catador')}" style="font-weight:600;">${escapeHtml(r.authorName || 'Catador')}</button> · ${fmt(r.createdAt)}</div>
         <p>${escapeHtml(r.body || '')}</p>
         <div class="thread-foot">
@@ -1231,8 +1280,8 @@ const renderThreads = (searchTerm = '') => {
             ? `<div class="actions-row"><button class="link-btn" data-reply-edit="${r.id}">Editar</button><button class="link-btn" data-reply-delete="${r.id}">Eliminar</button></div>`
             : ''}
         </div>
-      </div>`
-    )).join('');
+      </div>`;
+    }).join('');
 
     const detailBodyHtml = editingThreadId === activeThread.id
       ? renderInlineThreadEditor(activeThread)
@@ -1275,9 +1324,11 @@ const renderThreads = (searchTerm = '') => {
     if (displayList.length === 0) {
       const category = FORUM_CATEGORIES.find((c) => c.id === selectedCategory);
       const categoryLabel = (category && category.label) || 'esta categoría';
-      const cta = auth.token
-        ? `Todavía no hay hilos en ${categoryLabel}. Sé la primera voz y escribe el primer post de esta categoría.`
-        : `Todavía no hay hilos en ${categoryLabel}. Inicia sesión y abre el primer post de esta categoría.`;
+      const cta = searchTerm
+        ? `No se encontraron hilos para «${searchTerm}» en ninguna categoría.`
+        : (auth.token
+          ? `Todavía no hay hilos en ${categoryLabel}. Sé la primera voz y escribe el primer post de esta categoría.`
+          : `Todavía no hay hilos en ${categoryLabel}. Inicia sesión y abre el primer post de esta categoría.`);
       el.threadsWrap.innerHTML = `<p class="empty">${escapeHtml(cta)}</p>`;
       return;
     }
@@ -1314,7 +1365,7 @@ const renderThreads = (searchTerm = '') => {
           <button class="pager-btn pager-arrow" data-page="${currentListPage + 1}" ${nextDisabled} aria-label="Página siguiente">›</button>
           <button class="pager-btn pager-arrow" data-page="${totalPages}" ${nextDisabled} aria-label="Última página">»</button>
         </div>
-        <p class="pager-info">Mostrando temas del ${start + 1} al ${end} de ${displayList.length}</p>
+        <p class="pager-info">${searchTerm ? `${displayList.length} resultado${displayList.length !== 1 ? "s" : ""} en todas las categorías` : `Mostrando temas del ${start + 1} al ${end} de ${displayList.length}`}</p>
       </div>
     `;
 
@@ -1525,6 +1576,18 @@ const renderThreads = (searchTerm = '') => {
 
     el.threadsWrap.dataset.boundDelegatedInputs = '1';
   }
+
+  el.threadsWrap.querySelectorAll('[data-reply-save]').forEach((btn) => {
+    btn.addEventListener('click', () => saveReplyEdit(btn.getAttribute('data-reply-save')));
+  });
+
+  el.threadsWrap.querySelectorAll('[data-reply-cancel-edit]').forEach((btn) => {
+    btn.addEventListener('click', () => cancelReplyEdit());
+  });
+
+  el.threadsWrap.querySelectorAll('[data-reply-edit-body]').forEach((ta) => {
+    ta.addEventListener('input', () => { editingReplyDraft = ta.value; });
+  });
 
   el.threadsWrap.querySelectorAll('[data-reply-edit]').forEach((btn) => {
     btn.addEventListener('click', () => editReply(btn.getAttribute('data-reply-edit')));
@@ -1854,52 +1917,54 @@ const createThread = async () => {
     return;
   }
 
-  try {
-    const imageFile = el.threadImage.files && el.threadImage.files[0] ? el.threadImage.files[0] : null;
-    let imageUrl = '';
-    let imageUploadWarning = '';
-    if (imageFile) {
-      try {
-        imageUrl = await uploadImageWithRetry(imageFile, 'foro_hilos', 3);
-      } catch (uploadErr) {
-        imageUploadWarning = mapThreadPublishError(uploadErr);
-        const shouldContinue = window.confirm(`No se pudo subir la imagen.\n\n${imageUploadWarning}\n\n¿Quieres publicar el hilo sin imagen?`);
-        if (!shouldContinue) {
-          setStatus(el.threadStatus, 'Publicación cancelada. Inténtalo de nuevo con otra imagen.', 'error');
-          return;
+  await withSubmitGuard('thread', el.createThreadBtn, 'Publicando...', async () => {
+    try {
+      const imageFile = el.threadImage.files && el.threadImage.files[0] ? el.threadImage.files[0] : null;
+      let imageUrl = '';
+      let imageUploadWarning = '';
+      if (imageFile) {
+        try {
+          imageUrl = await uploadImageWithRetry(imageFile, 'foro_hilos', 3);
+        } catch (uploadErr) {
+          imageUploadWarning = mapThreadPublishError(uploadErr);
+          const shouldContinue = window.confirm(`No se pudo subir la imagen.\n\n${imageUploadWarning}\n\n¿Quieres publicar el hilo sin imagen?`);
+          if (!shouldContinue) {
+            setStatus(el.threadStatus, 'Publicación cancelada. Inténtalo de nuevo con otra imagen.', 'error');
+            return;
+          }
         }
       }
+
+      await addDocument('foro_hilos', {
+        categoryId,
+        categoryLabel: category ? category.label : 'General',
+        title,
+        body,
+        image: imageUrl,
+        authorUid: auth.uid,
+        authorName: getAuthorName(),
+        authorLevel: 'Web',
+        accessLevel,
+        createdAt: new Date().toISOString(),
+        upvotes: 0,
+        voterUids: '',
+        replyCount: 0,
+        reportedCount: 0,
+        reporterUids: '',
+      });
+
+      resetThreadComposer({ preserveStatus: true });
+
+      if (imageUploadWarning) {
+        setStatus(el.threadStatus, `Hilo publicado sin imagen. ${imageUploadWarning}`, 'error');
+      } else {
+        setStatus(el.threadStatus, 'Hilo publicado.', 'ok');
+      }
+      await loadForum();
+    } catch (e) {
+      setStatus(el.threadStatus, mapThreadPublishError(e), 'error');
     }
-
-    await addDocument('foro_hilos', {
-      categoryId,
-      categoryLabel: category ? category.label : 'General',
-      title,
-      body,
-      image: imageUrl,
-      authorUid: auth.uid,
-      authorName: getAuthorName(),
-      authorLevel: 'Web',
-      accessLevel,
-      createdAt: new Date().toISOString(),
-      upvotes: 0,
-      voterUids: '',
-      replyCount: 0,
-      reportedCount: 0,
-      reporterUids: '',
-    });
-
-    resetThreadComposer({ preserveStatus: true });
-
-    if (imageUploadWarning) {
-      setStatus(el.threadStatus, `Hilo publicado sin imagen. ${imageUploadWarning}`, 'error');
-    } else {
-      setStatus(el.threadStatus, 'Hilo publicado.', 'ok');
-    }
-    await loadForum();
-  } catch (e) {
-    setStatus(el.threadStatus, mapThreadPublishError(e), 'error');
-  }
+  });
 };
 
 const voteThread = async (threadId) => {
@@ -1917,19 +1982,42 @@ const voteThread = async (threadId) => {
     return;
   }
 
-  voters.add(auth.uid);
+  if (_submitting.vote) return;
+  _submitting.vote = true;
 
-  const ok = await updateDocument('foro_hilos', threadId, {
-    upvotes: Number(item.upvotes || 0) + 1,
-    voterUids: Array.from(voters).join(','),
+  // Optimistic update: reflect the vote immediately in local state and DOM
+  voters.add(auth.uid);
+  const newUpvotes = Number(item.upvotes || 0) + 1;
+  const newVoterUids = Array.from(voters).join(',');
+  item.upvotes = newUpvotes;
+  item.voterUids = newVoterUids;
+  // Update just the vote button and count in the DOM without a full re-render
+  el.threadsWrap.querySelectorAll(`[data-vote="${threadId}"]`).forEach((btn) => {
+    btn.textContent = btn.textContent.includes('✓') ? btn.textContent : '✓ Interesa';
+  });
+  el.threadsWrap.querySelectorAll(`[data-vote="${threadId}"]`).forEach((btn) => {
+    const sibling = btn.nextElementSibling;
+    if (sibling && sibling.classList.contains('muted')) {
+      sibling.textContent = sibling.textContent.replace(/\d+ votos/, `${newUpvotes} votos`);
+    }
   });
 
-  if (!ok) {
-    setStatus(el.threadStatus, 'No se pudo guardar tu voto.', 'error');
-    return;
+  try {
+    const ok = await updateDocument('foro_hilos', threadId, {
+      upvotes: newUpvotes,
+      voterUids: newVoterUids,
+    });
+    if (!ok) {
+      // Revert optimistic update on failure
+      item.upvotes = newUpvotes - 1;
+      voters.delete(auth.uid);
+      item.voterUids = Array.from(voters).join(',');
+      setStatus(el.threadStatus, 'No se pudo guardar tu voto.', 'error');
+      renderThreads();
+    }
+  } finally {
+    _submitting.vote = false;
   }
-
-  await loadForum();
 };
 
 const voteReply = async (replyId) => {
@@ -1947,19 +2035,39 @@ const voteReply = async (replyId) => {
     return;
   }
 
-  voters.add(auth.uid);
+  if (_submitting.vote) return;
+  _submitting.vote = true;
 
-  const ok = await updateDocument('foro_respuestas', replyId, {
-    upvotes: Number(item.upvotes || 0) + 1,
-    voterUids: Array.from(voters).join(','),
+  // Optimistic update: reflect the vote immediately
+  voters.add(auth.uid);
+  const newUpvotes = Number(item.upvotes || 0) + 1;
+  const newVoterUids = Array.from(voters).join(',');
+  item.upvotes = newUpvotes;
+  item.voterUids = newVoterUids;
+  el.threadsWrap.querySelectorAll(`[data-reply-vote="${replyId}"]`).forEach((btn) => {
+    btn.textContent = 'Ya te interesa';
+    const sibling = btn.nextElementSibling;
+    if (sibling && sibling.classList.contains('muted')) {
+      sibling.textContent = `${newUpvotes} votos`;
+    }
   });
 
-  if (!ok) {
-    setStatus(el.threadStatus, 'No se pudo guardar tu voto.', 'error');
-    return;
+  try {
+    const ok = await updateDocument('foro_respuestas', replyId, {
+      upvotes: newUpvotes,
+      voterUids: newVoterUids,
+    });
+    if (!ok) {
+      // Revert on failure
+      item.upvotes = newUpvotes - 1;
+      voters.delete(auth.uid);
+      item.voterUids = Array.from(voters).join(',');
+      setStatus(el.threadStatus, 'No se pudo guardar tu voto.', 'error');
+      renderThreads();
+    }
+  } finally {
+    _submitting.vote = false;
   }
-
-  await loadForum();
 };
 
 const editThread = async (threadId) => {
@@ -1977,7 +2085,6 @@ const saveInlineThreadEdit = async (threadId) => {
   const categoryId = String(editingThreadDraft.categoryId || 'general').trim() || 'general';
   const category = FORUM_CATEGORIES.find((c) => c.id === categoryId);
   const accessLevel = editingThreadDraft.accessLevel === 'registered_only' ? 'registered_only' : 'public';
-  let image = String(item.image || '');
 
   if (title.length < 3 || body.length < 3) {
     setStatus(el.threadStatus, 'Título y contenido deben tener mínimo 3 caracteres.', 'error');
@@ -1987,38 +2094,47 @@ const saveInlineThreadEdit = async (threadId) => {
     return;
   }
 
-  if (editingThreadDraft.imageRemoved) {
-    image = '';
-  }
+  // Find the save button inside the inline editor to disable it during the operation
+  const saveBtn = el.threadsWrap
+    ? el.threadsWrap.querySelector(`[data-thread-save="${threadId}"]`)
+    : null;
 
-  const imageFile = editingThreadDraft.imageFile || null;
-  if (imageFile) {
-    try {
-      image = await uploadImageWithRetry(imageFile, 'foro_hilos', 3);
-    } catch (uploadErr) {
-      setStatus(el.threadStatus, mapThreadPublishError(uploadErr), 'error');
+  await withSubmitGuard('edit', saveBtn, 'Guardando...', async () => {
+    let image = String(item.image || '');
+
+    if (editingThreadDraft.imageRemoved) {
+      image = '';
+    }
+
+    const imageFile = editingThreadDraft.imageFile || null;
+    if (imageFile) {
+      try {
+        image = await uploadImageWithRetry(imageFile, 'foro_hilos', 3);
+      } catch (uploadErr) {
+        setStatus(el.threadStatus, mapThreadPublishError(uploadErr), 'error');
+        return;
+      }
+    }
+
+    const ok = await updateDocument('foro_hilos', threadId, {
+      categoryId,
+      categoryLabel: category ? category.label : 'General',
+      title,
+      body,
+      image,
+      accessLevel,
+      updatedAt: new Date().toISOString(),
+    });
+
+    if (!ok) {
+      setStatus(el.threadStatus, 'No se pudieron guardar los cambios del hilo.', 'error');
       return;
     }
-  }
 
-  const ok = await updateDocument('foro_hilos', threadId, {
-    categoryId,
-    categoryLabel: category ? category.label : 'General',
-    title,
-    body,
-    image,
-    accessLevel,
-    updatedAt: new Date().toISOString(),
+    setStatus(el.threadStatus, `Cambios guardados en "${title}".`, 'ok');
+    resetInlineThreadEdit({ preserveStatus: true, rerender: false });
+    await loadForum();
   });
-
-  if (!ok) {
-    setStatus(el.threadStatus, 'No se pudieron guardar los cambios del hilo.', 'error');
-    return;
-  }
-
-  setStatus(el.threadStatus, `Cambios guardados en "${title}".`, 'ok');
-  resetInlineThreadEdit({ preserveStatus: true, rerender: false });
-  await loadForum();
 };
 
 const deleteThread = async (threadId) => {
@@ -2048,31 +2164,53 @@ const deleteThread = async (threadId) => {
   await loadForum();
 };
 
-const editReply = async (replyId) => {
+const editReply = (replyId) => {
+  const item = replies.find((reply) => reply.id === replyId);
+  if (!canManageItem(item)) return;
+  editingReplyId = replyId;
+  editingReplyDraft = item.body || '';
+  renderThreads();
+  // Focus the textarea after render
+  window.requestAnimationFrame(() => {
+    const ta = el.threadsWrap && el.threadsWrap.querySelector(`[data-reply-edit-body="${replyId}"]`);
+    if (ta) { ta.focus(); const end = ta.value.length; ta.setSelectionRange(end, end); }
+  });
+};
+
+const saveReplyEdit = async (replyId) => {
   const item = replies.find((reply) => reply.id === replyId);
   if (!canManageItem(item)) return;
 
-  const nextBody = window.prompt('Editar respuesta', item.body || '');
-  if (nextBody === null) return;
-
-  const body = nextBody.trim();
+  const ta = el.threadsWrap && el.threadsWrap.querySelector(`[data-reply-edit-body="${replyId}"]`);
+  const body = (ta ? ta.value : editingReplyDraft).trim();
   if (!body) {
     setStatus(el.threadStatus, 'La respuesta no puede quedar vacía.', 'error');
     return;
   }
 
-  const ok = await updateDocument('foro_respuestas', replyId, {
-    body,
-    updatedAt: new Date().toISOString(),
+  const saveBtn = el.threadsWrap && el.threadsWrap.querySelector(`[data-reply-save="${replyId}"]`);
+  await withSubmitGuard('edit', saveBtn, 'Guardando...', async () => {
+    const ok = await updateDocument('foro_respuestas', replyId, {
+      body,
+      updatedAt: new Date().toISOString(),
+    });
+    if (!ok) {
+      setStatus(el.threadStatus, 'No se pudo guardar la respuesta.', 'error');
+      return;
+    }
+    // Optimistic update in local state
+    item.body = body;
+    editingReplyId = '';
+    editingReplyDraft = '';
+    setStatus(el.threadStatus, 'Respuesta actualizada.', 'ok');
+    renderThreads();
   });
+};
 
-  if (!ok) {
-    setStatus(el.threadStatus, 'No se pudo guardar la respuesta.', 'error');
-    return;
-  }
-
-  setStatus(el.threadStatus, 'Respuesta actualizada.', 'ok');
-  await loadForum();
+const cancelReplyEdit = () => {
+  editingReplyId = '';
+  editingReplyDraft = '';
+  renderThreads();
 };
 
 const deleteReply = async (replyId) => {
@@ -2105,26 +2243,30 @@ const sendReply = async (threadId) => {
   const body = (input.value || '').trim();
   if (!body) return;
 
-  try {
-    await addDocument('foro_respuestas', {
-      threadId,
-      parentId: '',
-      body,
-      authorUid: auth.uid,
-      authorName: getAuthorName(),
-      authorLevel: 'Web',
-      createdAt: new Date().toISOString(),
-      upvotes: 0,
-      voterUids: '',
-      reportedCount: 0,
-      reporterUids: '',
-    });
+  const sendBtn = el.threadsWrap.querySelector(`[data-reply-send="${threadId}"]`);
 
-    input.value = '';
-    await loadForum();
-  } catch {
-    setStatus(el.threadStatus, 'No se pudo enviar la respuesta.', 'error');
-  }
+  await withSubmitGuard('reply', sendBtn, 'Enviando...', async () => {
+    try {
+      await addDocument('foro_respuestas', {
+        threadId,
+        parentId: '',
+        body,
+        authorUid: auth.uid,
+        authorName: getAuthorName(),
+        authorLevel: 'Web',
+        createdAt: new Date().toISOString(),
+        upvotes: 0,
+        voterUids: '',
+        reportedCount: 0,
+        reporterUids: '',
+      });
+
+      input.value = '';
+      await loadForum();
+    } catch {
+      setStatus(el.threadStatus, 'No se pudo enviar la respuesta.', 'error');
+    }
+  });
 };
 
 const showProfileGate = () => {

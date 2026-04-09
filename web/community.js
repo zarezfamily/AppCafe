@@ -390,7 +390,23 @@ const renderMemberEvolutionCard = ({ profile = null, allThreads = [], allReplies
   const verifyBadgeOrBtn = auth.emailVerified
     ? VERIFIED_BADGE
     : ` <button id="communityVerifyBtn" style="margin-left:5px;font-size:10px;letter-spacing:1px;text-transform:uppercase;background:rgba(201,149,87,0.15);border:1px solid rgba(201,149,87,0.4);color:#9e6a42;border-radius:6px;padding:2px 7px;cursor:pointer;font-family:inherit;vertical-align:middle;">Verificar email</button>`;
-  el.memberEvolutionName.innerHTML = escapeHtml(aliasDisplay) + verifyBadgeOrBtn;
+  el.memberEvolutionName.innerHTML =
+    `<button class="link-btn member-alias-btn" id="memberAliasBtn"
+       style="font-family:inherit;font-size:inherit;font-weight:inherit;
+              color:inherit;letter-spacing:inherit;background:none;border:none;
+              cursor:pointer;padding:0;text-decoration:none;
+              transition:opacity 0.2s;" title="Ver tu perfil">${escapeHtml(aliasDisplay)}</button>` +
+    verifyBadgeOrBtn;
+  // Wire click after DOM settles
+  setTimeout(() => {
+    const aliasBtn = document.getElementById('memberAliasBtn');
+    if (aliasBtn && !aliasBtn.dataset.bound) {
+      aliasBtn.addEventListener('click', () => goToProfilePage(auth.uid, getAuthorName()));
+      aliasBtn.addEventListener('mouseenter', () => { aliasBtn.style.opacity = '0.65'; });
+      aliasBtn.addEventListener('mouseleave', () => { aliasBtn.style.opacity = '1'; });
+      aliasBtn.dataset.bound = '1';
+    }
+  }, 0);
   // Wire verify button
   setTimeout(() => {
     const vBtn = document.getElementById('communityVerifyBtn');
@@ -833,10 +849,12 @@ const goBackFromThreadDetail = () => {
 };
 
 const goToProfilePage = (uid, name) => {
-  const safeUid = String(uid || '').trim();
-  if (!safeUid) return;
-  const url = `/perfil/?uid=${encodeURIComponent(safeUid)}&name=${encodeURIComponent(String(name || 'Catador'))}`;
-  window.location.href = url;
+  const safeUid  = String(uid  || '').trim();
+  const safeAlias = String(name || '').trim().replace(/^@+/, '').replace(/\s+/g, '_').toLowerCase();
+  if (!safeUid && !safeAlias) return;
+  // Use clean URL /perfil/@alias; fall back to uid if no alias
+  const slug = safeAlias || safeUid;
+  window.location.href = `/perfil/@${encodeURIComponent(slug)}`;
 };
 
 const resolveUidByAlias = async (uid, name) => {

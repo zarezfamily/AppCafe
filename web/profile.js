@@ -5,26 +5,39 @@
   const BASE_URL = `https://europe-west1-firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
   const FIREBASE_STORAGE_BUCKET = `${FIREBASE_PROJECT_ID}.appspot.com`;
 
+  // ─── URL PARSING ──────────────────────────────────────────────────────────
+  // New clean URL format: /perfil/@alias
+  // Legacy fallback:      /perfil/?uid=XXX&name=YYY
   const params = new URLSearchParams(window.location.search);
-  const requestedUid = String(params.get('uid') || '').trim();
-  const requestedName = String(params.get('name') || '').trim();
+
+  // Extract alias from clean pathname: /perfil/@zarez or /perfil/zarez
+  const pathAlias = (() => {
+    const seg = window.location.pathname.replace(/\/+$/, '').split('/').pop() || '';
+    return seg.startsWith('@') ? seg.slice(1) : (seg !== 'perfil' && seg !== '' ? seg : '');
+  })();
+
+  const requestedUid  = String(params.get('uid')  || '').trim();
+  const requestedName = String(params.get('name') || pathAlias || '').trim();
 
   const auth = {
-    uid: localStorage.getItem('etiove_web_uid') || '',
-    email: localStorage.getItem('etiove_web_email') || '',
-    token: localStorage.getItem('etiove_web_token') || '',
+    uid:           localStorage.getItem('etiove_web_uid')   || '',
+    email:         localStorage.getItem('etiove_web_email') || '',
+    token:         localStorage.getItem('etiove_web_token') || '',
     emailVerified: localStorage.getItem('etiove_web_email_verified') === 'true',
   };
 
-  const uid = requestedUid || auth.uid || '';
+  // uid may be resolved later from alias lookup;
+  // start with whatever we have immediately
+  let uid = requestedUid || (pathAlias ? '' : auth.uid) || '';
   const queryName = requestedName || String(localStorage.getItem('etiove_web_alias') || '').trim();
 
-  if (!requestedUid && uid) {
-    const desiredSearch = `?uid=${encodeURIComponent(uid)}${queryName ? `&name=${encodeURIComponent(queryName)}` : ''}`;
-    const nextUrl = `/perfil/${desiredSearch}`;
-    if (window.location.pathname !== '/perfil/' || window.location.search !== desiredSearch) {
-      window.history.replaceState(null, '', nextUrl);
-    }
+  // If we only have alias (clean URL), resolve uid from Firestore later in init().
+  // If we own the profile and no uid in URL, redirect to clean URL.
+  if (!requestedUid && !pathAlias && auth.uid) {
+    const ownAlias = String(localStorage.getItem('etiove_web_alias') || '').trim();
+    const cleanSlug = ownAlias || auth.uid;
+    const cleanUrl = `/perfil/@${encodeURIComponent(cleanSlug.replace(/^@/, ''))}`;
+    window.history.replaceState(null, '', cleanUrl);
   }
 
   const state = {
@@ -768,10 +781,11 @@
   };
 
   const openProfile = (targetUid, name) => {
-    const safeUid = String(targetUid || '').trim();
-    if (!safeUid) return;
-    const url = `/perfil/?uid=${encodeURIComponent(safeUid)}&name=${encodeURIComponent(String(name || 'Catador'))}`;
-    window.location.href = url;
+    const safeAlias = String(name || '').trim().replace(/^@+/, '').replace(/\s+/g, '_').toLowerCase();
+    const safeUid   = String(targetUid || '').trim();
+    const slug = safeAlias || safeUid;
+    if (!slug) return;
+    window.location.href = `/perfil/@${encodeURIComponent(slug)}`;
   };
 
   const renderEmpty = (message) => {
@@ -1331,6 +1345,27 @@
   };
 
   const init = async () => {
+    // ── Resolve uid from alias if using clean URL (/perfil/@alias) ──────────
+    if (!uid && pathAlias) {
+      try {
+        const normAlias = (v) => String(v || '').normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+        const needle = normAlias(pathAlias);
+        const profiles = await getCollection('user_profiles', 2000);
+        const hit = profiles.find((p) => {
+          return [p.displayName, p.alias, p.nickname]
+            .some((v) => normAlias(v) === needle);
+        });
+        if (hit && hit.uid) {
+          uid = String(hit.uid).trim();
+        } else {
+          // Try matching by uid directly (alias might be a uid)
+          const byUid = profiles.find((p) => String(p.uid || '').trim() === pathAlias);
+          if (byUid) uid = pathAlias;
+        }
+      } catch (_) {}
+    }
+
     if (!uid) {
       // No uid en la URL y no hay sesión — redirigir a comunidad con mensaje amable
       if (!el.content) {

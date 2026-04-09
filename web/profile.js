@@ -1075,6 +1075,38 @@
     renderMsgPage();
   };
 
+
+  // ─── SCHEMA PERSON (SEO dinámico) ────────────────────────────────────────
+  const injectPersonSchema = (profile, displayName) => {
+    const existing = document.getElementById('personSchemaTag');
+    if (existing) existing.remove();
+
+    if (!uid || !displayName) return;
+
+    const schema = {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": displayName,
+      "url": `https://etiove.com/perfil/?uid=${encodeURIComponent(uid)}`,
+      "description": `Perfil de ${displayName} en la comunidad Etiove de café de especialidad.`,
+      "memberOf": {
+        "@type": "Organization",
+        "name": "Etiove",
+        "url": "https://etiove.com"
+      }
+    };
+
+    if (profile && (profile.photoURL || profile.avatarUrl)) {
+      schema.image = profile.photoURL || profile.avatarUrl;
+    }
+
+    const tag = document.createElement('script');
+    tag.id = 'personSchemaTag';
+    tag.type = 'application/ld+json';
+    tag.textContent = JSON.stringify(schema);
+    document.head.appendChild(tag);
+  };
+
   const renderTab = (tabName) => {
     if (!el.tabs.length) return;
     setHashForTab(tabName);
@@ -1450,6 +1482,11 @@
     state.profile = profile;
     state.messages = messages;
     updateUnreadBadge(state.messages);
+    // Inject Person schema for SEO
+    const pName = state.profile
+      ? String(state.profile.displayName || state.profile.alias || queryName || '').trim()
+      : String(queryName || '').trim();
+    if (pName) injectPersonSchema(state.profile, pName);
     state.profiles = profiles;
 
     // Para el dueño del perfil: importar foto/nombre/frase desde fuentes legacy o Auth.

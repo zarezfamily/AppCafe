@@ -50,6 +50,25 @@
 
     html { scroll-behavior: smooth; }
 
+    /* ─── SKIP TO CONTENT (accesibilidad) ─── */
+    .skip-to-content {
+      position: absolute;
+      top: -100px;
+      left: 24px;
+      z-index: 9999;
+      background: var(--ink, #1c120d);
+      color: #fff9f1;
+      padding: 10px 20px;
+      border-radius: 0 0 8px 8px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: top 0.2s;
+      font-family: -apple-system, sans-serif;
+    }
+    .skip-to-content:focus { top: 0; }
+
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       background: var(--cream);
@@ -793,7 +812,26 @@
       background: radial-gradient(circle, rgba(93,64,48,0.1) 0%, transparent 65%);
       pointer-events: none;
     }
-  </style>
+  
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ink:         #f0e8de;
+        --ink-soft:    #c9b8a8;
+        --ink-muted:   #9a8778;
+        --cream:       #1a110a;
+        --cream-alt:   #211509;
+        --accent:      #c99557;
+        --accent-deep: #efd5ad;
+        --border:      #3a2518;
+        --border-soft: rgba(58,37,24,0.6);
+      }
+      nav { background: rgba(26,17,10,0.92); }
+      .btn-download.dark { background: #f0e8de; color: #1a110a; }
+      .btn-download.light { background: transparent; color: #f0e8de; border-color: rgba(240,232,222,0.4); }
+      footer { border-top-color: var(--border); }
+    }
+
+    </style>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -892,6 +930,8 @@
   </script>
 </head>
 <body>
+  <a class="skip-to-content" href="#main-content">Saltar al contenido</a>
+
 
   <!-- NAV -->
   <nav>
@@ -905,7 +945,7 @@
   </nav>
 
   <!-- HERO -->
-  <section class="hero">
+  <section class="hero" id="main-content">
     <div class="aura aura-1"></div>
     <div class="aura aura-2"></div>
     <div class="aura aura-3"></div>
@@ -1116,7 +1156,7 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   </script>
-  <script src="/quiz.js"></script>
+  <script src="/quiz.js" defer></script>
   
   <script>
     // ── Cookie banner ──────────────────────────────────────────────────────────

@@ -400,6 +400,19 @@
     .post-nav-link:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(28,18,13,0.08); border-color: var(--accent); }
     .post-nav-label { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 6px; }
     .post-nav-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 500; color: var(--ink); line-height: 1.35; }
+    
+    /* ─── ARTÍCULOS RELACIONADOS ─── */
+    .related-section { margin-top: 56px; padding-top: 40px; border-top: 1px solid var(--border); }
+    .related-label { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; }
+    .related-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .related-card { display: flex; flex-direction: column; text-decoration: none; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: all .2s; }
+    .related-card:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(28,18,13,.08); border-color: var(--accent); }
+    .related-thumb { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; }
+    .related-body { padding: 14px 16px; flex: 1; }
+    .related-tag { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; display: block; }
+    .related-title { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 500; color: var(--ink); line-height: 1.35; }
+    @media (max-width: 600px) { .related-grid { grid-template-columns: 1fr; } }
+
     </style>
   <script type="application/ld+json">
   {
@@ -440,6 +453,33 @@
   }
   </script>
   <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Inicio",
+        "item": "https://etiove.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Blog",
+        "item": "https://etiove.com/blog/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "El Café de Especialidad Crece un 34% en España",
+        "item": "https://etiove.com/blog/cafe-de-especialidad-crece-en-espana-2026.html"
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
   <nav class="site-nav" aria-label="Navegación principal">
@@ -675,6 +715,24 @@
         <a class="cta-btn-ghost" href="/blog/">← Más artículos</a>
       </div>
     </div>
+    <section class="related-section">
+      <p class="related-label">También te puede interesar</p>
+      <div class="related-grid">
+      <a class="related-card" href="/blog/cafe-de-especialidad-vs-cafe-normal.html">
+        <img class="related-thumb" src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=400&q=75&auto=format&fit=crop" alt="Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real?" loading="lazy" width="400" height="225" />
+        <div class="related-body">
+          <span class="related-tag">Análisis</span>
+          <p class="related-title">Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real?</p>
+        </div>
+      </a>      <a class="related-card" href="/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html">
+        <img class="related-thumb" src="https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=400&q=75&auto=format&fit=crop" alt="¿Vale la Pena Pagar Más por Café de Especialidad?" loading="lazy" width="400" height="225" />
+        <div class="related-body">
+          <span class="related-tag">Análisis</span>
+          <p class="related-title">¿Vale la Pena Pagar Más por Café de Especialidad?</p>
+        </div>
+      </a>
+      </div>
+    </section>
 
         <nav class="post-nav" aria-label="Otros artículos">
       <a class="post-nav-link" href="/blog/guia-de-molienda-por-metodo.html">
@@ -700,7 +758,7 @@
       postSlug: 'cafe-de-especialidad-crece-en-espana-2026',
     };
   </script>
-  <script src="/blog/post-shared.js"></script>
+  <script src="/blog/post-shared.js" defer></script>
   <script>
     (function () {
       var btn = document.getElementById('navHamburger');

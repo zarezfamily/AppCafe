@@ -185,6 +185,7 @@ let editingThreadDraft = null;
 let editingThreadFocusField = 'title';
 // Búsqueda persistente: se mantiene al paginar y al cambiar de categoría
 let activeSearchTerm = '';
+let activeSortOrder = 'recent'; // 'recent' | 'votes' | 'replies'
 // Edición inline de respuestas
 let editingReplyId = '';
 let editingReplyDraft = '';
@@ -1297,6 +1298,38 @@ const renderCategories = () => {
     }
   }
 
+  // ─── SELECTOR DE ORDENACIÓN ──────────────────────────────────────────────
+  const chipsWrapRef = searchInputEl && (searchInputEl.closest('.chips-search-wrap') || searchInputEl.parentElement);
+  let sortSelect = document.getElementById('threadSortSelect');
+  if (!sortSelect && chipsWrapRef) {
+    sortSelect = document.createElement('select');
+    sortSelect.id = 'threadSortSelect';
+    sortSelect.style.cssText = [
+      'font-size:11px', 'font-weight:500', 'letter-spacing:1px',
+      'color:var(--ink-muted)', 'background:transparent',
+      'border:1px solid var(--border-soft)', 'border-radius:6px',
+      'padding:5px 10px', 'cursor:pointer', 'font-family:inherit',
+      'margin-top:6px', 'appearance:none',
+    ].join(';');
+    sortSelect.innerHTML = [
+      '<option value="recent">Más recientes</option>',
+      '<option value="votes">Más votados</option>',
+      '<option value="replies">Más respuestas</option>',
+    ].join('');
+    chipsWrapRef.appendChild(sortSelect);
+  }
+  if (sortSelect) {
+    sortSelect.value = activeSortOrder;
+    if (!sortSelect.dataset.bound) {
+      sortSelect.addEventListener('change', () => {
+        activeSortOrder = sortSelect.value;
+        currentListPage = 1;
+        renderThreads();
+      });
+      sortSelect.dataset.bound = '1';
+    }
+  }
+
   // Buscador funcional con debounce (200ms) — persiste término y busca en todas las categorías
   if (searchInputEl && !searchInputEl.dataset.bound) {
     let searchDebounceTimer = null;
@@ -1328,7 +1361,15 @@ const renderThreads = () => {
       (t.body && t.body.toLowerCase().includes(term))
     );
   }
-  list = list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  list = list.sort((a, b) => {
+    if (activeSortOrder === 'votes') return Number(b.upvotes || 0) - Number(a.upvotes || 0);
+    if (activeSortOrder === 'replies') {
+      const ra = replies.filter(r => r.threadId === a.id).length;
+      const rb = replies.filter(r => r.threadId === b.id).length;
+      return rb - ra;
+    }
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
   const displayList = list;
 
   if (activeThreadId) {

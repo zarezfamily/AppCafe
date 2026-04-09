@@ -1472,10 +1472,37 @@
       .skeleton-line { animation: none !important; }
       .scroll-indicator svg { animation: none !important; }
     }
-  </style>
+  
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --ink:         #f0e8de;
+        --ink-soft:    #c9b8a8;
+        --ink-muted:   #9a8778;
+        --cream:       #1a110a;
+        --cream-alt:   #211509;
+        --accent:      #c99557;
+        --accent-deep: #efd5ad;
+        --gold:        #efd5ad;
+        --gold-soft:   #5a3820;
+        --border:      #3a2518;
+        --border-soft: rgba(58,37,24,0.55);
+        --danger:      #e06060;
+        --success:     #6ab870;
+      }
+      nav { background: rgba(26,17,10,0.92); }
+      .main-card, .sidebar-card { background: #211509; border-color: var(--border); }
+      .thread { border-bottom-color: var(--border); }
+      .btn { background: #2d1a0e; border-color: var(--border); color: var(--ink); }
+      .btn.primary { background: var(--accent); color: #1a110a; }
+      input, textarea, select { background: #2d1a0e; color: var(--ink); border-color: var(--border); }
+    }
+
+    </style>
   <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
 </head>
 <body>
+  <a class="skip-to-content" href="#main-content">Saltar al contenido</a>
+
 
   <nav>
     <a class="nav-wordmark" href="/">Etiove</a>
@@ -1488,7 +1515,7 @@
   </nav>
 
   <!-- HERO -->
-  <section class="hero" aria-label="Cabecera comunidad">
+  <section class="hero" id="main-content" aria-label="Cabecera comunidad">
     <div class="hero-img" id="heroImg"></div>
     <div class="hero-overlay"></div>
     <div class="hero-aura1" aria-hidden="true"></div>
@@ -1537,7 +1564,7 @@
         <!-- SIDEBAR -->
         <aside class="sidebar-card">
           <div class="login-section" id="authSection">
-          <h2>Acceso</h2>
+          <h3>Acceso</h3>
           <p class="muted">Inicia sesión para crear hilos y responder. Usa el mismo email y contraseña de tu cuenta en la app (no el alias).</p>
           <div class="field"><input id="email" type="email" placeholder="tu@email.com" autocomplete="username" aria-label="Email" /></div>
           <div class="field"><input id="password" type="password" placeholder="Contraseña" autocomplete="current-password" aria-label="Contraseña" /></div>
@@ -1578,7 +1605,7 @@
           <div id="draftRestoredNotice" style="display:none;background:#edf7ee;border:1px solid #b7e2c7;border-radius:8px;padding:8px 12px;font-size:12px;color:#4f7a53;margin-bottom:10px;font-family:-apple-system,sans-serif;">✓ Se ha restaurado tu borrador anterior.</div>
           <div id="newThreadSection" style="display:none;">
           <div class="thread-composer-title">
-            <h2 id="threadComposerTitle">Nuevo hilo</h2>
+            <h3 id="threadComposerTitle">Nuevo hilo</h3>
           </div>
           <div id="threadEditBanner" class="thread-edit-banner" aria-live="polite">
             <strong>Editando hilo</strong>
@@ -1606,7 +1633,7 @@
         <!-- MAIN -->
         <main class="main-card">
           <div class="section-lead" id="mainCardHeader" style="text-align:left;margin-bottom:16px;padding-top:0;">
-            <h2>Hilos recientes</h2>
+            <h3>Hilos recientes</h3>
             <p class="muted" style="margin-top:4px;">Filtra por categoría o explora todo lo que comparte la comunidad.</p>
             <div class="chips-search-wrap">
               <div class="chips" id="categoryChips"></div>

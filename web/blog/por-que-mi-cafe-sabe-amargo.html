@@ -204,7 +204,96 @@
     .scroll-top.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
     .scroll-top:hover { background: var(--accent); }
     @media (max-width: 600px) { .cause-card { grid-template-columns: 1fr; gap: 8px; } .score-visual { grid-template-columns: 1fr; } .myth-card { grid-template-columns: 1fr; gap: 6px; } .cta-box { padding: 28px 20px; } }
-  </style>
+  
+    /* ─── ARTÍCULOS RELACIONADOS ─── */
+    .related-section { margin-top: 56px; padding-top: 40px; border-top: 1px solid var(--border); }
+    .related-label { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; }
+    .related-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .related-card { display: flex; flex-direction: column; text-decoration: none; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: all .2s; }
+    .related-card:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(28,18,13,.08); border-color: var(--accent); }
+    .related-thumb { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; }
+    .related-body { padding: 14px 16px; flex: 1; }
+    .related-tag { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; display: block; }
+    .related-title { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 500; color: var(--ink); line-height: 1.35; }
+    @media (max-width: 600px) { .related-grid { grid-template-columns: 1fr; } }
+
+    </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "¿Por qué mi café sabe amargo?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Las 7 causas más comunes son: sobreextracción, agua demasiado caliente (por encima de 96°C), molienda demasiado fina, café de tueste muy oscuro o quemado, equipo sucio con residuos de aceites rancios, café rancio o mal almacenado, y una ratio de café demasiado alta respecto al agua."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "¿Cómo sé si el amargor es por sobreextracción o por el tueste?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Si el amargor aparece al final del sorbo y persiste, suele ser sobreextracción — reduce el tiempo o muele más grueso. Si el café sabe amargo desde el primer sorbo y no hay otros sabores, el problema está en el tueste: prueba un café de especialidad de tueste claro o medio."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "¿Qué temperatura del agua es ideal para el café?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "El rango ideal está entre 90 y 96°C. Por encima de 96°C el agua quema el café y extrae compuestos amargos de forma agresiva. Si hierves el agua, déjala reposar 30-45 segundos antes de usarla."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "¿Cómo afecta la molienda al amargor del café?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Una molienda más fina aumenta la superficie de contacto con el agua y acelera la extracción. Para métodos como el V60 o la prensa francesa, una molienda demasiado fina convierte un café equilibrado en uno amargo. Ajusta: gruesa para prensa francesa, media para V60 y Chemex, fina solo para espresso."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "¿Con qué frecuencia hay que limpiar el equipo de café?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Después de cada uso, especialmente el porta-filtro y el grupo del espresso. Los aceites del café se oxidan y se vuelven rancios, y los residuos se transfieren a cada taza nueva dando un sabor amargo persistente."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Inicio",
+        "item": "https://etiove.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Blog",
+        "item": "https://etiove.com/blog/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "¿Por qué mi café sabe amargo? Causas y soluciones",
+        "item": "https://etiove.com/blog/por-que-mi-cafe-sabe-amargo.html"
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
 
@@ -400,6 +489,24 @@
         <a class="cta-btn-ghost" href="/blog/">← Más artículos</a>
       </div>
     </div>
+    <section class="related-section">
+      <p class="related-label">También te puede interesar</p>
+      <div class="related-grid">
+      <a class="related-card" href="/blog/guia-de-molienda-por-metodo.html">
+        <img class="related-thumb" src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&q=75&auto=format&fit=crop" alt="Guía de Molienda por Método: de V60 a Espresso" loading="lazy" width="400" height="225" />
+        <div class="related-body">
+          <span class="related-tag">Tutorial</span>
+          <p class="related-title">Guía de Molienda por Método: de V60 a Espresso</p>
+        </div>
+      </a>      <a class="related-card" href="/blog/cafe-de-especialidad-vs-cafe-normal.html">
+        <img class="related-thumb" src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=400&q=75&auto=format&fit=crop" alt="Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real?" loading="lazy" width="400" height="225" />
+        <div class="related-body">
+          <span class="related-tag">Análisis</span>
+          <p class="related-title">Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real?</p>
+        </div>
+      </a>
+      </div>
+    </section>
 
         <nav class="post-nav" aria-label="Otros artículos">
       <a class="post-nav-link" href="/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html">
@@ -419,7 +526,7 @@
   </button>
 
   <script>window.ETIOVE_BLOG_POST_CONFIG = { postSlug: 'por-que-mi-cafe-sabe-amargo' };</script>
-  <script src="/blog/post-shared.js"></script>
+  <script src="/blog/post-shared.js" defer></script>
 
   <script>
     (function () {

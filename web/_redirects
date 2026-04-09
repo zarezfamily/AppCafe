@@ -4,6 +4,9 @@
 # Profile route normalization
 /perfil  /perfil/  301
 
+# Profile clean URL: /perfil/@alias → serve index.html silently
+/perfil/@*  /perfil/index.html  200
+
 # Community thread detail slug
 /comunidad/hilo/*  /comunidad.html  200
 

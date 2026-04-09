@@ -5,39 +5,28 @@
   const BASE_URL = `https://europe-west1-firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
   const FIREBASE_STORAGE_BUCKET = `${FIREBASE_PROJECT_ID}.appspot.com`;
 
-  // ─── URL PARSING ──────────────────────────────────────────────────────────
-  // New clean URL format: /perfil/@alias
-  // Legacy fallback:      /perfil/?uid=XXX&name=YYY
   const params = new URLSearchParams(window.location.search);
-
-  // Extract alias from clean pathname: /perfil/@zarez or /perfil/zarez
-  const pathAlias = (() => {
-    const seg = window.location.pathname.replace(/\/+$/, '').split('/').pop() || '';
-    return seg.startsWith('@') ? seg.slice(1) : (seg !== 'perfil' && seg !== '' ? seg : '');
-  })();
-
-  const requestedUid  = String(params.get('uid')  || '').trim();
-  const requestedName = String(params.get('name') || pathAlias || '').trim();
+  const requestedUid = String(params.get('uid') || '').trim();
+  const requestedName = String(params.get('name') || '').trim();
 
   const auth = {
-    uid:           localStorage.getItem('etiove_web_uid')   || '',
-    email:         localStorage.getItem('etiove_web_email') || '',
-    token:         localStorage.getItem('etiove_web_token') || '',
+    uid: localStorage.getItem('etiove_web_uid') || '',
+    email: localStorage.getItem('etiove_web_email') || '',
+    token: localStorage.getItem('etiove_web_token') || '',
     emailVerified: localStorage.getItem('etiove_web_email_verified') === 'true',
   };
 
-  // uid may be resolved later from alias lookup;
-  // start with whatever we have immediately
-  let uid = requestedUid || (pathAlias ? '' : auth.uid) || '';
+  let uid = requestedUid || auth.uid || '';
   const queryName = requestedName || String(localStorage.getItem('etiove_web_alias') || '').trim();
 
-  // If we only have alias (clean URL), resolve uid from Firestore later in init().
-  // If we own the profile and no uid in URL, redirect to clean URL.
-  if (!requestedUid && !pathAlias && auth.uid) {
-    const ownAlias = String(localStorage.getItem('etiove_web_alias') || '').trim();
-    const cleanSlug = ownAlias || auth.uid;
-    const cleanUrl = `/perfil/@${encodeURIComponent(cleanSlug.replace(/^@/, ''))}`;
-    window.history.replaceState(null, '', cleanUrl);
+  // If no uid in URL but we have one from session, redirect to canonical URL
+  if (!requestedUid && uid) {
+    const desiredSearch = `?uid=${encodeURIComponent(uid)}`
+      + (queryName ? `&name=${encodeURIComponent(queryName)}` : '');
+    const nextUrl = `/perfil/${desiredSearch}`;
+    if (window.location.pathname !== '/perfil/' || window.location.search !== desiredSearch) {
+      window.history.replaceState(null, '', nextUrl);
+    }
   }
 
   const state = {
@@ -781,11 +770,12 @@
   };
 
   const openProfile = (targetUid, name) => {
-    const safeAlias = String(name || '').trim().replace(/^@+/, '').replace(/\s+/g, '_').toLowerCase();
-    const safeUid   = String(targetUid || '').trim();
-    const slug = safeAlias || safeUid;
-    if (!slug) return;
-    window.location.href = `/perfil/@${encodeURIComponent(slug)}`;
+    const safeUid = String(targetUid || '').trim();
+    if (!safeUid) return;
+    const safeName = String(name || '').trim();
+    const url = `/perfil/?uid=${encodeURIComponent(safeUid)}`
+      + (safeName ? `&name=${encodeURIComponent(safeName)}` : '');
+    window.location.href = url;
   };
 
   const renderEmpty = (message) => {
@@ -964,6 +954,58 @@
       }).join('');
   };
 
+
+  // ─── BADGE DE MENSAJES NO LEÍDOS ─────────────────────────────────────────
+  const updateUnreadBadge = (messages) => {
+    if (!auth.uid || !isOwner()) return;
+    const unread = messages.filter(
+      (m) => m.recipientUid === auth.uid && !m.read
+    ).length;
+    const tab = el.tabs.find((b) => b.getAttribute('data-tab') === 'messages');
+    if (!tab) return;
+
+    let badge = tab.querySelector('.tab-unread-badge');
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.className = 'tab-unread-badge';
+      badge.style.cssText = [
+        'display:inline-flex', 'align-items:center', 'justify-content:center',
+        'min-width:16px', 'height:16px',
+        'background:#c0392b', 'color:#fff',
+        'font-size:9px', 'font-weight:700',
+        'border-radius:8px', 'padding:0 4px',
+        'margin-left:5px', 'font-family:-apple-system,sans-serif',
+        'vertical-align:middle', 'letter-spacing:0',
+      ].join(';');
+      tab.appendChild(badge);
+    }
+
+    if (unread > 0) {
+      badge.textContent = unread > 9 ? '9+' : String(unread);
+      badge.style.display = 'inline-flex';
+    } else {
+      badge.style.display = 'none';
+    }
+  };
+
+  // Mark messages as read when user opens the messages tab
+  const markMessagesAsRead = async () => {
+    if (!auth.uid || !isOwner()) return;
+    const unreadMsgs = state.messages.filter(
+      (m) => m.recipientUid === auth.uid && !m.read
+    );
+    if (!unreadMsgs.length) return;
+
+    // Optimistic update
+    unreadMsgs.forEach((m) => { m.read = true; });
+    updateUnreadBadge(state.messages);
+
+    // Persist to Firestore (fire and forget)
+    await Promise.allSettled(
+      unreadMsgs.map((m) => updateDocument('direct_messages', m.id, { read: true }))
+    );
+  };
+
   const renderMessages = () => {
     if (!auth.uid) {
       renderEmpty('Inicia sesión para ver y responder mensajes.');
@@ -988,10 +1030,11 @@
       .slice(0, 120)
       .map((row) => {
         const mine = row.senderUid === auth.uid;
+        const isUnread = !mine && !row.read;
         const otherUid = mine ? row.recipientUid : row.senderUid;
         const otherName = mine ? (row.recipientName || userNameByUid(otherUid)) : (row.senderName || userNameByUid(otherUid));
         return `
-          <article class="msg-card">
+          <article class="msg-card${isUnread ? ' msg-unread' : ''}">
             <div class="msg-direction">
               <div class="msg-arrow ${mine ? 'out' : 'in'}">${mine ? '↗' : '↘'}</div>
               <span class="msg-who">${mine ? 'Para' : 'De'} ${esc(otherName)}</span>
@@ -1036,6 +1079,7 @@
     }
     if (tabName === 'messages') {
       renderMessages();
+      markMessagesAsRead();
       return;
     }
     if (tabName === 'stats') {
@@ -1345,27 +1389,6 @@
   };
 
   const init = async () => {
-    // ── Resolve uid from alias if using clean URL (/perfil/@alias) ──────────
-    if (!uid && pathAlias) {
-      try {
-        const normAlias = (v) => String(v || '').normalize('NFD')
-          .replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
-        const needle = normAlias(pathAlias);
-        const profiles = await getCollection('user_profiles', 2000);
-        const hit = profiles.find((p) => {
-          return [p.displayName, p.alias, p.nickname]
-            .some((v) => normAlias(v) === needle);
-        });
-        if (hit && hit.uid) {
-          uid = String(hit.uid).trim();
-        } else {
-          // Try matching by uid directly (alias might be a uid)
-          const byUid = profiles.find((p) => String(p.uid || '').trim() === pathAlias);
-          if (byUid) uid = pathAlias;
-        }
-      } catch (_) {}
-    }
-
     if (!uid) {
       // No uid en la URL y no hay sesión — redirigir a comunidad con mensaje amable
       if (!el.content) {
@@ -1401,6 +1424,7 @@
     state.follows = follows;
     state.profile = profile;
     state.messages = messages;
+    updateUnreadBadge(state.messages);
     state.profiles = profiles;
 
     // Para el dueño del perfil: importar foto/nombre/frase desde fuentes legacy o Auth.

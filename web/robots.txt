@@ -1,9 +1,12 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://etiove.com/sitemap.xml
+# No indexar perfiles de usuario (no aportan SEO, fragmentan crawl budget)
+Disallow: /perfil/
 
-# Recursos internos no públicos
-Disallow: /node_modules/
-Disallow: /blog/_template-post.html
-Disallow: /404.html
+# No indexar la API interna del quiz si la hubiera
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://etiove.com/sitemap.xml
+Sitemap: https://etiove.com/feed.xml

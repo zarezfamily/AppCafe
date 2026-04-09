@@ -4,15 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>404 | Etiove</title>
+  <meta name="robots" content="noindex, nofollow" />
   <meta name="description" content="La página que buscas no existe. Vuelve a Etiove." />
   <link rel="canonical" href="https://etiove.com/404.html" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700;800&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="apple-touch-icon" href="/favicon.svg" />
-  <meta name="theme-color" content="#fffaf5" />
-  <link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="Etiove" />
+  <meta name="theme-color" content="#21150f" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -56,31 +59,33 @@
       position: relative;
       z-index: 1;
     }
-    .wordmark {
+    .error-num {
       font-family: 'Playfair Display', serif;
-      font-size: clamp(36px, 7vw, 60px);
-      font-weight: 300;
-      letter-spacing: 12px;
-      text-transform: uppercase;
-      margin-bottom: 20px;
-      color: var(--ink);
+      font-size: clamp(56px, 12vw, 88px);
+      font-weight: 700;
+      letter-spacing: 8px;
+      line-height: 1;
+      color: transparent;
+      -webkit-text-stroke: 2px var(--ink);
+      margin-bottom: 14px;
     }
-    .code {
+    .error-label {
       font-size: 10px;
-      letter-spacing: 3.5px;
+      letter-spacing: 4px;
       text-transform: uppercase;
       color: var(--accent);
-      margin-bottom: 20px;
-      font-weight: 500;
+      margin-bottom: 24px;
+      font-weight: 600;
     }
     .copy {
       font-family: 'Playfair Display', serif;
-      font-size: clamp(16px, 2.5vw, 20px);
+      font-size: clamp(15px, 2vw, 17px);
       font-weight: 400;
-      color: var(--ink-soft);
-      margin-bottom: 40px;
       font-style: italic;
-      line-height: 1.5;
+      color: var(--ink-muted);
+      margin-bottom: 40px;
+      line-height: 1.75;
+      letter-spacing: 0.2px;
     }
     .btn {
       display: inline-flex;
@@ -201,14 +206,20 @@
   </nav>
 
   <main class="box">
-    <h1 class="wordmark">Etiove</h1>
-    <p class="code">Error 404</p>
-    <p class="copy">La página que buscas no existe.</p>
+    <p class="error-num">404</p>
+    <p class="error-label">Página no encontrada</p>
+    <p class="copy">Esta taza está vacía.<br>La página que buscas no existe o ha sido movida.<br>Vuelve al inicio y sigue explorando café de especialidad.</p>
     <div class="divider-line"><span class="divider-dot"></span></div>
-    <a class="btn" href="/">
-      Volver al inicio
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-    </a>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a class="btn" href="/">
+        Volver al inicio
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+      <a class="btn" href="/comunidad.html" style="background:transparent;color:var(--ink);border-color:var(--border);">
+        Ir a la comunidad
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
   </main>
 
   <button class="scroll-top" id="scrollTopBtn" aria-label="Volver arriba">

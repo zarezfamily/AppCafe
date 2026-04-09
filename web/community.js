@@ -849,12 +849,12 @@ const goBackFromThreadDetail = () => {
 };
 
 const goToProfilePage = (uid, name) => {
-  const safeUid  = String(uid  || '').trim();
-  const safeAlias = String(name || '').trim().replace(/^@+/, '').replace(/\s+/g, '_').toLowerCase();
-  if (!safeUid && !safeAlias) return;
-  // Use clean URL /perfil/@alias; fall back to uid if no alias
-  const slug = safeAlias || safeUid;
-  window.location.href = `/perfil/@${encodeURIComponent(slug)}`;
+  const safeUid = String(uid || '').trim();
+  if (!safeUid) return;
+  const safeName = String(name || '').trim();
+  const url = `/perfil/?uid=${encodeURIComponent(safeUid)}`
+    + (safeName ? `&name=${encodeURIComponent(safeName)}` : '');
+  window.location.href = url;
 };
 
 const resolveUidByAlias = async (uid, name) => {
@@ -1383,9 +1383,13 @@ const renderThreads = () => {
             <button class="link-btn" data-reply-vote="${r.id}">${hasUserVote(r) ? 'Ya te interesa' : 'Me interesa'}</button>
             <span class="muted">${Number(r.upvotes || 0)} votos</span>
           </div>
-          ${canManageItem(r)
-            ? `<div class="actions-row"><button class="link-btn" data-reply-edit="${r.id}">Editar</button><button class="link-btn" data-reply-delete="${r.id}">Eliminar</button></div>`
-            : ''}
+          <div class="actions-row">
+            ${canManageItem(r)
+              ? `<button class="link-btn" data-reply-edit="${r.id}">Editar</button><button class="link-btn" data-reply-delete="${r.id}">Eliminar</button>`
+              : (auth.token && r.authorUid !== auth.uid
+                  ? `<button class="link-btn" data-report-reply="${r.id}" style="color:var(--ink-muted);font-size:11px;opacity:0.6;">Reportar</button>`
+                  : '')}
+          </div>
         </div>
       </div>`;
     }).join('');
@@ -1408,7 +1412,9 @@ const renderThreads = () => {
           </div>
           ${threadCanManage
             ? `<div class=\"actions-row\"><button class=\"link-btn\" data-thread-edit=\"${activeThread.id}\">Editar</button><button class=\"link-btn\" data-thread-delete=\"${activeThread.id}\">Eliminar</button></div>`
-            : ''}
+            : (auth.token && activeThread.authorUid !== auth.uid
+                ? `<div class=\"actions-row\"><button class=\"link-btn\" data-report-thread=\"${activeThread.id}\" style=\"color:var(--ink-muted);font-size:11px;opacity:0.6;\">Reportar</button></div>`
+                : '')}
         </div>
         <div class="reply-box">
           ${repliesHtml || '<p class="muted">Sin respuestas aún.</p>'}
@@ -1709,6 +1715,14 @@ const renderThreads = () => {
         setTimeout(() => { btn.textContent = orig; }, 2000);
       } catch { btn.textContent = 'No se pudo copiar'; }
     });
+  });
+
+  // Report buttons
+  el.threadsWrap.querySelectorAll('[data-report-thread]').forEach((btn) => {
+    btn.addEventListener('click', () => reportItem('foro_hilos', btn.getAttribute('data-report-thread'), 'hilo'));
+  });
+  el.threadsWrap.querySelectorAll('[data-report-reply]').forEach((btn) => {
+    btn.addEventListener('click', () => reportItem('foro_respuestas', btn.getAttribute('data-report-reply'), 'respuesta'));
   });
 
   el.threadsWrap.querySelectorAll('[data-reply-save]').forEach((btn) => {
@@ -2271,7 +2285,8 @@ const saveInlineThreadEdit = async (threadId) => {
 
     setStatus(el.threadStatus, `Cambios guardados en "${title}".`, 'ok');
     resetInlineThreadEdit({ preserveStatus: true, rerender: false });
-    await loadForum();
+    applyLocalUpdate({ updateThread: { id: threadId, title, body, categoryId,
+      categoryLabel: category ? category.label : 'General', image, accessLevel } });
   });
 };
 
@@ -2296,10 +2311,11 @@ const deleteThread = async (threadId) => {
   if (editingThreadId === threadId) resetInlineThreadEdit({ preserveStatus: true, rerender: false });
   setStatus(el.threadStatus, 'Hilo eliminado.', 'ok');
   if (getActiveThreadId() === threadId) {
+    applyLocalUpdate({ removeThreadId: threadId });
     goToThreadList();
     return;
   }
-  await loadForum();
+  applyLocalUpdate({ removeThreadId: threadId });
 };
 
 const editReply = (replyId) => {
@@ -2364,7 +2380,7 @@ const deleteReply = async (replyId) => {
   }
 
   setStatus(el.threadStatus, 'Respuesta eliminada.', 'ok');
-  await loadForum();
+  applyLocalUpdate({ removeReplyId: replyId });
 };
 
 const sendReply = async (threadId) => {
@@ -2401,8 +2417,22 @@ const sendReply = async (threadId) => {
         reporterUids: '',
       });
 
+      const newReply = {
+        threadId,
+        body,
+        authorUid: auth.uid,
+        authorName: getAuthorName(),
+        authorLevel: 'Web',
+        createdAt: new Date().toISOString(),
+        upvotes: 0,
+        voterUids: '',
+        reportedCount: 0,
+        reporterUids: '',
+      };
       input.value = '';
-      await loadForum();
+      // Use local update — no full reload needed
+      applyLocalUpdate({ addReply: newReply });
+      setStatus(el.threadStatus, 'Respuesta enviada.', 'ok');
     } catch {
       setStatus(el.threadStatus, 'No se pudo enviar la respuesta.', 'error');
     }
@@ -2609,6 +2639,84 @@ const restoreDraft = () => {
 
 const clearDraft = () => {
   try { localStorage.removeItem(DRAFT_KEY); } catch (_) {}
+};
+
+// ─── ACTUALIZACIÓN LOCAL DE ESTADO (evita recargar todo el foro) ─────────────
+// Después de operaciones que ya conocemos el resultado, actualizamos el estado
+// local y re-renderizamos sin ir a Firestore.
+const applyLocalUpdate = ({ addThread, removeThreadId, addReply, removeReplyId, updateThread, updateReply } = {}) => {
+  if (addThread) {
+    threads = [normalizeThread(addThread), ...threads];
+  }
+  if (removeThreadId) {
+    threads = threads.filter((t) => t.id !== removeThreadId);
+    replies = replies.filter((r) => r.threadId !== removeThreadId);
+  }
+  if (addReply) {
+    replies = [...replies, addReply];
+    // Increment replyCount on the parent thread
+    const parent = threads.find((t) => t.id === addReply.threadId);
+    if (parent) parent.replyCount = (Number(parent.replyCount) || 0) + 1;
+  }
+  if (removeReplyId) {
+    replies = replies.filter((r) => r.id !== removeReplyId);
+  }
+  if (updateThread) {
+    threads = threads.map((t) => t.id === updateThread.id ? { ...t, ...updateThread } : t);
+  }
+  if (updateReply) {
+    replies = replies.map((r) => r.id === updateReply.id ? { ...r, ...updateReply } : r);
+  }
+  renderThreads();
+};
+
+// ─── REPORTAR CONTENIDO ───────────────────────────────────────────────────────
+const reportItem = async (collection, itemId, itemType) => {
+  if (!auth.token || !auth.uid) {
+    setStatus(el.threadStatus, 'Inicia sesión para reportar.', 'error');
+    return;
+  }
+
+  // Find the item in local state
+  const item = collection === 'foro_hilos'
+    ? threads.find((t) => t.id === itemId)
+    : replies.find((r) => r.id === itemId);
+  if (!item) return;
+
+  // Prevent self-report
+  if (item.authorUid === auth.uid) {
+    setStatus(el.threadStatus, 'No puedes reportar tu propio contenido.', 'error');
+    return;
+  }
+
+  // Check if already reported
+  const reporters = new Set(String(item.reporterUids || '').split(',').map(s => s.trim()).filter(Boolean));
+  if (reporters.has(auth.uid)) {
+    setStatus(el.threadStatus, 'Ya has reportado este contenido.', 'error');
+    return;
+  }
+
+  if (!window.confirm(`¿Reportar este ${itemType} como contenido inapropiado?\n\nEl equipo de Etiove lo revisará.`)) return;
+
+  reporters.add(auth.uid);
+  const newCount = Number(item.reportedCount || 0) + 1;
+
+  const ok = await updateDocument(collection, itemId, {
+    reportedCount: newCount,
+    reporterUids: Array.from(reporters).join(','),
+  });
+
+  if (!ok) {
+    setStatus(el.threadStatus, 'No se pudo enviar el reporte.', 'error');
+    return;
+  }
+
+  // Optimistic local update
+  item.reportedCount = newCount;
+  item.reporterUids  = Array.from(reporters).join(',');
+
+  setStatus(el.threadStatus, 'Reporte enviado. Gracias por ayudar a mantener la comunidad.', 'ok');
+  renderThreads();
 };
 
 const init = async () => {

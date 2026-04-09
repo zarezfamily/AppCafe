@@ -1419,6 +1419,18 @@
     .nav-hamburger.open span:nth-child(2) { opacity: 0; }
     .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
+
+    /* ─── FIELD LABELS ─── */
+    .field-label {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 5px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
     /* ─── RESPONSIVE ─── */
     @media (max-width: 768px) {
       nav { padding: 16px 24px; }
@@ -1524,8 +1536,8 @@
           <div class="login-section" id="authSection">
           <h2>Acceso</h2>
           <p class="muted">Inicia sesión para crear hilos y responder. Usa el mismo email y contraseña de tu cuenta en la app (no el alias).</p>
-          <div class="field"><input id="email" type="email" placeholder="tu@email.com" autocomplete="username" /></div>
-          <div class="field"><input id="password" type="password" placeholder="Contraseña" autocomplete="current-password" /></div>
+          <div class="field"><input id="email" type="email" placeholder="tu@email.com" autocomplete="username" aria-label="Email" /></div>
+          <div class="field"><input id="password" type="password" placeholder="Contraseña" autocomplete="current-password" aria-label="Contraseña" /></div>
           <div class="field" style="display:flex;align-items:center;gap:8px;">
             <input type="checkbox" id="rememberMe" style="width:auto;margin:0;cursor:pointer;" />
             <label for="rememberMe" style="font-size:13px;color:var(--ink-muted);cursor:pointer;user-select:none;">Recordarme</label>
@@ -1560,6 +1572,7 @@
 
           <div class="card-divider"></div>
 
+          <div id="draftRestoredNotice" style="display:none;background:#edf7ee;border:1px solid #b7e2c7;border-radius:8px;padding:8px 12px;font-size:12px;color:#4f7a53;margin-bottom:10px;font-family:-apple-system,sans-serif;">✓ Se ha restaurado tu borrador anterior.</div>
           <div id="newThreadSection" style="display:none;">
           <div class="thread-composer-title">
             <h2 id="threadComposerTitle">Nuevo hilo</h2>
@@ -1568,16 +1581,16 @@
             <strong>Editando hilo</strong>
             <span id="threadEditBannerText">Aquí editarás el título y el mensaje del hilo seleccionado.</span>
           </div>
-          <div class="field"><select id="categorySelect"></select></div>
+          <div class="field"><label for="categorySelect" class="field-label">Categoría</label><select id="categorySelect" aria-label="Categoría del hilo"></select></div>
           <div class="field">
-            <select id="threadAccessLevel">
+            <label for="threadAccessLevel" class="field-label">Visibilidad</label><select id="threadAccessLevel" aria-label="Visibilidad del hilo">
               <option value="public">Público (cualquiera puede leer)</option>
               <option value="registered_only">Solo registrados</option>
             </select>
           </div>
-          <div class="field"><input id="threadTitle" maxlength="120" placeholder="Título (3–120 caracteres)" /></div>
-          <div class="field"><textarea id="threadBody" maxlength="1000" placeholder="Contenido (3–1000 caracteres)"></textarea></div>
-          <div class="field"><input id="threadImage" type="file" accept="image/*" /></div>
+          <div class="field"><label for="threadTitle" class="field-label">Título</label><input id="threadTitle" maxlength="120" placeholder="Título (3–120 caracteres)" aria-label="Título del hilo" aria-required="true" /></div>
+          <div class="field"><label for="threadBody" class="field-label">Contenido</label><textarea id="threadBody" maxlength="1000" placeholder="Contenido (3–1000 caracteres)" aria-label="Contenido del hilo" aria-required="true"></textarea></div>
+          <div class="field"><label for="threadImage" class="field-label">Imagen <span style="font-weight:400;color:var(--ink-muted);">(opcional)</span></label><input id="threadImage" type="file" accept="image/*" aria-label="Imagen opcional para el hilo" /></div>
           <p class="file-note" id="threadImageStatus">Imagen opcional para el hilo</p>
           <div class="thread-composer-actions">
             <button class="btn primary" id="createThreadBtn">Publicar hilo</button>

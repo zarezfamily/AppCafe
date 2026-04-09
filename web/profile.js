@@ -995,6 +995,7 @@
 
   const renderTab = (tabName) => {
     if (!el.tabs.length) return;
+    setHashForTab(tabName);
     el.tabs.forEach((btn) => {
       btn.classList.toggle('active', btn.getAttribute('data-tab') === tabName);
     });
@@ -1069,19 +1070,85 @@
     setStatus(state.isFollowing ? 'Ahora sigues a este usuario.' : 'Ya no sigues a este usuario.');
   };
 
-  const handleSendDirectMessage = async () => {
+
+  // ─── INLINE MODAL (reemplaza window.prompt) ───────────────────────────────
+  const showInlineModal = ({ title, placeholder, initialValue = '', maxLength = 600, onConfirm }) => {
+    // Remove any existing modal
+    const existing = document.getElementById('profileInlineModal');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'profileInlineModal';
+    overlay.style.cssText = [
+      'position:fixed', 'inset:0', 'z-index:10000',
+      'background:rgba(28,18,13,0.55)', 'backdrop-filter:blur(4px)',
+      'display:flex', 'align-items:center', 'justify-content:center',
+      'padding:24px',
+    ].join(';');
+
+    overlay.innerHTML = `
+      <div style="background:#fdf8f1;border-radius:16px;padding:28px 24px;max-width:440px;width:100%;box-shadow:0 24px 64px rgba(28,18,13,0.22);">
+        <p style="font-family:'Playfair Display',serif;font-size:18px;font-weight:500;color:#1c120d;margin-bottom:16px;">${title}</p>
+        <textarea id="profileModalInput"
+          maxlength="${maxLength}"
+          placeholder="${placeholder}"
+          style="width:100%;min-height:90px;resize:vertical;border:1px solid #deccb6;border-radius:10px;padding:10px 14px;font-size:14px;font-family:inherit;background:#fff;color:#1c120d;line-height:1.6;"
+        >${initialValue}</textarea>
+        <p id="profileModalCounter" style="font-size:11px;color:#9a7963;text-align:right;margin-top:4px;font-family:-apple-system,sans-serif;">
+          ${initialValue.length} / ${maxLength}
+        </p>
+        <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end;">
+          <button id="profileModalCancel"
+            style="background:transparent;border:1px solid #deccb6;border-radius:8px;padding:9px 20px;font-size:13px;font-weight:600;color:#5d4030;cursor:pointer;font-family:inherit;">
+            Cancelar
+          </button>
+          <button id="profileModalConfirm"
+            style="background:#1c120d;border:none;border-radius:8px;padding:9px 20px;font-size:13px;font-weight:700;color:#fff9f1;cursor:pointer;font-family:inherit;">
+            Enviar
+          </button>
+        </div>
+      </div>`;
+
+    document.body.appendChild(overlay);
+
+    const input    = overlay.querySelector('#profileModalInput');
+    const counter  = overlay.querySelector('#profileModalCounter');
+    const cancelBtn  = overlay.querySelector('#profileModalCancel');
+    const confirmBtn = overlay.querySelector('#profileModalConfirm');
+
+    input.focus();
+    const end = input.value.length;
+    input.setSelectionRange(end, end);
+
+    input.addEventListener('input', () => {
+      counter.textContent = `${input.value.length} / ${maxLength}`;
+    });
+
+    const close = () => overlay.remove();
+
+    cancelBtn.addEventListener('click', close);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+    document.addEventListener('keydown', function esc(e) {
+      if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); }
+    });
+
+    confirmBtn.addEventListener('click', () => {
+      const val = input.value.trim();
+      close();
+      onConfirm(val);
+    });
+  };
+
+  const handleSendDirectMessage = () => {
     if (!auth.uid || isOwner()) return;
-    const message = window.prompt('Escribe tu mensaje directo');
-    if (message === null) return;
-
-    const body = String(message || '').trim();
-    if (body.length < 2) {
-      setStatus('El mensaje es demasiado corto.');
-      return;
-    }
-
-    setStatus('Enviando mensaje...');
-    const ok = await addDocument('direct_messages', {
+    showInlineModal({
+      title: 'Mensaje directo',
+      placeholder: 'Escribe tu mensaje...',
+      maxLength: 600,
+      onConfirm: async (body) => {
+        if (!body || body.length < 2) { setStatus('El mensaje es demasiado corto.'); return; }
+        setStatus('Enviando mensaje...');
+        const ok = await addDocument('direct_messages', {
       senderUid: auth.uid,
       senderName: String(localStorage.getItem('etiove_web_alias') || 'Catador'),
       recipientUid: uid,
@@ -1095,11 +1162,13 @@
       setStatus('No se pudo enviar el mensaje.');
       return;
     }
-    state.messages = await getCollection('direct_messages', 4000);
-    if (el.tabs.some((btn) => btn.classList.contains('active') && btn.getAttribute('data-tab') === 'messages')) {
-      renderMessages();
-    }
-    setStatus('Mensaje directo enviado.');
+        state.messages = await getCollection('direct_messages', 4000);
+        if (el.tabs.some((btn) => btn.classList.contains('active') && btn.getAttribute('data-tab') === 'messages')) {
+          renderMessages();
+        }
+        setStatus('Mensaje directo enviado.');
+      },
+    });
   };
 
   const replyDirectMessage = async (targetUid, targetName) => {
@@ -1111,43 +1180,39 @@
     const safeTargetUid = String(targetUid || '').trim();
     if (!safeTargetUid) return;
 
-    const message = window.prompt(`Responder a ${targetName || 'usuario'}`);
-    if (message === null) return;
-
-    const body = String(message || '').trim();
-    if (body.length < 2) {
-      setStatus('El mensaje es demasiado corto.');
-      return;
-    }
-
-    const ok = await addDocument('direct_messages', {
-      senderUid: auth.uid,
-      senderName: String(localStorage.getItem('etiove_web_alias') || 'Catador'),
-      recipientUid: safeTargetUid,
-      recipientName: String(targetName || userNameByUid(safeTargetUid) || 'Catador'),
-      body,
-      createdAt: new Date().toISOString(),
-      read: false,
+    showInlineModal({
+      title: `Responder a ${targetName || 'usuario'}`,
+      placeholder: 'Escribe tu respuesta...',
+      maxLength: 600,
+      onConfirm: async (body) => {
+        if (!body || body.length < 2) { setStatus('El mensaje es demasiado corto.'); return; }
+        const ok = await addDocument('direct_messages', {
+          senderUid: auth.uid,
+          senderName: String(localStorage.getItem('etiove_web_alias') || 'Catador'),
+          recipientUid: safeTargetUid,
+          recipientName: String(targetName || userNameByUid(safeTargetUid) || 'Catador'),
+          body,
+          createdAt: new Date().toISOString(),
+          read: false,
+        });
+        if (!ok) { setStatus('No se pudo enviar la respuesta.'); return; }
+        state.messages = await getCollection('direct_messages', 4000);
+        renderMessages();
+        setStatus('Respuesta enviada.');
+      },
     });
-
-    if (!ok) {
-      setStatus('No se pudo enviar la respuesta.');
-      return;
-    }
-
-    state.messages = await getCollection('direct_messages', 4000);
-    renderMessages();
-    setStatus('Respuesta enviada.');
   };
 
-  const handleEditQuote = async () => {
+  const handleEditQuote = () => {
     if (!isOwner()) return;
     const current = formatMottoForDisplay(String(state.profile && state.profile.motto || '').trim());
-    const next = window.prompt('Edita tu frase', current);
-    if (next === null) return;
-    const motto = String(next || '').trim();
-
-    const ok = await updateDocument('user_profiles', uid, {
+    showInlineModal({
+      title: 'Tu frase de perfil',
+      placeholder: 'Una frase que te defina como catador...',
+      initialValue: current,
+      maxLength: 200,
+      onConfirm: async (motto) => {
+        const ok = await updateDocument('user_profiles', uid, {
       uid,
       displayName: getAuthorName(),
       avatarUrl: resolvedProfileAvatar(),
@@ -1160,9 +1225,11 @@
       return;
     }
 
-    state.profile = await getDocument('user_profiles', uid);
-    renderHeader();
-    setStatus(motto ? 'Frase actualizada.' : 'Frase eliminada.');
+        state.profile = await getDocument('user_profiles', uid);
+        renderHeader();
+        setStatus(motto ? 'Frase actualizada.' : 'Frase eliminada.');
+      },
+    });
   };
 
   const handlePhotoSelected = async (event) => {
@@ -1311,7 +1378,8 @@
     attachActionEvents();
     setupScrollTop();
     renderButtons();
-    renderTab('activity');
+    const initialTab = getTabFromHash() || 'activity';
+    renderTab(initialTab);
     state.loaded = true;
   };
 

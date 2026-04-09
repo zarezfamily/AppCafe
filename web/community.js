@@ -56,6 +56,39 @@ const withSubmitGuard = async (key, btn, loadingText, fn) => {
   }
 };
 
+// ─── DETECCIÓN OFFLINE ───────────────────────────────────────────────────────
+const isOffline = () => !navigator.onLine;
+
+const showOfflineBanner = () => {
+  if (document.getElementById('offlineBanner')) return;
+  const banner = document.createElement('div');
+  banner.id = 'offlineBanner';
+  banner.style.cssText = [
+    'position:fixed;top:0;left:0;right:0;z-index:9998',
+    'background:#4d3529;color:#fff9f1',
+    'padding:10px 20px',
+    'display:flex;align-items:center;justify-content:space-between;gap:16px',
+    'font-size:13px;font-family:-apple-system,BlinkMacSystemFont,sans-serif',
+    'box-shadow:0 2px 12px rgba(0,0,0,0.2)',
+  ].join(';');
+  banner.innerHTML = `
+    <span>📶 Sin conexión — Los cambios no se guardarán hasta que vuelvas a estar en línea.</span>
+    <button id="offlineBannerClose" style="background:transparent;color:rgba(255,249,241,0.6);border:none;font-size:18px;line-height:1;cursor:pointer;padding:0 4px;">×</button>`;
+  document.body.prepend(banner);
+  document.getElementById('offlineBannerClose').onclick = () => banner.remove();
+};
+
+const hideOfflineBanner = () => {
+  const banner = document.getElementById('offlineBanner');
+  if (banner) banner.remove();
+};
+
+// Guard that checks connectivity before any write operation
+const requireOnline = () => {
+  if (isOffline()) { showOfflineBanner(); return false; }
+  return true;
+};
+
 const VERIFIED_BADGE = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-left:4px;flex-shrink:0;" aria-label="Email verificado" title="Email verificado"><circle cx="12" cy="12" r="12" fill="#1d9bf0"/><path d="M8.5 12.5l2.5 2.5 5-5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
 let canonicalAlias = String(localStorage.getItem('etiove_web_alias') || '').trim();
@@ -629,7 +662,20 @@ const setStatus = (target, text, kind = '') => {
 
 const fmt = (iso) => {
   try {
-    return new Date(iso).toLocaleString('es-ES');
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso || '';
+    const now = Date.now();
+    const diff = now - d.getTime();
+    const mins  = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days  = Math.floor(diff / 86400000);
+    if (diff < 60000)   return 'ahora mismo';
+    if (mins  < 60)     return `hace ${mins} min`;
+    if (hours < 24)     return `hace ${hours}h`;
+    if (days  === 1)    return 'ayer';
+    if (days  < 7)      return `hace ${days} días`;
+    if (days  < 30)     return `hace ${Math.floor(days / 7)} semanas`;
+    return d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
   } catch {
     return iso || '';
   }
@@ -1192,6 +1238,47 @@ const renderCategories = () => {
   const searchInputEl = document.getElementById('threadSearchInput');
   if (searchInputEl) searchInputEl.value = activeSearchTerm;
 
+  // Clear-search button — shown when there's an active term
+  const chipsWrapEl = searchInputEl && (searchInputEl.closest('.chips-search-wrap') || searchInputEl.parentElement);
+  let clearBtn = document.getElementById('threadSearchClear');
+  if (!clearBtn && chipsWrapEl) {
+    clearBtn = document.createElement('button');
+    clearBtn.id = 'threadSearchClear';
+    clearBtn.type = 'button';
+    clearBtn.setAttribute('aria-label', 'Limpiar búsqueda');
+    clearBtn.style.cssText = [
+      'display:none',
+      'background:var(--accent)',
+      'color:#fff9f1',
+      'border:none',
+      'border-radius:20px',
+      'padding:5px 12px',
+      'font-size:11px',
+      'font-weight:700',
+      'letter-spacing:1px',
+      'cursor:pointer',
+      'font-family:-apple-system,sans-serif',
+      'margin-top:6px',
+      'transition:background 0.2s',
+    ].join(';');
+    clearBtn.textContent = '× Limpiar búsqueda';
+    chipsWrapEl.appendChild(clearBtn);
+  }
+  if (clearBtn) {
+    clearBtn.style.display = activeSearchTerm ? 'inline-block' : 'none';
+    if (!clearBtn.dataset.bound) {
+      clearBtn.addEventListener('click', () => {
+        activeSearchTerm = '';
+        currentListPage = 1;
+        const si = document.getElementById('threadSearchInput');
+        if (si) si.value = '';
+        clearBtn.style.display = 'none';
+        renderThreads();
+      });
+      clearBtn.dataset.bound = '1';
+    }
+  }
+
   // Buscador funcional con debounce (200ms) — persiste término y busca en todas las categorías
   if (searchInputEl && !searchInputEl.dataset.bound) {
     let searchDebounceTimer = null;
@@ -1200,6 +1287,8 @@ const renderCategories = () => {
       searchDebounceTimer = setTimeout(() => {
         activeSearchTerm = searchInputEl.value.trim();
         currentListPage = 1;
+        const cb = document.getElementById('threadSearchClear');
+        if (cb) cb.style.display = activeSearchTerm ? 'inline-block' : 'none';
         renderThreads();
       }, 200);
     });
@@ -1297,6 +1386,7 @@ const renderThreads = () => {
           <div class="actions-row">
             <button class="link-btn" data-vote="${activeThread.id}">${threadVoted ? 'Ya te interesa' : 'Me interesa'}</button>
             <span class="muted">${threadReplies.length} respuestas</span>
+            <button class="link-btn" data-copy-thread-link="${activeThread.id}" title="Copiar enlace al hilo">🔗 Copiar enlace</button>
           </div>
           ${threadCanManage
             ? `<div class=\"actions-row\"><button class=\"link-btn\" data-thread-edit=\"${activeThread.id}\">Editar</button><button class=\"link-btn\" data-thread-delete=\"${activeThread.id}\">Eliminar</button></div>`
@@ -1449,6 +1539,11 @@ const renderThreads = () => {
     btn.addEventListener('click', () => sendReply(btn.getAttribute('data-reply-send')));
   });
 
+  // Auto-resize reply + inline-edit textareas
+  el.threadsWrap.querySelectorAll('.reply-textarea, [data-reply-edit-body]').forEach((ta) => {
+    if (typeof wireAutoResize === 'function') wireAutoResize(ta);
+  });
+
   if (!el.threadsWrap.dataset.boundDelegatedClicks) {
     el.threadsWrap.addEventListener('click', (event) => {
       const saveBtn = event.target.closest('[data-thread-save]');
@@ -1576,6 +1671,27 @@ const renderThreads = () => {
 
     el.threadsWrap.dataset.boundDelegatedInputs = '1';
   }
+
+  // Copy thread link
+  el.threadsWrap.querySelectorAll('[data-copy-thread-link]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const threadId = btn.getAttribute('data-copy-thread-link');
+      const url = `https://etiove.com${threadDetailUrl(threadId)}`;
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(url);
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = url; ta.style.cssText = 'position:fixed;opacity:0;';
+          document.body.appendChild(ta); ta.select();
+          document.execCommand('copy'); ta.remove();
+        }
+        const orig = btn.textContent;
+        btn.textContent = '✓ Enlace copiado';
+        setTimeout(() => { btn.textContent = orig; }, 2000);
+      } catch { btn.textContent = 'No se pudo copiar'; }
+    });
+  });
 
   el.threadsWrap.querySelectorAll('[data-reply-save]').forEach((btn) => {
     btn.addEventListener('click', () => saveReplyEdit(btn.getAttribute('data-reply-save')));
@@ -1735,6 +1851,8 @@ const loadForum = async () => {
   }
 
   renderThreads();
+  // Restore any saved draft once the composer is visible
+  if (auth.uid) restoreDraft();
 
   if (rRes.status === 'fulfilled') {
     setStatus(el.threadStatus, 'Comunidad actualizada.', 'ok');
@@ -1917,6 +2035,7 @@ const createThread = async () => {
     return;
   }
 
+  if (!requireOnline()) return;
   await withSubmitGuard('thread', el.createThreadBtn, 'Publicando...', async () => {
     try {
       const imageFile = el.threadImage.files && el.threadImage.files[0] ? el.threadImage.files[0] : null;
@@ -1954,6 +2073,7 @@ const createThread = async () => {
       });
 
       resetThreadComposer({ preserveStatus: true });
+      clearDraft();
 
       if (imageUploadWarning) {
         setStatus(el.threadStatus, `Hilo publicado sin imagen. ${imageUploadWarning}`, 'error');
@@ -2189,6 +2309,7 @@ const saveReplyEdit = async (replyId) => {
   }
 
   const saveBtn = el.threadsWrap && el.threadsWrap.querySelector(`[data-reply-save="${replyId}"]`);
+  if (!requireOnline()) return;
   await withSubmitGuard('edit', saveBtn, 'Guardando...', async () => {
     const ok = await updateDocument('foro_respuestas', replyId, {
       body,
@@ -2245,6 +2366,7 @@ const sendReply = async (threadId) => {
 
   const sendBtn = el.threadsWrap.querySelector(`[data-reply-send="${threadId}"]`);
 
+  if (!requireOnline()) return;
   await withSubmitGuard('reply', sendBtn, 'Enviando...', async () => {
     try {
       await addDocument('foro_respuestas', {
@@ -2431,6 +2553,46 @@ const checkNotifications = async () => {
   } catch (_) { /* silencioso */ }
 };
 
+// ─── DRAFT DEL COMPOSER ──────────────────────────────────────────────────────
+const DRAFT_KEY = 'etiove_thread_draft';
+
+const saveDraft = () => {
+  if (!auth.uid) return;
+  try {
+    const draft = {
+      title: el.threadTitle ? el.threadTitle.value : '',
+      body:  el.threadBody  ? el.threadBody.value  : '',
+      categoryId:  el.categorySelect    ? el.categorySelect.value    : 'general',
+      accessLevel: el.threadAccessLevel ? el.threadAccessLevel.value : 'public',
+    };
+    if (draft.title.trim() || draft.body.trim()) {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    } else {
+      localStorage.removeItem(DRAFT_KEY);
+    }
+  } catch (_) {}
+};
+
+const restoreDraft = () => {
+  if (!auth.uid) return;
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return;
+    const draft = JSON.parse(raw);
+    if (!draft) return;
+    if (draft.title && el.threadTitle && !el.threadTitle.value) el.threadTitle.value = draft.title;
+    if (draft.body  && el.threadBody  && !el.threadBody.value)  el.threadBody.value  = draft.body;
+    if (draft.categoryId  && el.categorySelect)    el.categorySelect.value    = draft.categoryId;
+    if (draft.accessLevel && el.threadAccessLevel) el.threadAccessLevel.value = draft.accessLevel;
+    const notice = document.getElementById('draftRestoredNotice');
+    if (notice) { notice.style.display = 'block'; setTimeout(() => { notice.style.display = 'none'; }, 4000); }
+  } catch (_) {}
+};
+
+const clearDraft = () => {
+  try { localStorage.removeItem(DRAFT_KEY); } catch (_) {}
+};
+
 const init = async () => {
   initializeMetaDefaults();
   renderCategories();
@@ -2467,6 +2629,32 @@ const init = async () => {
     const chk = document.getElementById('rememberMe');
     if (chk) chk.checked = true;
   }
+
+  // Offline/online detection
+  window.addEventListener('offline', () => showOfflineBanner());
+  window.addEventListener('online', () => hideOfflineBanner());
+  if (isOffline()) showOfflineBanner();
+
+  // ─── TEXTAREA AUTO-RESIZE ────────────────────────────────────────────────
+  const autoResize = (ta) => {
+    if (!ta) return;
+    ta.style.height = 'auto';
+    ta.style.height = Math.min(ta.scrollHeight, 400) + 'px';
+  };
+  const wireAutoResize = (ta) => {
+    if (!ta || ta.dataset.autoResize) return;
+    ta.style.overflow = 'hidden';
+    ta.addEventListener('input', () => autoResize(ta));
+    autoResize(ta);
+    ta.dataset.autoResize = '1';
+  };
+  wireAutoResize(el.threadBody);
+
+  // ─── DRAFT AUTO-SAVE ──────────────────────────────────────────────────────
+  if (el.threadTitle) el.threadTitle.addEventListener('input', saveDraft);
+  if (el.threadBody)  el.threadBody.addEventListener('input',  saveDraft);
+  if (el.categorySelect)    el.categorySelect.addEventListener('change',    saveDraft);
+  if (el.threadAccessLevel) el.threadAccessLevel.addEventListener('change', saveDraft);
 
   el.loginBtn.addEventListener('click', () => signIn(false));
   el.registerBtn.addEventListener('click', () => signIn(true));
@@ -2522,6 +2710,28 @@ const init = async () => {
     };
     reader.readAsDataURL(selected);
   });
+  // ─── CONTADORES DE CARACTERES ────────────────────────────────────────────
+  const wireCharCounter = (inputEl, maxLen, counterId) => {
+    if (!inputEl) return;
+    // Create counter element if it doesn't exist
+    let counter = document.getElementById(counterId);
+    if (!counter) {
+      counter = document.createElement('span');
+      counter.id = counterId;
+      counter.style.cssText = 'font-size:11px;color:var(--ink-muted);float:right;margin-top:3px;font-family:-apple-system,sans-serif;transition:color 0.2s;';
+      inputEl.parentNode.appendChild(counter);
+    }
+    const update = () => {
+      const remaining = maxLen - inputEl.value.length;
+      counter.textContent = `${inputEl.value.length} / ${maxLen}`;
+      counter.style.color = remaining <= 20 ? 'var(--danger)' : remaining <= 50 ? '#b07a52' : 'var(--ink-muted)';
+    };
+    inputEl.addEventListener('input', update);
+    update();
+  };
+  wireCharCounter(el.threadTitle, 120, 'threadTitleCounter');
+  wireCharCounter(el.threadBody, 1000, 'threadBodyCounter');
+
   if (el.refreshBtn) el.refreshBtn.addEventListener('click', loadForum);
   el.categorySelect.addEventListener('change', () => {
     selectedCategory = el.categorySelect.value;

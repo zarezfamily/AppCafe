@@ -1,7 +1,22 @@
 {
   "name": "Etiove",
   "short_name": "Etiove",
+  "description": "Descubre tu café de especialidad ideal. Comunidad, quiz de sabor y recomendaciones personalizadas.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6efe5",
+  "theme_color": "#21150f",
+  "lang": "es-ES",
+  "dir": "ltr",
+  "orientation": "portrait-primary",
+  "categories": ["food", "lifestyle", "social"],
   "icons": [
+    {
+      "src": "/favicon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "/web-app-manifest-192x192.png",
       "sizes": "192x192",
@@ -13,9 +28,12 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
     }
-  ],
-  "theme_color": "#f6efe5",
-  "background_color": "#f6efe5",
-  "display": "standalone"
+  ]
 }

@@ -244,3 +244,32 @@ El script te va pidiendo navegar por cada pantalla y pulsar Enter para guardar:
 - `.env` no se sube al repo
 - No hardcodear API keys ni tokens
 - Reglas de Firestore y Storage versionadas en `firestore.rules` y `storage.rules`
+
+---
+
+## Web Etiove
+
+La versión web está disponible en https://etiove.com y se despliega con Cloudflare Pages. Incluye:
+
+- Página principal con presentación, valores y enlaces a la app
+- Favicon en SVG y PNG, og-image y manifest para PWA
+- Blog de café de especialidad (web/blog/)
+- Comunidad y recursos (web/comunidad.html, web/sobre.html)
+- SEO y Open Graph optimizados
+- Service Worker y soporte offline básico
+
+### Despliegue web
+
+Para desplegar la web estática:
+
+```bash
+npx wrangler pages deploy web --project-name=etiove
+```
+
+Si tienes errores relacionados con node_modules en functions/, elimina esa carpeta antes de desplegar:
+
+```bash
+rm -rf functions/node_modules
+```
+
+---

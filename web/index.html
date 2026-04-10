@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Etiove | App y Comunidad de Café de Especialidad en España</title>
-  <meta name="description" content="Etiove es la app para los amantes del café de especialidad. Descubre, cata, colecciona y conecta." />
+  <meta name="description" content="Etiove: app y comunidad de café de especialidad. Etio (Etiopía, cuna del café) + Ove (donde, en italiano) = donde nació el café. Descubre, cata y conecta." />
   <link rel="canonical" href="https://etiove.com/" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Etiove" />
@@ -869,15 +869,6 @@
 
     
   
-    /* ── TESTIMONIOS ── */
-    .section-testimonials {
-      position: relative;
-      z-index: 1;
-      background: #fffaf5;
-      border-top: 1px solid #e4d3c2;
-      padding: 80px 40px;
-      overflow: hidden;
-    }
 
     .testimonials-label {
       font-size: 10px;
@@ -1125,12 +1116,15 @@
     <div class="about-content reveal">
       <p class="about-label">Quiénes somos</p>
       <h2 class="about-title">Nacimos del amor por el <em>buen café</em></h2>
-      <p class="about-text">
-        Nos llamamos ETIOVE porque nuestro nombre cuenta exactamente lo que defendemos.
-        Etio evoca Etiopía, el origen histórico del café; y Ove, en italiano, significa
-        "donde". De esa unión nace nuestra idea central y también nuestro lema:
-        "donde nació el café".
-      </p>
+
+      <!-- Cápsula de significado: optimizada para AI Overviews y Featured Snippets -->
+      <section id="significado-etiove" style="margin-bottom:20px;">
+        <h3 style="font-family:'Playfair Display',serif;font-size:15px;font-weight:500;color:var(--ink);margin-bottom:8px;letter-spacing:0.2px;">¿Qué significa Etiove?</h3>
+        <p style="font-size:15px;color:var(--ink-soft);line-height:1.75;">
+          <strong>Etiove</strong> es una app y comunidad de <strong>café de especialidad</strong> cuyo nombre fusiona dos conceptos: <strong>Etio</strong>, que evoca <strong>Etiopía</strong> — la cuna histórica del café —, y <strong>Ove</strong>, que en italiano significa <em>donde</em>. Juntos forman el lema que define la marca: <em>"donde nació el café"</em>.
+        </p>
+      </section>
+
       <p class="about-text">
         Etiove es una comunidad creada para quienes viven el café de especialidad de
         verdad: personas que quieren descubrir mejores orígenes, catar con criterio,
@@ -1270,11 +1264,25 @@
       #webQuizRoot .eq-summary-pill::before { background: linear-gradient(90deg,#8f5e3b,transparent) !important; }
       #webQuizRoot .eq-summary-key { color: #9a7963 !important; }
       #webQuizRoot .eq-summary-val { color: #1c120d !important; }
-      #webQuizRoot .eq-footer-link  { color: rgba(28,18,13,0.40) !important; }
-      #webQuizRoot .eq-footer-link:hover { color: #8f5e3b !important; }
-      #webQuizRoot .eq-footer-sep   { color: rgba(28,18,13,0.20) !important; }
-      #webQuizRoot .eq-btn-text     { color: rgba(28,18,13,0.30) !important; }
-      #webQuizRoot .eq-btn-text:hover { color: #8f5e3b !important; }
+      #webQuizRoot .eq-footer-link  { color: #9a7963 !important; }
+      #webQuizRoot .eq-footer-link:hover { color: #5d4030 !important; }
+      #webQuizRoot .eq-footer-sep   { color: #c9b8a8 !important; }
+      /* Botón "Repetir el quiz" — visible y claro */
+      #webQuizRoot .eq-btn-text {
+        color: #5d4030 !important;
+        font-size: 11px !important;
+        letter-spacing: 1.5px !important;
+        text-decoration: underline !important;
+        text-underline-offset: 3px !important;
+        text-decoration-color: #c9b8a8 !important;
+      }
+      #webQuizRoot .eq-btn-text:hover { color: #1c120d !important; text-decoration-color: #8f5e3b !important; }
+      /* Eyebrow "Perfil completado" */
+      #webQuizRoot .eq-eyebrow { color: #8f5e3b !important; }
+      /* Icono resultado */
+      #webQuizRoot .eq-result-icon { color: #1c120d !important; }
+      /* Sub texto resultado */
+      #webQuizRoot .eq-sub { color: #5d4030 !important; }
 
       /* Pantalla de resultado: título no superpuesto */
       #webQuizRoot .eq-title {
@@ -1326,45 +1334,6 @@
           <span class="btn-app-main">Google Play</span>
         </div>
       </a>
-    </div>
-  </section>
-  <!-- TESTIMONIOS -->
-  <section class="section-testimonials">
-    <p class="testimonials-label">Lo que dice la comunidad</p>
-    <div class="testimonials-grid">
-      <div class="testimonial-card">
-        <div class="testimonial-quote">"</div>
-        <p class="testimonial-text">El quiz me descubrió los cafés de Etiopía con proceso natural. Nunca había probado algo con esas notas afrutadas. Completamente transformador.</p>
-        <div class="testimonial-author">
-          <div class="testimonial-avatar">☕</div>
-          <div>
-            <p class="testimonial-name">@caficultora</p>
-            <p class="testimonial-role">Miembro · Madrid</p>
-          </div>
-        </div>
-      </div>
-      <div class="testimonial-card">
-        <div class="testimonial-quote">"</div>
-        <p class="testimonial-text">La comunidad resolvió en 20 minutos por qué mi espresso salía amargo. Llevaba meses ajustando la molienda a ciegas.</p>
-        <div class="testimonial-author">
-          <div class="testimonial-avatar">🫘</div>
-          <div>
-            <p class="testimonial-name">@v60_diaries</p>
-            <p class="testimonial-role">Miembro · Barcelona</p>
-          </div>
-        </div>
-      </div>
-      <div class="testimonial-card">
-        <div class="testimonial-quote">"</div>
-        <p class="testimonial-text">Llevo un año registrando mis catas aquí. Ver la evolución de mi paladar desde los primeros apuntes hasta ahora no tiene precio.</p>
-        <div class="testimonial-author">
-          <div class="testimonial-avatar">📓</div>
-          <div>
-            <p class="testimonial-name">@granos_de_altura</p>
-            <p class="testimonial-role">Miembro · Sevilla</p>
-          </div>
-        </div>
-      </div>
     </div>
   </section>
 
@@ -1490,6 +1459,21 @@
           .catch(function () { /* SW not critical — fail silently */ });
       });
     }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "DefinedTerm",
+    "name": "Etiove",
+    "description": "Etiove es una app y comunidad de café de especialidad. Su nombre fusiona Etio (de Etiopía, cuna del café) y Ove (donde, en italiano), formando el lema donde nació el café.",
+    "inDefinedTermSet": {
+      "@type": "DefinedTermSet",
+      "name": "Etiove — Glosario",
+      "url": "https://etiove.com"
+    },
+    "url": "https://etiove.com/#significado-etiove",
+    "sameAs": "https://etiove.com"
+  }
   </script>
 </body>
 </html>

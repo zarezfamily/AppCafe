@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Etiove | La mayor comunidad de café de especialidad</title>
+  <title>Etiove | App y Comunidad de Café de Especialidad en España</title>
   <meta name="description" content="Etiove es la app para los amantes del café de especialidad. Descubre, cata, colecciona y conecta." />
   <link rel="canonical" href="https://etiove.com/" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Etiove" />
   <meta property="og:locale" content="es_ES" />
-  <meta property="og:title" content="Etiove | La mayor comunidad de café de especialidad" />
+  <meta property="og:title" content="Etiove | App y Comunidad de Café de Especialidad en España" />
   <meta property="og:description" content="Descubre, cata, colecciona y conecta con amantes del café de especialidad en Etiove." />
   <meta property="og:url" content="https://etiove.com/" />
   <meta property="og:image" content="https://etiove.com/og-image.jpg" />
@@ -19,10 +19,11 @@
   <meta property="og:image:height" content="500" />
   <meta property="og:image:alt" content="Etiove, donde nació el café" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Etiove | La mayor comunidad de café de especialidad" />
+  <meta name="twitter:title" content="Etiove | App y Comunidad de Café de Especialidad en España" />
   <meta name="twitter:description" content="Descubre, cata, colecciona y conecta con amantes del café de especialidad en Etiove." />
   <meta name="twitter:image" content="https://etiove.com/og-image.jpg" />
   <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="shortcut icon" href="/favicon.ico" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -142,18 +143,6 @@
       z-index: 1;
       overflow: hidden;
       background: #1c120d;
-    }
-
-    /* Imagen de fondo emocional */
-    .hero::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image: url('https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=1800&q=80&auto=format&fit=crop');
-      background-size: cover;
-      background-position: center 55%;
-      z-index: 0;
-      opacity: 0.38;
     }
 
     /* Auras decorativas */
@@ -622,6 +611,7 @@
       grid-row: 2;
       margin-top: 40px;
       padding-top: 24px;
+      padding-bottom: 16px;
       border-top: 1px solid var(--border-soft);
       display: flex;
       align-items: center;
@@ -784,7 +774,7 @@
     /* ── SCROLL TO TOP ── */
     .scroll-top {
       position: fixed;
-      bottom: 48px;
+      bottom: 72px;
       right: 28px;
       width: 44px;
       height: 44px;
@@ -1067,11 +1057,10 @@
   <nav>
     <a class="nav-wordmark" href="/">Etiove</a>
     <div class="nav-links">
-      <a class="nav-link" href="#sobre">Sobre nosotros</a>
       <a class="nav-link" href="#app">La app</a>
-      <a class="nav-link" href="/blog.html">Blog</a>
+      <a class="nav-link" href="/blog/">Blog</a>
       <a class="nav-link" href="/comunidad.html">Comunidad</a>
-      <a class="nav-link" href="/sobre.html">Sobre</a>
+      <a class="nav-link" href="/about.html">Sobre Nosotros</a>
     </div>
   </nav>
 
@@ -1080,6 +1069,15 @@
     <div class="aura aura-1"></div>
     <div class="aura aura-2"></div>
     <div class="aura aura-3"></div>
+    <!-- Imagen indexable para Google Imágenes -->
+    <img
+      src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=1800&q=80&auto=format&fit=crop"
+      alt="Cata de café de especialidad en la comunidad Etiove — taza de espresso con vapor"
+      width="1800" height="900"
+      fetchpriority="low" loading="lazy"
+      style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.38;z-index:0;pointer-events:none;"
+      aria-hidden="false"
+    />
 
     <div class="hero-seal">
       <div class="seal-ring">
@@ -1189,9 +1187,33 @@
       /* Todos los textos del quiz en oscuro */
       #webQuizRoot, #webQuizRoot * { color: #1c120d !important; }
 
-      /* Excepciones: botón primario mantiene texto claro */
-      #webQuizRoot .eq-btn-primary,
+      /* Botón primario — visible sobre fondo crema */
+      #webQuizRoot .eq-btn-primary {
+        background: #1c120d !important;
+        color: #fdf8f1 !important;
+        border-color: transparent !important;
+        box-shadow: 0 4px 20px rgba(28,18,13,0.18) !important;
+      }
+      #webQuizRoot .eq-btn-primary:hover {
+        background: #5d4030 !important;
+        transform: translateY(-2px) !important;
+      }
       #webQuizRoot .eq-btn-primary * { color: #fdf8f1 !important; }
+      /* Ghost button */
+      #webQuizRoot .eq-btn-ghost {
+        color: var(--ink-muted) !important;
+        border: 1px solid var(--border) !important;
+        padding: 10px 20px !important;
+        border-radius: 4px !important;
+      }
+      #webQuizRoot .eq-btn-ghost:hover { color: var(--accent) !important; border-color: var(--accent) !important; }
+      /* Text button (rehacer, repetir) */
+      #webQuizRoot .eq-btn-text {
+        color: var(--ink-muted) !important;
+        text-decoration: underline !important;
+        text-underline-offset: 3px !important;
+      }
+      #webQuizRoot .eq-btn-text:hover { color: var(--accent) !important; }
 
       /* Títulos y subtítulos */
       #webQuizRoot .eq-title    { color: #1c120d !important; }
@@ -1203,17 +1225,25 @@
       #webQuizRoot .eq-question   { color: #1c120d !important; }
       #webQuizRoot .eq-step-label { color: #9a7963 !important; }
 
-      /* Opciones */
+      /* Opciones — fondo claro */
       #webQuizRoot .eq-option {
         background: #fffaf5 !important;
         border-color: #e4d3c2 !important;
       }
-      #webQuizRoot .eq-option:hover,
-      #webQuizRoot .eq-option.selected {
-        background: #fdf0e0 !important;
+      #webQuizRoot .eq-option::before { background: linear-gradient(to bottom,#8f5e3b,#c99557) !important; }
+      #webQuizRoot .eq-option::after  { background: #8f5e3b !important; color: #fff9f1 !important; }
+      #webQuizRoot .eq-option:hover {
+        background: rgba(143,94,59,0.07) !important;
         border-color: #8f5e3b !important;
+        box-shadow: 0 6px 20px rgba(143,94,59,0.12) !important;
       }
-      #webQuizRoot .eq-option-num   { color: #e4d3c2 !important; }
+      #webQuizRoot .eq-option.selected {
+        background: rgba(143,94,59,0.10) !important;
+        border-color: #8f5e3b !important;
+        box-shadow: 0 6px 20px rgba(143,94,59,0.15) !important;
+      }
+      #webQuizRoot .eq-option.selected .eq-option-label { color: #5d4030 !important; }
+      #webQuizRoot .eq-option-num   { color: #c9b8a8 !important; }
       #webQuizRoot .eq-option-label { color: #1c120d !important; }
       #webQuizRoot .eq-option-desc  { color: #9a7963 !important; }
 
@@ -1233,8 +1263,40 @@
       #webQuizRoot .eq-btn-ghost * { color: #9a7963 !important; }
 
       /* Resultado final */
+      #webQuizRoot .eq-result-icon { background: rgba(143,94,59,0.10) !important; border-color: rgba(143,94,59,0.30) !important; }
       #webQuizRoot .eq-result-title { color: #1c120d !important; }
       #webQuizRoot .eq-result-sub   { color: #5d4030 !important; }
+      #webQuizRoot .eq-summary-pill { background: #fffaf5 !important; border-color: #e4d3c2 !important; }
+      #webQuizRoot .eq-summary-pill::before { background: linear-gradient(90deg,#8f5e3b,transparent) !important; }
+      #webQuizRoot .eq-summary-key { color: #9a7963 !important; }
+      #webQuizRoot .eq-summary-val { color: #1c120d !important; }
+      #webQuizRoot .eq-footer-link  { color: rgba(28,18,13,0.40) !important; }
+      #webQuizRoot .eq-footer-link:hover { color: #8f5e3b !important; }
+      #webQuizRoot .eq-footer-sep   { color: rgba(28,18,13,0.20) !important; }
+      #webQuizRoot .eq-btn-text     { color: rgba(28,18,13,0.30) !important; }
+      #webQuizRoot .eq-btn-text:hover { color: #8f5e3b !important; }
+
+      /* Pantalla de resultado: título no superpuesto */
+      #webQuizRoot .eq-title {
+        color: #1c120d !important;
+        margin-bottom: 32px !important;
+        position: relative !important;
+        z-index: 2 !important;
+      }
+      #webQuizRoot .eq-title em { color: #8f5e3b !important; }
+
+      /* Píldoras de resumen en fondo claro */
+      #webQuizRoot .eq-summary-row {
+        position: relative !important;
+        z-index: 2 !important;
+        margin-top: 28px !important;
+      }
+      #webQuizRoot .eq-summary-pill {
+        background: #fffaf5 !important;
+        border-color: #e4d3c2 !important;
+        color: #1c120d !important;
+      }
+      #webQuizRoot .eq-summary-key { color: #9a7963 !important; }
     </style>
     <div id="webQuizRoot"></div>
   </section>
@@ -1316,7 +1378,7 @@
         <a class="footer-nav-link" href="/blog/">Blog</a>
         <a class="footer-nav-link" href="/comunidad.html">Comunidad</a>
         <a class="footer-nav-link" href="/#quizweb">Quiz de sabor</a>
-        <a class="footer-nav-link" href="/sobre.html">Sobre Etiove</a>
+        <a class="footer-nav-link" href="/about.html">Sobre Etiove</a>
       </div>
     </nav>
 

@@ -850,12 +850,12 @@ const goBackFromThreadDetail = () => {
 };
 
 const goToProfilePage = (uid, name) => {
-  const safeUid = String(uid || '').trim();
+  const safeUid  = String(uid  || '').trim();
   if (!safeUid) return;
-  const safeName = String(name || '').trim();
-  const url = `/perfil/?uid=${encodeURIComponent(safeUid)}`
-    + (safeName ? `&name=${encodeURIComponent(safeName)}` : '');
-  window.location.href = url;
+  const safeAlias = String(name || '').trim().replace(/^@+/, '').replace(/\s+/g, '_').toLowerCase();
+  // URL limpia: /perfil/@alias (Cloudflare _redirects hace el rewrite)
+  const slug = safeAlias || safeUid;
+  window.location.href = `/perfil/@${encodeURIComponent(slug)}`;
 };
 
 const resolveUidByAlias = async (uid, name) => {

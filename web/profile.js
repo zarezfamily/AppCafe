@@ -6,8 +6,15 @@
   const FIREBASE_STORAGE_BUCKET = `${FIREBASE_PROJECT_ID}.appspot.com`;
 
   const params = new URLSearchParams(window.location.search);
-  const requestedUid = String(params.get('uid') || '').trim();
-  const requestedName = String(params.get('name') || '').trim();
+
+  // Extraer alias de URL limpia: /perfil/@zarez
+  const pathAlias = (() => {
+    const seg = window.location.pathname.replace(/\/+$/, '').split('/').pop() || '';
+    return seg.startsWith('@') ? seg.slice(1) : (seg !== 'perfil' && seg !== '' ? seg : '');
+  })();
+
+  const requestedUid  = String(params.get('uid')  || '').trim();
+  const requestedName = String(params.get('name') || pathAlias || '').trim();
 
   const auth = {
     uid: localStorage.getItem('etiove_web_uid') || '',
@@ -16,17 +23,14 @@
     emailVerified: localStorage.getItem('etiove_web_email_verified') === 'true',
   };
 
-  let uid = requestedUid || auth.uid || '';
+  let uid = requestedUid || (pathAlias ? '' : auth.uid) || '';
   const queryName = requestedName || String(localStorage.getItem('etiove_web_alias') || '').trim();
 
-  // If no uid in URL but we have one from session, redirect to canonical URL
-  if (!requestedUid && uid) {
-    const desiredSearch = `?uid=${encodeURIComponent(uid)}`
-      + (queryName ? `&name=${encodeURIComponent(queryName)}` : '');
-    const nextUrl = `/perfil/${desiredSearch}`;
-    if (window.location.pathname !== '/perfil/' || window.location.search !== desiredSearch) {
-      window.history.replaceState(null, '', nextUrl);
-    }
+  // Si el usuario visita su propio perfil sin URL limpia, redirigir a @alias
+  if (!requestedUid && !pathAlias && auth.uid) {
+    const ownAlias = String(localStorage.getItem('etiove_web_alias') || '').trim().replace(/^@/, '');
+    const slug = ownAlias || auth.uid;
+    window.history.replaceState(null, '', `/perfil/@${encodeURIComponent(slug)}`);
   }
 
   const state = {
@@ -781,12 +785,11 @@
   };
 
   const openProfile = (targetUid, name) => {
-    const safeUid = String(targetUid || '').trim();
+    const safeUid   = String(targetUid || '').trim();
     if (!safeUid) return;
-    const safeName = String(name || '').trim();
-    const url = `/perfil/?uid=${encodeURIComponent(safeUid)}`
-      + (safeName ? `&name=${encodeURIComponent(safeName)}` : '');
-    window.location.href = url;
+    const safeAlias = String(name || '').trim().replace(/^@+/, '').replace(/\s+/g, '_').toLowerCase();
+    const slug = safeAlias || safeUid;
+    window.location.href = `/perfil/@${encodeURIComponent(slug)}`;
   };
 
   const renderEmpty = (message) => {
@@ -1533,6 +1536,20 @@
           </a>
         </div>`;
       return;
+    }
+
+    // ── Resolver uid desde alias si viene de URL limpia /perfil/@alias ──────
+    if (!uid && pathAlias) {
+      try {
+        const normAlias = (v) => String(v || '').normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+        const needle = normAlias(pathAlias);
+        const profiles = await getCollection('user_profiles', 2000);
+        const hit = profiles.find((p) =>
+          [p.displayName, p.alias, p.nickname].some((v) => normAlias(v) === needle)
+        ) || profiles.find((p) => String(p.uid || '').trim() === pathAlias);
+        if (hit && hit.uid) uid = String(hit.uid).trim();
+      } catch (_) {}
     }
 
     const [threads, replies, blogComments, follows, profile, messages, profiles] = await Promise.all([

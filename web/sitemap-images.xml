@@ -49,4 +49,20 @@
       <image:title>¿Vale la Pena Pagar Más por Café de Especialidad?</image:title>
     </image:image>
   </url>
+  <url>
+    <loc>https://etiove.com/blog/cold-brew-en-casa-guia-completa.html</loc>
+    <image:image>
+      <image:loc>https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=1400&q=80&auto=format&fit=crop</image:loc>
+      <image:caption>Vaso de cold brew con hielo y café de especialidad</image:caption>
+      <image:title>Cold Brew en Casa: Guía Completa para Hacerlo Perfecto</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://etiove.com/blog/arabica-vs-robusta.html</loc>
+    <image:image>
+      <image:loc>https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=1400&q=80&auto=format&fit=crop</image:loc>
+      <image:caption>Granos de café arábica de especialidad en mano</image:caption>
+      <image:title>Arábica vs Robusta: La Diferencia que Cambia tu Café</image:title>
+    </image:image>
+  </url>
 </urlset>

@@ -115,7 +115,9 @@ const STYLES = `
     color: #fff9f1;
     line-height: 1.08;
     letter-spacing: 0.5px;
-    margin-bottom: 22px;
+    margin-bottom: 32px;
+    position: relative;
+    z-index: 2;
   }
   .eq-title em {
     font-style: italic;
@@ -260,67 +262,100 @@ const STYLES = `
   .eq-options {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 14px;
+    gap: 12px;
     margin-bottom: 36px;
   }
   .eq-options.cols-3 { grid-template-columns: repeat(3, 1fr); }
 
   .eq-option {
-    background: rgba(228,195,164,0.10);
-    border: 1px solid rgba(228,195,164,0.32);
-    border-radius: 3px;
+    background: rgba(255,249,241,0.04);
+    border: 1px solid rgba(228,195,164,0.20);
+    border-radius: 12px;
     cursor: pointer;
     text-align: left;
-    padding: 26px 24px 22px;
-    transition: border-color 0.25s, background 0.25s, transform 0.22s, box-shadow 0.25s;
+    padding: 22px 20px 20px;
+    transition: border-color 0.2s, background 0.2s, transform 0.18s, box-shadow 0.2s;
     font-family: inherit;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
     position: relative;
+    overflow: hidden;
   }
-  .eq-option::after {
+  /* Línea dorada izquierda — visible en hover y selected */
+  .eq-option::before {
     content: '';
     position: absolute;
-    top: 16px; bottom: 16px; left: 0;
-    width: 2px;
-    background: rgba(228,195,164,0.7);
-    border-radius: 0 2px 2px 0;
+    top: 0; bottom: 0; left: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, #c99557, #efd5ad);
+    border-radius: 0 0 0 12px;
     opacity: 0;
-    transition: opacity 0.22s, transform 0.22s;
-    transform: scaleY(0.4);
-    transform-origin: center;
+    transition: opacity 0.2s;
+  }
+  /* Check mark — visible en selected */
+  .eq-option::after {
+    content: '✓';
+    position: absolute;
+    top: 14px; right: 16px;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: #c99557;
+    color: #1a0f08;
+    font-size: 12px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 22px;
+    text-align: center;
+    opacity: 0;
+    transform: scale(0.6);
+    transition: opacity 0.2s, transform 0.2s;
+    font-family: -apple-system, sans-serif;
   }
   .eq-option:hover {
-    border-color: rgba(228,195,164,0.7);
-    background: rgba(228,195,164,0.16);
-    transform: translateY(-4px);
-    box-shadow: 0 12px 36px rgba(0,0,0,0.3);
+    border-color: rgba(201,149,87,0.55);
+    background: rgba(201,149,87,0.08);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(0,0,0,0.25);
   }
-  .eq-option:hover::after { opacity: 1; transform: scaleY(1); }
-  .eq-option:active { transform: translateY(-1px); }
+  .eq-option:hover::before { opacity: 0.6; }
+  .eq-option.selected {
+    border-color: #c99557;
+    background: rgba(201,149,87,0.14);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(201,149,87,0.2);
+    pointer-events: none;
+  }
+  .eq-option.selected::before { opacity: 1; }
+  .eq-option.selected::after  { opacity: 1; transform: scale(1); }
+  .eq-option.selected .eq-option-label { color: #efd5ad; }
+  .eq-option.selected .eq-option-num   { color: rgba(201,149,87,0.8); }
 
   .eq-option-num {
-    font-family: 'Playfair Display', serif;
-    font-size: 10px;
-    color: rgba(205,165,120,0.45);
-    letter-spacing: 2px;
-    font-weight: 400;
+    font-family: -apple-system, sans-serif;
+    font-size: 9px;
+    color: rgba(205,165,120,0.35);
+    letter-spacing: 2.5px;
+    font-weight: 600;
+    text-transform: uppercase;
   }
   .eq-option-label {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(20px, 2.8vw, 24px);
-    font-weight: 400;
-    color: #fff9f1;
-    letter-spacing: 0.3px;
-    line-height: 1.1;
+    font-size: clamp(17px, 2.4vw, 21px);
+    font-weight: 500;
+    color: rgba(255,249,241,0.90);
+    letter-spacing: 0.2px;
+    line-height: 1.15;
+    transition: color 0.2s;
   }
   .eq-option-desc {
     font-size: 12px;
-    color: rgba(255,249,241,0.65);
+    color: rgba(255,249,241,0.45);
     font-weight: 300;
-    letter-spacing: 0.6px;
-    line-height: 1.6;
+    letter-spacing: 0.4px;
+    line-height: 1.65;
     margin-top: 2px;
   }
 
@@ -388,34 +423,71 @@ const STYLES = `
   }
   .eq-btn-text:hover { color: rgba(255,249,241,0.6); }
 
+  /* Icono de check al completar */
+  .eq-result-icon {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(201,149,87,0.25), rgba(201,149,87,0.10));
+    border: 1px solid rgba(201,149,87,0.4);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    margin: 0 auto 24px;
+    position: relative; z-index: 2;
+  }
+
   .eq-summary-row {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: 10px;
-    justify-content: center;
-    margin-top: 24px;
+    margin-top: 28px;
+    position: relative;
+    z-index: 2;
   }
   .eq-summary-pill {
-    display: inline-flex;
+    display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 3px;
-    padding: 10px 18px;
+    align-items: flex-start;
+    gap: 4px;
+    padding: 14px 16px;
     background: rgba(255,249,241,0.06);
-    border: 1px solid rgba(228,195,164,0.22);
+    border: 1px solid rgba(228,195,164,0.18);
     border-radius: 12px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #f4dfc8;
-    min-width: 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .eq-summary-pill::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #c99557, transparent);
+    opacity: 0.6;
   }
   .eq-summary-key {
     font-size: 9px;
     font-weight: 700;
-    letter-spacing: 2px;
+    letter-spacing: 2.5px;
     text-transform: uppercase;
-    color: rgba(205,165,120,0.6);
+    color: rgba(201,149,87,0.65);
     display: block;
+    font-family: -apple-system, sans-serif;
+  }
+  .eq-summary-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: #f4dfc8;
+    letter-spacing: 0.3px;
+  }
+
+  .eq-final-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-top: 32px;
+    position: relative;
+    z-index: 2;
   }
 
   @media (max-width: 600px) {
@@ -467,12 +539,12 @@ function renderQuiz() {
         const summaryHTML = Object.entries(savedPrefs).map(([key, val]) => {
           const label = (LABELS[key] && LABELS[key][val]) || val;
           const names = { tueste: 'Tueste', origen: 'Origen', acidez: 'Acidez', sabor: 'Perfil' };
-          return `<span class="eq-summary-pill"><span class="eq-summary-key">${names[key] || key}</span>${label}</span>`;
+          return `<div class="eq-summary-pill"><span class="eq-summary-key">${names[key] || key}</span><span class="eq-summary-val">${label}</span></div>`;
         }).join('');
 
         inner.innerHTML = `
           <span class="eq-eyebrow">Tu perfil guardado · Etiove</span>
-          <h2 class="eq-title">Ya conocemos <em>tu café ideal</em></h2>
+          <h2 class="eq-title" style="white-space:nowrap;">Ya conocemos <em>tu café ideal</em></h2>
           <div class="eq-summary-row">${summaryHTML}</div>
           <p class="eq-sub" style="margin-top:20px;">Descarga Etiove para ver los cafés que encajan exactamente con tu perfil.</p>
           <div class="eq-divider"><span class="eq-divider-glyph">✦</span></div>
@@ -525,14 +597,15 @@ function renderQuiz() {
       const summaryHTML = Object.entries(prefs).map(([key, val]) => {
         const label = (LABELS[key] && LABELS[key][val]) || val;
         const names = { tueste: 'Tueste', origen: 'Origen', acidez: 'Acidez', sabor: 'Perfil' };
-        return `<span class="eq-summary-pill"><span class="eq-summary-key">${names[key] || key}</span>${label}</span>`;
+        return `<div class="eq-summary-pill"><span class="eq-summary-key">${names[key] || key}</span><span class="eq-summary-val">${label}</span></div>`;
       }).join('');
 
       inner.innerHTML = `
-        <span class="eq-eyebrow">Perfil completado</span>
-        <h2 class="eq-title">Tu café perfecto<br><em>te está esperando</em></h2>
+        <div class="eq-result-icon">☕</div>
+        <span class="eq-eyebrow">Perfil completado · Etiove</span>
+        <h2 class="eq-title">Tu café perfecto <em>te está esperando</em></h2>
         <div class="eq-summary-row">${summaryHTML}</div>
-        <p class="eq-sub" style="margin-top:20px;">Hemos guardado tu perfil sensorial. Descarga Etiove para ver los cafés que encajan exactamente con él.</p>
+        <p class="eq-sub" style="margin-top:24px;">Perfil sensorial guardado. Descarga Etiove para ver los cafés que encajan exactamente con él.</p>
         <div class="eq-final-actions">
           <a class="eq-btn-primary" href="https://etiove.com/app" target="_blank">
             Descargar Etiove
@@ -586,7 +659,13 @@ function renderQuiz() {
     `;
 
     inner.querySelectorAll('.eq-option').forEach(btn => {
-      btn.onclick = () => { prefs[q.id] = btn.dataset.value; step++; render(); };
+      btn.onclick = () => {
+        // Feedback visual: marcar seleccionado 320ms antes de avanzar
+        inner.querySelectorAll('.eq-option').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        prefs[q.id] = btn.dataset.value;
+        setTimeout(() => { step++; render(); }, 320);
+      };
     });
     const back = inner.querySelector('#eq-back');
     if (back && !back.disabled) back.onclick = () => { step--; render(); };

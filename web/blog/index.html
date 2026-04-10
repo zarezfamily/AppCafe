@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
   <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="shortcut icon" href="/favicon.ico" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -339,26 +340,6 @@
     .card:hover .read-link { color: var(--accent); border-color: var(--accent); gap: 12px; }
 
     /* FOOTER */
-    footer {
-      position: relative; z-index: 1; background: var(--ink);
-      padding: 54px 40px; display: flex; align-items: center;
-      justify-content: space-between; gap: 24px; flex-wrap: wrap;
-    }
-    .footer-wordmark {
-      font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 500;
-      letter-spacing: 4px; text-transform: uppercase; color: rgba(255,248,241,0.55);
-      text-decoration: none; transition: color 0.2s;
-    }
-    .footer-wordmark:hover { color: rgba(255,220,180,0.8); }
-    .footer-copy { font-size: 11px; color: rgba(255,248,241,0.30); }
-    .social-row { display: flex; gap: 14px; align-items: center; }
-    .social-link {
-      display: flex; align-items: center; justify-content: center;
-      width: 38px; height: 38px; border: 1px solid rgba(255,248,241,0.28);
-      border-radius: 50%; color: rgba(255,248,241,0.55); text-decoration: none;
-      transition: all 0.2s;
-    }
-    .social-link:hover { border-color: rgba(255,220,180,0.8); color: rgba(255,220,180,0.95); transform: translateY(-2px); }
     .social-link svg { width: 16px; height: 16px; fill: currentColor; }
 
     /* SCROLL TOP */
@@ -379,8 +360,6 @@
       .hero-title { letter-spacing: 5px; }
       .grid { grid-template-columns: 1fr; }
       .card-thumb { height: 210px; }
-      footer { flex-direction: column; text-align: center; }
-      .social-row { justify-content: center; }
     }
     @media (max-width: 560px) {
       nav { padding: 14px 20px; }
@@ -390,6 +369,49 @@
       .hero-tagline { font-size: 12px; letter-spacing: 1.4px; }
       .hero-scroll { display: none; }
       .scroll-top { bottom: 80px; right: 16px; }
+    }
+
+    /* ─── FOOTER (canonical) ─── */
+    footer {
+      position: relative; z-index: 1;
+      padding: 32px 40px 32px;
+      border-top: 1px solid var(--border-soft);
+      display: grid; grid-template-columns: 1fr;
+      gap: 0; align-items: start;
+      background: #f6efe7;
+    }
+    .footer-nav { grid-column: 1; grid-row: 1; display: flex; flex-direction: column; gap: 20px; }
+    .footer-nav-group { display: flex; flex-wrap: wrap; gap: 8px 28px; }
+    .footer-nav-label { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-muted); opacity: 0.6; width: 100%; margin-bottom: 2px; }
+    .footer-nav-link { font-size: 13px; font-weight: 400; color: var(--ink-soft); text-decoration: none; transition: color 0.2s; letter-spacing: 0.2px; }
+    .footer-nav-link:hover { color: var(--accent); }
+    .footer-legal-link { font-size: 11px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-muted); text-decoration: none; opacity: 0.7; transition: opacity 0.2s, color 0.2s; }
+    .footer-legal-link:hover { opacity: 1; color: var(--accent); }
+    .footer-copy {
+      font-size: 11px; color: var(--ink-muted); letter-spacing: 0.5px; font-weight: 300;
+      grid-column: 1 / -1; grid-row: 2; margin-top: 40px;
+      padding-top: 24px; padding-bottom: 16px;
+      border-top: 1px solid var(--border-soft);
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+    }
+    .footer-copy-center { display: flex; align-items: center; gap: 14px; }
+    .footer-wordmark-sm {
+      font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 400;
+      letter-spacing: 6px; text-transform: uppercase; color: var(--ink-soft);
+    }
+    .social-row-inline { display: flex; align-items: center; gap: 12px; }
+    .social-row-inline .social-link { width: 38px; height: 38px; }
+    .social-row-inline .social-link svg { width: 17px; height: 17px; }
+    .social-link {
+      display: flex; align-items: center; justify-content: center;
+      width: 40px; height: 40px; border: 1px solid var(--border);
+      border-radius: 50%; text-decoration: none; transition: all 0.3s; color: var(--ink-muted);
+    }
+    .social-link:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+    .social-link svg { width: 16px; height: 16px; fill: currentColor; }
+    @media (max-width: 768px) {
+      footer { padding: 28px 20px; }
+      .footer-copy { flex-direction: column; align-items: flex-start; }
     }
   </style>
   <script type="application/ld+json">
@@ -534,6 +556,37 @@
       <div id="searchStatus" class="search-status"></div>
 
       <div class="grid" id="postGrid">
+<article class="card" data-category="tutorial" data-post-url="/blog/cold-brew-en-casa-guia-completa.html" data-search="cold brew en casa guia completa cafe frio infusion fria ratio molienda tiempo temperatura receta metodo">
+          <a class="card-link" href="/blog/cold-brew-en-casa-guia-completa.html">
+            <div class="card-thumb">
+              <img src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=900&q=80&auto=format&fit=crop" alt="Vaso de cold brew con hielo y café de especialidad" loading="lazy" width="900" height="248" />
+              <span class="card-tag">Tutorial</span>
+            </div>
+            <div class="card-body">
+              <p class="card-date">10 abril 2026</p>
+              <h2 class="card-title">Cold Brew en Casa: Guía Completa para Hacerlo Perfecto</h2>
+              <p class="card-excerpt">Ratio de café, molienda gruesa, 18 horas en la nevera. Todo lo que necesitas para hacer un cold brew perfecto sin equipamiento especial.</p>
+              <span class="read-link">Leer artículo <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+            </div>
+          </a>
+        </article>
+
+        <article class="card" data-category="guia" data-post-url="/blog/arabica-vs-robusta.html" data-search="arabica vs robusta diferencia cafe arabica robusta cafeina sabor precio cultivo espresso blend especialidad">
+          <a class="card-link" href="/blog/arabica-vs-robusta.html">
+            <div class="card-thumb">
+              <img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=900&q=80&auto=format&fit=crop" alt="Granos de café arábica de especialidad en mano" loading="lazy" width="900" height="248" />
+              <span class="card-tag">Guía</span>
+            </div>
+            <div class="card-body">
+              <p class="card-date">10 abril 2026</p>
+              <h2 class="card-title">Arábica vs Robusta: La Diferencia que Cambia tu Café</h2>
+              <p class="card-excerpt">Sabor, cafeína, precio y cuándo usar cada variedad. Todo lo que necesitas saber para entender qué hay realmente en tu taza.</p>
+              <span class="read-link">Leer artículo <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+            </div>
+          </a>
+        </article>
+
+      
 
         <article class="card" data-category="analisis" data-post-url="/blog/cafe-de-especialidad-vs-cafe-normal.html" data-search="cafe de especialidad vs cafe normal diferencia que es especialidad sca puntuacion 80 puntos origen single origin trazabilidad tueste frescura precio productor sabor comparacion">
           <a class="card-link" href="/blog/cafe-de-especialidad-vs-cafe-normal.html">
@@ -626,55 +679,51 @@
         </article>
 
 
-        <article class="card" data-category="tutorial" data-post-url="/blog/cold-brew-en-casa-guia-completa.html" data-search="cold brew en casa guia completa cafe frio infusion fria ratio molienda tiempo temperatura receta metodo">
-          <a class="card-link" href="/blog/cold-brew-en-casa-guia-completa.html">
-            <div class="card-thumb">
-              <img src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=900&q=80&auto=format&fit=crop" alt="Vaso de cold brew con hielo y café de especialidad" loading="lazy" width="900" height="248" />
-              <span class="card-tag">Tutorial</span>
-            </div>
-            <div class="card-body">
-              <p class="card-date">10 abril 2026</p>
-              <h2 class="card-title">Cold Brew en Casa: Guía Completa para Hacerlo Perfecto</h2>
-              <p class="card-excerpt">Ratio de café, molienda gruesa, 18 horas en la nevera. Todo lo que necesitas para hacer un cold brew perfecto sin equipamiento especial.</p>
-              <span class="read-link">Leer artículo <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
-            </div>
-          </a>
-        </article>
-
-        <article class="card" data-category="guia" data-post-url="/blog/arabica-vs-robusta.html" data-search="arabica vs robusta diferencia cafe arabica robusta cafeina sabor precio cultivo espresso blend especialidad">
-          <a class="card-link" href="/blog/arabica-vs-robusta.html">
-            <div class="card-thumb">
-              <img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=900&q=80&auto=format&fit=crop" alt="Granos de café arábica de especialidad en mano" loading="lazy" width="900" height="248" />
-              <span class="card-tag">Guía</span>
-            </div>
-            <div class="card-body">
-              <p class="card-date">10 abril 2026</p>
-              <h2 class="card-title">Arábica vs Robusta: La Diferencia que Cambia tu Café</h2>
-              <p class="card-excerpt">Sabor, cafeína, precio y cuándo usar cada variedad. Todo lo que necesitas saber para entender qué hay realmente en tu taza.</p>
-              <span class="read-link">Leer artículo <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
-            </div>
-          </a>
-        </article>
-
+        
       </div><!-- /postGrid -->
       <div id="blogPager"></div>
     </div>
   </section>
 
+
+
+  <!-- FOOTER -->
   <footer>
-    <a class="footer-wordmark" href="/">ETIOVE</a>
-    <div class="social-row">
-      <a class="social-link" href="https://instagram.com/etiove_cafe" target="_blank" aria-label="Instagram @etiove_cafe">
-        <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-      </a>
-      <a class="social-link" href="https://x.com/etiove_cafe" target="_blank" aria-label="X @etiove_cafe">
-        <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-      </a>
-      <a class="social-link" href="https://tiktok.com/@etiove" target="_blank" aria-label="TikTok @etiove">
-        <svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.16 8.16 0 004.77 1.52V6.75a4.85 4.85 0 01-1-.06z"/></svg>
-      </a>
-    </div>
-    <p class="footer-copy">&copy; 2026 Etiove. Hecho con ☕ en Espa&ntilde;a.</p>
+    <nav class="footer-nav" aria-label="Navegación del sitio">
+      <div class="footer-nav-group">
+        <span class="footer-nav-label">Explorar</span>
+        <a class="footer-nav-link" href="/">Inicio</a>
+        <a class="footer-nav-link" href="/blog/">Blog</a>
+        <a class="footer-nav-link" href="/comunidad.html">Comunidad</a>
+        <a class="footer-nav-link" href="/#quizweb">Quiz de sabor</a>
+        <a class="footer-nav-link" href="/about.html">Sobre Etiove</a>
+      </div>
+    </nav>
+
+    <p class="footer-copy">
+      <span>© 2026 Etiove. Hecho con ☕ en España.</span>
+
+      <span class="footer-copy-center">
+        <span class="footer-wordmark-sm">Etiove</span>
+        <span class="social-row-inline">
+          <a class="social-link" href="https://instagram.com/etiove_cafe" target="_blank" aria-label="Instagram @etiove_cafe">
+            <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+          </a>
+          <a class="social-link" href="https://x.com/etiove_cafe" target="_blank" aria-label="X @etiove_cafe">
+            <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+          <a class="social-link" href="https://tiktok.com/@etiove" target="_blank" aria-label="TikTok @etiove">
+            <svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.16 8.16 0 004.77 1.52V6.75a4.85 4.85 0 01-1-.06z"/></svg>
+          </a>
+        </span>
+      </span>
+
+      <span style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;">
+        <a class="footer-legal-link" href="/privacidad.html">Privacidad</a>
+        <a class="footer-legal-link" href="/cookies.html">Cookies</a>
+        <a class="footer-legal-link" href="/terminos.html">Términos</a>
+      </span>
+    </p>
   </footer>
 
   <button class="scroll-top" id="scrollTopBtn" aria-label="Volver arriba">
@@ -691,11 +740,12 @@
     const searchStatus = document.getElementById('searchStatus');
     const blogPager = document.getElementById('blogPager');
     let allCards = Array.from(document.querySelectorAll('.card'));
+    const originalOrder = allCards.map((card, index) => ({ card, index }));
     let activeFilter = 'todos';
     let searchQuery = '';
     let searchIndexReady = false;
     let currentPage = 1;
-    const PAGE_SIZE = 6;
+    const PAGE_SIZE = 8;
 
     const escapeHtml = (value) => String(value || '')
       .replace(/&/g, '&amp;')
@@ -993,7 +1043,8 @@
     window.addEventListener('scroll', () => st.classList.toggle('visible', window.scrollY > 320));
     st.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
     ensureCardBaseContent();
-    if (typeof cards !== 'undefined') setSearchMeta(`${cards.length} posts`);
+    const cards = Array.from(document.querySelectorAll('#postGrid .card'));
+    setSearchMeta(`${cards.length} posts`);
     applyFilters();
   </script>
         <!-- Eliminado style duplicado de nav-link -->

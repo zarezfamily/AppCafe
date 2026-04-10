@@ -132,7 +132,7 @@
     /* ── HERO ── */
     .hero {
       position: relative;
-      min-height: 100vh;
+      min-height: 88vh;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -141,6 +141,19 @@
       text-align: center;
       z-index: 1;
       overflow: hidden;
+      background: #1c120d;
+    }
+
+    /* Imagen de fondo emocional */
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url('https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=1800&q=80&auto=format&fit=crop');
+      background-size: cover;
+      background-position: center 55%;
+      z-index: 0;
+      opacity: 0.38;
     }
 
     /* Auras decorativas */
@@ -148,6 +161,7 @@
       position: absolute;
       border-radius: 50%;
       pointer-events: none;
+      z-index: 1;
     }
     .aura-1 {
       width: 600px; height: 600px;
@@ -175,6 +189,8 @@
 
     /* Sello decorativo */
     .hero-seal {
+      position: relative;
+      z-index: 2;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -211,21 +227,25 @@
     }
 
     .hero-eyebrow {
+      position: relative;
+      z-index: 2;
       font-size: 11px;
       font-weight: 500;
       letter-spacing: 3px;
       text-transform: uppercase;
-      color: var(--ink-muted);
+      color: #c99557;
       margin-bottom: 20px;
       animation: fadeUp 1s 0.1s ease both;
     }
 
     .hero-title {
+      position: relative;
+      z-index: 2;
       font-family: 'Playfair Display', serif;
       font-size: clamp(72px, 12vw, 140px);
       font-weight: 300;
       letter-spacing: 12px;
-      color: var(--ink);
+      color: #fdf8f1;
       line-height: 1;
       text-transform: uppercase;
       margin-bottom: 8px;
@@ -237,8 +257,10 @@
       font-size: clamp(14px, 2vw, 18px);
       font-weight: 500;
       font-style: normal;
+      position: relative;
+      z-index: 2;
       text-transform: uppercase;
-      color: var(--ink-soft);
+      color: rgba(246,239,231,0.80);
       letter-spacing: 4px;
       margin-bottom: 48px;
       animation: fadeUp 1s 0.3s ease both;
@@ -246,6 +268,8 @@
 
     /* Línea divisora con sello */
     .divider-line {
+      position: relative;
+      z-index: 2;
       display: flex;
       align-items: center;
       gap: 16px;
@@ -268,6 +292,8 @@
 
     /* ── BOTONES DE DESCARGA ── */
     .download-group {
+      position: relative;
+      z-index: 2;
       display: flex;
       gap: 16px;
       flex-wrap: wrap;
@@ -287,27 +313,28 @@
     }
 
     .btn-download.dark {
-      background: var(--ink);
-      border-color: var(--ink);
-      color: #fff9f1;
+      background: rgba(255,249,241,0.10);
+      border-color: rgba(246,239,231,0.45);
+      color: #fdf8f1;
     }
     .btn-download.dark:hover {
-      background: var(--accent-deep);
-      border-color: var(--accent-deep);
+      background: rgba(201,149,87,0.18);
+      border-color: #c99557;
       transform: translateY(-2px);
-      box-shadow: 0 12px 32px rgba(28, 18, 13, 0.2);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.3);
     }
 
     .btn-download.light {
-      background: transparent;
-      border-color: var(--border);
-      color: var(--ink);
+      background: rgba(255,255,255,0.10);
+      border-color: rgba(246, 239, 231, 0.5);
+      color: #fdf8f1;
     }
     .btn-download.light:hover {
-      border-color: var(--accent);
-      color: var(--accent);
+      background: rgba(255,255,255,0.18);
+      border-color: #c99557;
+      color: #efd5ad;
       transform: translateY(-2px);
-      box-shadow: 0 12px 32px rgba(143, 94, 59, 0.1);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.3);
     }
 
     .btn-icon {
@@ -341,9 +368,15 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 80px;
-      max-width: 1100px;
+      max-width: 1600px;
       margin: 0 auto;
       align-items: center;
+    }
+
+    .section-about-wrap {
+      background: #fffaf5;
+      border-top: 1px solid #e4d3c2;
+      border-bottom: 1px solid #e4d3c2;
     }
 
     .about-label {
@@ -351,9 +384,18 @@
       font-weight: 500;
       letter-spacing: 3px;
       text-transform: uppercase;
-      color: var(--accent);
+      color: #c99557;
       margin-bottom: 24px;
     }
+
+    .section-about-wrap .about-title { color: var(--ink); }
+    .section-about-wrap .about-title em { color: var(--accent); }
+    .section-about-wrap .about-text { color: var(--ink-soft); }
+    .section-about-wrap .feature-num { color: var(--border); }
+    .section-about-wrap .feature-copy h3 { color: var(--ink); }
+    .section-about-wrap .feature-copy p { color: var(--ink-muted); }
+    .section-about-wrap .feature-row { border-bottom-color: var(--border-soft); }
+    .section-about-wrap .feature-row:first-child { border-top-color: var(--border-soft); }
 
     .about-title {
       font-family: 'Playfair Display', serif;
@@ -415,14 +457,15 @@
       color: var(--ink-muted);
       font-weight: 300;
       line-height: 1.7;
+      text-align: justify;
     }
 
     /* ── SECTION: APP ── */
     .section-app {
       position: relative;
       z-index: 1;
-      background: var(--ink);
-      padding: 100px 40px;
+      background: #1c120d;
+      padding: 80px 40px 60px;
       text-align: center;
       overflow: hidden;
     }
@@ -442,7 +485,7 @@
       font-weight: 500;
       letter-spacing: 3px;
       text-transform: uppercase;
-      color: rgba(154, 121, 99, 0.8);
+      color: rgba(201,149,87,0.8);
       margin-bottom: 24px;
     }
 
@@ -450,14 +493,14 @@
       font-family: 'Playfair Display', serif;
       font-size: clamp(24px, 3vw, 40px);
       font-weight: 300;
-      color: #fff9f1;
+      color: #fdf8f1;
       margin-bottom: 16px;
       letter-spacing: 2px;
     }
 
     .app-sub {
       font-size: 14px;
-      color: rgba(255, 249, 241, 0.5);
+      color: rgba(246,239,231,0.50);
       font-weight: 300;
       margin-bottom: 48px;
       letter-spacing: 0.5px;
@@ -475,24 +518,25 @@
       align-items: center;
       gap: 12px;
       padding: 14px 28px;
-      border: 1px solid rgba(228, 211, 194, 0.2);
+      border: 1.5px solid rgba(246, 239, 231, 0.45);
       border-radius: 4px;
       text-decoration: none;
-      color: #fff9f1;
+      color: #fdf8f1;
       transition: all 0.3s;
-      background: rgba(255, 249, 241, 0.05);
+      background: rgba(255,249,241,0.07);
     }
     .btn-app:hover {
-      background: rgba(143, 94, 59, 0.2);
-      border-color: rgba(143, 94, 59, 0.5);
+      background: rgba(201,149,87,0.15);
+      border-color: #c99557;
       transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.25);
     }
     .btn-app-icon { width: 20px; height: 20px; }
     .btn-app-sub {
       font-size: 9px;
       letter-spacing: 1.5px;
       text-transform: uppercase;
-      opacity: 0.5;
+      opacity: 0.7;
       display: block;
       text-align: left;
     }
@@ -507,12 +551,13 @@
     footer {
       position: relative;
       z-index: 1;
-      padding: 60px 40px 48px;
+      padding: 32px 40px 32px;
       border-top: 1px solid var(--border-soft);
       display: grid;
       grid-template-columns: 1fr;
       gap: 0;
       align-items: start;
+      background: #f6efe7;
     }
 
     .footer-nav {
@@ -593,27 +638,27 @@
 
     .footer-wordmark-sm {
       font-family: 'Playfair Display', serif;
-      font-size: 14px;
+      font-size: 20px;
       font-weight: 400;
-      letter-spacing: 4px;
+      letter-spacing: 6px;
       text-transform: uppercase;
-      color: var(--ink-muted);
+      color: var(--ink-soft);
     }
 
     .social-row-inline {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
 
     .social-row-inline .social-link {
-      width: 28px;
-      height: 28px;
+      width: 38px;
+      height: 38px;
     }
 
     .social-row-inline .social-link svg {
-      width: 13px;
-      height: 13px;
+      width: 17px;
+      height: 17px;
     }
 
     /* Cookie banner */
@@ -791,7 +836,8 @@
     .section-quiz {
       position: relative;
       z-index: 1;
-      background: var(--ink);
+      background: #f6efe7;
+      border-top: 1px solid #e4d3c2;
       overflow: hidden;
     }
     .section-quiz::before {
@@ -827,11 +873,94 @@
       }
       nav { background: rgba(26,17,10,0.92); }
       .btn-download.dark { background: #f0e8de; color: #1a110a; }
-      .btn-download.light { background: transparent; color: #f0e8de; border-color: rgba(240,232,222,0.4); }
+      .btn-download.light { background: rgba(255,255,255,0.08); color: #f0e8de; border-color: rgba(240,232,222,0.45); }
       footer { border-top-color: var(--border); }
     }
 
-    </style>
+    
+  
+    /* ── TESTIMONIOS ── */
+    .section-testimonials {
+      position: relative;
+      z-index: 1;
+      background: #fffaf5;
+      border-top: 1px solid #e4d3c2;
+      padding: 80px 40px;
+      overflow: hidden;
+    }
+
+    .testimonials-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent);
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .testimonial-card {
+      background: #f6efe7;
+      border: 1px solid #e4d3c2;
+      border-radius: 12px;
+      padding: 28px 24px;
+      position: relative;
+    }
+    .testimonial-quote {
+      font-family: 'Playfair Display', serif;
+      font-size: 32px;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 12px;
+      opacity: 0.4;
+    }
+    .testimonial-text {
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--ink-soft);
+      font-style: italic;
+      margin-bottom: 20px;
+    }
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .testimonial-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(143,94,59,0.10);
+      border: 1px solid rgba(143,94,59,0.20);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+    }
+    .testimonial-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink);
+      letter-spacing: 0.5px;
+    }
+    .testimonial-role {
+      font-size: 10px;
+      color: var(--ink-muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    @media (max-width: 768px) {
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .section-testimonials { padding: 60px 24px; }
+    }
+
+  </style>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -992,12 +1121,8 @@
     </div>
   </section>
 
-  <!-- QUIZ DE SABOR WEB -->
-  <section id="quizweb" class="section-quiz">
-    <div id="webQuizRoot"></div>
-  </section>
-
   <!-- SOBRE NOSOTROS -->
+  <div class="section-about-wrap">
   <section class="section-about" id="sobre">
     <div class="about-content reveal">
       <p class="about-label">Quiénes somos</p>
@@ -1046,6 +1171,74 @@
       </div>
     </div>
   </section>
+  </div>
+
+  <div style="height:2px;background:linear-gradient(90deg,transparent,#c99557 30%,#c99557 70%,transparent);opacity:0.5;position:relative;z-index:2;"></div>
+  <!-- QUIZ DE SABOR WEB -->
+  <section id="quizweb" class="section-quiz">
+    <style>
+      /* Override quiz.js full-height — keep it compact */
+      #webQuizRoot {
+        min-height: unset !important;
+        padding: 72px 40px 80px !important;
+        background: transparent !important;
+        color: #1c120d !important;
+      }
+      #webQuizRoot::before { display: none !important; }
+
+      /* Todos los textos del quiz en oscuro */
+      #webQuizRoot, #webQuizRoot * { color: #1c120d !important; }
+
+      /* Excepciones: botón primario mantiene texto claro */
+      #webQuizRoot .eq-btn-primary,
+      #webQuizRoot .eq-btn-primary * { color: #fdf8f1 !important; }
+
+      /* Títulos y subtítulos */
+      #webQuizRoot .eq-title    { color: #1c120d !important; }
+      #webQuizRoot .eq-title em { color: #8f5e3b !important; }
+      #webQuizRoot .eq-sub      { color: #5d4030 !important; }
+      #webQuizRoot .eq-label    { color: #9a7963 !important; }
+
+      /* Pregunta y paso */
+      #webQuizRoot .eq-question   { color: #1c120d !important; }
+      #webQuizRoot .eq-step-label { color: #9a7963 !important; }
+
+      /* Opciones */
+      #webQuizRoot .eq-option {
+        background: #fffaf5 !important;
+        border-color: #e4d3c2 !important;
+      }
+      #webQuizRoot .eq-option:hover,
+      #webQuizRoot .eq-option.selected {
+        background: #fdf0e0 !important;
+        border-color: #8f5e3b !important;
+      }
+      #webQuizRoot .eq-option-num   { color: #e4d3c2 !important; }
+      #webQuizRoot .eq-option-label { color: #1c120d !important; }
+      #webQuizRoot .eq-option-desc  { color: #9a7963 !important; }
+
+      /* Cards (si las usa) */
+      #webQuizRoot .eq-card { background: #fffaf5 !important; border-color: #e4d3c2 !important; }
+      #webQuizRoot .eq-card:hover,
+      #webQuizRoot .eq-card.selected { border-color: #8f5e3b !important; background: #fdf0e0 !important; }
+      #webQuizRoot .eq-card-label { color: #1c120d !important; }
+      #webQuizRoot .eq-card-sub   { color: #9a7963 !important; }
+
+      /* Progress dots */
+      #webQuizRoot .eq-step-dot        { background: #e4d3c2 !important; }
+      #webQuizRoot .eq-step-dot.active { background: #8f5e3b !important; }
+
+      /* Ghost button */
+      #webQuizRoot .eq-btn-ghost,
+      #webQuizRoot .eq-btn-ghost * { color: #9a7963 !important; }
+
+      /* Resultado final */
+      #webQuizRoot .eq-result-title { color: #1c120d !important; }
+      #webQuizRoot .eq-result-sub   { color: #5d4030 !important; }
+    </style>
+    <div id="webQuizRoot"></div>
+  </section>
+
 
   <!-- CTA APP -->
   <section class="section-app" id="app">
@@ -1073,6 +1266,46 @@
       </a>
     </div>
   </section>
+  <!-- TESTIMONIOS -->
+  <section class="section-testimonials">
+    <p class="testimonials-label">Lo que dice la comunidad</p>
+    <div class="testimonials-grid">
+      <div class="testimonial-card">
+        <div class="testimonial-quote">"</div>
+        <p class="testimonial-text">El quiz me descubrió los cafés de Etiopía con proceso natural. Nunca había probado algo con esas notas afrutadas. Completamente transformador.</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">☕</div>
+          <div>
+            <p class="testimonial-name">@caficultora</p>
+            <p class="testimonial-role">Miembro · Madrid</p>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-quote">"</div>
+        <p class="testimonial-text">La comunidad resolvió en 20 minutos por qué mi espresso salía amargo. Llevaba meses ajustando la molienda a ciegas.</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">🫘</div>
+          <div>
+            <p class="testimonial-name">@v60_diaries</p>
+            <p class="testimonial-role">Miembro · Barcelona</p>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-quote">"</div>
+        <p class="testimonial-text">Llevo un año registrando mis catas aquí. Ver la evolución de mi paladar desde los primeros apuntes hasta ahora no tiene precio.</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">📓</div>
+          <div>
+            <p class="testimonial-name">@granos_de_altura</p>
+            <p class="testimonial-role">Miembro · Sevilla</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
 
   <!-- FOOTER -->
   <footer>
@@ -1125,11 +1358,6 @@
     </div>
   </div>
 
-  <!-- MOBILE BOTTOM NAV -->
-  <nav class="mobile-nav" aria-label="Navegación móvil">
-    <a class="mobile-nav-link primary" href="/comunidad.html">Comunidad</a>
-    <a class="mobile-nav-link" href="/blog.html">Blog</a>
-  </nav>
 
   <!-- SCROLL TO TOP -->
   <button class="scroll-top" id="scrollTopBtn" aria-label="Volver arriba">

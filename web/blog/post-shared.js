@@ -17,6 +17,55 @@
   const postUrl  = window.location.href.split('?')[0].split('#')[0];
   const postTitle = document.title.replace(' | Blog Etiove', '').trim();
 
+  // ─── TIEMPO DE LECTURA DINÁMICO ─────────────────────────────────────────────
+  const updateReadingTime = () => {
+    // Contar palabras del cuerpo del artículo
+    const articleEl = document.querySelector('.post-body, article, .article-body, main');
+    if (!articleEl) return;
+
+    const text = articleEl.innerText || articleEl.textContent || '';
+    const words = text.trim().split(/\s+/).filter(Boolean).length;
+    const mins  = Math.max(1, Math.round(words / 200)); // 200 palabras/min
+
+    // Actualizar el hero-tag (reemplaza solo el fragmento "X min de lectura")
+    const heroTag = document.querySelector('.hero-tag');
+    if (heroTag) {
+      heroTag.textContent = heroTag.textContent.replace(
+        /\d+\s*min\s+de\s+lectura/i,
+        `${mins} min de lectura`
+      );
+    }
+
+    // Actualizar el schema JSON-LD si existe (timeRequired y wordCount)
+    document.querySelectorAll('script[type="application/ld+json"]').forEach((tag) => {
+      try {
+        const schema = JSON.parse(tag.textContent);
+        if (schema['@type'] === 'Article' || schema['@type'] === 'BlogPosting') {
+          schema.timeRequired = `PT${mins}M`;
+          schema.wordCount    = words;
+          tag.textContent     = JSON.stringify(schema);
+        }
+        // Handle @graph
+        if (schema['@graph']) {
+          schema['@graph'].forEach((node) => {
+            if (node['@type'] === 'Article' || node['@type'] === 'BlogPosting') {
+              node.timeRequired = `PT${mins}M`;
+              node.wordCount    = words;
+            }
+          });
+          tag.textContent = JSON.stringify(schema);
+        }
+      } catch (_) {}
+    });
+  };
+
+  // Run after DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', updateReadingTime);
+  } else {
+    updateReadingTime();
+  }
+
   // ─── AUTH (read-only from localStorage) ───────────────────────────────────
   const getAuth = () => ({
     uid:   localStorage.getItem('etiove_web_uid')   || '',

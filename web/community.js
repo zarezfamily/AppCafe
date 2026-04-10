@@ -1607,6 +1607,7 @@ const renderThreads = () => {
   // Auto-resize reply + inline-edit textareas
   el.threadsWrap.querySelectorAll('.reply-textarea, [data-reply-edit-body]').forEach((ta) => {
     if (typeof wireAutoResize === 'function') wireAutoResize(ta);
+    initMentionAutocomplete(ta);
   });
 
   // Ctrl+Enter / Cmd+Enter to submit reply
@@ -2641,27 +2642,53 @@ const checkNotifications = async () => {
   if (!auth.uid || !auth.token) return;
 
   try {
-    const [allReplies] = await Promise.all([
+    const [allReplies, allMessages] = await Promise.all([
       getCollection('foro_respuestas', 400),
+      getCollection('direct_messages', 200),
     ]);
 
-    // Respuestas nuevas en mis hilos (desde la última visita)
     const lastCheck = Number(localStorage.getItem('etiove_notif_last_check') || 0);
-    const myThreadIds = new Set(threads.filter((t) => t.authorUid === auth.uid).map((t) => t.id));
-    const unread = allReplies.filter((r) => {
-      if (r.authorUid === auth.uid) return false; // mis propias respuestas no cuentan
-      if (!myThreadIds.has(r.threadId)) return false;
-      return new Date(r.createdAt).getTime() > lastCheck;
-    }).length;
+    const myAlias   = String(localStorage.getItem('etiove_web_alias') || '').toLowerCase().replace(/^@/, '');
 
-    // Actualizar badge en nav
+    // 1. Respuestas nuevas en mis hilos
+    const myThreadIds = new Set(threads.filter((t) => t.authorUid === auth.uid).map((t) => t.id));
+    const newRepliesInMyThreads = allReplies.filter((r) =>
+      r.authorUid !== auth.uid &&
+      myThreadIds.has(r.threadId) &&
+      new Date(r.createdAt).getTime() > lastCheck
+    ).length;
+
+    // 2. Menciones @alias en respuestas y títulos
+    const mentionPattern = myAlias ? new RegExp(`@${myAlias}\b`, 'i') : null;
+    const newMentions = mentionPattern ? allReplies.filter((r) =>
+      r.authorUid !== auth.uid &&
+      new Date(r.createdAt).getTime() > lastCheck &&
+      (mentionPattern.test(r.body || '') || mentionPattern.test(r.title || ''))
+    ).length : 0;
+
+    // 3. Mensajes directos no leídos
+    const newDMs = allMessages.filter((m) =>
+      m.recipientUid === auth.uid &&
+      !m.read &&
+      new Date(m.createdAt).getTime() > lastCheck
+    ).length;
+
+    const total = newRepliesInMyThreads + newMentions + newDMs;
+
+    // Mostrar badge con desglose en tooltip
     const badge = document.getElementById('communityNavBadge');
     if (badge) {
-      if (unread > 0) {
-        badge.textContent = unread > 9 ? '9+' : String(unread);
+      if (total > 0) {
+        badge.textContent = total > 9 ? '9+' : String(total);
         badge.style.display = 'inline-flex';
+        const parts = [];
+        if (newRepliesInMyThreads) parts.push(`${newRepliesInMyThreads} respuesta${newRepliesInMyThreads > 1 ? 's' : ''} en tus hilos`);
+        if (newMentions) parts.push(`${newMentions} mención${newMentions > 1 ? 'es' : ''}`);
+        if (newDMs) parts.push(`${newDMs} mensaje${newDMs > 1 ? 's' : ''} directo${newDMs > 1 ? 's' : ''}`);
+        badge.title = parts.join(' · ');
       } else {
         badge.style.display = 'none';
+        badge.title = '';
       }
     }
   } catch (_) { /* silencioso */ }
@@ -2841,6 +2868,116 @@ const reportItem = async (collection, itemId, itemType) => {
   });
 };
 
+
+// ─── MENCIONES @USUARIO (autocomplete) ────────────────────────────────────────
+const initMentionAutocomplete = (textarea) => {
+  if (!textarea || textarea.dataset.mentionBound) return;
+  textarea.dataset.mentionBound = '1';
+
+  let dropdown = null;
+  let mentionStart = -1;
+
+  const closeDropdown = () => {
+    if (dropdown) { dropdown.remove(); dropdown = null; }
+    mentionStart = -1;
+  };
+
+  const buildDropdown = (matches, pos) => {
+    closeDropdown();
+    if (!matches.length) return;
+
+    dropdown = document.createElement('div');
+    dropdown.style.cssText = [
+      'position:fixed', 'z-index:9999',
+      'background:#fffaf5', 'border:1px solid #e4d3c2',
+      'border-radius:8px', 'box-shadow:0 8px 24px rgba(28,18,13,0.12)',
+      'max-height:200px', 'overflow-y:auto',
+      'min-width:200px', 'font-family:-apple-system,sans-serif',
+    ].join(';');
+
+    // Position below the textarea cursor
+    const rect = textarea.getBoundingClientRect();
+    dropdown.style.top  = (rect.bottom + 4) + 'px';
+    dropdown.style.left = (rect.left) + 'px';
+
+    matches.slice(0, 6).forEach((user) => {
+      const item = document.createElement('div');
+      item.style.cssText = 'padding:10px 14px;cursor:pointer;font-size:13px;color:#1c120d;display:flex;align-items:center;gap:8px;';
+      item.innerHTML = `<span style="color:#9a7963;font-size:11px;">@</span><strong>${escapeHtml(user.alias || user.name)}</strong><span style="color:#9a7963;font-size:11px;margin-left:4px;">${escapeHtml(user.name)}</span>`;
+      item.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        const val = textarea.value;
+        const before = val.slice(0, mentionStart);
+        const after  = val.slice(textarea.selectionStart);
+        const insert = `@${user.alias || user.name} `;
+        textarea.value = before + insert + after;
+        textarea.selectionStart = textarea.selectionEnd = before.length + insert.length;
+        textarea.dispatchEvent(new Event('input'));
+        closeDropdown();
+      });
+      item.addEventListener('mouseover', () => { item.style.background = '#f6efe7'; });
+      item.addEventListener('mouseout',  () => { item.style.background = ''; });
+      dropdown.appendChild(item);
+    });
+
+    document.body.appendChild(dropdown);
+  };
+
+  textarea.addEventListener('input', () => {
+    const val = textarea.value;
+    const cur = textarea.selectionStart;
+    // Find the @ before the cursor
+    let i = cur - 1;
+    while (i >= 0 && val[i] !== ' ' && val[i] !== '\n' && val[i] !== '@') i--;
+    if (i < 0 || val[i] !== '@') { closeDropdown(); return; }
+    mentionStart = i;
+    const query = val.slice(i + 1, cur).toLowerCase();
+    if (!query) { closeDropdown(); return; }
+
+    // Search in loaded profiles
+    const matches = profiles
+      .map((p) => ({
+        uid:   p.uid || '',
+        name:  String(p.displayName || p.alias || '').trim(),
+        alias: String(p.alias || '').replace(/^@/, '').trim(),
+      }))
+      .filter((u) => u.name && (
+        u.name.toLowerCase().includes(query) ||
+        u.alias.toLowerCase().includes(query)
+      ));
+
+    buildDropdown(matches);
+  });
+
+  textarea.addEventListener('keydown', (e) => {
+    if (!dropdown) return;
+    const items = dropdown.querySelectorAll('div');
+    const active = dropdown.querySelector('.mention-active');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      const next = active ? active.nextElementSibling : items[0];
+      if (active) active.classList.remove('mention-active'), active.style.background = '';
+      if (next) next.classList.add('mention-active'), next.style.background = '#f6efe7';
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      const prev = active ? active.previousElementSibling : items[items.length - 1];
+      if (active) active.classList.remove('mention-active'), active.style.background = '';
+      if (prev) prev.classList.add('mention-active'), prev.style.background = '#f6efe7';
+    } else if (e.key === 'Enter' || e.key === 'Tab') {
+      if (active) {
+        e.preventDefault();
+        active.dispatchEvent(new MouseEvent('mousedown'));
+      } else {
+        closeDropdown();
+      }
+    } else if (e.key === 'Escape') {
+      closeDropdown();
+    }
+  });
+
+  textarea.addEventListener('blur', () => setTimeout(closeDropdown, 150));
+};
+
 const init = async () => {
   initializeMetaDefaults();
   renderCategories();
@@ -2897,6 +3034,7 @@ const init = async () => {
     ta.dataset.autoResize = '1';
   };
   wireAutoResize(el.threadBody);
+  initMentionAutocomplete(el.threadBody);
 
   // Ctrl+Enter to publish thread
   if (el.threadBody) {

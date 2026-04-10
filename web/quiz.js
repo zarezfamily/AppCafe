@@ -155,24 +155,26 @@ const STYLES = `
     display: inline-flex;
     align-items: center;
     gap: 14px;
-    background: #e8d5be;
-    color: #1a0f08;
-    border: none;
+    background: #21150f;
+    color: #fdf8f1;
+    border: 1px solid rgba(255,255,255,0.12);
     padding: 20px 48px;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 2.5px;
     text-transform: uppercase;
     cursor: pointer;
-    border-radius: 2px;
-    transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+    border-radius: 4px;
+    transition: background 0.25s, transform 0.2s, box-shadow 0.25s, border-color 0.25s;
     font-family: inherit;
     text-decoration: none;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.35);
   }
   .eq-btn-primary:hover {
-    background: #f5e6cf;
+    background: #2d1a0e;
+    border-color: rgba(201,149,87,0.5);
     transform: translateY(-3px);
-    box-shadow: 0 20px 48px rgba(0,0,0,0.45);
+    box-shadow: 0 20px 48px rgba(0,0,0,0.55);
   }
   .eq-btn-primary svg { transition: transform 0.3s; flex-shrink: 0; }
   .eq-btn-primary:hover svg { transform: translateX(5px); }

@@ -14,7 +14,7 @@ import {
   View,
 } from 'react-native';
 
-import { updateDocument } from '../../firebaseConfig';
+import { updateDocument } from '../../firestoreService';
 import AppDialogModal from '../components/AppDialogModal';
 import PackshotImage from '../components/PackshotImage';
 import Stars from '../components/Stars';

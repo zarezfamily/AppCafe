@@ -1,16 +1,29 @@
-// Sincronización en tiempo real del perfil de usuario entre Web y App
-import { doc, onSnapshot } from 'firebase/firestore';
 import { useEffect } from 'react';
-import { db } from '../../firebaseConfig';
+import { getDocument } from '../../firestoreService';
 
 export function useProfileRealtimeSync(user, setPerfil) {
   useEffect(() => {
     if (!user?.uid) return;
-    const unsub = onSnapshot(doc(db, 'user_profiles', user.uid), (docSnap) => {
-      if (docSnap.exists()) {
-        setPerfil(docSnap.data());
+
+    let active = true;
+
+    const syncProfile = async () => {
+      try {
+        const profile = await getDocument('user_profiles', user.uid);
+        if (active && profile) {
+          setPerfil(profile);
+        }
+      } catch {
+        // noop
       }
-    });
-    return unsub;
+    };
+
+    syncProfile();
+    const intervalId = setInterval(syncProfile, 15000);
+
+    return () => {
+      active = false;
+      clearInterval(intervalId);
+    };
   }, [user?.uid]);
 }

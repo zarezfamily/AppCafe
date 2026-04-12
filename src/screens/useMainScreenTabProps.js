@@ -1,8 +1,88 @@
-export function buildCommunityTabProps({
+import {
+  buildBottomBarProps,
+  buildCommunityTabProps,
+  buildInicioTabProps,
+  buildMasTabProps,
+  buildMisCafesTabProps,
+  buildOfertasTabProps,
+  buildTopCafesTabProps,
+  buildUltimosAnadidosTabProps,
+} from './mainScreenTabProps';
+
+export default function useMainScreenTabProps({
   s,
   theme,
   premiumAccent,
-  PremiumBadge,
+  premiumAccentDeep,
+  keyFavs,
+  keyPrefs,
+  keyVotes,
+  activeTab,
+  setActiveTab,
+  setScanning,
+  setShowProfile,
+  setCafeDetalle,
+  perfil,
+  profileInitial,
+  profileAlias,
+  profileName,
+  memberStatus,
+  unlockedCount,
+  achievementTotal,
+  pendingAchievements,
+  achievementProgress,
+  unlockedAchievements,
+  newsletterState,
+  guardarNewsletter,
+  newsletterLoading,
+  newsletterSaving,
+  newsletterHasEmail,
+  newsletterEmail,
+  onLogout,
+  appVersion,
+  iconFaint,
+  interactionFeedbackSettings,
+  guardarFeedbackInteracciones,
+  guardarModoFeedbackInteracciones,
+  premium,
+  gamification,
+  currentLevel,
+  nextLevel,
+  brandCardAnim,
+  brandCardTranslateY,
+  brandCardScale,
+  brandProgressWidth,
+  busqueda,
+  setBusqueda,
+  busquedaMis,
+  setBusquedaMis,
+  cargando,
+  cargandoCafInicio,
+  errorCafInicio,
+  cafeteriasInicio,
+  cargarCafeteriasInicio,
+  allCafes,
+  filtrar,
+  favs,
+  toggleFav,
+  ultimosGlobal,
+  topCafesVista,
+  flag,
+  cafesParaOfertas,
+  abrirOfertasCafe,
+  abrirOfertaWeb,
+  ofertasPorCafe,
+  buscandoOfertaId,
+  openOfferCafeId,
+  errorOfertas,
+  favCafes,
+  misCafes,
+  cafesFiltrados,
+  eliminarCafe,
+  notebook,
+  abrirNuevaCata,
+  ultimos100,
+  top100,
   forumCategories,
   forumCategory,
   setForumCategory,
@@ -52,14 +132,30 @@ export function buildCommunityTabProps({
   setForumEditBody,
   guardarEdicionForo,
   forumEditing,
-  interactionFeedbackEnabled,
-  interactionFeedbackMode,
-  gamification,
   getUserLevel,
   getAchievementDefs,
-  LEVELS,
+  levels,
+  SearchInput,
+  CardVertical,
+  CardHorizontal,
+  PackshotImage,
+  PremiumBadge,
+  DiarioCatasSection,
+  onGamifyEvent,
 }) {
-  return {
+  const quizSectionProps = {
+    allCafes,
+    onGamifyEvent,
+    theme,
+    premiumAccent,
+    premiumAccentDeep,
+    s,
+    keyFavs,
+    keyPrefs,
+    keyVotes,
+  };
+
+  const communityTabProps = buildCommunityTabProps({
     s,
     theme,
     premiumAccent,
@@ -113,60 +209,15 @@ export function buildCommunityTabProps({
     setForumEditBody,
     guardarEdicionForo,
     forumEditing,
-    interactionFeedbackEnabled,
-    interactionFeedbackMode,
+    interactionFeedbackEnabled: interactionFeedbackSettings.enabled,
+    interactionFeedbackMode: interactionFeedbackSettings.mode,
     gamification,
     getUserLevel,
     getAchievementDefs,
-    LEVELS,
-  };
-}
+    LEVELS: levels,
+  });
 
-export function buildInicioTabProps({
-  s,
-  perfil,
-  setShowProfile,
-  brandCardAnim,
-  brandCardTranslateY,
-  brandCardScale,
-  profileInitial,
-  profileAlias,
-  profileName,
-  currentLevel,
-  gamification,
-  nextLevel,
-  brandProgressWidth,
-  busqueda,
-  setBusqueda,
-  SearchInput,
-  allCafes,
-  filtrar,
-  CardVertical,
-  setCafeDetalle,
-  favs,
-  toggleFav,
-  ultimosGlobal,
-  setActiveTab,
-  cargando,
-  premiumAccent,
-  CardHorizontal,
-  topCafesVista,
-  flag,
-  cargandoCafInicio,
-  errorCafInicio,
-  cafeteriasInicio,
-  cargarCafeteriasInicio,
-  theme,
-  cafesParaOfertas,
-  abrirOfertasCafe,
-  PackshotImage,
-  abrirOfertaWeb,
-  ofertasPorCafe,
-  buscandoOfertaId,
-  openOfferCafeId,
-  errorOfertas,
-}) {
-  return {
+  const inicioTabProps = buildInicioTabProps({
     s,
     perfil,
     setShowProfile,
@@ -209,33 +260,9 @@ export function buildInicioTabProps({
     buscandoOfertaId,
     openOfferCafeId,
     errorOfertas,
-  };
-}
+  });
 
-export function buildMisCafesTabProps({
-  s,
-  cargando,
-  allCafes,
-  quizSectionProps,
-  favCafes,
-  CardHorizontal,
-  setCafeDetalle,
-  favs,
-  toggleFav,
-  busquedaMis,
-  setBusquedaMis,
-  misCafes,
-  SearchInput,
-  cafesFiltrados,
-  CardVertical,
-  eliminarCafe,
-  premiumAccent,
-  notebook,
-  irAbrirModal,
-  theme,
-  DiarioCatasSection,
-}) {
-  return {
+  const misCafesTabProps = buildMisCafesTabProps({
     s,
     cargando,
     allCafes,
@@ -253,27 +280,13 @@ export function buildMisCafesTabProps({
     CardVertical,
     eliminarCafe,
     premiumAccent,
-    notebook: {
-      ...notebook,
-      irAbrirModal,
-    },
+    notebook,
+    irAbrirModal: abrirNuevaCata,
     theme,
     DiarioCatasSection,
-  };
-}
+  });
 
-export function buildUltimosAnadidosTabProps({
-  s,
-  setActiveTab,
-  premiumAccent,
-  cargando,
-  ultimos100,
-  CardVertical,
-  setCafeDetalle,
-  favs,
-  toggleFav,
-}) {
-  return {
+  const ultimosAnadidosTabProps = buildUltimosAnadidosTabProps({
     s,
     setActiveTab,
     premiumAccent,
@@ -283,22 +296,9 @@ export function buildUltimosAnadidosTabProps({
     setCafeDetalle,
     favs,
     toggleFav,
-  };
-}
+  });
 
-export function buildTopCafesTabProps({
-  s,
-  setActiveTab,
-  premiumAccent,
-  perfil,
-  cargando,
-  top100,
-  CardVertical,
-  setCafeDetalle,
-  favs,
-  toggleFav,
-}) {
-  return {
+  const topCafesTabProps = buildTopCafesTabProps({
     s,
     setActiveTab,
     premiumAccent,
@@ -309,25 +309,9 @@ export function buildTopCafesTabProps({
     setCafeDetalle,
     favs,
     toggleFav,
-  };
-}
+  });
 
-export function buildOfertasTabProps({
-  s,
-  setActiveTab,
-  premiumAccent,
-  cafesParaOfertas,
-  ofertasPorCafe,
-  buscandoOfertaId,
-  openOfferCafeId,
-  abrirOfertasCafe,
-  PackshotImage,
-  abrirOfertaWeb,
-  theme,
-  premiumAccentDeep,
-  errorOfertas,
-}) {
-  return {
+  const ofertasTabProps = buildOfertasTabProps({
     s,
     setActiveTab,
     premiumAccent,
@@ -341,43 +325,9 @@ export function buildOfertasTabProps({
     theme,
     premiumAccentDeep,
     errorOfertas,
-  };
-}
+  });
 
-export function buildMasTabProps({
-  s,
-  perfil,
-  profileInitial,
-  profileAlias,
-  profileName,
-  memberStatus,
-  unlockedCount,
-  achievementTotal,
-  pendingAchievements,
-  achievementProgress,
-  setShowProfile,
-  setActiveTab,
-  premiumAccentDeep,
-  unlockedAchievements,
-  newsletterState,
-  guardarNewsletter,
-  newsletterLoading,
-  newsletterSaving,
-  newsletterHasEmail,
-  newsletterEmail,
-  onLogout,
-  appVersion,
-  premiumAccent,
-  isPremium,
-  premiumDaysLeft,
-  onOpenPaywall,
-  iconFaint,
-  interactionFeedbackEnabled,
-  interactionFeedbackMode,
-  guardarFeedbackInteracciones,
-  guardarModoFeedbackInteracciones,
-}) {
-  return {
+  const masTabProps = buildMasTabProps({
     s,
     perfil,
     profileInitial,
@@ -401,33 +351,34 @@ export function buildMasTabProps({
     onLogout,
     appVersion,
     premiumAccent,
-    isPremium,
-    premiumDaysLeft,
-    onOpenPaywall,
+    isPremium: premium.isPremium,
+    premiumDaysLeft: premium.daysLeft,
+    onOpenPaywall: () => premium.openPaywall('mas_tab'),
     iconFaint,
-    interactionFeedbackEnabled,
-    interactionFeedbackMode,
+    interactionFeedbackEnabled: interactionFeedbackSettings.enabled,
+    interactionFeedbackMode: interactionFeedbackSettings.mode,
     guardarFeedbackInteracciones,
     guardarModoFeedbackInteracciones,
-  };
-}
+  });
 
-export function buildBottomBarProps({
-  s,
-  activeTab,
-  setActiveTab,
-  setScanning,
-  favs,
-  accentColor,
-  inactiveColor,
-}) {
-  return {
+  const bottomBarProps = buildBottomBarProps({
     s,
     activeTab,
     setActiveTab,
     setScanning,
     favs,
-    accentColor,
-    inactiveColor,
+    accentColor: premiumAccent,
+    inactiveColor: theme.icon.inactive,
+  });
+
+  return {
+    communityTabProps,
+    inicioTabProps,
+    misCafesTabProps,
+    ultimosAnadidosTabProps,
+    topCafesTabProps,
+    ofertasTabProps,
+    masTabProps,
+    bottomBarProps,
   };
 }

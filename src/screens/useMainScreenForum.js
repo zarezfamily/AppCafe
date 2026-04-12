@@ -1,0 +1,73 @@
+import useForumState from '../hooks/useForumState';
+import { createMainScreenForumHandlers } from './mainScreenForumHandlers';
+
+export default function useMainScreenForum({
+  user,
+  voteWeight,
+  forumThreadScrollRef,
+  forumReplyInputRef,
+  forumAuthorName,
+  currentLevel,
+  premium,
+  getCollection,
+  addDocument,
+  updateDocument,
+  deleteDocument,
+  uploadImageToStorage,
+  showDialog,
+}) {
+  const forum = useForumState();
+
+  const handlers = createMainScreenForumHandlers({
+    user,
+    voteWeight,
+    forumReplies: forum.forumReplies,
+    forumThread: forum.forumThread,
+    setForumThread: forum.setForumThread,
+    setForumThreads: forum.setForumThreads,
+    setForumReplies: forum.setForumReplies,
+    setForumLoading: forum.setForumLoading,
+    setForumError: forum.setForumError,
+    setForumReplyText: forum.setForumReplyText,
+    setForumReplyTo: forum.setForumReplyTo,
+    setForumEditCollection: forum.setForumEditCollection,
+    setForumEditTarget: forum.setForumEditTarget,
+    setForumEditTitle: forum.setForumEditTitle,
+    setForumEditBody: forum.setForumEditBody,
+    setForumEditOpen: forum.setForumEditOpen,
+    setForumEditing: forum.setForumEditing,
+    setForumSendingReply: forum.setForumSendingReply,
+    forumThreadScrollRef,
+    forumReplyInputRef,
+    forumAuthorName,
+    currentLevel,
+    premium,
+    forumReplyText: forum.forumReplyText,
+    forumReplyTo: forum.forumReplyTo,
+    forumEditBody: forum.forumEditBody,
+    forumEditTitle: forum.forumEditTitle,
+    forumEditCollection: forum.forumEditCollection,
+    forumEditTarget: forum.forumEditTarget,
+    forumPhoto: forum.forumPhoto,
+    forumTitle: forum.forumTitle,
+    forumBody: forum.forumBody,
+    forumAccessLevel: forum.forumAccessLevel,
+    setForumSaving: forum.setForumSaving,
+    setForumCreateOpen: forum.setForumCreateOpen,
+    setForumTitle: forum.setForumTitle,
+    setForumBody: forum.setForumBody,
+    setForumAccessLevel: forum.setForumAccessLevel,
+    setForumPhoto: forum.setForumPhoto,
+    getCollection,
+    addDocument,
+    updateDocument,
+    deleteDocument,
+    uploadImageToStorage,
+    showDialog,
+  });
+
+  return {
+    ...forum,
+    ...handlers,
+  };
+}

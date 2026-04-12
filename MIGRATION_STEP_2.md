@@ -19,7 +19,9 @@ Este pack separa la parte más importante del `App.js` actual:
    - `src/navigation/linking`
    - `src/api/profileSync`
    - `src/components/AppDialogModal`
-   - `firebaseConfig.js`
+   - `authService.js`
+   - `firestoreService.js`
+   - `storageService.js`
 4. Pega la implementación real de `MainScreen` dentro de `src/screens/MainScreen.js`.
 5. Cuando eso funcione, empieza el paso 2.1: sacar subbloques de `MainScreen` a `/features`.
 
@@ -33,5 +35,5 @@ Este pack separa la parte más importante del `App.js` actual:
 ## Qué NO resuelve aún
 
 - El `MainScreen` real sigue pendiente de moverse completo.
-- No se ha tocado todavía `firebaseConfig.js`.
+- La capa Firebase ya está separada por servicios (`auth`, `firestore`, `storage`, `mappers`).
 - No se ha dividido todavía la lógica de café, foro, perfil y premium.

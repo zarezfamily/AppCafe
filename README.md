@@ -150,7 +150,11 @@ Si falta alguna variable requerida, el pre-check falla con mensaje explicativo a
 ```text
 etiove/
 ├── App.js
-├── firebaseConfig.js
+├── authService.js
+├── firebaseCore.js
+├── firestoreMappers.js
+├── firestoreService.js
+├── storageService.js
 ├── app.json
 ├── functions/
 │   ├── index.js

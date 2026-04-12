@@ -1,12 +1,12 @@
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { normalize } from '../core/utils';
+import QuizSection from './QuizSection';
 
 export default function MisCafesTab({
   s,
   cargando,
   allCafes,
-  registrarEventoGamificacion,
-  QuizSection,
+  quizSectionProps,
   favCafes,
   CardHorizontal,
   setCafeDetalle,
@@ -73,7 +73,7 @@ export default function MisCafesTab({
 
       {!cargando && (
         <View style={sectionCardStyle}>
-          <QuizSection allCafes={allCafes} onGamifyEvent={registrarEventoGamificacion} />
+          <QuizSection {...quizSectionProps} />
         </View>
       )}
 

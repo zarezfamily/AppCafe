@@ -19,7 +19,7 @@ import {
   getDocument,
   setDocument,
   updateDocument,
-} from '../../firebaseConfig';
+} from '../../firestoreService';
 import Stars from '../components/Stars';
 import { useAuth } from '../context/AuthContext';
 

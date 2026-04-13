@@ -22,7 +22,7 @@ export function renderMainScreenTransientView({
   s,
   premiumAccent,
 }) {
-  if (!permission?.granted) {
+  if (scanning && !permission?.granted) {
     return (
       <SafeAreaView style={s.permScreen}>
         <Ionicons name="cafe" size={72} color={premiumAccent} />
@@ -94,7 +94,7 @@ export function MainScreenOverlayLayer({
   return (
     <>
       <AppDialogModal
-        visible={dialogVisible}
+        visible={!!dialogVisible}
         onClose={closeDialog}
         title={dialogConfig.title}
         description={dialogConfig.description}
@@ -104,7 +104,7 @@ export function MainScreenOverlayLayer({
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
       <OnboardingModal
-        visible={showOnboarding}
+        visible={!!showOnboarding}
         onClose={completeOnboarding}
         onStartQuiz={startQuizFromOnboarding}
       />
@@ -152,7 +152,7 @@ export function MainScreenOverlayLayer({
         />
       )}
 
-      {showProfile && (
+      {!!showProfile && (
         <ProfileScreen
           isPremium={premium.isPremium}
           premiumDaysLeft={premium.daysLeft}

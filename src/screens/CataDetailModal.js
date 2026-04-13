@@ -22,7 +22,7 @@ export default function CataDetailModal({
   if (cata) lastCataRef.current = cata;
 
   useEffect(() => {
-    if (visible) {
+    if (!!visible) {
       setShouldRender(true);
       Animated.parallel([
         Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
@@ -51,7 +51,7 @@ export default function CataDetailModal({
   });
 
   return (
-    <Modal visible={visible} animationType="none" transparent onRequestClose={onClose}>
+    <Modal visible={!!visible} animationType="none" transparent onRequestClose={onClose}>
       <Animated.View
         style={{
           flex: 1,

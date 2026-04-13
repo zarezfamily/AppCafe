@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Animated, Easing } from 'react-native';
+import { MAIN_TABS } from './mainScreenTabs';
 
 export default function useMainScreenEffects({
   brandCardAnim,
@@ -41,7 +42,7 @@ export default function useMainScreenEffects({
   }, [cargarCatas, restoreAuthTokenFromSecureStore, userId]);
 
   useEffect(() => {
-    if (activeTab === 'Comunidad' && forumThreadsLength === 0 && !forumLoading) {
+    if (activeTab === MAIN_TABS.COMMUNITY && forumThreadsLength === 0 && !forumLoading) {
       cargarForo();
     }
   }, [activeTab, cargarForo, forumLoading, forumThreadsLength]);

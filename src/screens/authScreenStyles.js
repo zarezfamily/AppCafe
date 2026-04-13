@@ -112,7 +112,58 @@ const authScreenStyles = StyleSheet.create({
     gap: 10,
     marginBottom: 16,
   },
+  rememberToggle: {
+    width: 46,
+    height: 28,
+    borderRadius: 14,
+    padding: 3,
+    backgroundColor: '#ddd4cb',
+    justifyContent: 'center',
+  },
+  rememberToggleActive: {
+    backgroundColor: AUTH_COLORS.accent,
+  },
+  rememberToggleKnob: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: '#fffdf8',
+  },
+  rememberToggleKnobActive: {
+    alignSelf: 'flex-end',
+  },
   rememberText: { fontSize: 14, color: '#5f534b' },
+  inlineNotice: {
+    marginBottom: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#e1cfbf',
+    backgroundColor: '#f8efe6',
+    padding: 14,
+    gap: 8,
+  },
+  inlineNoticeTitle: {
+    color: AUTH_COLORS.text,
+    fontSize: 14,
+    fontWeight: '800',
+  },
+  inlineNoticeText: {
+    color: '#6c584a',
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  inlineNoticeBtn: {
+    alignSelf: 'flex-start',
+    borderRadius: 999,
+    backgroundColor: '#eadbce',
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+  },
+  inlineNoticeBtnText: {
+    color: AUTH_COLORS.accent,
+    fontSize: 12,
+    fontWeight: '800',
+  },
   primaryBtn: {
     backgroundColor: AUTH_COLORS.primary,
     borderRadius: 30,

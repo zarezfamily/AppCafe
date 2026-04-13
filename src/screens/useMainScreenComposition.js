@@ -284,6 +284,8 @@ export default function useMainScreenComposition({ onLogout, services, ui }) {
     forumEditOpen: forum.forumEditOpen,
     setForumEditOpen: forum.setForumEditOpen,
     forumEditCollection: forum.forumEditCollection,
+    forumEditTitle: forum.forumEditTitle,
+    setForumEditTitle: forum.setForumEditTitle,
     forumEditTarget: forum.forumEditTarget,
     setForumEditTarget: forum.setForumEditTarget,
     forumEditBody: forum.forumEditBody,

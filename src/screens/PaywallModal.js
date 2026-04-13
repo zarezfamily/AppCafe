@@ -37,7 +37,7 @@ export default function PaywallModal({
   const slideAnim = useRef(new Animated.Value(40)).current;
 
   useEffect(() => {
-    if (visible) {
+    if (!!visible) {
       Animated.parallel([
         Animated.timing(fadeAnim, { toValue: 1, duration: 320, useNativeDriver: true }),
         Animated.timing(slideAnim, { toValue: 0, duration: 320, useNativeDriver: true }),
@@ -77,7 +77,7 @@ export default function PaywallModal({
   const triggerMsg = trigger ? triggerMessages[trigger] : null;
 
   return (
-    <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
+    <Modal visible={!!visible} animationType="slide" onRequestClose={onClose}>
       <SafeAreaView style={styles.screen}>
         <StatusBar barStyle="dark-content" />
 
@@ -163,7 +163,7 @@ export default function PaywallModal({
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.restoreBtn} onPress={onRestore} activeOpacity={0.82}>
-              <Text style={styles.restoreBtnText}>{restoring ? 'Restaurando compras...' : 'Restaurar compras'}</Text>
+              <Text style={styles.restoreBtnText}>{!!restoring ? 'Restaurando compras...' : 'Restaurar compras'}</Text>
             </TouchableOpacity>
 
             {!revenueCatReady ? (

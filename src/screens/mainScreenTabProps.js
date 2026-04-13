@@ -46,6 +46,8 @@ export function buildCommunityTabProps({
   forumEditOpen,
   setForumEditOpen,
   forumEditCollection,
+  forumEditTitle,
+  setForumEditTitle,
   forumEditTarget,
   setForumEditTarget,
   forumEditBody,
@@ -58,6 +60,7 @@ export function buildCommunityTabProps({
   getUserLevel,
   getAchievementDefs,
   LEVELS,
+  perfil,
 }) {
   return {
     s,
@@ -107,6 +110,8 @@ export function buildCommunityTabProps({
     forumEditOpen,
     setForumEditOpen,
     forumEditCollection,
+    forumEditTitle,
+    setForumEditTitle,
     forumEditTarget,
     setForumEditTarget,
     forumEditBody,
@@ -119,6 +124,7 @@ export function buildCommunityTabProps({
     getUserLevel,
     getAchievementDefs,
     LEVELS,
+    perfil,
   };
 }
 

@@ -51,7 +51,7 @@ export default function ProfileScreen({ isPremium, premiumDaysLeft, onClose, onP
   return (
     <Modal visible animationType="slide" onRequestClose={onClose}>
       <AppDialogModal
-        visible={dialogVisible}
+        visible={!!dialogVisible}
         onClose={() => setDialogVisible(false)}
         title={dialogConfig.title}
         description={dialogConfig.description}
@@ -134,7 +134,7 @@ export default function ProfileScreen({ isPremium, premiumDaysLeft, onClose, onP
           <TouchableOpacity
             style={[styles.primaryButton, { marginTop: 24, opacity: guardando || !camposObligatoriosCompletos ? 0.8 : 1 }]}
             onPress={guardar}
-            disabled={guardando}
+            disabled={!!guardando}
           >
             {guardando ? <ActivityIndicator color="#fff" /> : <Text style={styles.primaryButtonText}>Guardar cambios</Text>}
           </TouchableOpacity>

@@ -26,7 +26,8 @@
   "dependencies": {
     "@expo-google-fonts/playfair-display": "^0.4.2",
     "@expo/vector-icons": "^15.1.1",
-    "@react-native-community/datetimepicker": "^9.1.0",
+    "@react-native-community/datetimepicker": "8.4.4",
+    "@react-native-community/netinfo": "11.4.1",
     "@react-navigation/native-stack": "^7.14.10",
     "expo": "~54.0.33",
     "expo-av": "~16.0.8",

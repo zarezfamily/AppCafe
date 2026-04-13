@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { SkeletonVerticalList } from '../components/SkeletonLoader';
+import { MAIN_TABS } from './mainScreenTabs';
 
 export default function SimpleCoffeeListTab({
   s,
@@ -19,7 +20,7 @@ export default function SimpleCoffeeListTab({
   return (
     <View style={{ paddingTop: 20 }}>
       <View style={{ paddingHorizontal: 16 }}>
-        <TouchableOpacity onPress={() => setActiveTab('Inicio')} style={s.backRow}>
+        <TouchableOpacity onPress={() => setActiveTab(MAIN_TABS.HOME)} style={s.backRow}>
           <Ionicons name="chevron-back" size={20} color={premiumAccent} />
           <Text style={s.backText}>Volver</Text>
         </TouchableOpacity>

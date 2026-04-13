@@ -1,6 +1,28 @@
 import { BASE_URL, FIREBASE_API_KEY, authHeaders } from './firebaseCore';
 import { docToObject, toFields, toFirestoreValue } from './firestoreMappers';
 
+const normalizeFirestoreError = (error, operation) => {
+  const message = String(error?.message || error || '');
+  if (
+    error instanceof TypeError
+    || message.includes('Network request failed')
+    || message.includes('Load failed')
+    || message.includes('fetch')
+  ) {
+    return new Error(`${operation} -> NETWORK_UNAVAILABLE`);
+  }
+  return error instanceof Error ? error : new Error(`${operation} -> UNKNOWN_ERROR`);
+};
+
+const firestoreFetch = async (url, options, operation) => {
+  try {
+    return await fetch(url, options);
+  } catch (error) {
+    console.log('[Firestore] Network error:', operation, String(error?.message || error));
+    throw normalizeFirestoreError(error, operation);
+  }
+};
+
 export const queryCollection = async (colName, field, value, orderByField = null) => {
   const url = `${BASE_URL}:runQuery?key=${FIREBASE_API_KEY}`;
   const body = {
@@ -20,11 +42,11 @@ export const queryCollection = async (colName, field, value, orderByField = null
     body.structuredQuery.orderBy = [{ field: { fieldPath: orderByField }, direction: 'DESCENDING' }];
   }
 
-  const res = await fetch(url, {
+  const res = await firestoreFetch(url, {
     method: 'POST',
     headers: authHeaders(),
     body: JSON.stringify(body),
-  });
+  }, `queryCollection(${colName})`);
 
   if (!res.ok) {
     const txt = await res.text();
@@ -39,7 +61,7 @@ export const queryCollection = async (colName, field, value, orderByField = null
 export const getCollection = async (colName, orderByField = null, limitN = null) => {
   const pageSize = limitN ? limitN * 3 : 100;
   const url = `${BASE_URL}/${colName}?key=${FIREBASE_API_KEY}&pageSize=${pageSize}`;
-  const res = await fetch(url, { headers: authHeaders() });
+  const res = await firestoreFetch(url, { headers: authHeaders() }, `getCollection(${colName})`);
 
   if (res.status === 404) return [];
   if (!res.ok) {
@@ -75,7 +97,7 @@ export const getUserCafes = async (uid) => {
 
 export const getDocument = async (colName, docId) => {
   const url = `${BASE_URL}/${colName}/${docId}?key=${FIREBASE_API_KEY}`;
-  const res = await fetch(url, { headers: authHeaders() });
+  const res = await firestoreFetch(url, { headers: authHeaders() }, `getDocument(${colName}/${docId})`);
 
   if (!res.ok) return null;
   return docToObject(await res.json());
@@ -83,11 +105,11 @@ export const getDocument = async (colName, docId) => {
 
 export const addDocument = async (colName, data) => {
   const url = `${BASE_URL}/${colName}?key=${FIREBASE_API_KEY}`;
-  const res = await fetch(url, {
+  const res = await firestoreFetch(url, {
     method: 'POST',
     headers: authHeaders(),
     body: JSON.stringify(toFields(data)),
-  });
+  }, `addDocument(${colName})`);
 
   if (!res.ok) {
     throw new Error(`addDocument(${colName}) -> ${res.status}`);
@@ -98,11 +120,11 @@ export const addDocument = async (colName, data) => {
 
 export const setDocument = async (colName, docId, data) => {
   const url = `${BASE_URL}/${colName}/${docId}?key=${FIREBASE_API_KEY}`;
-  const res = await fetch(url, {
+  const res = await firestoreFetch(url, {
     method: 'PATCH',
     headers: authHeaders(),
     body: JSON.stringify(toFields(data)),
-  });
+  }, `setDocument(${colName}/${docId})`);
   return res.ok;
 };
 
@@ -110,19 +132,19 @@ export const updateDocument = async (colName, docId, data) => {
   const params = new URLSearchParams({ key: FIREBASE_API_KEY });
   Object.keys(data).forEach((field) => params.append('updateMask.fieldPaths', field));
   const url = `${BASE_URL}/${colName}/${docId}?${params.toString()}`;
-  const res = await fetch(url, {
+  const res = await firestoreFetch(url, {
     method: 'PATCH',
     headers: authHeaders(),
     body: JSON.stringify(toFields(data)),
-  });
+  }, `updateDocument(${colName}/${docId})`);
   return res.ok;
 };
 
 export const deleteDocument = async (colName, docId) => {
   const url = `${BASE_URL}/${colName}/${docId}?key=${FIREBASE_API_KEY}`;
-  const res = await fetch(url, {
+  const res = await firestoreFetch(url, {
     method: 'DELETE',
     headers: authHeaders(),
-  });
+  }, `deleteDocument(${colName}/${docId})`);
   return res.ok;
 };

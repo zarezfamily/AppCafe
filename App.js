@@ -1,6 +1,6 @@
 import React from 'react';
 import AppProviders from './src/providers/AppProviders';
-import AppBootstrap from './src/app/AppBootstrap';
+import AppBootstrap from './src/bootstrap/AppBootstrap';
 
 export default function App() {
   return (

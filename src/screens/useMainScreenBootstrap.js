@@ -1,6 +1,8 @@
+import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
 import * as SecureStore from 'expo-secure-store';
 import { Platform, useEffect, useState } from 'react';
+import { MAIN_TABS } from './mainScreenTabs';
 
 export default function useMainScreenBootstrap({
   user,
@@ -25,6 +27,7 @@ export default function useMainScreenBootstrap({
   offersCacheTtlMs,
   showDialog,
 }) {
+  const isExpoGo = Constants.appOwnership === 'expo';
   const [newsletterState, setNewsletterState] = useState({ subscribed: false, createdAt: '', subscribedAt: '', updatedAt: '' });
   const [newsletterLoading, setNewsletterLoading] = useState(false);
   const [newsletterSaving, setNewsletterSaving] = useState(false);
@@ -73,14 +76,16 @@ export default function useMainScreenBootstrap({
       })
       .catch(() => {});
 
+    if (isExpoGo) return undefined;
+
     const notificationSubscription = Notifications.addNotificationResponseReceivedListener(() => {});
     return () => {
       notificationSubscription.remove();
     };
-  }, [keys, offersCacheTtlMs, setFavs, setOfertasPorCafe, setPerfil, setVotes]);
+  }, [isExpoGo, keys, offersCacheTtlMs, setFavs, setOfertasPorCafe, setPerfil, setVotes]);
 
   useEffect(() => {
-    if (!user?.uid) return;
+    if (!user?.uid || isExpoGo) return;
     registerForPushNotificationsAsync()
       .then(async ({ status, token }) => {
         setNotificationsReady(status === 'granted');
@@ -97,10 +102,10 @@ export default function useMainScreenBootstrap({
         });
       })
       .catch(() => setNotificationsReady(false));
-  }, [appVersion, favs, registerForPushNotificationsAsync, setDocument, user?.uid]);
+  }, [appVersion, favs, isExpoGo, registerForPushNotificationsAsync, setDocument, user?.uid]);
 
   useEffect(() => {
-    if (!user?.uid || !notificationsReady || !pushToken) return;
+    if (!user?.uid || isExpoGo || !notificationsReady || !pushToken) return;
     setDocument('push_subscriptions', user.uid, {
       uid: user.uid,
       expoPushToken: pushToken,
@@ -110,7 +115,7 @@ export default function useMainScreenBootstrap({
       favoriteCafeIds: Array.isArray(favs) ? favs : [],
       updatedAt: new Date().toISOString(),
     }).catch(() => {});
-  }, [appVersion, favs, notificationsReady, pushToken, setDocument, user?.uid]);
+  }, [appVersion, favs, isExpoGo, notificationsReady, pushToken, setDocument, user?.uid]);
 
   const guardarFeedbackInteracciones = async (nextValue) => {
     const next = {
@@ -144,7 +149,7 @@ export default function useMainScreenBootstrap({
   };
 
   const startQuizFromOnboarding = async () => {
-    setActiveTab('Mis Cafés');
+    setActiveTab(MAIN_TABS.NOTEBOOK);
     await completeOnboarding();
   };
 
@@ -173,7 +178,7 @@ export default function useMainScreenBootstrap({
   }, [getDocument, user?.uid]);
 
   useEffect(() => {
-    if (!user?.uid || allCafes.length === 0 || !notificationsReady) return;
+    if (!user?.uid || isExpoGo || allCafes.length === 0 || !notificationsReady) return;
     const key = `${keys.notifyCommunitySnapshot}_${user.uid}`;
     const nextSnapshot = {
       latestCafeId: allCafes[0]?.id || '',
@@ -203,10 +208,10 @@ export default function useMainScreenBootstrap({
     };
 
     syncSnapshot();
-  }, [allCafes, communityNotificationBootRef, keys.notifyCommunitySnapshot, notificationsReady, scheduleEtioveNotification, user?.uid]);
+  }, [allCafes, communityNotificationBootRef, isExpoGo, keys.notifyCommunitySnapshot, notificationsReady, scheduleEtioveNotification, user?.uid]);
 
   useEffect(() => {
-    if (!user?.uid || forumThreads.length === 0 || !notificationsReady) return;
+    if (!user?.uid || isExpoGo || forumThreads.length === 0 || !notificationsReady) return;
     const ownThreads = forumThreads.filter((thread) => thread.authorUid === user.uid);
     const key = `${keys.notifyForumSnapshot}_${user.uid}`;
     const nextSnapshot = ownThreads.reduce((acc, thread) => {
@@ -247,10 +252,10 @@ export default function useMainScreenBootstrap({
     };
 
     syncSnapshot();
-  }, [forumNotificationBootRef, forumThreads, keys.notifyForumSnapshot, notificationsReady, scheduleEtioveNotification, user?.uid]);
+  }, [forumNotificationBootRef, forumThreads, isExpoGo, keys.notifyForumSnapshot, notificationsReady, scheduleEtioveNotification, user?.uid]);
 
   useEffect(() => {
-    if (!user?.uid || allCafes.length === 0 || favs.length === 0 || !notificationsReady) return;
+    if (!user?.uid || isExpoGo || allCafes.length === 0 || favs.length === 0 || !notificationsReady) return;
     const favoriteMap = allCafes
       .filter((cafe) => favs.includes(cafe.id))
       .reduce((acc, cafe) => {
@@ -291,7 +296,7 @@ export default function useMainScreenBootstrap({
     };
 
     syncSnapshot();
-  }, [allCafes, favoriteNotificationBootRef, favs, keys.notifyFavoritesSnapshot, notificationsReady, scheduleEtioveNotification, user?.uid]);
+  }, [allCafes, favoriteNotificationBootRef, favs, isExpoGo, keys.notifyFavoritesSnapshot, notificationsReady, scheduleEtioveNotification, user?.uid]);
 
   const guardarNewsletter = async (nextSubscribed) => {
     if (!user?.uid) return;

@@ -14,7 +14,7 @@ if (!FIREBASE_PROJECT_ID || !FIREBASE_API_KEY) {
   console.warn('[Firebase] Faltan variables de entorno EXPO_PUBLIC_FIREBASE_PROJECT_ID y EXPO_PUBLIC_FIREBASE_API_KEY');
 }
 
-export const BASE_URL = `https://europe-west1-firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
+export const BASE_URL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
 export const AUTH_URL = 'https://identitytoolkit.googleapis.com/v1/accounts';
 
 let authToken = null;

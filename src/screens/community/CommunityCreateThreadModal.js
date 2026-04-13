@@ -32,7 +32,7 @@ export default function CommunityCreateThreadModal({
   createModalAnim,
 }) {
   return (
-    <Modal visible={visible} animationType="none" transparent onRequestClose={closeCreateModal}>
+    <Modal visible={!!visible} animationType="none" transparent onRequestClose={closeCreateModal}>
       <KeyboardAvoidingView
         style={[s.forumModalOverlay, { backgroundColor: 'transparent' }]}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -141,9 +141,9 @@ export default function CommunityCreateThreadModal({
               <TouchableOpacity
                 style={[s.redBtn, { flex: 1, marginTop: 0 }]}
                 onPress={handlePublishThread}
-                disabled={forumSaving}
+                disabled={!!forumSaving}
               >
-                {forumSaving ? <ActivityIndicator color="#fff" /> : <Text style={s.redBtnText}>Publicar</Text>}
+                {!!forumSaving ? <ActivityIndicator color="#fff" /> : <Text style={s.redBtnText}>Publicar</Text>}
               </TouchableOpacity>
             </View>
           </Animated.View>

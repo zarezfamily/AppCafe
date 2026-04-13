@@ -3,7 +3,7 @@ import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function OnboardingModal({ visible, onClose, onStartQuiz }) {
   return (
-    <Modal visible={visible} animationType="fade" transparent onRequestClose={onClose}>
+    <Modal visible={!!visible} animationType="fade" transparent onRequestClose={onClose}>
       <View style={styles.overlay}>
         <View style={styles.card}>
           <Text style={styles.kicker}>WELCOME TO ETIOVE</Text>

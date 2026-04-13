@@ -1,16 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
-import * as Location from 'expo-location';
-import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
-  Image,
-  Linking,
-  Modal,
-  Platform,
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -18,145 +9,29 @@ import {
 } from 'react-native';
 
 import {
-  GOOGLE_PLACES_KEY,
   H,
   PREMIUM_ACCENT,
-  PREMIUM_ACCENT_DEEP,
-  PREMIUM_BORDER_SOFT,
-  PREMIUM_SURFACE_SOFT,
   THEME,
 } from '../constants/theme';
-import { buildPlacesPhotoUrl, calcDistanceMeters, fetchNearbyPlaces, isGooglePlacesConfigured } from '../core/places';
+import CafeteriaCard from './cafeterias/CafeteriaCard';
+import CafeteriaDetailModal from './cafeterias/CafeteriaDetailModal';
+import useCafeteriasScreen, { RADIOS_DISPONIBLES } from './cafeterias/useCafeteriasScreen';
 
 export default function CafeteriasScreen() {
-  const [cafeterias, setCafeterias] = useState([]);
-  const [cargando, setCargando] = useState(false);
-  const [error, setError] = useState(null);
-  const [seleccionada, setSeleccionada] = useState(null);
-  const [radioKm, setRadioKm] = useState(5);
-  const [soloAbiertas, setSoloAbiertas] = useState(false);
-
-  const radiosDisponibles = [2, 5, 10];
-
-  useEffect(() => {
-    cargarCafeterias(radioKm);
-  }, [radioKm]);
-
-  const formatearTipo = (types = []) => {
-    if (types.includes('coffee_shop') || types.includes('cafe')) return 'Coffee Shop';
-    return 'Cafetería';
-  };
-
-  const formatearCategorias = (types = []) =>
-    types
-      .filter((type) => type !== 'point_of_interest' && type !== 'establishment')
-      .slice(0, 4)
-      .map((type) => type.replace(/_/g, ' '))
-      .join(' · ');
-
-  const cargarCafeterias = async (radiusKm = radioKm) => {
-    setCargando(true);
-    setError(null);
-
-    try {
-      if (!isGooglePlacesConfigured(GOOGLE_PLACES_KEY)) {
-        setError('Configura una Google Places API key válida para habilitar cafeterías cercanas.');
-        setCargando(false);
-        return;
-      }
-
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setError('Activa la ubicación para ver cafeterías cerca de ti');
-        setCargando(false);
-        return;
-      }
-
-      const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-      const { latitude: lat, longitude: lon } = loc.coords;
-
-      const places = await fetchNearbyPlaces({
-        apiKey: GOOGLE_PLACES_KEY,
-        lat,
-        lon,
-        maxResultCount: 20,
-        radiusMeters: radiusKm * 1000,
-        rankPreference: 'DISTANCE',
-        fieldMask:
-          'places.id,places.displayName,places.formattedAddress,places.location,places.rating,places.userRatingCount,places.currentOpeningHours,places.regularOpeningHours,places.internationalPhoneNumber,places.websiteUri,places.photos,places.editorialSummary,places.types',
-      });
-
-      const result = places
-        .map((place) => {
-          const geo = place.location || {};
-          const distancia = calcDistanceMeters(lat, lon, geo.latitude || lat, geo.longitude || lon);
-          const horarioTexto = place.regularOpeningHours?.weekdayDescriptions
-            ? place.regularOpeningHours.weekdayDescriptions.join(', ')
-            : null;
-          const abierto = place.currentOpeningHours?.openNow ?? null;
-          const fotoUrl = place.photos?.[0]?.name ? buildPlacesPhotoUrl(place.photos[0].name, GOOGLE_PLACES_KEY) : null;
-          const fotosUrls = (place.photos || []).slice(0, 4).map((photo) => buildPlacesPhotoUrl(photo.name, GOOGLE_PLACES_KEY));
-          const placeTypes = place.types || [];
-          const descripcion = place.editorialSummary?.text || null;
-
-          return {
-            id: place.id,
-            nombre: place.displayName?.text || 'Cafetería',
-            lat: geo.latitude || lat,
-            lon: geo.longitude || lon,
-            distancia,
-            direccion: place.formattedAddress || null,
-            telefono: place.internationalPhoneNumber || null,
-            web: place.websiteUri || null,
-            abierto,
-            horario: horarioTexto,
-            rating: place.rating ? place.rating.toFixed(1) : '--',
-            numResenas: place.userRatingCount || 0,
-            resenas: [],
-            descripcion,
-            foto: fotoUrl,
-            fotos: fotosUrls,
-            tipo: formatearTipo(placeTypes),
-            categorias: formatearCategorias(placeTypes),
-            especialidades: descripcion || 'Café de especialidad, espresso y métodos de filtro',
-            wifi: false,
-            terraza: false,
-            takeaway: placeTypes.includes('meal_takeaway'),
-          };
-        })
-        .sort((a, b) => {
-          if (a.distancia !== b.distancia) return a.distancia - b.distancia;
-          return parseFloat(b.rating) - parseFloat(a.rating);
-        });
-
-      setCafeterias(result);
-      if (result.length === 0) {
-        setError('No encontramos cafeterías cerca. Prueba en otra zona.');
-      }
-    } catch (error) {
-      const message = String(error?.message || '');
-      if (message.includes('GOOGLE_PLACES_KEY_NOT_CONFIGURED')) {
-        setError('Configura una Google Places API key válida para habilitar cafeterías cercanas.');
-      } else if (message.includes('GOOGLE_PLACES_API_ERROR')) {
-        setError('Google Places no está disponible: revisa permisos de API key y facturación en Google Cloud.');
-      } else {
-        setError(`Error al buscar cafeterías: ${message}`);
-      }
-    } finally {
-      setCargando(false);
-    }
-  };
-
-  const abrirMaps = (cafeteria) => {
-    const url =
-      Platform.OS === 'ios'
-        ? `maps://maps.apple.com/?q=${encodeURIComponent(cafeteria.nombre)}&ll=${cafeteria.lat},${cafeteria.lon}`
-        : `geo:${cafeteria.lat},${cafeteria.lon}?q=${encodeURIComponent(cafeteria.nombre)}`;
-
-    Linking.openURL(url).catch(() => {});
-  };
-
-  const cafeteriasVisibles = soloAbiertas ? cafeterias.filter((cafeteria) => cafeteria.abierto === true) : cafeterias;
+  const {
+    abrirMaps,
+    cafeterias,
+    cafeteriasVisibles,
+    cargarCafeterias,
+    cargando,
+    error,
+    radioKm,
+    seleccionada,
+    setRadioKm,
+    setSeleccionada,
+    soloAbiertas,
+    setSoloAbiertas,
+  } = useCafeteriasScreen();
 
   if (cargando) {
     return (
@@ -184,194 +59,12 @@ export default function CafeteriasScreen() {
 
   return (
     <View style={{ flex: 1 }}>
-      {seleccionada && (
-        <Modal visible animationType="slide" onRequestClose={() => setSeleccionada(null)}>
-          <SafeAreaView style={styles.detailScreen}>
-            <StatusBar barStyle="dark-content" />
-            <ScrollView showsVerticalScrollIndicator={false}>
-              <View style={styles.detHero}>
-                {seleccionada.foto ? (
-                  <Image source={{ uri: seleccionada.foto }} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
-                ) : (
-                  <View style={styles.detPlaceholder}>
-                    <Text style={styles.detPlaceholderEmoji}>☕</Text>
-                  </View>
-                )}
-
-                <View style={styles.detHeroGrad} />
-
-                <TouchableOpacity style={styles.detBack} onPress={() => setSeleccionada(null)}>
-                  <Ionicons name="chevron-back" size={24} color="#fff" />
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.detNavBtn} onPress={() => abrirMaps(seleccionada)}>
-                  <Ionicons name="navigate" size={20} color="#fff" />
-                </TouchableOpacity>
-
-                {seleccionada.abierto !== null && (
-                  <View
-                    style={[
-                      styles.badgeEstado,
-                      { backgroundColor: seleccionada.abierto ? THEME.status.success : THEME.status.danger },
-                    ]}
-                  >
-                    <Text style={styles.badgeEstadoText}>{seleccionada.abierto ? '🟢 Abierto ahora' : '🔴 Cerrado'}</Text>
-                  </View>
-                )}
-
-                <View style={styles.detOverlay}>
-                  <Text style={styles.detNombre}>{seleccionada.nombre}</Text>
-                  <Text style={styles.detTipo}>{seleccionada.tipo}</Text>
-                  <View style={styles.detRatingRow}>
-                    {[1, 2, 3, 4, 5].map((n) => (
-                      <Ionicons
-                        key={n}
-                        name={n <= Math.round(seleccionada.rating) ? 'star' : 'star-outline'}
-                        size={14}
-                        color={THEME.status.favorite}
-                      />
-                    ))}
-                    <Text style={styles.detRatingNum}>{seleccionada.rating}</Text>
-                    <Text style={styles.detReseñas}>({seleccionada.numResenas} reseñas)</Text>
-                  </View>
-                </View>
-              </View>
-
-              <View style={styles.detBody}>
-                <View style={styles.detInfoRow}>
-                  <View style={styles.detInfoItem}>
-                    <Ionicons name="location" size={20} color={PREMIUM_ACCENT} />
-                    <Text style={styles.detInfoLabel}>
-                      {seleccionada.distancia < 1000
-                        ? `${seleccionada.distancia}m`
-                        : `${(seleccionada.distancia / 1000).toFixed(1)}km`}
-                    </Text>
-                  </View>
-
-                  <View style={styles.detInfoItem}>
-                    <Ionicons name="star" size={20} color={THEME.status.favorite} />
-                    <Text style={styles.detInfoLabel}>
-                      {seleccionada.rating} ({seleccionada.numResenas})
-                    </Text>
-                  </View>
-
-                  {seleccionada.wifi && (
-                    <View style={styles.detInfoItem}>
-                      <Ionicons name="wifi" size={20} color={PREMIUM_ACCENT} />
-                      <Text style={styles.detInfoLabel}>WiFi</Text>
-                    </View>
-                  )}
-
-                  {seleccionada.terraza && (
-                    <View style={styles.detInfoItem}>
-                      <Ionicons name="sunny" size={20} color={PREMIUM_ACCENT} />
-                      <Text style={styles.detInfoLabel}>Terraza</Text>
-                    </View>
-                  )}
-
-                  {seleccionada.takeaway && (
-                    <View style={styles.detInfoItem}>
-                      <Ionicons name="bag-handle" size={20} color={PREMIUM_ACCENT} />
-                      <Text style={styles.detInfoLabel}>Para llevar</Text>
-                    </View>
-                  )}
-                </View>
-
-                {seleccionada.descripcion && (
-                  <View style={styles.seccion}>
-                    <Text style={styles.secTitulo}>📝 Sobre esta cafetería</Text>
-                    <Text style={styles.secTexto}>{seleccionada.descripcion}</Text>
-                  </View>
-                )}
-
-                {seleccionada.categorias && (
-                  <View style={styles.seccion}>
-                    <Text style={styles.secTitulo}>🏷️ Categorías</Text>
-                    <Text style={styles.secTexto}>{seleccionada.categorias}</Text>
-                  </View>
-                )}
-
-                <View style={styles.seccion}>
-                  <Text style={styles.secTitulo}>☕ Especialidades</Text>
-                  <Text style={styles.secTexto}>{seleccionada.especialidades}</Text>
-                </View>
-
-                {seleccionada.fotos && seleccionada.fotos.length > 1 && (
-                  <View style={styles.seccion}>
-                    <Text style={styles.secTitulo}>📸 Fotos</Text>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 8 }}>
-                      {seleccionada.fotos.map(
-                        (foto, index) =>
-                          foto && (
-                            <Image
-                              key={index}
-                              source={{ uri: foto }}
-                              style={{ width: 120, height: 90, borderRadius: 10, marginRight: 8 }}
-                              resizeMode="cover"
-                            />
-                          )
-                      )}
-                    </ScrollView>
-                  </View>
-                )}
-
-                {seleccionada.horario && (
-                  <View style={styles.seccion}>
-                    <Text style={styles.secTitulo}>🕐 Horario</Text>
-                    <Text style={styles.secTexto}>{seleccionada.horario}</Text>
-                  </View>
-                )}
-
-                {seleccionada.direccion && (
-                  <View style={styles.seccion}>
-                    <Text style={styles.secTitulo}>📍 Dirección</Text>
-                    <Text style={styles.secTexto}>{seleccionada.direccion}</Text>
-                    <Text style={[styles.secTexto, { marginTop: 6 }]}>
-                      Coordenadas: {Number(seleccionada.lat).toFixed(5)}, {Number(seleccionada.lon).toFixed(5)}
-                    </Text>
-                  </View>
-                )}
-
-                {(seleccionada.telefono || seleccionada.web) && (
-                  <View style={styles.seccion}>
-                    <Text style={styles.secTitulo}>📞 Contacto</Text>
-
-                    {seleccionada.telefono && (
-                      <TouchableOpacity onPress={() => Linking.openURL(`tel:${seleccionada.telefono}`)} style={styles.contactBtn}>
-                        <Ionicons name="call-outline" size={16} color={PREMIUM_ACCENT} />
-                        <Text style={styles.contactText}>{seleccionada.telefono}</Text>
-                      </TouchableOpacity>
-                    )}
-
-                    {seleccionada.web && (
-                      <TouchableOpacity
-                        onPress={() =>
-                          Linking.openURL(seleccionada.web.startsWith('http') ? seleccionada.web : `https://${seleccionada.web}`)
-                        }
-                        style={styles.contactBtn}
-                      >
-                        <Ionicons name="globe-outline" size={16} color={PREMIUM_ACCENT} />
-                        <Text style={styles.contactText}>
-                          {seleccionada.web.replace('https://', '').replace('http://', '').split('/')[0]}
-                        </Text>
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                )}
-
-                <TouchableOpacity style={[styles.primaryButton, { marginTop: 8 }]} onPress={() => abrirMaps(seleccionada)}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                    <Ionicons name="navigate-outline" size={20} color="#fff" />
-                    <Text style={styles.primaryButtonText}>Cómo llegar</Text>
-                  </View>
-                </TouchableOpacity>
-
-                <View style={{ height: 20 }} />
-              </View>
-            </ScrollView>
-          </SafeAreaView>
-        </Modal>
-      )}
+      <CafeteriaDetailModal
+        cafeteria={seleccionada}
+        styles={styles}
+        onClose={() => setSeleccionada(null)}
+        abrirMaps={abrirMaps}
+      />
 
       <View style={styles.headerBox}>
         <View>
@@ -382,12 +75,12 @@ export default function CafeteriasScreen() {
         </View>
 
         <TouchableOpacity onPress={() => cargarCafeterias(radioKm)} style={styles.refreshBtn}>
-          <Ionicons name="refresh-outline" size={18} color={PREMIUM_ACCENT_DEEP} />
+          <Ionicons name="refresh-outline" size={18} color={THEME.brand.accentDeep} />
         </TouchableOpacity>
       </View>
 
       <View style={styles.radiusRow}>
-        {radiosDisponibles.map((km) => {
+        {RADIOS_DISPONIBLES.map((km) => {
           const activo = radioKm === km;
           return (
             <TouchableOpacity
@@ -422,84 +115,7 @@ export default function CafeteriasScreen() {
           </View>
         )}
         renderItem={({ item, index }) => (
-          <TouchableOpacity style={styles.card} onPress={() => setSeleccionada(item)} activeOpacity={0.88}>
-            <View style={styles.cardImgWrap}>
-              {item.foto ? (
-                <Image source={{ uri: item.foto }} style={styles.cardImg} resizeMode="cover" />
-              ) : (
-                <View style={styles.cardPlaceholder}>
-                  <Text style={styles.cardPlaceholderEmoji}>☕</Text>
-                  <Text style={styles.cardPlaceholderNombre} numberOfLines={2}>
-                    {item.nombre}
-                  </Text>
-                </View>
-              )}
-
-              <View style={styles.cardNum}>
-                <Text style={styles.cardNumText}>{index + 1}</Text>
-              </View>
-
-              {item.abierto !== null && (
-                <View style={[styles.cardEstado, { backgroundColor: item.abierto ? THEME.status.success : THEME.status.danger }]}>
-                  <Text style={styles.cardEstadoText}>{item.abierto ? 'Abierto' : 'Cerrado'}</Text>
-                </View>
-              )}
-            </View>
-
-            <View style={styles.cardInfo}>
-              <Text style={styles.cardNombre} numberOfLines={1}>
-                {item.nombre}
-              </Text>
-              <Text style={styles.cardTipo}>{item.tipo}</Text>
-
-              <View style={styles.cardRatingRow}>
-                {[1, 2, 3, 4, 5].map((n) => (
-                  <Ionicons
-                    key={n}
-                    name={n <= Math.round(item.rating) ? 'star' : 'star-outline'}
-                    size={12}
-                    color={THEME.status.favorite}
-                  />
-                ))}
-                <Text style={styles.cardRatingNum}>{item.rating}</Text>
-                <Text style={styles.cardReseñas}>({item.numResenas})</Text>
-              </View>
-
-              <View style={styles.cardTags}>
-                <View style={styles.cardTag}>
-                  <Ionicons name="location-outline" size={11} color={PREMIUM_ACCENT} />
-                  <Text style={styles.cardTagText}>
-                    {item.distancia < 1000 ? `${item.distancia}m` : `${(item.distancia / 1000).toFixed(1)}km`}
-                  </Text>
-                </View>
-
-                {item.wifi && (
-                  <View style={styles.cardTag}>
-                    <Ionicons name="wifi-outline" size={11} color={THEME.text.tertiary} />
-                    <Text style={styles.cardTagText}>WiFi</Text>
-                  </View>
-                )}
-
-                {item.terraza && (
-                  <View style={styles.cardTag}>
-                    <Ionicons name="sunny-outline" size={11} color={THEME.text.tertiary} />
-                    <Text style={styles.cardTagText}>Terraza</Text>
-                  </View>
-                )}
-
-                {item.takeaway && (
-                  <View style={styles.cardTag}>
-                    <Ionicons name="bag-handle-outline" size={11} color={THEME.text.tertiary} />
-                    <Text style={styles.cardTagText}>Para llevar</Text>
-                  </View>
-                )}
-              </View>
-
-              <Text style={styles.cardEspec} numberOfLines={1}>
-                {item.especialidades}
-              </Text>
-            </View>
-          </TouchableOpacity>
+          <CafeteriaCard item={item} index={index} styles={styles} onPress={setSeleccionada} />
         )}
       />
     </View>
@@ -528,20 +144,20 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: PREMIUM_SURFACE_SOFT,
+    backgroundColor: THEME.brand.soft,
     alignItems: 'center',
     justifyContent: 'center',
   },
   radiusRow: { flexDirection: 'row', gap: 8, paddingHorizontal: 16, paddingBottom: 12 },
   radiusChip: {
     borderWidth: 1,
-    borderColor: PREMIUM_BORDER_SOFT,
+    borderColor: THEME.brand.borderSoft,
     borderRadius: 999,
     paddingHorizontal: 12,
     paddingVertical: 7,
     backgroundColor: '#fff',
   },
-  radiusChipActive: { backgroundColor: PREMIUM_ACCENT_DEEP, borderColor: PREMIUM_ACCENT_DEEP },
+  radiusChipActive: { backgroundColor: THEME.brand.accentDeep, borderColor: THEME.brand.accentDeep },
   radiusChipText: { fontSize: 12, fontWeight: '700', color: THEME.text.secondary },
   radiusChipTextActive: { color: '#fff' },
   emptyBox: {
@@ -549,7 +165,7 @@ const styles = StyleSheet.create({
     marginTop: 18,
     backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: PREMIUM_BORDER_SOFT,
+    borderColor: THEME.brand.borderSoft,
     borderRadius: 14,
     padding: 14,
   },
@@ -636,7 +252,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: PREMIUM_ACCENT_DEEP,
+    backgroundColor: THEME.brand.accentDeep,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -656,7 +272,7 @@ const styles = StyleSheet.create({
   secTitulo: { fontSize: 15, fontWeight: '700', color: '#111', marginBottom: 8 },
   secTexto: { fontSize: 14, color: '#555', lineHeight: 22 },
   contactBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 6 },
-  contactText: { fontSize: 14, color: PREMIUM_ACCENT_DEEP, fontWeight: '500' },
+  contactText: { fontSize: 14, color: THEME.brand.accentDeep, fontWeight: '500' },
   primaryButton: {
     backgroundColor: THEME.brand.primary,
     borderRadius: 30,

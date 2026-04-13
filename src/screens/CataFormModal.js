@@ -43,7 +43,7 @@ export default function CataFormModal({
   const [mostrarListaCafes, setMostrarListaCafes] = useState(false);
 
   useEffect(() => {
-    if (visible) {
+    if (!!visible) {
       Animated.parallel([
         Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
         Animated.spring(slideAnim, { toValue: 0, friction: 8, tension: 110, useNativeDriver: true }),
@@ -124,10 +124,10 @@ export default function CataFormModal({
   const fechaDisplay = new Date(fechaHora).toLocaleDateString('es-ES');
   const horaDisplay = new Date(fechaHora).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
 
-  if (!visible) return null;
+  if (!visible || visible === 'false') return null;
 
   return (
-    <Modal visible={visible} animationType="none" transparent onRequestClose={onClose}>
+    <Modal visible={!!visible} animationType="none" transparent onRequestClose={onClose}>
       <Animated.View
         style={{
           flex: 1,
@@ -161,7 +161,7 @@ export default function CataFormModal({
             {/* Header */}
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <Text style={s.sectionTitle}>{isEditing ? 'Editar Cata' : 'Nueva Cata'}</Text>
-              <TouchableOpacity onPress={onClose} disabled={guardando} style={{ padding: 6 }}>
+              <TouchableOpacity onPress={onClose} disabled={!!guardando} style={{ padding: 6 }}>
                 <Ionicons name="close" size={24} color={theme.text.primary} />
               </TouchableOpacity>
             </View>
@@ -410,7 +410,7 @@ export default function CataFormModal({
             <Text style={[s.label, { marginBottom: 8 }]}>Foto (opcional)</Text>
             <TouchableOpacity
               onPress={handleSelectFoto}
-              disabled={guardando}
+              disabled={!!guardando}
               style={{
                 borderWidth: 2, borderColor: '#e8dfd5', borderStyle: 'dashed', borderRadius: 8,
                 paddingVertical: 20, alignItems: 'center', marginBottom: 16,
@@ -451,7 +451,7 @@ export default function CataFormModal({
             <View style={{ flexDirection: 'row', gap: 10 }}>
               <TouchableOpacity
                 onPress={onClose}
-                disabled={guardando}
+                disabled={!!guardando}
                 style={{ flex: 1, paddingVertical: 12, borderRadius: 8, borderWidth: 1.5, borderColor: premiumAccent }}
               >
                 <Text style={{ textAlign: 'center', color: premiumAccent, fontWeight: '700', fontSize: 12 }}>
@@ -460,7 +460,7 @@ export default function CataFormModal({
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={handleSave}
-                disabled={guardando || !cafeNombre.trim()}
+                disabled={!!guardando || !cafeNombre.trim()}
                 style={{
                   flex: 1, paddingVertical: 12, borderRadius: 8,
                   backgroundColor: !cafeNombre.trim() ? '#ccc' : premiumAccent,

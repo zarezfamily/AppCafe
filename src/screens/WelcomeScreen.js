@@ -64,7 +64,7 @@ export default function WelcomeScreen() {
           <Text style={styles.welcomeLineBottom}>{bottomRaw}{showCursorBottom ? '|' : ' '}</Text>
         </View>
         <Text style={styles.welcomeSub}>SPECIALTY COFFEE ATELIER</Text>
-        <Text style={styles.welcomeCaption}>Donde nació el café</Text>
+        <Text style={styles.welcomeCaption}>Dónde nació el café</Text>
       </Animated.View>
     </SafeAreaView>
   );

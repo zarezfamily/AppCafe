@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { ScrollView, View } from 'react-native';
 
 import BottomBarNav from './BottomBarNav';
@@ -12,6 +13,7 @@ import OfertasTab from './OfertasTab';
 import PaywallModal from './PaywallModal';
 import TopCafesTab from './TopCafesTab';
 import UltimosAnadidosTab from './UltimosAnadidosTab';
+import { MAIN_TABS } from './mainScreenTabs';
 
 export default function MainScreenBody({
   activeTab,
@@ -38,31 +40,44 @@ export default function MainScreenBody({
   purchasesReady,
   handlePremiumPurchase,
 }) {
+  const contentScrollRef = useRef(null);
+
+  useEffect(() => {
+    if (activeTab === MAIN_TABS.CAFETERIAS || activeTab === MAIN_TABS.COMMUNITY) return;
+    requestAnimationFrame(() => {
+      contentScrollRef.current?.scrollTo?.({ y: 0, animated: false });
+    });
+  }, [activeTab]);
+
   return (
     <>
-      {activeTab === 'Cafeterías' && (
+      {activeTab === MAIN_TABS.CAFETERIAS && (
         <View style={{ flex: 1 }}>
           <CafeteriasScreen />
         </View>
       )}
 
-      {activeTab === 'Comunidad' && <CommunityTab {...communityTabProps} />}
+      {activeTab === MAIN_TABS.COMMUNITY && <CommunityTab {...communityTabProps} />}
 
-      {activeTab !== 'Cafeterías' && activeTab !== 'Comunidad' && (
-        <ScrollView contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
-          {activeTab === 'Inicio' && <InicioTab {...inicioTabProps} />}
-          {activeTab === 'Mis Cafés' && <MisCafesTab {...misCafesTabProps} />}
-          {activeTab === 'Últimos añadidos' && <UltimosAnadidosTab {...ultimosAnadidosTabProps} />}
-          {activeTab === 'Top cafés' && <TopCafesTab {...topCafesTabProps} />}
-          {activeTab === 'Ofertas' && <OfertasTab {...ofertasTabProps} />}
-          {activeTab === 'Más' && <MasTab {...masTabProps} />}
+      {activeTab !== MAIN_TABS.CAFETERIAS && activeTab !== MAIN_TABS.COMMUNITY && (
+        <ScrollView
+          ref={contentScrollRef}
+          contentContainerStyle={{ paddingBottom: 100 }}
+          showsVerticalScrollIndicator={false}
+        >
+          {activeTab === MAIN_TABS.HOME && <InicioTab {...inicioTabProps} />}
+          {activeTab === MAIN_TABS.NOTEBOOK && <MisCafesTab {...misCafesTabProps} />}
+          {activeTab === MAIN_TABS.LATEST && <UltimosAnadidosTab {...ultimosAnadidosTabProps} />}
+          {activeTab === MAIN_TABS.TOP && <TopCafesTab {...topCafesTabProps} />}
+          {activeTab === MAIN_TABS.OFFERS && <OfertasTab {...ofertasTabProps} />}
+          {activeTab === MAIN_TABS.MORE && <MasTab {...masTabProps} />}
         </ScrollView>
       )}
 
-      {!(activeTab === 'Comunidad' && !!forumThread) && <BottomBarNav {...bottomBarProps} />}
+      {!(activeTab === MAIN_TABS.COMMUNITY && !!forumThread) && <BottomBarNav {...bottomBarProps} />}
 
       <CataFormModal
-        visible={notebook.modalFormOpen}
+        visible={!!notebook.modalFormOpen}
         onClose={notebook.irCerrarModal}
         onSave={guardarCata}
         allCafes={allCafes}
@@ -100,7 +115,7 @@ export default function MainScreenBody({
       />
 
       <CataDetailModal
-        visible={notebook.modalDetailOpen}
+        visible={!!notebook.modalDetailOpen}
         cata={notebook.cataSeleccionada}
         onClose={notebook.irCerrarDetail}
         onEdit={(cata) => {
@@ -127,7 +142,7 @@ export default function MainScreenBody({
       />
 
       <PaywallModal
-        visible={premium.showPaywall}
+        visible={!!premium.showPaywall}
         onClose={premium.closePaywall}
         onRestore={handleRestorePurchases}
         trigger={premium.paywallTrigger}

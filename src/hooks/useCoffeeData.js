@@ -28,6 +28,7 @@ export default function useCoffeeData({
   const [topCafes, setTopCafes] = useState([]);
   const [allCafes, setAllCafes] = useState([]);
   const [cargando, setCargando] = useState(true);
+  const [errorCargaDatos, setErrorCargaDatos] = useState(null);
   const [cafeteriasInicio, setCafeteriasInicio] = useState([]);
   const [cargandoCafInicio, setCargandoCafInicio] = useState(false);
   const [errorCafInicio, setErrorCafInicio] = useState(null);
@@ -35,6 +36,7 @@ export default function useCoffeeData({
   const cargarDatos = async () => {
     if (!user?.uid) return;
     setCargando(true);
+    setErrorCargaDatos(null);
     const cached = await loadCollectionOfflineCache(user.uid);
     if (cached) {
       setMisCafes(Array.isArray(cached.misCafes) ? cached.misCafes : []);
@@ -54,8 +56,17 @@ export default function useCoffeeData({
         topCafes: ranking,
         allCafes: todos,
       });
-    } catch {}
-    setCargando(false);
+    } catch (error) {
+      const message = String(error?.message || error || '');
+      console.log('[CoffeeData] Error cargar datos:', message);
+      if (message.includes('NETWORK_UNAVAILABLE')) {
+        setErrorCargaDatos(cached ? 'Sin conexión. Mostrando datos guardados.' : 'Sin conexión. No se pudieron cargar tus datos.');
+      } else {
+        setErrorCargaDatos(cached ? 'No pudimos refrescar los datos. Mostrando la última copia guardada.' : 'No se pudieron cargar tus datos.');
+      }
+    } finally {
+      setCargando(false);
+    }
   };
 
   const cargarCafeteriasInicio = async () => {
@@ -163,7 +174,11 @@ export default function useCoffeeData({
       return;
     }
 
-    cargarCafeteriasInicio();
+    const timer = setTimeout(() => {
+      cargarCafeteriasInicio();
+    }, 300);
+
+    return () => clearTimeout(timer);
   }, [user?.uid]);
 
   const toggleFav = async (cafe) => {
@@ -227,6 +242,7 @@ export default function useCoffeeData({
     topCafes,
     allCafes,
     cargando,
+    errorCargaDatos,
     setCargando,
     cafeteriasInicio,
     cargandoCafInicio,

@@ -1,20 +1,22 @@
 import React from 'react';
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
   ScrollView,
   StatusBar,
-  Switch,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import AppDialogModal from '../components/AppDialogModal';
-import authScreenStyles, { AUTH_COLORS } from './authScreenStyles';
+import authScreenStyles from './authScreenStyles';
+import {
+  AuthActionButtons,
+  AuthCredentialsFields,
+  AuthInlineNotice,
+  AuthRememberToggle,
+} from './AuthScreenParts';
+import buildAuthScreenViewModel from './buildAuthScreenViewModel';
 import useAuthScreen from './useAuthScreen';
 
 export default function AuthScreen({ onAuth }) {
@@ -40,16 +42,16 @@ export default function AuthScreen({ onAuth }) {
   } = useAuthScreen({ onAuth });
 
   const styles = authScreenStyles;
+  const viewModel = buildAuthScreenViewModel({
+    modo,
+    hasAccount,
+    faceIdDisponible,
+    faceIdGuardado,
+    cargando,
+  });
 
   return (
     <SafeAreaView style={styles.screen}>
-      <AppDialogModal
-        visible={dialogVisible}
-        onClose={() => setDialogVisible(false)}
-        title={dialogConfig.title}
-        description={dialogConfig.description}
-        actions={dialogConfig.actions}
-      />
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.authScroll}>
@@ -60,87 +62,52 @@ export default function AuthScreen({ onAuth }) {
             <View style={styles.authBrandBlock}>
               <Text style={styles.wordmark}>ETIOVE</Text>
               <Text style={styles.wordmarkSub}>COFFEE ATELIER</Text>
-              <Text style={styles.wordmarkTag}>Donde nació el café</Text>
+              <Text style={styles.wordmarkTag}>Dónde nació el café</Text>
             </View>
 
             <View style={styles.authCard}>
-              <Text style={styles.authKicker}>
-                {modo === 'login'
-                  ? hasAccount
-                    ? 'BIENVENIDO DE NUEVO'
-                    : 'BIENVENIDO'
-                  : modo === 'register'
-                    ? 'NUEVA MEMBRESÍA'
-                    : 'RECUPERACIÓN SEGURA'}
-              </Text>
-              <Text style={styles.authTitle}>
-                {modo === 'login'
-                  ? 'Accede a tu cuenta'
-                  : modo === 'register'
-                    ? 'Crea tu cuenta'
-                    : 'Recupera tu acceso'}
-              </Text>
-              <Text style={styles.authSub}>
-                {modo === 'login'
-                  ? 'Entra para seguir tu colección, nivel y ritual de cata.'
-                  : modo === 'register'
-                    ? 'Únete a Etiove y empieza a construir tu perfil de catador.'
-                    : 'Te enviaremos un enlace para restaurar tu contraseña.'}
-              </Text>
+              <Text style={styles.authKicker}>{viewModel.kicker}</Text>
+              <Text style={styles.authTitle}>{viewModel.title}</Text>
+              <Text style={styles.authSub}>{viewModel.subtitle}</Text>
 
-              <Text style={styles.label}>Email</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="tu@email.com"
-                placeholderTextColor="#9f9388"
-                value={email}
-                onChangeText={setEmail}
-                autoCapitalize="none"
-                keyboardType="email-address"
+              <AuthInlineNotice
+                styles={styles}
+                dialogVisible={dialogVisible}
+                dialogConfig={dialogConfig}
+                setDialogVisible={setDialogVisible}
               />
 
-              {modo !== 'reset' && (
-                <>
-                  <Text style={styles.label}>Contraseña</Text>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Mínimo 6 caracteres"
-                    placeholderTextColor="#9f9388"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry
-                  />
-                </>
+              <AuthCredentialsFields
+                styles={styles}
+                email={email}
+                setEmail={setEmail}
+                password={password}
+                setPassword={setPassword}
+                showPasswordField={viewModel.showPasswordField}
+              />
+
+              {viewModel.showRememberToggle && (
+                <AuthRememberToggle
+                  styles={styles}
+                  recordar={recordar}
+                  setRecordar={setRecordar}
+                  borrarCreds={borrarCreds}
+                />
               )}
 
-              {modo === 'login' && (
-                <View style={styles.rememberRow}>
-                  <Switch
-                    value={recordar}
-                    onValueChange={(value) => {
-                      setRecordar(value);
-                      if (!value) borrarCreds();
-                    }}
-                    trackColor={{ false: '#ddd4cb', true: COLORS.accent }}
-                    thumbColor="#fffdf8"
-                  />
-                  <Text style={styles.rememberText}>Recordar contraseña</Text>
-                </View>
-              )}
-
-              <TouchableOpacity style={styles.primaryBtn} onPress={handleSubmit} disabled={cargando}>
-                {cargando ? <ActivityIndicator color={AUTH_COLORS.primaryText} /> : <Text style={styles.primaryBtnText}>{modo === 'login' ? 'Entrar' : modo === 'register' ? 'Crear cuenta' : 'Enviar enlace'}</Text>}
-              </TouchableOpacity>
-
-              {modo === 'login' && faceIdDisponible && faceIdGuardado && (
-                <TouchableOpacity style={styles.secondaryBtn} onPress={handleFaceId} disabled={cargando}>
-                  <Ionicons name="scan-outline" size={22} color={AUTH_COLORS.accent} />
-                  <Text style={styles.secondaryBtnText}>Entrar con Face ID</Text>
-                </TouchableOpacity>
-              )}
+              <AuthActionButtons
+                styles={styles}
+                cargando={cargando}
+                primaryAction={viewModel.primaryAction}
+                handleSubmit={handleSubmit}
+                showFaceIdButton={viewModel.showFaceIdButton}
+                handleFaceId={handleFaceId}
+                disablePrimaryAction={viewModel.disablePrimaryAction}
+                disableSecondaryAction={viewModel.disableSecondaryAction}
+              />
 
               <View style={styles.links}>
-                {modo === 'login' ? (
+                {viewModel.isLoginMode ? (
                   <>
                     <TouchableOpacity onPress={() => setModo('register')}>
                       <Text style={styles.link}>¿Sin cuenta? Regístrate</Text>

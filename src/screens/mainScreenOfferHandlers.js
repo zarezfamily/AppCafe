@@ -1,3 +1,4 @@
+import { MAIN_TABS } from './mainScreenTabs';
 import * as SecureStore from 'expo-secure-store';
 import { Linking } from 'react-native';
 
@@ -225,7 +226,7 @@ export function createMainScreenOfferHandlers({
   const abrirOfertasCafe = async (cafe, options = {}) => {
     if (!cafe?.id) return;
     setOpenOfferCafeId(cafe.id);
-    if (options.navigate) setActiveTab('Ofertas');
+    if (options.navigate) setActiveTab(MAIN_TABS.OFFERS);
     await buscarOfertasCafe(cafe, !!options.forceRefresh);
   };
 

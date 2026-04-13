@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import {
   PlayfairDisplay_700Bold,
   PlayfairDisplay_800ExtraBold,
 } from '@expo-google-fonts/playfair-display';
-import linking from '../navigation/linking';
-import RootNavigator from '../navigation/RootNavigator';
+import AuthScreen from '../screens/AuthScreen';
+import MainScreen from '../screens/MainScreen';
 import WelcomeScreen from '../screens/WelcomeScreen';
 import { useAuth } from '../context/AuthContext';
 import { useProfileRealtimeSync } from '../api/profileSync';
@@ -17,7 +16,7 @@ export default function AppBootstrap() {
     PlayfairDisplay_800ExtraBold,
   });
   const [showWelcome, setShowWelcome] = useState(true);
-  const { user, setPerfil } = useAuth();
+  const { user, setPerfil, setUser, logout } = useAuth();
 
   useProfileRealtimeSync(user, setPerfil);
 
@@ -28,10 +27,7 @@ export default function AppBootstrap() {
 
   if (!fontsLoaded) return null;
   if (showWelcome) return <WelcomeScreen />;
+  if (!user) return <AuthScreen onAuth={setUser} />;
 
-  return (
-    <NavigationContainer linking={linking}>
-      <RootNavigator />
-    </NavigationContainer>
-  );
+  return <MainScreen onLogout={logout} />;
 }

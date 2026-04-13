@@ -170,7 +170,7 @@ export default function createMainScreenStyles(THEME, PREMIUM_ACCENT, PREMIUM_AC
     forumMetaText: { fontSize: 11, color: THEME.text.secondary },
     forumCountersRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 8 },
     forumCounter: { fontSize: 12, color: THEME.text.tertiary, fontWeight: '600' },
-    forumMainPost: { marginTop: 4, backgroundColor: PREMIUM_SURFACE_SOFT, borderRadius: 14, borderWidth: 1, borderColor: '#e4d3c2', padding: 14 },
+    forumMainPost: { marginTop: 4, backgroundColor: THEME.brand.soft, borderRadius: 14, borderWidth: 1, borderColor: '#e4d3c2', padding: 14 },
     forumMainPostHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 },
     forumMainPostImage: { marginTop: 8, width: '100%', height: 160, borderRadius: 10 },
     forumReplyCard: { marginBottom: 10, backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#efe6dc', padding: 10 },

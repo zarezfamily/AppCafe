@@ -1,10 +1,11 @@
-import { useCameraPermissions } from 'expo-camera';
+import { Camera } from 'expo-camera';
 import * as SecureStore from 'expo-secure-store';
 import { useRef, useState } from 'react';
 import { Animated } from 'react-native';
+import { MAIN_TABS } from './mainScreenTabs';
 
 export default function useMainScreenUiState({ keyProfile }) {
-  const [activeTab, setActiveTab] = useState('Inicio');
+  const [activeTab, setActiveTab] = useState(MAIN_TABS.HOME);
   const [scanning, setScanning] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
@@ -26,9 +27,27 @@ export default function useMainScreenUiState({ keyProfile }) {
   const communityNotificationBootRef = useRef(false);
   const forumNotificationBootRef = useRef(false);
   const favoriteNotificationBootRef = useRef(false);
-  const [permission, requestPermission] = useCameraPermissions();
+  const [permission, setPermission] = useState(null);
   const brandCardAnim = useRef(new Animated.Value(0)).current;
   const brandProgressAnim = useRef(new Animated.Value(0)).current;
+
+  const requestPermission = async () => {
+    try {
+      if (permission?.granted) return permission;
+      const nextPermission = await Camera.requestCameraPermissionsAsync();
+      setPermission(nextPermission);
+      return nextPermission;
+    } catch {
+      const fallbackPermission = {
+        granted: false,
+        status: 'denied',
+        canAskAgain: false,
+        expires: 'never',
+      };
+      setPermission(fallbackPermission);
+      return fallbackPermission;
+    }
+  };
 
   const refrescarPerfil = async () => {
     try {
@@ -51,7 +70,7 @@ export default function useMainScreenUiState({ keyProfile }) {
 
   const closeFormAndRefreshData = (onRefresh) => {
     setShowForm(false);
-    setActiveTab('Mis Cafés');
+    setActiveTab(MAIN_TABS.NOTEBOOK);
     onRefresh?.();
   };
 

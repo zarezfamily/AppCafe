@@ -1,14 +1,8 @@
-import Constants from 'expo-constants';
-import * as LocalAuthentication from 'expo-local-authentication';
-import * as SecureStore from 'expo-secure-store';
 import { useEffect, useState } from 'react';
 
-import { loginUser, registerUser, resetPassword } from '../../authService';
-
-const KEY_EMAIL = 'etiove_email';
-const KEY_PASSWORD = 'etiove_password';
-const KEY_REMEMBER = 'etiove_remember';
-const KEY_HAS_ACCOUNT = 'etiove_has_account';
+import { buildAuthFaceIdHandler, buildAuthSubmitHandler } from './buildAuthScreenActions';
+import { getFaceIdAvailability } from './authScreenBiometrics';
+import { clearRememberedCredentials, loadStoredAuthState } from './authScreenStorage';
 
 export default function useAuthScreen({ onAuth }) {
   const [modo, setModo] = useState('login');
@@ -30,122 +24,51 @@ export default function useAuthScreen({ onAuth }) {
   useEffect(() => {
     (async () => {
       try {
-        const hasHardware = await LocalAuthentication.hasHardwareAsync();
-        const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-        const supportedTypes = await LocalAuthentication.supportedAuthenticationTypesAsync();
-        const hasFaceId = supportedTypes.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION);
-        setFaceIdDisponible(hasHardware && isEnrolled && hasFaceId);
+        const isFaceIdAvailable = await getFaceIdAvailability();
+        const storedState = await loadStoredAuthState();
 
-        if ((await SecureStore.getItemAsync(KEY_REMEMBER)) === 'true') {
-          const em = await SecureStore.getItemAsync(KEY_EMAIL);
-          const pw = await SecureStore.getItemAsync(KEY_PASSWORD);
-          if (em && pw) {
-            setEmail(em);
-            setPassword(pw);
-            setRecordar(true);
-            setFaceIdGuardado(true);
-          }
+        setFaceIdDisponible(isFaceIdAvailable);
+        setHasAccount(storedState.hasAccount);
+
+        if (storedState.rememberEnabled && storedState.email && storedState.password) {
+          setEmail(storedState.email);
+          setPassword(storedState.password);
+          setRecordar(true);
+          setFaceIdGuardado(true);
         }
-
-        setHasAccount((await SecureStore.getItemAsync(KEY_HAS_ACCOUNT)) === 'true');
       } catch {
         // noop
       }
     })();
   }, []);
 
-  const guardarCreds = async (em, pw) => {
-    await SecureStore.setItemAsync(KEY_EMAIL, em);
-    await SecureStore.setItemAsync(KEY_PASSWORD, pw);
-    await SecureStore.setItemAsync(KEY_REMEMBER, 'true');
-  };
-
   const borrarCreds = async () => {
-    await SecureStore.deleteItemAsync(KEY_EMAIL);
-    await SecureStore.deleteItemAsync(KEY_PASSWORD);
-    await SecureStore.setItemAsync(KEY_REMEMBER, 'false');
+    await clearRememberedCredentials();
     setFaceIdGuardado(false);
   };
 
-  const marcarCuenta = async () => {
-    await SecureStore.setItemAsync(KEY_HAS_ACCOUNT, 'true').catch(() => {});
-    setHasAccount(true);
-  };
+  const getState = () => ({
+    email,
+    password,
+    modo,
+    recordar,
+  });
 
-  const handleSubmit = async () => {
-    if (!email.trim() || (!password.trim() && modo !== 'reset')) {
-      showDialog('Aviso', 'Rellena todos los campos');
-      return;
-    }
+  const handleSubmit = buildAuthSubmitHandler({
+    getState,
+    setModo,
+    setCargando,
+    showDialog,
+    onAuth,
+    setHasAccount,
+    setFaceIdGuardado,
+  });
 
-    setCargando(true);
-    try {
-      if (modo === 'login') {
-        const user = await loginUser(email.trim(), password);
-        await marcarCuenta();
-        if (recordar) await guardarCreds(email.trim(), password);
-        else await borrarCreds();
-        onAuth?.(user);
-      } else if (modo === 'register') {
-        const user = await registerUser(email.trim(), password);
-        await marcarCuenta();
-        onAuth?.(user);
-      } else {
-        await resetPassword(email.trim());
-        showDialog('Email enviado', 'Revisa tu bandeja de entrada');
-        setModo('login');
-      }
-    } catch (e) {
-      showDialog('Error', e?.message || 'Algo salió mal');
-    } finally {
-      setCargando(false);
-    }
-  };
-
-  const handleFaceId = async () => {
-    try {
-      if (Constants.appOwnership === 'expo' || Constants.executionEnvironment === 'storeClient') {
-        showDialog('Face ID en Expo Go', 'En Expo Go Face ID puede fallar. Usa un build de desarrollo o TestFlight para biometría real.');
-        return;
-      }
-
-      const hasHardware = await LocalAuthentication.hasHardwareAsync();
-      const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-      const supportedTypes = await LocalAuthentication.supportedAuthenticationTypesAsync();
-      const hasFaceId = supportedTypes.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION);
-
-      if (!hasHardware || !isEnrolled || !hasFaceId) {
-        showDialog('Face ID no disponible', 'Este dispositivo no tiene Face ID listo para usar ahora mismo.');
-        return;
-      }
-
-      const auth = await LocalAuthentication.authenticateAsync({
-        promptMessage: 'Accede a Etiove',
-        disableDeviceFallback: true,
-        fallbackLabel: '',
-      });
-
-      if (!auth.success) {
-        showDialog('Face ID', 'No se pudo completar la autenticación biométrica.');
-        return;
-      }
-
-      const em = await SecureStore.getItemAsync(KEY_EMAIL);
-      const pw = await SecureStore.getItemAsync(KEY_PASSWORD);
-      if (!em || !pw) {
-        showDialog('Aviso', 'Primero inicia sesión y activa “Recordar contraseña”.');
-        return;
-      }
-
-      setCargando(true);
-      const user = await loginUser(em, pw);
-      onAuth?.(user);
-    } catch {
-      showDialog('Error', 'No se pudo autenticar');
-    } finally {
-      setCargando(false);
-    }
-  };
+  const handleFaceId = buildAuthFaceIdHandler({
+    showDialog,
+    setCargando,
+    onAuth,
+  });
 
   return {
     modo,

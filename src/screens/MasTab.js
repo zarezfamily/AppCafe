@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { ActivityIndicator, Image, Linking, Switch, Text, TouchableOpacity, View } from 'react-native';
 import AppDialogModal from '../components/AppDialogModal';
 import MemberInfoModal from '../components/MemberInfoModal';
 import mas from './masStyles';
+import { MAIN_TABS } from './mainScreenTabs';
 import PremiumBadge from './PremiumBadge';
 
 function MasItem({ icon, label, sub, onPress, mas, premiumAccent, iconFaint }) {
@@ -14,6 +16,27 @@ function MasItem({ icon, label, sub, onPress, mas, premiumAccent, iconFaint }) {
         {sub && <Text style={mas.sub}>{sub}</Text>}
       </View>
       <Ionicons name="chevron-forward" size={18} color={iconFaint} />
+    </TouchableOpacity>
+  );
+}
+
+function SocialIconButton({ icon, onPress, premiumAccent }) {
+  return (
+    <TouchableOpacity
+      style={{
+        width: 58,
+        height: 58,
+        borderRadius: 16,
+        backgroundColor: '#faf8f5',
+        borderWidth: 1,
+        borderColor: '#e8dcc8',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+      onPress={onPress}
+      activeOpacity={0.75}
+    >
+      <Ionicons name={icon} size={28} color={premiumAccent} />
     </TouchableOpacity>
   );
 }
@@ -95,7 +118,7 @@ export default function MasTab({
     <View style={{ paddingTop: 20 }}>
       <MemberInfoModal visible={showMemberInfo} onClose={() => setShowMemberInfo(false)} />
       <AppDialogModal
-        visible={dialogVisible}
+        visible={!!dialogVisible}
         onClose={() => setDialogVisible(false)}
         title={dialogConfig.title}
         description={dialogConfig.description}
@@ -169,6 +192,27 @@ export default function MasTab({
           </View>
         </View>
 
+        <Text style={mas.blockTitle}>Blog</Text>
+        <TouchableOpacity
+          style={mas.blogCard}
+          activeOpacity={0.9}
+          onPress={() => Linking.openURL('https://etiove.com/blog/')}
+        >
+          <View style={mas.blogCardGlow} />
+          <Text style={mas.blogKicker}>ETIOVE JOURNAL</Text>
+          <Text style={mas.blogTitle}>Lee el blog de Etiove desde la app</Text>
+          <Text style={mas.blogDesc}>
+            Guías de molienda, métodos, cafés recomendados y contenido editorial para seguir descubriendo café de especialidad.
+          </Text>
+          <View style={mas.blogActionRow}>
+            <View style={mas.blogActionPill}>
+              <Ionicons name="newspaper-outline" size={16} color="#fff5eb" />
+              <Text style={mas.blogActionText}>Abrir blog</Text>
+            </View>
+            <Ionicons name="arrow-forward" size={18} color="#8f5e3b" />
+          </View>
+        </TouchableOpacity>
+
         <Text style={mas.blockTitle}>Accesos</Text>
         <View style={mas.quickGrid}>
           <TouchableOpacity style={[mas.quickCard, mas.quickCardDark]} onPress={() => setShowProfile(true)}>
@@ -176,7 +220,7 @@ export default function MasTab({
             <Text style={mas.quickTitleDark}>Mi Perfil</Text>
             <Text style={mas.quickSubDark}>Editar datos y foto</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[mas.quickCard, mas.quickCardSoft]} onPress={() => setActiveTab('Mis Cafés')}>
+          <TouchableOpacity style={[mas.quickCard, mas.quickCardSoft]} onPress={() => setActiveTab(MAIN_TABS.NOTEBOOK)}>
             <Ionicons name="heart-outline" size={20} color={premiumAccentDeep} />
             <Text style={mas.quickTitle}>Mis Cafés</Text>
             <Text style={mas.quickSub}>Tu colección personal</Text>
@@ -214,12 +258,12 @@ export default function MasTab({
           <View style={mas.newsletterTopRow}>
             <View style={mas.newsletterTitleWrap}>
               <Text style={mas.newsletterTitle}>BE ETIOVE BY EMAIL</Text>
-              <Text style={mas.newsletterSub}>Recibe lanzamientos, cafes y novedades</Text>
+              <Text style={mas.newsletterSub}>Recibe lanzamientos, cafés y novedades</Text>
             </View>
             <Switch
-              value={newsletterState.subscribed}
+              value={!!newsletterState?.subscribed}
               onValueChange={guardarNewsletter}
-              disabled={newsletterLoading || newsletterSaving || !newsletterHasEmail}
+              disabled={!!newsletterLoading || !!newsletterSaving || !newsletterHasEmail}
               trackColor={{ false: '#d8cbbf', true: '#6b4a37' }}
               thumbColor="#fffdf8"
             />
@@ -228,10 +272,10 @@ export default function MasTab({
           <View style={mas.newsletterMetaRow}>
             <View style={[mas.newsletterStatusPill, newsletterState.subscribed ? mas.newsletterStatusOn : mas.newsletterStatusOff]}>
               <Text style={[mas.newsletterStatusText, newsletterState.subscribed ? mas.newsletterStatusTextOn : mas.newsletterStatusTextOff]}>
-                {newsletterLoading ? 'CARGANDO' : newsletterState.subscribed ? 'SUSCRIPCION ACTIVA' : 'NO SUSCRITO'}
+                {newsletterLoading ? 'CARGANDO' : newsletterState.subscribed ? 'SUSCRIPCIÓN ACTIVA' : 'NO SUSCRITO'}
               </Text>
             </View>
-            <Text style={mas.newsletterEmail}>{newsletterHasEmail ? newsletterEmail.toUpperCase() : 'ANADE UN EMAIL EN TU PERFIL PARA ACTIVAR LA NEWSLETTER.'}</Text>
+            <Text style={mas.newsletterEmail}>{newsletterHasEmail ? newsletterEmail.toUpperCase() : 'AÑADE UN EMAIL EN TU PERFIL PARA ACTIVAR LA NEWSLETTER.'}</Text>
           </View>
 
           <Text style={mas.newsletterNote}>Guardamos tus consentimientos para que seas un ETIOVER</Text>
@@ -239,7 +283,7 @@ export default function MasTab({
           <TouchableOpacity
             style={[mas.newsletterBtn, (!newsletterHasEmail || newsletterSaving) && mas.newsletterBtnDisabled]}
             onPress={() => guardarNewsletter(!newsletterState.subscribed)}
-            disabled={!newsletterHasEmail || newsletterSaving}
+            disabled={!newsletterHasEmail || !!newsletterSaving}
           >
             {newsletterSaving
               ? <ActivityIndicator color="#fff" />
@@ -256,7 +300,14 @@ export default function MasTab({
                 icon="shield-checkmark-outline"
                 label={isAdmin ? 'Panel de administración' : 'Panel de staff'}
                 sub={isAdmin ? 'Gestión total del sistema' : 'Herramientas de moderación'}
-                onPress={() => setActiveTab('PanelAdmin')}
+                onPress={() => openDialog(
+                  isAdmin ? 'Panel de administración' : 'Panel de staff',
+                  isAdmin
+                    ? 'La moderación avanzada ya está integrada en Comunidad. Si quieres, el siguiente paso es crear una pantalla admin real con métricas, reportes y acciones globales.'
+                    : 'Las herramientas de moderación ya están integradas en Comunidad para editar, eliminar y revisar contenido.'
+                  ,
+                  [{ label: 'Cerrar' }]
+                )}
                 mas={mas}
                 premiumAccent={premiumAccent}
                 iconFaint={iconFaint}
@@ -287,47 +338,28 @@ export default function MasTab({
         </View>
 
         {/* ─── DONDE ESTAMOS ─── */}
-        <Text style={mas.blockTitle}>Donde Estamos</Text>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-around', paddingHorizontal: 16, paddingVertical: 20, gap: 12 }}>
-          <TouchableOpacity
-            style={{ flexDirection: 'column', alignItems: 'center', gap: 8, paddingVertical: 12, paddingHorizontal: 16, borderRadius: 14, backgroundColor: '#faf8f5', borderWidth: 1, borderColor: '#e8dcc8', flex: 1 }}
-            onPress={() => Linking.openURL('https://instagram.com/etiove')}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="logo-instagram" size={32} color="#E4405F" />
-            <Text style={{ fontSize: 12, fontWeight: '700', color: '#1f140f', textAlign: 'center' }}>Instagram</Text>
-            <Text style={{ fontSize: 10, color: '#8b7355', textAlign: 'center' }}>@etiove</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={{ flexDirection: 'column', alignItems: 'center', gap: 8, paddingVertical: 12, paddingHorizontal: 16, borderRadius: 14, backgroundColor: '#faf8f5', borderWidth: 1, borderColor: '#e8dcc8', flex: 1 }}
-            onPress={() => Linking.openURL('https://twitter.com/etiove')}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="logo-x" size={32} color="#1DA1F2" />
-            <Text style={{ fontSize: 12, fontWeight: '700', color: '#1f140f', textAlign: 'center' }}>X</Text>
-            <Text style={{ fontSize: 10, color: '#8b7355', textAlign: 'center' }}>@etiove</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={{ flexDirection: 'column', alignItems: 'center', gap: 8, paddingVertical: 12, paddingHorizontal: 16, borderRadius: 14, backgroundColor: '#faf8f5', borderWidth: 1, borderColor: '#e8dcc8', flex: 1 }}
+        <Text style={mas.blockTitle}>Dónde estamos</Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 20, gap: 12 }}>
+          <SocialIconButton
+            icon="logo-instagram"
+            premiumAccent={premiumAccent}
+            onPress={() => Linking.openURL('https://instagram.com/etiove_cafe')}
+          />
+          <SocialIconButton
+            icon="logo-x"
+            premiumAccent={premiumAccent}
+            onPress={() => Linking.openURL('https://x.com/etiove_cafe')}
+          />
+          <SocialIconButton
+            icon="logo-tiktok"
+            premiumAccent={premiumAccent}
             onPress={() => Linking.openURL('https://tiktok.com/@etiove')}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="logo-tiktok" size={32} color="#000000" />
-            <Text style={{ fontSize: 12, fontWeight: '700', color: '#1f140f', textAlign: 'center' }}>TikTok</Text>
-            <Text style={{ fontSize: 10, color: '#8b7355', textAlign: 'center' }}>@etiove</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={{ flexDirection: 'column', alignItems: 'center', gap: 8, paddingVertical: 12, paddingHorizontal: 16, borderRadius: 14, backgroundColor: '#faf8f5', borderWidth: 1, borderColor: '#e8dcc8', flex: 1 }}
-            onPress={() => Linking.openURL('https://etiove.com/comunidad.html')}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="globe-outline" size={32} color="#5B7FA6" />
-            <Text style={{ fontSize: 12, fontWeight: '700', color: '#1f140f', textAlign: 'center' }}>Comunidad web</Text>
-            <Text style={{ fontSize: 10, color: '#8b7355', textAlign: 'center' }}>etiove.com/comunidad</Text>
-          </TouchableOpacity>
+          />
+          <SocialIconButton
+            icon="globe-outline"
+            premiumAccent={premiumAccent}
+            onPress={() => Linking.openURL('https://etiove.com')}
+          />
         </View>
 
         <TouchableOpacity

@@ -21,15 +21,15 @@ export default function useCommunityTabUi({
   interactionFeedbackMode,
 }) {
   const [showMemberInfo, setShowMemberInfo] = useState(false);
-  const communityHeroAnim = useRef(new Animated.Value(0)).current;
+  const communityHeroAnim = useRef(new Animated.Value(1)).current;
   const categoryRowAnimsRef = useRef([]);
   const categoryPressAnimsRef = useRef([]);
   const threadRowAnimsRef = useRef([]);
   const threadPressAnimsRef = useRef([]);
-  const threadListEnterAnim = useRef(new Animated.Value(0)).current;
+  const threadListEnterAnim = useRef(new Animated.Value(1)).current;
   const skeletonShimmerAnim = useRef(new Animated.Value(0)).current;
   const skeletonLoopRef = useRef(null);
-  const composerEnterAnim = useRef(new Animated.Value(0)).current;
+  const composerEnterAnim = useRef(new Animated.Value(1)).current;
   const createModalAnim = useRef(new Animated.Value(0)).current;
   const editModalAnim = useRef(new Animated.Value(0)).current;
 

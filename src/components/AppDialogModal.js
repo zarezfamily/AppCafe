@@ -29,7 +29,7 @@ export default function AppDialogModal({ visible, onClose, title, description, a
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal visible={!!visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={{ flex: 1, backgroundColor: 'rgba(16, 10, 7, 0.62)', justifyContent: 'center', padding: 20 }}>
         <TouchableOpacity style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }} activeOpacity={1} onPress={onClose} />
         <View style={{ position: 'relative', overflow: 'hidden', borderRadius: 20, backgroundColor: '#1f140f', borderWidth: 1, borderColor: '#4e3426', padding: compactActions ? 16 : 18, gap: 12 }}>

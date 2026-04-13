@@ -26,7 +26,7 @@ export default function CommunityEditItemModal({
   editModalAnim,
 }) {
   return (
-    <Modal visible={visible} animationType="none" transparent onRequestClose={closeEditModal}>
+    <Modal visible={!!visible} animationType="none" transparent onRequestClose={closeEditModal}>
       <KeyboardAvoidingView
         style={[s.forumModalOverlay, { backgroundColor: 'transparent' }]}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -101,8 +101,8 @@ export default function CommunityEditItemModal({
               <TouchableOpacity style={[s.authSecondaryBtn, { flex: 1, marginTop: 0 }]} onPress={closeEditModal}>
                 <Text style={s.authSecondaryBtnText}>Cancelar</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[s.redBtn, { flex: 1, marginTop: 0 }]} onPress={handleSaveEdit} disabled={forumEditing}>
-                {forumEditing ? <ActivityIndicator color="#fff" /> : <Text style={s.redBtnText}>Guardar</Text>}
+              <TouchableOpacity style={[s.redBtn, { flex: 1, marginTop: 0 }]} onPress={handleSaveEdit} disabled={!!forumEditing}>
+                {!!forumEditing ? <ActivityIndicator color="#fff" /> : <Text style={s.redBtnText}>Guardar</Text>}
               </TouchableOpacity>
             </View>
           </Animated.View>

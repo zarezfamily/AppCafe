@@ -32,471 +32,90 @@
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:wght@400;500&display=swap" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:wght@400;500&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --ink:         #1c120d;
-      --ink-soft:    #5d4030;
-      --ink-muted:   #9a7963;
-      --cream:       #f6efe7;
-      --cream-alt:   #fffaf5;
-      --accent:      #8f5e3b;
-      --accent-deep: #5d4030;
-      --border:      #e4d3c2;
-      --border-soft: rgba(228, 211, 194, 0.5);
-    }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      font-family: 'Source Serif 4', Georgia, serif;
-      background: var(--cream);
-      color: var(--ink);
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    body::before {
-      content: '';
-      position: fixed; inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none; z-index: 0; opacity: 0.6;
-    }
-
-    /* NAV */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 20px 40px;
-      background: rgba(246, 239, 231, 0.85);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border-soft);
-    }
-
-    .nav-wordmark {
-      font-family: 'Playfair Display', serif;
-      font-size: 22px;
-      font-weight: 500;
-      letter-spacing: 4px;
-      color: var(--ink);
-      text-decoration: none;
-      text-transform: uppercase;
-    }
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 32px;
-    }
-    .nav-link {
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--ink-muted);
-      text-decoration: none;
-      transition: color 0.3s;
-    }
-    .nav-link:hover {
-      color: var(--accent);
-    }
-
-    /* HERO */
-    .hero {
-      position: relative; height: 100vh; min-height: 600px;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      text-align: center; overflow: hidden; z-index: 1;
-    }
-    .hero-bg {
-      position: absolute; inset: 0;
-      background-image: url('https://images.unsplash.com/photo-1504630083234-14187a9df0f5?w=1800&q=80&auto=format&fit=crop');
-      background-size: cover; background-position: center 40%;
-      transform: scale(1.04); transition: transform 12s ease;
-      filter: brightness(0.40) saturate(0.80);
-    }
-    .hero:hover .hero-bg { transform: scale(1.07); }
-    .hero-overlay {
-      position: absolute; inset: 0;
-      background: linear-gradient(180deg, rgba(28,18,13,0.08) 0%, rgba(28,18,13,0) 40%, rgba(28,18,13,0.60) 100%);
-    }
-    .aura { position: absolute; border-radius: 50%; pointer-events: none; z-index: 1; }
-    .aura-1 {
-      width: 700px; height: 700px; top: -150px; right: -200px;
-      background: radial-gradient(circle, rgba(143,94,59,0.14) 0%, transparent 70%);
-      animation: drift 14s ease-in-out infinite alternate;
-    }
-    .aura-2 {
-      width: 500px; height: 500px; bottom: -80px; left: -100px;
-      background: radial-gradient(circle, rgba(93,64,48,0.10) 0%, transparent 70%);
-      animation: drift 18s ease-in-out infinite alternate-reverse;
-    }
-    @keyframes drift {
-      from { transform: translate(0,0) scale(1); }
-      to   { transform: translate(24px,-24px) scale(1.06); }
-    }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(28px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes bounceDown {
-      0%, 100% { transform: translateY(0); }
-      50%       { transform: translateY(6px); }
-    }
-    .hero-content {
-      position: relative; z-index: 2;
-      display: flex; flex-direction: column; align-items: center; padding: 0 24px;
-    }
-    .hero-eyebrow {
-      font-size: 10px; font-weight: 500; letter-spacing: 4px; text-transform: uppercase;
-      color: rgba(255,248,241,0.65); margin-bottom: 22px; animation: fadeUp 1s 0.1s ease both;
-    }
-    .hero-title {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(64px, 13vw, 140px); font-weight: 300; letter-spacing: 10px;
-      color: #fff9f1; line-height: 1; text-transform: uppercase; margin-bottom: 6px;
-      animation: fadeUp 1s 0.2s ease both;
-    }
-    .hero-title em {
-      font-style: italic; font-weight: 300; letter-spacing: 5px;
-      color: rgba(255,220,180,0.90); display: block; font-size: 0.60em;
-      margin-top: 10px; text-transform: none;
-    }
-    .hero-tagline {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(13px, 1.8vw, 17px); font-weight: 300; font-style: italic;
-      color: rgba(255,248,241,0.70); max-width: 500px;
-      margin: 26px auto 38px; line-height: 1.65; animation: fadeUp 1s 0.3s ease both;
-    }
-    .hero-divider {
-      display: flex; align-items: center; gap: 16px;
-      width: 240px; margin-bottom: 22px; animation: fadeUp 1s 0.4s ease both;
-    }
-    .hero-divider::before, .hero-divider::after {
-      content: ''; flex: 1; height: 1px; background: rgba(255,248,241,0.22);
-    }
-    .hero-divider span { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,215,170,0.75); flex-shrink: 0; }
-    .hero-badge { font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(255,248,241,0.45); animation: fadeUp 1s 0.5s ease both; }
-    .hero-scroll {
-      position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%); z-index: 2;
-      display: flex; flex-direction: column; align-items: center; gap: 8px;
-      color: rgba(255,248,241,0.40); font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
-      animation: fadeUp 1s 0.9s ease both;
-    }
-    .hero-scroll svg { animation: bounceDown 2.4s ease-in-out infinite; }
-
-    /* ARTICLES */
-    .articles {
-      position: relative; z-index: 1; padding: 84px 0 110px;
-      background: radial-gradient(circle at 5% 10%, rgba(143,94,59,0.07) 0%, transparent 50%),
-                  radial-gradient(circle at 95% 80%, rgba(93,64,48,0.05) 0%, transparent 50%),
-                  var(--cream);
-    }
-    .container { width: min(1080px, 92vw); margin: 0 auto; }
-    .section-label { font-size: 10px; font-weight: 500; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
-    .section-title { font-family: 'Playfair Display', serif; font-size: clamp(28px, 4vw, 44px); font-weight: 400; color: var(--ink); margin-bottom: 10px; }
-    .section-intro { font-size: 15px; color: var(--ink-muted); line-height: 1.75; max-width: 560px; margin-bottom: 38px; font-weight: 300; }
-
-    .filters { display: flex; gap: 10px; margin-bottom: 46px; flex-wrap: wrap; }
-    .filter-btn {
-      border: 1px solid var(--border); border-radius: 999px; padding: 8px 18px;
-      background: var(--cream-alt); color: var(--ink-muted); font-size: 11px;
-      font-weight: 600; letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
-      transition: all 0.2s; font-family: 'Source Serif 4', serif;
-    }
-    .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
-    .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-
-    .search-wrap {
-      flex: 1 1 280px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: min(100%, 320px);
-      margin-left: auto;
-    }
-    .search-box {
-      width: 100%;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 11px 16px;
-      background: rgba(255, 250, 245, 0.92);
-      color: var(--ink);
-      font-size: 14px;
-      font-family: 'Source Serif 4', serif;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .search-box:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(143, 94, 59, 0.12);
-    }
-    .search-box::placeholder { color: var(--ink-muted); }
-    .search-count {
-      flex: 0 0 auto;
-      min-width: 108px;
-      padding: 0 14px;
-      height: 40px;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      background: rgba(255, 250, 245, 0.92);
-      color: var(--ink-soft);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.6px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      white-space: nowrap;
-    }
-    .search-count.is-loading {
-      color: var(--accent);
-      border-color: rgba(143, 94, 59, 0.45);
-    }
-    .search-clear {
-      flex: 0 0 auto;
-      width: 40px;
-      height: 40px;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      background: rgba(255, 250, 245, 0.92);
-      color: var(--ink-soft);
-      font-size: 18px;
-      line-height: 1;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      transition: border-color 0.2s, color 0.2s, opacity 0.2s;
-      opacity: 0;
-      pointer-events: none;
-    }
-    .search-clear.visible {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .search-clear:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-    .search-status {
-      display: none;
-      margin: 0 0 26px;
-      min-height: 0;
-      color: var(--ink-soft);
-      font-size: 14px;
-    }
-    .search-status.visible { display: block; }
-    .search-status strong { color: var(--accent-deep); }
-    .grid-empty {
-      grid-column: 1 / -1;
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      background: rgba(255, 250, 245, 0.88);
-      padding: 26px;
-      color: var(--ink-soft);
-      text-align: center;
-      font-size: 16px;
-    }
-
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(460px, 1fr)); gap: 30px; }
-
-    .card {
-      border-radius: 20px; background: var(--cream-alt); border: 1px solid var(--border);
-      box-shadow: 0 6px 28px rgba(28,18,13,0.06); overflow: hidden;
-      transition: transform 0.32s ease, box-shadow 0.32s ease;
-    }
-    .card:hover { transform: translateY(-6px); box-shadow: 0 22px 56px rgba(28,18,13,0.13); }
-    .card-link { display: block; text-decoration: none; color: inherit; }
-    .card-thumb { position: relative; height: 248px; overflow: hidden; }
-    .card-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.55s ease; }
-    .card:hover .card-thumb img { transform: scale(1.07); }
-    .card-tag {
-      position: absolute; top: 16px; left: 16px;
-      background: rgba(28,18,13,0.68); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-      color: rgba(255,248,241,0.92); font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
-      text-transform: uppercase; padding: 5px 13px; border-radius: 999px;
-      border: 1px solid rgba(255,248,241,0.16);
-    }
-    .card-body { padding: 28px 30px 32px; }
-    .card-date { font-size: 11px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 12px; font-weight: 600; }
-    .card-title { font-family: 'Playfair Display', serif; font-size: clamp(20px, 2.4vw, 27px); font-weight: 500; line-height: 1.22; color: var(--ink); margin-bottom: 13px; }
-    .card-excerpt { font-size: 15px; line-height: 1.78; color: var(--ink-soft); font-weight: 300; margin-bottom: 24px; }
-    .search-hit {
-      background: rgba(255, 214, 153, 0.72);
-      color: var(--ink);
-      border-radius: 4px;
-      padding: 0 2px;
-      box-decoration-break: clone;
-      -webkit-box-decoration-break: clone;
-    }
-    .read-link {
-      display: inline-flex; align-items: center; gap: 7px; font-size: 11px;
-      font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
-      color: var(--accent-deep); text-decoration: none;
-      border-bottom: 1px solid rgba(93,64,48,0.30); padding-bottom: 2px;
-      transition: color 0.2s, border-color 0.2s, gap 0.2s;
-    }
-    .card:hover .read-link { color: var(--accent); border-color: var(--accent); gap: 12px; }
-
-    /* FOOTER */
-    .social-link svg { width: 16px; height: 16px; fill: currentColor; }
-
-    /* SCROLL TOP */
-    .scroll-top {
-      position: fixed; bottom: 28px; right: 24px; width: 46px; height: 46px;
-      border-radius: 50%; background: var(--accent-deep); color: #fff9f1; border: none;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 20px rgba(28,18,13,0.28); opacity: 0; transform: translateY(14px);
-      transition: opacity 0.3s ease, transform 0.3s ease, background 0.2s;
-      pointer-events: none; z-index: 200;
-    }
-    .scroll-top.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
-    .scroll-top:hover { background: var(--accent); }
-
-    @media (max-width: 768px) {
-      nav { padding: 16px 20px; }
-      .nav-links { display: none; }
-      .hero-title { letter-spacing: 5px; }
-      .grid { grid-template-columns: 1fr; }
-      .card-thumb { height: 210px; }
-    }
-    @media (max-width: 560px) {
-      nav { padding: 14px 20px; }
-      .articles { padding: 60px 0 80px; }
-      .hero-content { padding: 0 18px; }
-      .hero-title { font-size: clamp(2rem, 11vw, 2.8rem); }
-      .hero-tagline { font-size: 12px; letter-spacing: 1.4px; }
-      .hero-scroll { display: none; }
-      .scroll-top { bottom: 80px; right: 16px; }
-    }
-
-    /* ─── FOOTER (canonical) ─── */
-    footer {
-      position: relative; z-index: 1;
-      padding: 32px 40px 32px;
-      border-top: 1px solid var(--border-soft);
-      display: grid; grid-template-columns: 1fr;
-      gap: 0; align-items: start;
-      background: #f6efe7;
-    }
-    .footer-nav { grid-column: 1; grid-row: 1; display: flex; flex-direction: column; gap: 20px; }
-    .footer-nav-group { display: flex; flex-wrap: wrap; gap: 8px 28px; }
-    .footer-nav-label { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-muted); opacity: 0.6; width: 100%; margin-bottom: 2px; }
-    .footer-nav-link { font-size: 13px; font-weight: 400; color: var(--ink-soft); text-decoration: none; transition: color 0.2s; letter-spacing: 0.2px; }
-    .footer-nav-link:hover { color: var(--accent); }
-    .footer-legal-link { font-size: 11px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-muted); text-decoration: none; opacity: 0.7; transition: opacity 0.2s, color 0.2s; }
-    .footer-legal-link:hover { opacity: 1; color: var(--accent); }
-    .footer-copy {
-      font-size: 11px; color: var(--ink-muted); letter-spacing: 0.5px; font-weight: 300;
-      grid-column: 1 / -1; grid-row: 2; margin-top: 40px;
-      padding-top: 24px; padding-bottom: 16px;
-      border-top: 1px solid var(--border-soft);
-      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
-    }
-    .footer-copy-center { display: flex; align-items: center; gap: 14px; }
-    .footer-wordmark-sm {
-      font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 400;
-      letter-spacing: 6px; text-transform: uppercase; color: var(--ink-soft);
-    }
-    .social-row-inline { display: flex; align-items: center; gap: 12px; }
-    .social-row-inline .social-link { width: 38px; height: 38px; }
-    .social-row-inline .social-link svg { width: 17px; height: 17px; }
-    .social-link {
-      display: flex; align-items: center; justify-content: center;
-      width: 40px; height: 40px; border: 1px solid var(--border);
-      border-radius: 50%; text-decoration: none; transition: all 0.3s; color: var(--ink-muted);
-    }
-    .social-link:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
-    .social-link svg { width: 16px; height: 16px; fill: currentColor; }
-    @media (max-width: 768px) {
-      footer { padding: 28px 20px; }
-      .footer-copy { flex-direction: column; align-items: flex-start; }
-    }
-  </style>
+  <link rel="stylesheet" href="/blog/index.css" />
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "Blog",
-        "@id": "https://etiove.com/blog/#blog",
-        "name": "Blog Etiove",
-        "description": "Guías, tutoriales y análisis para amantes del café de especialidad.",
-        "url": "https://etiove.com/blog/",
-        "inLanguage": "es-ES",
-        "publisher": {
-          "@type": "Organization",
-          "@id": "https://etiove.com/#organization",
-          "name": "Etiove",
-          "url": "https://etiove.com/",
-          "logo": {
-            "@type": "ImageObject",
-            "url": "https://etiove.com/favicon.svg",
-            "width": 512,
-            "height": 512
-          }
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Blog",
+      "@id": "https://etiove.com/blog/#blog",
+      "name": "Blog Etiove",
+      "description": "Guías, tutoriales y análisis para amantes del café de especialidad.",
+      "url": "https://etiove.com/blog/",
+      "inLanguage": "es-ES",
+      "publisher": {
+        "@type": "Organization",
+        "@id": "https://etiove.com/#organization",
+        "name": "Etiove",
+        "url": "https://etiove.com/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://etiove.com/favicon.svg",
+          "width": 512,
+          "height": 512
         }
-      },
-      {
-        "@type": "ItemList",
-        "@id": "https://etiove.com/blog/#posts",
-        "name": "Artículos del blog Etiove",
-        "url": "https://etiove.com/blog/",
-        "numberOfItems": 8,
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "url": "https://etiove.com/blog/cafe-de-especialidad-vs-cafe-normal.html",
-            "name": "Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real?"
-          },
-          {
-            "@type": "ListItem",
-            "position": 2,
-            "url": "https://etiove.com/blog/por-que-mi-cafe-sabe-amargo.html",
-            "name": "¿Por qué mi café sabe amargo? 7 causas y sus soluciones"
-          },
-          {
-            "@type": "ListItem",
-            "position": 3,
-            "url": "https://etiove.com/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html",
-            "name": "¿Vale la Pena Pagar Más por Café de Especialidad?"
-          },
-          {
-            "@type": "ListItem",
-            "position": 4,
-            "url": "https://etiove.com/blog/cafe-de-especialidad-crece-en-espana-2026.html",
-            "name": "El Café de Especialidad Crece un 34% en España"
-          },
-          {
-            "@type": "ListItem",
-            "position": 5,
-            "url": "https://etiove.com/blog/guia-de-molienda-por-metodo.html",
-            "name": "Guía de Molienda por Método: de V60 a Espresso"
-          },
-          {
-            "@type": "ListItem",
-            "position": 6,
-            "url": "https://etiove.com/blog/como-elegir-el-mejor-cafe-de-etiopia.html",
-            "name": "Cómo Elegir el Mejor Café de Etiopía: Guía Completa"
-          },
-          {
-            "@type": "ListItem",
-            "position": 7,
-            "url": "https://etiove.com/blog/cold-brew-en-casa-guia-completa.html",
-            "name": "Cold Brew en Casa: Guía Completa para Hacerlo Perfecto"
-          },
-          {
-            "@type": "ListItem",
-            "position": 8,
-            "url": "https://etiove.com/blog/arabica-vs-robusta.html",
-            "name": "Arábica vs Robusta: La Diferencia que Cambia tu Café"
-          }
-        ]
       }
-    ]
-  }
+    },
+    {
+      "@type": "ItemList",
+      "@id": "https://etiove.com/blog/#posts",
+      "name": "Artículos del blog Etiove",
+      "url": "https://etiove.com/blog/",
+      "numberOfItems": 8,
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "url": "https://etiove.com/blog/cold-brew-en-casa-guia-completa.html",
+          "name": "Cold Brew en Casa: Guía Completa para Hacerlo Perfecto"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "url": "https://etiove.com/blog/arabica-vs-robusta.html",
+          "name": "Arábica vs Robusta: La Diferencia que Cambia tu Café"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "url": "https://etiove.com/blog/cafe-de-especialidad-vs-cafe-normal.html",
+          "name": "Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real?"
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "url": "https://etiove.com/blog/por-que-mi-cafe-sabe-amargo.html",
+          "name": "¿Por qué mi café sabe amargo? 7 causas y sus soluciones"
+        },
+        {
+          "@type": "ListItem",
+          "position": 5,
+          "url": "https://etiove.com/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html",
+          "name": "¿Vale la Pena Pagar Más por Café de Especialidad?"
+        },
+        {
+          "@type": "ListItem",
+          "position": 6,
+          "url": "https://etiove.com/blog/cafe-de-especialidad-crece-en-espana-2026.html",
+          "name": "El Café de Especialidad Crece un 34% en España"
+        },
+        {
+          "@type": "ListItem",
+          "position": 7,
+          "url": "https://etiove.com/blog/guia-de-molienda-por-metodo.html",
+          "name": "Guía de Molienda por Método: de V60 a Espresso"
+        },
+        {
+          "@type": "ListItem",
+          "position": 8,
+          "url": "https://etiove.com/blog/como-elegir-el-mejor-cafe-de-etiopia.html",
+          "name": "Cómo Elegir el Mejor Café de Etiopía: Guía Completa"
+        }
+      ]
+    }
+  ]
+}
   </script>
   <link rel="search" type="application/opensearchdescription+xml" title="Blog Etiove" href="/opensearch.xml" />
 </head>
@@ -511,7 +130,6 @@
     </div>
   </nav>
 
-  <!-- HERO restaurado con imagen principal -->
   <section class="hero">
     <div class="hero-bg"></div>
     <div class="hero-overlay"></div>
@@ -533,21 +151,18 @@
   <section class="articles">
     <div class="container">
       <p class="section-label">Art&iacute;culos</p>
+      <h2 class="section-title">Aprende, cata y elige mejor</h2>
+      <p class="section-intro">Contenido editorial de Etiove para profundizar en café de especialidad, molienda, origen, métodos y decisiones de compra con más criterio.</p>
 
       <div class="filters">
+
         <button class="filter-btn active" data-filter="todos">Todos</button>
-        <button class="filter-btn" data-filter="guia">Gu&iacute;a</button>
         <button class="filter-btn" data-filter="tutorial">Tutorial</button>
+        <button class="filter-btn" data-filter="guia">Guía</button>
+        <button class="filter-btn" data-filter="analisis">Análisis</button>
         <button class="filter-btn" data-filter="noticia">Noticia</button>
-        <button class="filter-btn" data-filter="analisis">An&aacute;lisis</button>
         <div class="search-wrap">
-          <input
-            id="postSearch"
-            class="search-box"
-            type="search"
-            placeholder="Busca palabras o frases dentro de los posts"
-            aria-label="Buscar dentro de los posts"
-          />
+          <input id="postSearch" class="search-box" type="search" placeholder="Busca palabras o frases dentro de los posts" aria-label="Buscar dentro de los posts" />
           <span id="searchCount" class="search-count">8 posts</span>
           <button id="clearSearch" class="search-clear" type="button" aria-label="Limpiar búsqueda">×</button>
         </div>
@@ -556,10 +171,11 @@
       <div id="searchStatus" class="search-status"></div>
 
       <div class="grid" id="postGrid">
-<article class="card" data-category="tutorial" data-post-url="/blog/cold-brew-en-casa-guia-completa.html" data-search="cold brew en casa guia completa cafe frio infusion fria ratio molienda tiempo temperatura receta metodo">
+
+        <article class="card" data-category="tutorial" data-post-url="/blog/cold-brew-en-casa-guia-completa.html" data-search="cold brew en casa guia completa cafe frio infusion fria ratio molienda tiempo temperatura receta metodo">
           <a class="card-link" href="/blog/cold-brew-en-casa-guia-completa.html">
             <div class="card-thumb">
-              <img src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=900&q=80&auto=format&fit=crop" alt="Vaso de cold brew con hielo y café de especialidad" loading="lazy" width="900" height="248" />
+              <img src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=900&amp;q=80&amp;auto=format&amp;fit=crop" alt="Vaso de cold brew con hielo y café de especialidad" loading="lazy" width="900" height="248" />
               <span class="card-tag">Tutorial</span>
             </div>
             <div class="card-body">
@@ -574,7 +190,7 @@
         <article class="card" data-category="guia" data-post-url="/blog/arabica-vs-robusta.html" data-search="arabica vs robusta diferencia cafe arabica robusta cafeina sabor precio cultivo espresso blend especialidad">
           <a class="card-link" href="/blog/arabica-vs-robusta.html">
             <div class="card-thumb">
-              <img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=900&q=80&auto=format&fit=crop" alt="Granos de café arábica de especialidad en mano" loading="lazy" width="900" height="248" />
+              <img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=900&amp;q=80&amp;auto=format&amp;fit=crop" alt="Granos de café arábica de especialidad en mano" loading="lazy" width="900" height="248" />
               <span class="card-tag">Guía</span>
             </div>
             <div class="card-body">
@@ -586,19 +202,17 @@
           </a>
         </article>
 
-      
-
         <article class="card" data-category="analisis" data-post-url="/blog/cafe-de-especialidad-vs-cafe-normal.html" data-search="cafe de especialidad vs cafe normal diferencia que es especialidad sca puntuacion 80 puntos origen single origin trazabilidad tueste frescura precio productor sabor comparacion">
           <a class="card-link" href="/blog/cafe-de-especialidad-vs-cafe-normal.html">
             <div class="card-thumb">
-              <img src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=900&q=80&auto=format&fit=crop" alt="Granos de café de especialidad de distintos orígenes" loading="lazy" width="900" height="248" />
-              <span class="card-tag">An&aacute;lisis</span>
+              <img src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=900&amp;q=80&amp;auto=format&amp;fit=crop" alt="Granos de café de especialidad de distintos orígenes" loading="lazy" width="900" height="248" />
+              <span class="card-tag">Análisis</span>
             </div>
             <div class="card-body">
               <p class="card-date">09 abril 2026</p>
-              <h2 class="card-title">Caf&eacute; de Especialidad vs Caf&eacute; Normal: &iquest;Cu&aacute;l es la diferencia real?</h2>
-              <p class="card-excerpt">Puntuaci&oacute;n SCA, trazabilidad, sabor y precio. Todo lo que diferencia un caf&eacute; de especialidad de uno del supermercado, explicado sin tecnicismos.</p>
-              <span class="read-link">Leer art&iacute;culo <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+              <h2 class="card-title">Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real?</h2>
+              <p class="card-excerpt">Puntuación SCA, trazabilidad, sabor y precio. Todo lo que diferencia un café de especialidad de uno del supermercado, explicado sin tecnicismos.</p>
+              <span class="read-link">Leer artículo <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
             </div>
           </a>
         </article>
@@ -606,14 +220,14 @@
         <article class="card" data-category="guia" data-post-url="/blog/por-que-mi-cafe-sabe-amargo.html" data-search="por que mi cafe sabe amargo causas soluciones sobreextraccion molienda temperatura agua cafetera italiana metodo preparacion amargor astringente">
           <a class="card-link" href="/blog/por-que-mi-cafe-sabe-amargo.html">
             <div class="card-thumb">
-              <img src="https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=900&q=80&auto=format&fit=crop" alt="Taza de café con vapor, preparación en casa" loading="lazy" width="900" height="248" />
-              <span class="card-tag">Gu&iacute;a</span>
+              <img src="https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=900&amp;q=80&amp;auto=format&amp;fit=crop" alt="Taza de café con vapor, preparación en casa" loading="lazy" width="900" height="248" />
+              <span class="card-tag">Guía</span>
             </div>
             <div class="card-body">
               <p class="card-date">08 abril 2026</p>
-              <h2 class="card-title">&iquest;Por qu&eacute; mi caf&eacute; sabe amargo? 7 causas y sus soluciones</h2>
-              <p class="card-excerpt">Sobreextracci&oacute;n, molienda incorrecta, agua demasiado caliente&hellip; Descubre las 7 causas reales de que tu caf&eacute; sepa amargo y c&oacute;mo solucionarlas hoy.</p>
-              <span class="read-link">Leer art&iacute;culo <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+              <h2 class="card-title">¿Por qué mi café sabe amargo? 7 causas y sus soluciones</h2>
+              <p class="card-excerpt">Sobreextracción, molienda incorrecta, agua demasiado caliente... Descubre las 7 causas reales de que tu café sepa amargo y cómo solucionarlas hoy.</p>
+              <span class="read-link">Leer artículo <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
             </div>
           </a>
         </article>
@@ -621,14 +235,14 @@
         <article class="card" data-category="analisis" data-post-url="/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html" data-search="vale la pena pagar mas por cafe de especialidad analisis precio calidad impacto social consumidor granos finca altura">
           <a class="card-link" href="/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html">
             <div class="card-thumb">
-              <img src="https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=900&q=80&auto=format&fit=crop" alt="Granos de caf&eacute; seleccionados a mano en una finca de altura" loading="lazy" width="900" height="248" />
-              <span class="card-tag">An&aacute;lisis</span>
+              <img src="https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=900&amp;q=80&amp;auto=format&amp;fit=crop" alt="Granos de café seleccionados a mano en una finca de altura" loading="lazy" width="900" height="248" />
+              <span class="card-tag">Análisis</span>
             </div>
             <div class="card-body">
               <p class="card-date">04 abril 2026</p>
-              <h2 class="card-title">&iquest;Vale la Pena Pagar M&aacute;s por Caf&eacute; de Especialidad?</h2>
-              <p class="card-excerpt">Un an&aacute;lisis honesto de qu&eacute; hay detr&aacute;s del precio: calidad real, impacto social y cu&aacute;ndo merece la pena el desembolso.</p>
-              <span class="read-link">Leer art&iacute;culo <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+              <h2 class="card-title">¿Vale la Pena Pagar Más por Café de Especialidad?</h2>
+              <p class="card-excerpt">Un análisis honesto de qué hay detrás del precio: calidad real, impacto social y cuándo merece la pena el desembolso.</p>
+              <span class="read-link">Leer artículo <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
             </div>
           </a>
         </article>
@@ -636,14 +250,14 @@
         <article class="card" data-category="noticia" data-post-url="/blog/cafe-de-especialidad-crece-en-espana-2026.html" data-search="cafe de especialidad crece espana 2026 noticia mercado consumo cafeteria barista crecimiento">
           <a class="card-link" href="/blog/cafe-de-especialidad-crece-en-espana-2026.html">
             <div class="card-thumb">
-              <img src="https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=900&q=80&auto=format&fit=crop" alt="Barista preparando caf&eacute; de especialidad en una cafeter&iacute;a moderna" loading="lazy" width="900" height="248" />
+              <img src="https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=900&amp;q=80&amp;auto=format&amp;fit=crop" alt="Barista preparando café de especialidad en una cafetería moderna" loading="lazy" width="900" height="248" />
               <span class="card-tag">Noticia</span>
             </div>
             <div class="card-body">
               <p class="card-date">03 abril 2026</p>
-              <h2 class="card-title">El Caf&eacute; de Especialidad Crece un 34% en Espa&ntilde;a</h2>
+              <h2 class="card-title">El Café de Especialidad Crece un 34% en España</h2>
               <p class="card-excerpt">El mercado supera los 220 millones de euros en 2025. Analizamos los datos, las causas y lo que significa para el consumidor.</p>
-              <span class="read-link">Leer art&iacute;culo <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+              <span class="read-link">Leer artículo <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
             </div>
           </a>
         </article>
@@ -651,14 +265,14 @@
         <article class="card" data-category="tutorial" data-post-url="/blog/guia-de-molienda-por-metodo.html" data-search="guia de molienda por metodo tutorial v60 espresso aeropress chemex french press molinillo">
           <a class="card-link" href="/blog/guia-de-molienda-por-metodo.html">
             <div class="card-thumb">
-              <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=900&q=80&auto=format&fit=crop" alt="Molinillo de caf&eacute; manual con granos de especialidad" loading="lazy" width="900" height="248" />
+              <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=900&amp;q=80&amp;auto=format&amp;fit=crop" alt="Molinillo de café manual con granos de especialidad" loading="lazy" width="900" height="248" />
               <span class="card-tag">Tutorial</span>
             </div>
             <div class="card-body">
               <p class="card-date">02 abril 2026</p>
-              <h2 class="card-title">Gu&iacute;a de Molienda por M&eacute;todo: de V60 a Espresso</h2>
-              <p class="card-excerpt">Qu&eacute; tan fino o grueso moler para V60, Chemex, AeroPress, French Press y espresso, con ajustes r&aacute;pidos si tu taza sale &aacute;cida o amarga.</p>
-              <span class="read-link">Leer art&iacute;culo <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+              <h2 class="card-title">Guía de Molienda por Método: de V60 a Espresso</h2>
+              <p class="card-excerpt">Qué tan fino o grueso moler para V60, Chemex, AeroPress, French Press y espresso, con ajustes rápidos si tu taza sale ácida o amarga.</p>
+              <span class="read-link">Leer artículo <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
             </div>
           </a>
         </article>
@@ -666,28 +280,23 @@
         <article class="card" data-category="guia" data-post-url="/blog/como-elegir-el-mejor-cafe-de-etiopia.html" data-search="como elegir el mejor cafe de etiopia guia yirgacheffe guji origen proceso lavado natural altitud">
           <a class="card-link" href="/blog/como-elegir-el-mejor-cafe-de-etiopia.html">
             <div class="card-thumb">
-              <img src="https://images.unsplash.com/photo-1461988091159-192b6df7054f?w=900&q=80&auto=format&fit=crop" alt="Cafetales en las tierras altas de Etiop&iacute;a" loading="lazy" width="900" height="248" />
-              <span class="card-tag">Gu&iacute;a</span>
+              <img src="https://images.unsplash.com/photo-1461988091159-192b6df7054f?w=900&amp;q=80&amp;auto=format&amp;fit=crop" alt="Cafetales en las tierras altas de Etiopía" loading="lazy" width="900" height="248" />
+              <span class="card-tag">Guía</span>
             </div>
             <div class="card-body">
               <p class="card-date">01 abril 2026</p>
-              <h2 class="card-title">C&oacute;mo Elegir el Mejor Caf&eacute; de Etiop&iacute;a: Gu&iacute;a Completa</h2>
-              <p class="card-excerpt">Desde Yirgacheffe hasta Guji. C&oacute;mo descifrar etiquetas, entender procesos de lavado y natural, y encontrar el perfil ideal para tu paladar.</p>
-              <span class="read-link">Leer art&iacute;culo <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+              <h2 class="card-title">Cómo Elegir el Mejor Café de Etiopía: Guía Completa</h2>
+              <p class="card-excerpt">Desde Yirgacheffe hasta Guji. Cómo descifrar etiquetas, entender procesos de lavado y natural, y encontrar el perfil ideal para tu paladar.</p>
+              <span class="read-link">Leer artículo <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
             </div>
           </a>
         </article>
-
-
-        
-      </div><!-- /postGrid -->
+      </div>
       <div id="blogPager"></div>
     </div>
   </section>
 
 
-
-  <!-- FOOTER -->
   <footer>
     <nav class="footer-nav" aria-label="Navegación del sitio">
       <div class="footer-nav-group">
@@ -705,6 +314,7 @@
 
       <span class="footer-copy-center">
         <span class="footer-wordmark-sm">Etiove</span>
+
         <span class="social-row-inline">
           <a class="social-link" href="https://instagram.com/etiove_cafe" target="_blank" aria-label="Instagram @etiove_cafe">
             <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
@@ -718,7 +328,7 @@
         </span>
       </span>
 
-      <span style="display:flex;gap:20px;flex-wrap:wrap;align-items:center;">
+      <span class="footer-legal-links">
         <a class="footer-legal-link" href="/privacidad.html">Privacidad</a>
         <a class="footer-legal-link" href="/cookies.html">Cookies</a>
         <a class="footer-legal-link" href="/terminos.html">Términos</a>
@@ -729,322 +339,6 @@
   <button class="scroll-top" id="scrollTopBtn" aria-label="Volver arriba">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
   </button>
-
-  <script>
-
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    const postGrid = document.getElementById('postGrid');
-    const postSearch = document.getElementById('postSearch');
-    const searchCount = document.getElementById('searchCount');
-    const clearSearch = document.getElementById('clearSearch');
-    const searchStatus = document.getElementById('searchStatus');
-    const blogPager = document.getElementById('blogPager');
-    let allCards = Array.from(document.querySelectorAll('.card'));
-    const originalOrder = allCards.map((card, index) => ({ card, index }));
-    let activeFilter = 'todos';
-    let searchQuery = '';
-    let searchIndexReady = false;
-    let currentPage = 1;
-    const PAGE_SIZE = 8;
-
-    const escapeHtml = (value) => String(value || '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-
-    const normalize = (value) => String(value || '')
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-      .trim();
-
-    const ensureCardBaseContent = () => {
-      allCards.forEach((card) => {
-        const title = card.querySelector('.card-title');
-        const excerpt = card.querySelector('.card-excerpt');
-        if (title && !card.dataset.baseTitle) card.dataset.baseTitle = title.textContent || '';
-        if (excerpt && !card.dataset.baseExcerpt) card.dataset.baseExcerpt = excerpt.textContent || '';
-      });
-    };
-
-    const buildHighlightTerms = (query) => {
-      const raw = String(query || '').trim();
-      if (!raw) return [];
-      const normalizedPhrase = normalize(raw);
-      const tokenTerms = normalizedPhrase.split(/\s+/).filter((token) => token.length >= 2);
-      const merged = normalizedPhrase.includes(' ')
-        ? [normalizedPhrase, ...tokenTerms]
-        : tokenTerms;
-      return Array.from(new Set(merged)).sort((a, b) => b.length - a.length);
-    };
-
-    const normalizeWithMap = (text) => {
-      let normalizedText = '';
-      const charMap = [];
-      Array.from(String(text || '')).forEach((char, index) => {
-        const normalizedChar = char.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-        for (const mappedChar of normalizedChar) {
-          normalizedText += mappedChar;
-          charMap.push(index);
-        }
-      });
-      return { normalizedText, charMap };
-    };
-
-    const mergeRanges = (ranges) => {
-      if (!ranges.length) return [];
-      const sorted = ranges.slice().sort((a, b) => a.start - b.start);
-      return sorted.reduce((acc, range) => {
-        const last = acc[acc.length - 1];
-        if (!last || range.start > last.end) {
-          acc.push({ ...range });
-          return acc;
-        }
-        last.end = Math.max(last.end, range.end);
-        return acc;
-      }, []);
-    };
-
-    const highlightText = (text, query) => {
-      const terms = buildHighlightTerms(query);
-      if (!terms.length) return escapeHtml(text);
-
-      const originalText = String(text || '');
-      const { normalizedText, charMap } = normalizeWithMap(originalText);
-      const ranges = [];
-
-      terms.forEach((term) => {
-        let searchFrom = 0;
-        while (searchFrom < normalizedText.length) {
-          const foundAt = normalizedText.indexOf(term, searchFrom);
-          if (foundAt === -1) break;
-          const start = charMap[foundAt];
-          const endIndex = foundAt + term.length - 1;
-          const end = (charMap[endIndex] ?? start) + 1;
-          ranges.push({ start, end });
-          searchFrom = foundAt + Math.max(term.length, 1);
-        }
-      });
-
-      const mergedRanges = mergeRanges(ranges);
-      if (!mergedRanges.length) return escapeHtml(originalText);
-
-      let cursor = 0;
-      let html = '';
-      mergedRanges.forEach((range) => {
-        html += escapeHtml(originalText.slice(cursor, range.start));
-        html += `<mark class="search-hit">${escapeHtml(originalText.slice(range.start, range.end))}</mark>`;
-        cursor = range.end;
-      });
-      html += escapeHtml(originalText.slice(cursor));
-      return html;
-    };
-
-    const renderHighlights = (cards) => {
-      cards.forEach((card) => {
-        const title = card.querySelector('.card-title');
-        const excerpt = card.querySelector('.card-excerpt');
-        const baseTitle = card.dataset.baseTitle || '';
-        const baseExcerpt = card.dataset.baseExcerpt || '';
-        if (title) title.innerHTML = highlightText(baseTitle, searchQuery);
-        if (excerpt) excerpt.innerHTML = highlightText(baseExcerpt, searchQuery);
-      });
-    };
-
-    const setSearchMeta = (text, { loading = false, status = '' } = {}) => {
-      searchCount.textContent = text;
-      searchCount.classList.toggle('is-loading', loading);
-      searchStatus.textContent = status;
-      searchStatus.classList.toggle('visible', !!status);
-    };
-
-    const scoreCardMatch = (card, normalizedQuery) => {
-      if (!normalizedQuery) return 0;
-
-      const title = normalize(card.dataset.baseTitle || '');
-      const excerpt = normalize(card.dataset.baseExcerpt || '');
-      const haystack = normalize(card.dataset.search || '');
-      const tokens = normalizedQuery.split(/\s+/).filter(Boolean);
-
-      let score = 0;
-      if (title.includes(normalizedQuery)) score += 120;
-      if (excerpt.includes(normalizedQuery)) score += 55;
-      if (haystack.includes(normalizedQuery)) score += 20;
-
-      tokens.forEach((token) => {
-        if (title.includes(token)) score += 22;
-        if (excerpt.includes(token)) score += 10;
-        if (haystack.includes(token)) score += 4;
-      });
-
-      return score;
-    };
-
-    const reorderCards = (normalizedQuery) => {
-      const ranked = cards
-        .map((card) => {
-          const baseIndex = originalOrder.find((entry) => entry.card === card)?.index || 0;
-          return { card, score: scoreCardMatch(card, normalizedQuery), baseIndex };
-        })
-        .sort((a, b) => {
-          if (!normalizedQuery) return a.baseIndex - b.baseIndex;
-          if (b.score !== a.score) return b.score - a.score;
-          return a.baseIndex - b.baseIndex;
-        });
-
-      ranked.forEach(({ card }) => postGrid.appendChild(card));
-    };
-
-    const syncClearButton = () => {
-      clearSearch.classList.toggle('visible', !!normalize(searchQuery));
-    };
-
-    const ensureSearchIndex = async () => {
-      if (searchIndexReady) return;
-      await Promise.all(cards.map(async (card) => {
-        const url = card.getAttribute('data-post-url');
-        if (!url) return;
-        try {
-          const res = await fetch(url);
-          if (!res.ok) return;
-          const html = await res.text();
-          const doc = new DOMParser().parseFromString(html, 'text/html');
-          const content = [
-            doc.querySelector('title')?.textContent || '',
-            doc.querySelector('.hero-title')?.textContent || '',
-            doc.querySelector('.lead')?.textContent || '',
-            doc.querySelector('.article')?.textContent || '',
-          ].join(' ');
-          card.dataset.search = `${card.dataset.search || ''} ${normalize(content)}`.trim();
-        } catch (_) {
-          // No bloquear la UI si falla un post.
-        }
-      }));
-      searchIndexReady = true;
-    };
-
-    const renderEmptyState = (visibleCount) => {
-      const existing = document.getElementById('gridEmptyState');
-      if (existing) existing.remove();
-      if (visibleCount > 0) return;
-      const empty = document.createElement('div');
-      empty.id = 'gridEmptyState';
-      empty.className = 'grid-empty';
-      empty.textContent = searchQuery
-        ? 'No hay posts que contengan esa búsqueda con el filtro actual.'
-        : 'No hay posts en esta categoría ahora mismo.';
-      postGrid.appendChild(empty);
-    };
-
-    const updateSearchStatus = (visibleCount) => {
-      if (!searchQuery) {
-        setSearchMeta(`${cards.length} posts`);
-        return;
-      }
-      const label = visibleCount === 1 ? 'resultado' : 'resultados';
-      setSearchMeta(`${visibleCount} ${label}`);
-    };
-
-    function renderPager(total, page, pageSize) {
-      if (total <= pageSize) {
-        blogPager.innerHTML = '';
-        return;
-      }
-      const totalPages = Math.ceil(total / pageSize);
-      let html = '<div class="threads-pager"><div class="pager-nav">';
-      html += `<button class="pager-btn pager-arrow" data-page="1" ${page === 1 ? 'disabled' : ''} aria-label="Primera página">«</button>`;
-      html += `<button class="pager-btn pager-arrow" data-page="${page - 1}" ${page === 1 ? 'disabled' : ''} aria-label="Página anterior">‹</button>`;
-      for (let p = 1; p <= totalPages; p++) {
-        if (totalPages > 11 && (p > 2 && p < page - 3)) { if (p === 3) html += '<span style="padding:0 6px;">…</span>'; continue; }
-        if (totalPages > 11 && (p < totalPages - 1 && p > page + 3)) { if (p === totalPages - 2) html += '<span style="padding:0 6px;">…</span>'; continue; }
-        html += `<button class="pager-btn${p === page ? ' active' : ''}" data-page="${p}">${p}</button>`;
-      }
-      html += `<button class="pager-btn pager-arrow" data-page="${page + 1}" ${page === totalPages ? 'disabled' : ''} aria-label="Página siguiente">›</button>`;
-      html += `<button class="pager-btn pager-arrow" data-page="${totalPages}" ${page === totalPages ? 'disabled' : ''} aria-label="Última página">»</button>`;
-      html += '</div>';
-      html += `<p class="pager-info">Mostrando posts del ${(page - 1) * pageSize + 1} al ${Math.min(page * pageSize, total)} de ${total}</p>`;
-      html += '</div>';
-      blogPager.innerHTML = html;
-      blogPager.querySelectorAll('[data-page]').forEach(btn => {
-        btn.addEventListener('click', e => {
-          const newPage = parseInt(btn.getAttribute('data-page'), 10);
-          if (!btn.disabled && newPage >= 1 && newPage <= Math.ceil(total / pageSize)) {
-            currentPage = newPage;
-            applyFilters();
-            window.scrollTo({ top: postGrid.offsetTop - 80, behavior: 'smooth' });
-          }
-        });
-      });
-    }
-
-    const applyFilters = () => {
-      const normalizedQuery = normalize(searchQuery);
-      let visibleCards = allCards.filter(card => {
-        const category = card.getAttribute('data-category');
-        const haystack = normalize(card.dataset.search || '');
-        const categoryMatch = activeFilter === 'todos' || category === activeFilter;
-        const queryMatch = !normalizedQuery || haystack.includes(normalizedQuery) || normalizedQuery.split(/\s+/).every((token) => haystack.includes(token));
-        return categoryMatch && queryMatch;
-      });
-      const visibleCount = visibleCards.length;
-      updateSearchStatus(visibleCount);
-      renderEmptyState(visibleCount);
-      syncClearButton();
-      reorderCards(normalizedQuery);
-      // PAGINACIÓN
-      let pagedCards = visibleCards;
-      if (visibleCount > PAGE_SIZE) {
-        const start = (currentPage - 1) * PAGE_SIZE;
-        pagedCards = visibleCards.slice(start, start + PAGE_SIZE);
-      } else {
-        currentPage = 1;
-      }
-      postGrid.innerHTML = '';
-      pagedCards.forEach(card => postGrid.appendChild(card));
-      renderHighlights(pagedCards);
-      renderPager(visibleCount, currentPage, PAGE_SIZE);
-    };
-
-    filterBtns.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        activeFilter = btn.getAttribute('data-filter') || 'todos';
-        filterBtns.forEach((item) => item.classList.remove('active'));
-        btn.classList.add('active');
-        applyFilters();
-      });
-    });
-
-    postSearch.addEventListener('input', async () => {
-      searchQuery = postSearch.value || '';
-      if (normalize(searchQuery)) {
-        setSearchMeta('Indexando...', { loading: true, status: 'Preparando el contenido completo de los posts para buscar dentro.' });
-        await ensureSearchIndex();
-      }
-      applyFilters();
-    });
-
-    clearSearch.addEventListener('click', () => {
-      postSearch.value = '';
-      searchQuery = '';
-      applyFilters();
-      postSearch.focus();
-    });
-
-    postSearch.addEventListener('keydown', (event) => {
-      if (event.key !== 'Escape') return;
-      if (!postSearch.value) return;
-      event.preventDefault();
-      clearSearch.click();
-    });
-
-    const st = document.getElementById('scrollTopBtn');
-    window.addEventListener('scroll', () => st.classList.toggle('visible', window.scrollY > 320));
-    st.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-    ensureCardBaseContent();
-    const cards = Array.from(document.querySelectorAll('#postGrid .card'));
-    setSearchMeta(`${cards.length} posts`);
-    applyFilters();
-  </script>
-        <!-- Eliminado style duplicado de nav-link -->
+  <script type="module" src="/blog/index.js"></script>
+</body>
+</html>

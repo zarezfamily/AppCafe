@@ -1,0 +1,112 @@
+#webQuizRoot {
+  min-height: unset !important;
+  padding: 72px 40px 80px !important;
+  background: transparent !important;
+  color: #1c120d !important;
+}
+#webQuizRoot::before { display: none !important; }
+
+#webQuizRoot, #webQuizRoot * { color: #1c120d !important; }
+
+#webQuizRoot .eq-btn-primary {
+  background: #1c120d !important;
+  color: #fdf8f1 !important;
+  border-color: transparent !important;
+  box-shadow: 0 4px 20px rgba(28,18,13,0.18) !important;
+}
+#webQuizRoot .eq-btn-primary:hover {
+  background: #5d4030 !important;
+  transform: translateY(-2px) !important;
+}
+#webQuizRoot .eq-btn-primary * { color: #fdf8f1 !important; }
+
+#webQuizRoot .eq-btn-ghost {
+  color: var(--ink-muted) !important;
+  border: 1px solid var(--border) !important;
+  padding: 10px 20px !important;
+  border-radius: 4px !important;
+}
+#webQuizRoot .eq-btn-ghost:hover { color: var(--accent) !important; border-color: var(--accent) !important; }
+#webQuizRoot .eq-btn-ghost,
+#webQuizRoot .eq-btn-ghost * { color: #9a7963 !important; }
+
+#webQuizRoot .eq-btn-text {
+  color: #5d4030 !important;
+  font-size: 11px !important;
+  letter-spacing: 1.5px !important;
+  text-decoration: underline !important;
+  text-underline-offset: 3px !important;
+  text-decoration-color: #c9b8a8 !important;
+}
+#webQuizRoot .eq-btn-text:hover {
+  color: #1c120d !important;
+  text-decoration-color: #8f5e3b !important;
+}
+
+#webQuizRoot .eq-title {
+  color: #1c120d !important;
+  margin-bottom: 32px !important;
+  position: relative !important;
+  z-index: 2 !important;
+}
+#webQuizRoot .eq-title em { color: #8f5e3b !important; }
+#webQuizRoot .eq-sub { color: #5d4030 !important; }
+#webQuizRoot .eq-label { color: #9a7963 !important; }
+#webQuizRoot .eq-eyebrow { color: #8f5e3b !important; }
+#webQuizRoot .eq-question { color: #1c120d !important; }
+#webQuizRoot .eq-step-label { color: #9a7963 !important; }
+
+#webQuizRoot .eq-option {
+  background: #fffaf5 !important;
+  border-color: #e4d3c2 !important;
+}
+#webQuizRoot .eq-option::before { background: linear-gradient(to bottom,#8f5e3b,#c99557) !important; }
+#webQuizRoot .eq-option::after  { background: #8f5e3b !important; color: #fff9f1 !important; }
+#webQuizRoot .eq-option:hover {
+  background: rgba(143,94,59,0.07) !important;
+  border-color: #8f5e3b !important;
+  box-shadow: 0 6px 20px rgba(143,94,59,0.12) !important;
+}
+#webQuizRoot .eq-option.selected {
+  background: rgba(143,94,59,0.10) !important;
+  border-color: #8f5e3b !important;
+  box-shadow: 0 6px 20px rgba(143,94,59,0.15) !important;
+}
+#webQuizRoot .eq-option.selected .eq-option-label { color: #5d4030 !important; }
+#webQuizRoot .eq-option-num   { color: #c9b8a8 !important; }
+#webQuizRoot .eq-option-label { color: #1c120d !important; }
+#webQuizRoot .eq-option-desc  { color: #9a7963 !important; }
+
+#webQuizRoot .eq-card { background: #fffaf5 !important; border-color: #e4d3c2 !important; }
+#webQuizRoot .eq-card:hover,
+#webQuizRoot .eq-card.selected { border-color: #8f5e3b !important; background: #fdf0e0 !important; }
+#webQuizRoot .eq-card-label { color: #1c120d !important; }
+#webQuizRoot .eq-card-sub   { color: #9a7963 !important; }
+
+#webQuizRoot .eq-step-dot        { background: #e4d3c2 !important; }
+#webQuizRoot .eq-step-dot.active { background: #8f5e3b !important; }
+
+#webQuizRoot .eq-result-icon {
+  background: rgba(143,94,59,0.10) !important;
+  border-color: rgba(143,94,59,0.30) !important;
+  color: #1c120d !important;
+}
+#webQuizRoot .eq-result-title { color: #1c120d !important; }
+#webQuizRoot .eq-result-sub   { color: #5d4030 !important; }
+
+#webQuizRoot .eq-summary-row {
+  position: relative !important;
+  z-index: 2 !important;
+  margin-top: 28px !important;
+}
+#webQuizRoot .eq-summary-pill {
+  background: #fffaf5 !important;
+  border-color: #e4d3c2 !important;
+  color: #1c120d !important;
+}
+#webQuizRoot .eq-summary-pill::before { background: linear-gradient(90deg,#8f5e3b,transparent) !important; }
+#webQuizRoot .eq-summary-key { color: #9a7963 !important; }
+#webQuizRoot .eq-summary-val { color: #1c120d !important; }
+#webQuizRoot .eq-footer-link  { color: #9a7963 !important; }
+#webQuizRoot .eq-footer-link:hover { color: #5d4030 !important; }
+#webQuizRoot .eq-footer-sep   { color: #c9b8a8 !important; }

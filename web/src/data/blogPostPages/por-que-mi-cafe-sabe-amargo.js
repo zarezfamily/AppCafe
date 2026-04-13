@@ -1,44 +1,24 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="shortcut icon" href="/favicon.ico" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-  <meta name="apple-mobile-web-app-title" content="Etiove" />
-  <meta name="theme-color" content="#21150f" />
-  <link rel="manifest" href="/site.webmanifest" />
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>¿Por qué mi café sabe amargo? Causas y soluciones | Blog Etiove</title>
-  <meta name="author" content="Etiove" />
-  <meta name="description" content="Sobreextracción, molienda incorrecta, agua demasiado caliente… Descubre las 7 causas reales de que tu café sepa amargo y cómo solucionarlas hoy." />
-  <link rel="canonical" href="https://etiove.com/blog/por-que-mi-cafe-sabe-amargo.html" />
-  <link rel="alternate" type="application/rss+xml" title="Blog Etiove - RSS" href="https://etiove.com/feed.xml" />
-  <link rel="prev" href="https://etiove.com/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html" />
-  <link rel="next" href="https://etiove.com/blog/cafe-de-especialidad-vs-cafe-normal.html" />
-  <meta property="og:type" content="article" />
-  <meta property="og:site_name" content="Etiove" />
-  <meta property="og:locale" content="es_ES" />
-  <meta property="og:title" content="¿Por qué mi café sabe amargo? Causas y soluciones | Blog Etiove" />
-  <meta property="og:description" content="Sobreextracción, molienda incorrecta, agua demasiado caliente… Descubre las 7 causas reales de que tu café sepa amargo y cómo solucionarlas hoy." />
-  <meta property="og:url" content="https://etiove.com/blog/por-que-mi-cafe-sabe-amargo.html" />
-  <meta property="og:image" content="https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=1200&q=85&auto=format&fit=crop" />
-  <meta property="og:image:type" content="image/jpeg" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="Taza de café con vapor en mesa de madera" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="¿Por qué mi café sabe amargo? Causas y soluciones | Blog Etiove" />
-  <meta name="twitter:description" content="Descubre las 7 causas reales de que tu café sepa amargo y cómo solucionarlas hoy." />
-  <meta name="twitter:image" content="https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=1200&q=85&auto=format&fit=crop" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:wght@400;500&display=swap" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/blog/post-shell.css" />
-  <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+const porQueMiCafeSabeAmargo = {
+  slug: 'por-que-mi-cafe-sabe-amargo',
+  title: '¿Por qué mi café sabe amargo? Causas y soluciones',
+  description: 'Sobreextracción, molienda incorrecta, agua demasiado caliente… Descubre las 7 causas reales de que tu café sepa amargo y cómo solucionarlas hoy.',
+  ogDescription: 'Sobreextracción, molienda incorrecta, agua demasiado caliente… Descubre las 7 causas reales de que tu café sepa amargo y cómo solucionarlas hoy.',
+  twitterTitle: '¿Por qué mi café sabe amargo? Causas y soluciones | Blog Etiove',
+  twitterDescription: 'Descubre las 7 causas reales de que tu café sepa amargo y cómo solucionarlas hoy.',
+  canonicalUrl: 'https://etiove.com/blog/por-que-mi-cafe-sabe-amargo.html',
+  prevUrl: 'https://etiove.com/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html',
+  nextUrl: 'https://etiove.com/blog/cafe-de-especialidad-vs-cafe-normal.html',
+  bodyWrapperClass: 'container',
+  bodyInnerClass: 'post-body',
+  hero: {
+    image: 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=1400&q=80&auto=format&fit=crop',
+    imageSocial: 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=1200&q=85&auto=format&fit=crop',
+    imageAlt: 'Taza de café con vapor en mesa de madera',
+    tag: 'Guía · 08 abril 2026 · 8 min de lectura',
+    title: '¿Por qué mi café sabe amargo?',
+    meta: 'Por el equipo de Etiove · Foto: Unsplash'
+  },
+  inlineCss: String.raw`*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --ink: #1c120d; --ink-soft: #5d4030; --ink-muted: #9a7963; --cream: #f6efe7; --cream-alt: #fffaf5; --accent: #8f5e3b; --accent-deep: #5d4030; --border: #e4d3c2; --border-soft: rgba(228,211,194,0.5); }
     html { scroll-behavior: smooth; }
     body { font-family: 'Source Serif 4', Georgia, serif; color: var(--ink); background: radial-gradient(circle at 10% -10%, rgba(143,94,59,.12) 0%, transparent 45%), radial-gradient(circle at 100% 20%, rgba(93,64,48,.07) 0%, transparent 42%), var(--cream); min-height: 100vh; line-height: 1.75; }
@@ -106,154 +86,116 @@
     .origin-flag { font-size: 22px; }
     .origin-name { font-family: -apple-system, sans-serif; font-size: 11px; font-weight: 700; color: var(--ink-soft); text-align: center; }
     .origin-note { font-size: 10px; color: var(--ink-muted); text-align: center; }
-    @media (max-width: 600px) { .cause-card { grid-template-columns: 1fr; gap: 8px; } .score-visual { grid-template-columns: 1fr; } .myth-card { grid-template-columns: 1fr; gap: 6px; } .cta-box { padding: 28px 20px; } }
-  </style>
-  <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Article",
-  "headline": "¿Por qué mi café sabe amargo? 7 causas y sus soluciones",
-  "description": "Sobreextracción, molienda incorrecta, agua demasiado caliente… Descubre las causas reales de que tu café sepa amargo y cómo solucionarlas.",
-  "datePublished": "2026-04-08",
-  "dateModified": "2026-04-08",
-  "author": {
-    "@type": "Organization",
-    "name": "Etiove"
+    @media (max-width: 600px) { .cause-card { grid-template-columns: 1fr; gap: 8px; } .score-visual { grid-template-columns: 1fr; } .myth-card { grid-template-columns: 1fr; gap: 6px; } .cta-box { padding: 28px 20px; } }`,
+  articleJsonLd: {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: '¿Por qué mi café sabe amargo? 7 causas y sus soluciones',
+    description: 'Sobreextracción, molienda incorrecta, agua demasiado caliente… Descubre las causas reales de que tu café sepa amargo y cómo solucionarlas.',
+    datePublished: '2026-04-08',
+    dateModified: '2026-04-08',
+    author: {
+      '@type': 'Organization',
+      name: 'Etiove'
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Etiove',
+      url: 'https://etiove.com',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://etiove.com/favicon.svg',
+        width: 512,
+        height: 512
+      }
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': 'https://etiove.com/blog/por-que-mi-cafe-sabe-amargo.html'
+    },
+    image: {
+      '@type': 'ImageObject',
+      url: 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=1400&q=80&auto=format&fit=crop',
+      width: 1400,
+      height: 700,
+      caption: 'Taza de café con vapor en mesa de madera'
+    },
+    wordCount: 1031,
+    timeRequired: 'PT7M'
   },
-  "publisher": {
-    "@type": "Organization",
-    "name": "Etiove",
-    "url": "https://etiove.com",
-    "logo": {
-      "@type": "ImageObject",
-      "url": "https://etiove.com/favicon.svg",
-      "width": 512,
-      "height": 512
+  extraJsonLd: [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: '¿Por qué mi café sabe amargo?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Las 7 causas más comunes son: sobreextracción, agua demasiado caliente (por encima de 96°C), molienda demasiado fina, café de tueste muy oscuro o quemado, equipo sucio con residuos de aceites rancios, café rancio o mal almacenado, y una ratio de café demasiado alta respecto al agua.'
+          }
+        },
+        {
+          '@type': 'Question',
+          name: '¿Cómo sé si el amargor es por sobreextracción o por el tueste?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Si el amargor aparece al final del sorbo y persiste, suele ser sobreextracción — reduce el tiempo o muele más grueso. Si el café sabe amargo desde el primer sorbo y no hay otros sabores, el problema está en el tueste: prueba un café de especialidad de tueste claro o medio.'
+          }
+        },
+        {
+          '@type': 'Question',
+          name: '¿Qué temperatura del agua es ideal para el café?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'El rango ideal está entre 90 y 96°C. Por encima de 96°C el agua quema el café y extrae compuestos amargos de forma agresiva. Si hierves el agua, déjala reposar 30-45 segundos antes de usarla.'
+          }
+        },
+        {
+          '@type': 'Question',
+          name: '¿Cómo afecta la molienda al amargor del café?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Una molienda más fina aumenta la superficie de contacto con el agua y acelera la extracción. Para métodos como el V60 o la prensa francesa, una molienda demasiado fina convierte un café equilibrado en uno amargo. Ajusta: gruesa para prensa francesa, media para V60 y Chemex, fina solo para espresso.'
+          }
+        },
+        {
+          '@type': 'Question',
+          name: '¿Con qué frecuencia hay que limpiar el equipo de café?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Después de cada uso, especialmente el porta-filtro y el grupo del espresso. Los aceites del café se oxidan y se vuelven rancios, y los residuos se transfieren a cada taza nueva dando un sabor amargo persistente.'
+          }
+        }
+      ]
     }
+  ],
+  breadcrumbJsonLd: {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Inicio',
+        item: 'https://etiove.com/'
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Blog',
+        item: 'https://etiove.com/blog/'
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: '¿Por qué mi café sabe amargo? Causas y soluciones',
+        item: 'https://etiove.com/blog/por-que-mi-cafe-sabe-amargo.html'
+      }
+    ]
   },
-  "mainEntityOfPage": {
-    "@type": "WebPage",
-    "@id": "https://etiove.com/blog/por-que-mi-cafe-sabe-amargo.html"
-  },
-  "image": {
-    "@type": "ImageObject",
-    "url": "https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=1400&q=80&auto=format&fit=crop",
-    "width": 1400,
-    "height": 700,
-    "caption": "Taza de café con vapor en mesa de madera"
-  },
-  "wordCount": 1031,
-  "timeRequired": "PT7M"
-}
-  </script>
-  <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "¿Por qué mi café sabe amargo?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Las 7 causas más comunes son: sobreextracción, agua demasiado caliente (por encima de 96°C), molienda demasiado fina, café de tueste muy oscuro o quemado, equipo sucio con residuos de aceites rancios, café rancio o mal almacenado, y una ratio de café demasiado alta respecto al agua."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "¿Cómo sé si el amargor es por sobreextracción o por el tueste?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Si el amargor aparece al final del sorbo y persiste, suele ser sobreextracción — reduce el tiempo o muele más grueso. Si el café sabe amargo desde el primer sorbo y no hay otros sabores, el problema está en el tueste: prueba un café de especialidad de tueste claro o medio."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "¿Qué temperatura del agua es ideal para el café?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "El rango ideal está entre 90 y 96°C. Por encima de 96°C el agua quema el café y extrae compuestos amargos de forma agresiva. Si hierves el agua, déjala reposar 30-45 segundos antes de usarla."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "¿Cómo afecta la molienda al amargor del café?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Una molienda más fina aumenta la superficie de contacto con el agua y acelera la extracción. Para métodos como el V60 o la prensa francesa, una molienda demasiado fina convierte un café equilibrado en uno amargo. Ajusta: gruesa para prensa francesa, media para V60 y Chemex, fina solo para espresso."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "¿Con qué frecuencia hay que limpiar el equipo de café?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Después de cada uso, especialmente el porta-filtro y el grupo del espresso. Los aceites del café se oxidan y se vuelven rancios, y los residuos se transfieren a cada taza nueva dando un sabor amargo persistente."
-      }
-    }
-  ]
-}
-  </script>
-  <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
-  <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    {
-      "@type": "ListItem",
-      "position": 1,
-      "name": "Inicio",
-      "item": "https://etiove.com/"
-    },
-    {
-      "@type": "ListItem",
-      "position": 2,
-      "name": "Blog",
-      "item": "https://etiove.com/blog/"
-    },
-    {
-      "@type": "ListItem",
-      "position": 3,
-      "name": "¿Por qué mi café sabe amargo? Causas y soluciones",
-      "item": "https://etiove.com/blog/por-que-mi-cafe-sabe-amargo.html"
-    }
-  ]
-}
-  </script>
-</head>
-<body>
-
-  <nav class="site-nav" aria-label="Navegación principal">
-    <a class="nav-wordmark" href="/">Etiove</a>
-    <button class="nav-hamburger" id="navHamburger" aria-label="Menú" aria-expanded="false" aria-controls="navLinks"><span></span><span></span><span></span></button>
-    <div class="nav-links" id="navLinks">
-      <a class="nav-link" href="/">Inicio</a>
-      <a class="nav-link nav-link--active" href="/blog/">Blog</a>
-      <a class="nav-link" href="/comunidad.html">Comunidad</a>
-    </div>
-  </nav>
-
-  <header class="post-hero">
-    <img
-      class="hero-img"
-      src="https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=1400&q=80&auto=format&fit=crop"
-      alt="Taza de café con vapor en mesa de madera"
-      loading="eager"
-      fetchpriority="high"
-      width="1400"
-      height="700" />
-    <div class="hero-overlay"></div>
-    <div class="hero-content">
-      <span class="hero-tag">Guía · 08 abril 2026 · 8 min de lectura</span>
-      <h1 class="hero-title">¿Por qué mi café sabe amargo?</h1>
-      <div class="hero-meta">Por el equipo de Etiove · Foto: Unsplash</div>
-    </div>
-  </header>
-
-  <main class="container">
-    <div class="post-body">
-<p>Hay dos tipos de amargor en el café. Uno es el amargor <em>natural y elegante</em> que forma parte del perfil de un buen tueste oscuro o un espresso bien extraído. El otro es el amargor <em>áspero y desagradable</em> que arruina la taza y que indica que algo ha ido mal en el proceso.</p>
+  bodyHtml: String.raw`<p>Hay dos tipos de amargor en el café. Uno es el amargor <em>natural y elegante</em> que forma parte del perfil de un buen tueste oscuro o un espresso bien extraído. El otro es el amargor <em>áspero y desagradable</em> que arruina la taza y que indica que algo ha ido mal en el proceso.</p>
 
       <p>Este artículo trata del segundo. Si tu café sabe amargo, astringente o simplemente tiene un regusto que no te deja disfrutarlo, una de estas 7 causas es casi con toda seguridad la responsable.</p>
 
@@ -444,48 +386,9 @@
       <a class="post-nav-link" href="/blog/cafe-de-especialidad-vs-cafe-normal.html">
         <p class="post-nav-label">Siguiente →</p>
         <p class="post-nav-title">Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real?</p>
-      </a></div>
-    </div>
-  </main>
+      </a></div>`
+};
 
-
-  <button class="scroll-top" id="scrollTopBtn" aria-label="Volver arriba">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
-  </button>
-  <script>
-    window.ETIOVE_BLOG_POST_CONFIG = {
-      postSlug: 'por-que-mi-cafe-sabe-amargo',
-    };
-  </script>
-  <script src="/blog/post-shared.js" defer></script>
-  <script type="module" src="/blog/post-page.js"></script>
-
-  <footer>
-    <p class="footer-copy">
-      <span>© 2026 Etiove. Hecho con ☕ en España.</span>
-
-      <span class="footer-copy-center">
-        <span class="footer-wordmark-sm">Etiove</span>
-
-        <span class="social-row-inline">
-          <a class="social-link" href="https://instagram.com/etiove_cafe" target="_blank" aria-label="Instagram @etiove_cafe">
-            <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-          </a>
-          <a class="social-link" href="https://x.com/etiove_cafe" target="_blank" aria-label="X @etiove_cafe">
-            <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-          </a>
-          <a class="social-link" href="https://tiktok.com/@etiove" target="_blank" aria-label="TikTok @etiove">
-            <svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.16 8.16 0 004.77 1.52V6.75a4.85 4.85 0 01-1-.06z"/></svg>
-          </a>
-        </span>
-      </span>
-
-      <span class="footer-legal-group">
-        <a class="footer-legal-link" href="/privacidad.html">Privacidad</a>
-        <a class="footer-legal-link" href="/cookies.html">Cookies</a>
-        <a class="footer-legal-link" href="/terminos.html">Términos</a>
-      </span>
-    </p>
-  </footer>
-</body>
-</html>
+module.exports = {
+  porQueMiCafeSabeAmargo,
+};

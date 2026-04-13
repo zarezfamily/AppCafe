@@ -44,6 +44,70 @@ ${renderSocialLinks()}
   </footer>`;
 }
 
+function renderSiteFooter() {
+  return `
+  <footer>
+    <nav class="footer-nav" aria-label="Navegación del sitio">
+      <div class="footer-nav-group">
+        <span class="footer-nav-label">Explorar</span>
+        <a class="footer-nav-link" href="/">Inicio</a>
+        <a class="footer-nav-link" href="/blog/">Blog</a>
+        <a class="footer-nav-link" href="/comunidad.html">Comunidad</a>
+        <a class="footer-nav-link" href="/#quizweb">Quiz de sabor</a>
+        <a class="footer-nav-link" href="/about.html">Sobre Etiove</a>
+      </div>
+    </nav>
+
+    <p class="footer-copy">
+      <span>© 2026 Etiove. Hecho con ☕ en España.</span>
+
+      <span class="footer-copy-center">
+        <span class="footer-wordmark-sm">Etiove</span>
+${renderSocialLinks()}
+      </span>
+
+      <span class="footer-legal-links">
+        <a class="footer-legal-link" href="/privacidad.html">Privacidad</a>
+        <a class="footer-legal-link" href="/cookies.html">Cookies</a>
+        <a class="footer-legal-link" href="/terminos.html">Términos</a>
+      </span>
+    </p>
+  </footer>`;
+}
+
+function renderBlogPostFooter() {
+  return `
+  <footer>
+    <p class="footer-copy">
+      <span>© 2026 Etiove. Hecho con ☕ en España.</span>
+
+      <span class="footer-copy-center">
+        <span class="footer-wordmark-sm">Etiove</span>
+${renderSocialLinks()}
+      </span>
+
+      <span class="footer-legal-group">
+        <a class="footer-legal-link" href="/privacidad.html">Privacidad</a>
+        <a class="footer-legal-link" href="/cookies.html">Cookies</a>
+        <a class="footer-legal-link" href="/terminos.html">Términos</a>
+      </span>
+    </p>
+  </footer>`;
+}
+
+function renderBlogPostNav() {
+  return `
+  <nav class="site-nav" aria-label="Navegación principal">
+    <a class="nav-wordmark" href="/">Etiove</a>
+    <button class="nav-hamburger" id="navHamburger" aria-label="Menú" aria-expanded="false" aria-controls="navLinks"><span></span><span></span><span></span></button>
+    <div class="nav-links" id="navLinks">
+      <a class="nav-link" href="/">Inicio</a>
+      <a class="nav-link nav-link--active" href="/blog/">Blog</a>
+      <a class="nav-link" href="/comunidad.html">Comunidad</a>
+    </div>
+  </nav>`;
+}
+
 function renderLegalNav() {
   return `
   <nav>
@@ -65,7 +129,10 @@ function renderScrollTopButton() {
 }
 
 module.exports = {
+  renderBlogPostFooter,
+  renderBlogPostNav,
   renderLegalFooter,
   renderLegalNav,
+  renderSiteFooter,
   renderScrollTopButton,
 };

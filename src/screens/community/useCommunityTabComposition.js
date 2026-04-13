@@ -5,7 +5,11 @@ import {
   buildCommunityEditModalProps,
   buildCommunityThreadDetailViewProps,
   buildCommunityThreadListViewProps,
-} from './buildCommunityTabViewProps';
+} from '../../domain/community/viewProps';
+import {
+  getCommunityRoleFlags,
+  getCommunityVisibleViews,
+} from '../../domain/community/viewState';
 
 export default function useCommunityTabComposition(props) {
   const {
@@ -86,11 +90,11 @@ export default function useCommunityTabComposition(props) {
     interactionFeedbackMode,
   });
 
-  const isAdmin = perfil?.role === 'admin';
-  const isStaff = perfil?.role === 'staff';
-  const showCategories = !forumCategory;
-  const showThreadList = !!forumCategory && !forumThread;
-  const showThreadDetail = !!forumCategory && !!forumThread;
+  const { isAdmin, isStaff } = getCommunityRoleFlags(perfil);
+  const { showCategories, showThreadList, showThreadDetail } = getCommunityVisibleViews({
+    forumCategory,
+    forumThread,
+  });
 
   const categoriesViewProps = buildCommunityCategoriesViewProps({
     s,

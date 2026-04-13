@@ -25,7 +25,7 @@ export default function OfertasTab({
           <Text style={s.backText}>Volver</Text>
         </TouchableOpacity>
         <Text style={s.pageTitle}>Ofertas de cafés</Text>
-        <Text style={s.sectionSub}>Pulsa cualquier café para cargar sus 3 ofertas más baratas encontradas en Google</Text>
+        <Text style={s.sectionSub}>Pulsa cualquier café para cargar sus 3 ofertas más baratas encontradas en Google.</Text>
       </View>
       <View style={{ paddingHorizontal: 16, marginTop: 8 }}>
         {cafesParaOfertas.map((cafe) => {

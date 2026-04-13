@@ -4,8 +4,9 @@ import * as SecureStore from 'expo-secure-store';
 import { useEffect, useMemo, useState } from 'react';
 
 import { loadCollectionOfflineCache, saveCollectionOfflineCache } from '../core/offlineCache';
-import { buildPlacesPhotoUrl, calcDistanceMeters, fetchNearbyPlaces, isGooglePlacesConfigured } from '../core/places';
-import { normalize } from '../core/utils';
+import { fetchNearbyPlaces, isGooglePlacesConfigured } from '../core/places';
+import { filterCoffeeList, selectTopCoffeesForCountry } from '../domain/coffee/coffeeFilters';
+import { mapPlacesToHomeNearbyCafeterias } from '../domain/coffee/nearbyCafeterias';
 
 export default function useCoffeeData({
   user,
@@ -129,20 +130,11 @@ export default function useCoffeeData({
         fieldMask: 'places.id,places.displayName,places.formattedAddress,places.location,places.rating,places.userRatingCount,places.currentOpeningHours,places.photos,places.types',
       });
 
-      const mapped = places.map((p) => {
-        const geo = p.location || {};
-        const dist = calcDistanceMeters(lat, lon, geo.latitude || lat, geo.longitude || lon);
-        return {
-          id: p.id,
-          nombre: (p.displayName && p.displayName.text) || 'Cafetería',
-          rating: Number(p.rating || 0).toFixed(1),
-          numResenas: p.userRatingCount || 0,
-          distancia: dist,
-          abierto: (p.currentOpeningHours && p.currentOpeningHours.openNow !== undefined) ? p.currentOpeningHours.openNow : null,
-          foto: (p.photos && p.photos[0] && p.photos[0].name)
-            ? buildPlacesPhotoUrl(p.photos[0].name, googlePlacesKey)
-            : null,
-        };
+      const mapped = mapPlacesToHomeNearbyCafeterias({
+        places,
+        lat,
+        lon,
+        apiKey: googlePlacesKey,
       });
 
       setCafeteriasInicio(mapped);
@@ -214,24 +206,13 @@ export default function useCoffeeData({
   };
 
   const filtrar = (lista, query) => {
-    if (!query.trim()) return lista;
-    const q = normalize(query);
-    return lista.filter((c) => (
-      normalize(c.nombre).includes(q)
-      || normalize(c.pais).includes(q)
-      || normalize(c.region).includes(q)
-      || normalize(c.origen).includes(q)
-      || normalize(c.variedad).includes(q)
-      || normalize(c.proceso).includes(q)
-      || normalize(c.notas).includes(q)
-    )).slice(0, 50);
+    return filterCoffeeList(lista, query);
   };
 
   const favCafes = useMemo(() => allCafes.filter((c) => favs.includes(c.id)), [allCafes, favs]);
   const cafesFiltrados = useMemo(() => filtrar(misCafes, busquedaMis), [misCafes, busquedaMis]);
   const topFiltrados = useMemo(() => filtrar(topCafes, busquedaTop), [topCafes, busquedaTop]);
-  const topCafesPais = useMemo(() => topCafes.filter((c) => normalize(c.pais) === normalize(perfil.pais || 'España')), [topCafes, perfil.pais]);
-  const topCafesVista = topCafesPais.length > 0 ? topCafesPais : topCafes;
+  const topCafesVista = useMemo(() => selectTopCoffeesForCountry(topCafes, perfil.pais), [topCafes, perfil.pais]);
   const ultimosGlobal = allCafes.slice(0, 10);
   const ultimos100 = allCafes.slice(0, 100);
   const top100 = topCafesVista.slice(0, 100);

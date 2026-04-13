@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { buildThreadReplySections } from '../../domain/community/threadReplies';
 import CommunityReplyCard from './CommunityReplyCard';
 import CommunityThreadComposer from './CommunityThreadComposer';
 import CommunityThreadMainPost from './CommunityThreadMainPost';
@@ -39,6 +40,8 @@ export default function CommunityThreadDetailView({
   handleSendReply,
   forumSendingReply,
 }) {
+  const replySections = buildThreadReplySections(forumTopReplies, forumRepliesByThread);
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -81,8 +84,7 @@ export default function CommunityThreadDetailView({
         />
 
         <Text style={[s.sectionTitle, { marginTop: 14, marginBottom: 10 }]}>Respuestas</Text>
-        {forumTopReplies.map((reply) => {
-          const childReplies = forumRepliesByThread.filter((item) => item.parentId === reply.id).slice(0, 50);
+        {replySections.map(({ reply, childReplies }) => {
           return (
             <CommunityReplyCard
               key={reply.id}

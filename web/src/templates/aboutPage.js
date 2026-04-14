@@ -78,7 +78,6 @@ function renderAboutPage(page) {
       <a class="nav-link" href="/">Inicio</a>
       <a class="nav-link" href="/blog/">Blog</a>
       <a class="nav-link" href="/comunidad.html">Comunidad</a>
-      <a class="nav-link active" href="/about.html">Sobre</a>
     </div>
     <button class="nav-hamburger" id="navHamburger" aria-label="Menú" aria-expanded="false">
       <span></span><span></span><span></span>

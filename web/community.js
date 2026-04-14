@@ -2640,14 +2640,16 @@ const showSessionExpiredBanner = () => {
 // ─── NOTIFICACIONES CON BADGE ─────────────────────────────────────────────────
 const checkNotifications = async () => {
   if (!auth.uid || !auth.token) return;
+  const badge = document.getElementById('communityNavBadge');
+  if (!badge) return;
 
   try {
+    const lastCheck = Number(localStorage.getItem('etiove_notif_last_check') || 0);
     const [allReplies, allMessages] = await Promise.all([
       getCollection('foro_respuestas', 400),
       getCollection('direct_messages', 200),
     ]);
 
-    const lastCheck = Number(localStorage.getItem('etiove_notif_last_check') || 0);
     const myAlias   = String(localStorage.getItem('etiove_web_alias') || '').toLowerCase().replace(/^@/, '');
 
     // 1. Respuestas nuevas en mis hilos
@@ -2676,21 +2678,20 @@ const checkNotifications = async () => {
     const total = newRepliesInMyThreads + newMentions + newDMs;
 
     // Mostrar badge con desglose en tooltip
-    const badge = document.getElementById('communityNavBadge');
-    if (badge) {
-      if (total > 0) {
-        badge.textContent = total > 9 ? '9+' : String(total);
-        badge.style.display = 'inline-flex';
-        const parts = [];
-        if (newRepliesInMyThreads) parts.push(`${newRepliesInMyThreads} respuesta${newRepliesInMyThreads > 1 ? 's' : ''} en tus hilos`);
-        if (newMentions) parts.push(`${newMentions} mención${newMentions > 1 ? 'es' : ''}`);
-        if (newDMs) parts.push(`${newDMs} mensaje${newDMs > 1 ? 's' : ''} directo${newDMs > 1 ? 's' : ''}`);
-        badge.title = parts.join(' · ');
-      } else {
-        badge.style.display = 'none';
-        badge.title = '';
-      }
+    if (total > 0) {
+      badge.textContent = total > 9 ? '9+' : String(total);
+      badge.style.display = 'inline-flex';
+      const parts = [];
+      if (newRepliesInMyThreads) parts.push(`${newRepliesInMyThreads} respuesta${newRepliesInMyThreads > 1 ? 's' : ''} en tus hilos`);
+      if (newMentions) parts.push(`${newMentions} mención${newMentions > 1 ? 'es' : ''}`);
+      if (newDMs) parts.push(`${newDMs} mensaje${newDMs > 1 ? 's' : ''} directo${newDMs > 1 ? 's' : ''}`);
+      badge.title = parts.join(' · ');
+    } else {
+      badge.style.display = 'none';
+      badge.title = '';
     }
+
+    localStorage.setItem('etiove_notif_last_check', String(Date.now()));
   } catch (_) { /* silencioso */ }
 };
 
@@ -2983,28 +2984,6 @@ const init = async () => {
   renderCategories();
   renderAuthState();
 
-  // Si hay sesión guardada, refrescar emailVerified y resolver alias en background
-  if (auth.uid && auth.token) {
-    resolveAuthorAlias().catch(() => {});
-    fetch(`${AUTH_URL}:lookup?key=${FIREBASE_API_KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Ios-Bundle-Identifier': FIREBASE_IOS_BUNDLE_ID },
-      body: JSON.stringify({ idToken: auth.token }),
-    })
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.users && data.users[0]) {
-          const verified = data.users[0].emailVerified === true;
-          if (verified !== auth.emailVerified) {
-            auth.emailVerified = verified;
-            localStorage.setItem('etiove_web_email_verified', verified ? 'true' : 'false');
-            renderAuthState();
-          }
-        }
-      })
-      .catch(() => {});
-  }
-
   // Pre-rellenar campos de login si hay credenciales guardadas (Recordarme)
   const savedEmail = localStorage.getItem('etiove_web_saved_email');
   const savedPw = localStorage.getItem('etiove_web_saved_pw');
@@ -3154,9 +3133,48 @@ const init = async () => {
 
   await loadForum();
 
-  // Marcar momento de visita y comprobar notificaciones
-  localStorage.setItem('etiove_notif_last_check', String(Date.now()));
-  checkNotifications();
+  // Resolver alias y refrescar emailVerified en segundo plano para no penalizar el arranque
+  if (auth.uid && auth.token) {
+    const runBackgroundAuthTasks = () => {
+      resolveAuthorAlias().catch(() => {});
+      fetch(`${AUTH_URL}:lookup?key=${FIREBASE_API_KEY}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Ios-Bundle-Identifier': FIREBASE_IOS_BUNDLE_ID },
+        body: JSON.stringify({ idToken: auth.token }),
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.users && data.users[0]) {
+            const verified = data.users[0].emailVerified === true;
+            if (verified !== auth.emailVerified) {
+              auth.emailVerified = verified;
+              localStorage.setItem('etiove_web_email_verified', verified ? 'true' : 'false');
+              renderAuthState();
+            }
+          }
+        })
+        .catch(() => {});
+    };
+
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(runBackgroundAuthTasks, { timeout: 2000 });
+    } else {
+      window.setTimeout(runBackgroundAuthTasks, 800);
+    }
+  }
+
+  // Comprobar notificaciones en segundo plano para no penalizar el primer render
+  if (auth.uid && auth.token) {
+    const scheduleNotificationsCheck = () => {
+      checkNotifications().catch(() => {});
+    };
+
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(scheduleNotificationsCheck, { timeout: 2500 });
+    } else {
+      window.setTimeout(scheduleNotificationsCheck, 1200);
+    }
+  }
 };
 
 init();

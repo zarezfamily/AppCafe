@@ -449,6 +449,46 @@ const guiaDeMoliendaPorMetodo = {
     wordCount: 524,
     timeRequired: 'PT7M'
   },
+  extraJsonLd: [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: '¿Qué molienda usar para V60?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Para V60 suele funcionar una molienda media, parecida al azúcar de mesa. Si el café sale amargo, prueba un punto más grueso; si sale ácido o aguado, un punto más fino.'
+          }
+        },
+        {
+          '@type': 'Question',
+          name: '¿Qué molienda necesita la prensa francesa?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'La prensa francesa necesita molienda gruesa. Si mueles demasiado fino, pasarán más sedimentos a la taza y aumentará el riesgo de sobreextracción y amargor.'
+          }
+        },
+        {
+          '@type': 'Question',
+          name: '¿Cómo sé si debo moler más fino o más grueso?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Si el café sale ácido, plano o demasiado rápido, suele pedir una molienda más fina. Si sale amargo, seco o tarda demasiado, normalmente conviene moler más grueso.'
+          }
+        },
+        {
+          '@type': 'Question',
+          name: '¿Se puede usar la misma molienda para todos los métodos?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'No es lo ideal. Cada método necesita una resistencia distinta al paso del agua, así que espresso, V60, AeroPress y prensa francesa requieren ajustes diferentes para extraer bien.'
+          }
+        }
+      ]
+    }
+  ],
   breadcrumbJsonLd: {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',

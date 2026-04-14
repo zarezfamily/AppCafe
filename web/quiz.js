@@ -5,6 +5,8 @@ import { ensureQuizStyles } from '/quizStyles.js';
 function renderQuiz() {
   const root = document.getElementById('webQuizRoot');
   if (!root) return;
+  if (root.dataset.quizMounted === 'true') return;
+  root.dataset.quizMounted = 'true';
 
   ensureQuizStyles();
 
@@ -23,7 +25,7 @@ function renderQuiz() {
         <p class="eq-sub" style="margin-top:20px;">Descarga Etiove para ver los cafés que encajan exactamente con tu perfil.</p>
         <div class="eq-divider"><span class="eq-divider-glyph">✦</span></div>
         <div class="eq-final-actions">
-          <a class="eq-btn-primary" href="https://etiove.com/app" target="_blank">
+          <a class="eq-btn-primary" href="https://etiove.com/app" target="_blank" rel="noopener noreferrer">
             Descargar Etiove
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </a>
@@ -66,7 +68,7 @@ function renderQuiz() {
       <div class="eq-summary-row">${renderQuizSummary(prefs)}</div>
       <p class="eq-sub" style="margin-top:24px;">Perfil sensorial guardado. Descarga Etiove para ver los cafés que encajan exactamente con él.</p>
       <div class="eq-final-actions">
-        <a class="eq-btn-primary" href="https://etiove.com/app" target="_blank">
+        <a class="eq-btn-primary" href="https://etiove.com/app" target="_blank" rel="noopener noreferrer">
           Descargar Etiove
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </a>
@@ -165,4 +167,6 @@ function renderQuiz() {
   render();
 }
 
-document.addEventListener('DOMContentLoaded', renderQuiz);
+export function initQuiz() {
+  renderQuiz();
+}

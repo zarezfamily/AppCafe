@@ -22,6 +22,14 @@
   <meta name="twitter:title" content="Comunidad Etiove | Foro de café de especialidad" />
   <meta name="twitter:description" content="Participa en el foro de Etiove y comparte con otros amantes del café de especialidad." />
   <meta name="twitter:image" content="https://etiove.com/og-image.jpg" />
+  <link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com" />
+  <link rel="dns-prefetch" href="https://europe-west1-firestore.googleapis.com" />
+  <link rel="dns-prefetch" href="https://firebasestorage.googleapis.com" />
+  <link rel="dns-prefetch" href="https://uploadforumimage-prvi3ma7nq-ew.a.run.app" />
+  <link rel="preconnect" href="https://identitytoolkit.googleapis.com" crossorigin />
+  <link rel="preconnect" href="https://europe-west1-firestore.googleapis.com" crossorigin />
+  <link rel="preconnect" href="https://firebasestorage.googleapis.com" crossorigin />
+  <link rel="preconnect" href="https://uploadforumimage-prvi3ma7nq-ew.a.run.app" crossorigin />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="alternate" type="application/rss+xml" title="Blog Etiove - RSS" href="https://etiove.com/feed.xml" />
@@ -1712,7 +1720,7 @@
     </svg>
   </button>
 
-  <script src="/community.js"></script>
+  <script type="module" src="/community-loader.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function() {
       // Wire logout

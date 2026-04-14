@@ -4,6 +4,7 @@ const {
 } = require('./partials');
 
 function renderAboutPage(page) {
+  const canonicalUrl = page.canonicalUrl || `https://etiove.com/${page.slug}.html`;
   return `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -11,14 +12,20 @@ function renderAboutPage(page) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${page.title}</title>
   <meta name="description" content="${page.description}" />
-  <link rel="canonical" href="https://etiove.com/${page.slug}.html" />
+  <link rel="canonical" href="${canonicalUrl}" />
   <meta name="robots" content="${page.robots}" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Etiove" />
   <meta property="og:title" content="${page.ogTitle}" />
   <meta property="og:description" content="${page.ogDescription}" />
-  <meta property="og:url" content="https://etiove.com/${page.slug}.html" />
+  <meta property="og:url" content="${canonicalUrl}" />
   <meta property="og:image" content="https://etiove.com/og-image.jpg" />
+  <meta property="og:image:alt" content="Etiove, comunidad de cafe de especialidad" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="${page.ogTitle}" />
+  <meta name="twitter:description" content="${page.ogDescription}" />
+  <meta name="twitter:image" content="https://etiove.com/og-image.jpg" />
+  <meta name="twitter:image:alt" content="Etiove, comunidad de cafe de especialidad" />
   <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
   <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -37,8 +44,8 @@ function renderAboutPage(page) {
   {
     "@context": "https://schema.org",
     "@type": "AboutPage",
-    "@id": "https://etiove.com/${page.slug}.html",
-    "url": "https://etiove.com/${page.slug}.html",
+    "@id": "${canonicalUrl}",
+    "url": "${canonicalUrl}",
     "name": "${page.schemaName}",
     "description": "${page.schemaDescription}",
     "publisher": {
@@ -71,7 +78,7 @@ function renderAboutPage(page) {
       <a class="nav-link" href="/">Inicio</a>
       <a class="nav-link" href="/blog/">Blog</a>
       <a class="nav-link" href="/comunidad.html">Comunidad</a>
-      <a class="nav-link active" href="/sobre.html">Sobre</a>
+      <a class="nav-link active" href="/about.html">Sobre</a>
     </div>
     <button class="nav-hamburger" id="navHamburger" aria-label="Menú" aria-expanded="false">
       <span></span><span></span><span></span>

@@ -122,6 +122,46 @@ const cafeDeEspecialidadVsCafeNormal = {
     wordCount: 1119,
     timeRequired: 'PT8M'
   },
+  extraJsonLd: [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: '¿Qué diferencia hay entre café de especialidad y café normal?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'El café de especialidad supera los 80 puntos SCA, ofrece trazabilidad del origen, menos defectos, tueste más fresco y perfiles de sabor definidos. El café comercial no tiene ese umbral de calidad ni el mismo nivel de información sobre finca, variedad o proceso.'
+          }
+        },
+        {
+          '@type': 'Question',
+          name: '¿El café de especialidad siempre es más caro?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Sí, suele costar más por kilo, pero también paga mejor al productor, se selecciona mejor, se tuesta en lotes más pequeños y suele rendir más en taza porque aporta más sabor sin necesidad de sobrecargar la dosis.'
+          }
+        },
+        {
+          '@type': 'Question',
+          name: '¿Cómo sé si un café realmente es de especialidad?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Busca fecha de tueste, origen concreto, altitud, variedad, proceso y tostador identificable. Si el paquete solo dice mezcla, intensidad o sabor fuerte, pero no aporta trazabilidad, normalmente no está orientado a especialidad.'
+          }
+        },
+        {
+          '@type': 'Question',
+          name: '¿El café de especialidad tiene más cafeína?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'No necesariamente. La cafeína depende más de la especie, el tueste, la receta y la dosis. Un arábica de especialidad puede tener menos cafeína que un blend comercial con robusta.'
+          }
+        }
+      ]
+    }
+  ],
   breadcrumbJsonLd: {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',

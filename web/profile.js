@@ -25,6 +25,7 @@
 
   let uid = requestedUid || (pathAlias ? '' : auth.uid) || '';
   const queryName = requestedName || String(localStorage.getItem('etiove_web_alias') || '').trim();
+  let resolvedProfilesCache = null;
 
   // Si el usuario visita su propio perfil sin URL limpia, redirigir a @alias
   if (!requestedUid && !pathAlias && auth.uid) {
@@ -40,6 +41,8 @@
     follows: [],
     messages: [],
     profiles: [],
+    messagesLoaded: false,
+    profilesLoaded: false,
     profile: null,
     isFollowing: false,
     followersCount: 0,
@@ -765,6 +768,28 @@
     return map;
   };
 
+  const ensureProfilesLoaded = async () => {
+    if (state.profilesLoaded) return state.profiles;
+
+    if (Array.isArray(resolvedProfilesCache) && resolvedProfilesCache.length) {
+      state.profiles = resolvedProfilesCache;
+      state.profilesLoaded = true;
+      return state.profiles;
+    }
+
+    state.profiles = await getCollection('user_profiles', 2000);
+    state.profilesLoaded = true;
+    return state.profiles;
+  };
+
+  const ensureMessagesLoaded = async () => {
+    if (state.messagesLoaded) return state.messages;
+    state.messages = auth.uid ? await getCollection('direct_messages', 4000) : [];
+    state.messagesLoaded = true;
+    updateUnreadBadge(state.messages);
+    return state.messages;
+  };
+
   const userNameByUid = (targetUid) => {
     if (!targetUid) return 'Usuario';
     if (targetUid === uid) return getAuthorName();
@@ -928,6 +953,13 @@
 
   const renderFollowers = () => {
     const incoming = state.follows.filter((row) => row.targetUid === uid);
+    if (!state.profilesLoaded) {
+      renderEmpty('Cargando seguidores...');
+      ensureProfilesLoaded().then(() => renderFollowers()).catch(() => {
+        renderEmpty('No se pudieron cargar los seguidores.');
+      });
+      return;
+    }
     if (!incoming.length) {
       renderEmpty('Este perfil aun no tiene seguidores.');
       return;
@@ -954,6 +986,13 @@
 
   const renderFollowing = () => {
     const outgoing = state.follows.filter((row) => row.followerUid === uid);
+    if (!state.profilesLoaded) {
+      renderEmpty('Cargando seguidos...');
+      ensureProfilesLoaded().then(() => renderFollowing()).catch(() => {
+        renderEmpty('No se pudieron cargar los seguidos.');
+      });
+      return;
+    }
     if (!outgoing.length) {
       renderEmpty('Este perfil aun no sigue a nadie.');
       return;
@@ -1080,6 +1119,14 @@
   const renderMessages = () => {
     if (!auth.uid) {
       renderEmpty('Inicia sesión para ver y responder mensajes.');
+      return;
+    }
+
+    if (!state.messagesLoaded) {
+      renderEmpty('Cargando mensajes...');
+      ensureMessagesLoaded().then(() => renderMessages()).catch(() => {
+        renderEmpty('No se pudieron cargar los mensajes.');
+      });
       return;
     }
 
@@ -1545,6 +1592,7 @@
           .replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
         const needle = normAlias(pathAlias);
         const profiles = await getCollection('user_profiles', 2000);
+        resolvedProfilesCache = profiles;
         const hit = profiles.find((p) =>
           [p.displayName, p.alias, p.nickname].some((v) => normAlias(v) === needle)
         ) || profiles.find((p) => String(p.uid || '').trim() === pathAlias);
@@ -1552,14 +1600,12 @@
       } catch (_) {}
     }
 
-    const [threads, replies, blogComments, follows, profile, messages, profiles] = await Promise.all([
+    const [threads, replies, blogComments, follows, profile] = await Promise.all([
       getCollection('foro_hilos', 1200),
       getCollection('foro_respuestas', 2000),
       getCollection('blog_comentarios', 2000),
       getCollection('profile_follows', 4000),
       getDocument('user_profiles', uid),
-      auth.uid ? getCollection('direct_messages', 4000) : Promise.resolve([]),
-      getCollection('user_profiles', 2000),
     ]);
 
     state.threads = threads.filter((item) => item.authorUid === uid);
@@ -1567,14 +1613,15 @@
     state.blogComments = blogComments.filter((item) => item.authorUid === uid);
     state.follows = follows;
     state.profile = profile;
-    state.messages = messages;
-    updateUnreadBadge(state.messages);
     // Inject Person schema for SEO
     const pName = state.profile
       ? String(state.profile.displayName || state.profile.alias || queryName || '').trim()
       : String(queryName || '').trim();
     if (pName) injectPersonSchema(state.profile, pName);
-    state.profiles = profiles;
+    if (Array.isArray(resolvedProfilesCache) && resolvedProfilesCache.length) {
+      state.profiles = resolvedProfilesCache;
+      state.profilesLoaded = true;
+    }
 
     // Para el dueño del perfil: importar foto/nombre/frase desde fuentes legacy o Auth.
     await syncOwnerProfileIfNeeded();

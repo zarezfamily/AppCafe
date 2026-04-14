@@ -59,6 +59,7 @@ nav {
   padding: 20px 40px;
   background: rgba(246, 239, 231, 0.85);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-soft);
 }
 
@@ -161,6 +162,12 @@ nav {
   nav { padding: 16px 20px; }
   .nav-links { display: none; }
   body { padding-bottom: 0; }
+  body::before { opacity: 0.28; }
+  nav {
+    background: rgba(246, 239, 231, 0.96);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
   .mobile-nav {
     display: none !important;
   }
@@ -185,6 +192,26 @@ nav {
     border-color: var(--accent-deep);
   }
   .scroll-top { bottom: 80px; right: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+  .reveal,
+  .reveal.visible {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  body::before { opacity: 0.22; }
+  nav {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(246, 239, 231, 0.98);
+  }
 }
 
 @media (prefers-color-scheme: dark) {

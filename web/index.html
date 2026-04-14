@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Etiove | App y Comunidad de Café de Especialidad en España</title>
   <meta name="description" content="Etiove: app y comunidad de café de especialidad. Etio (Etiopía, cuna del café) + Ove (donde, en italiano) = donde nació el café. Descubre, cata y conecta." />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
   <link rel="canonical" href="https://etiove.com/" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Etiove" />
@@ -22,14 +23,19 @@
   <meta name="twitter:title" content="Etiove | App y Comunidad de Café de Especialidad en España" />
   <meta name="twitter:description" content="Descubre, cata, colecciona y conecta con amantes del café de especialidad en Etiove." />
   <meta name="twitter:image" content="https://etiove.com/og-image.jpg" />
-  <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48" />
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+  <link rel="icon" type="image/png" href="/icon.png" sizes="48x48" />
   <link rel="shortcut icon" href="/favicon.ico" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
   <meta name="apple-mobile-web-app-title" content="Etiove" />
   <meta name="theme-color" content="#21150f" />
-  <link rel="manifest" href="/site.webmanifest" /><meta itemprop="image" content="https://etiove.com/favicon.svg" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta itemprop="image" content="https://etiove.com/icon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" />
@@ -155,10 +161,10 @@
     <div class="aura aura-3"></div>
     <!-- Imagen indexable para Google Imágenes -->
     <img
-      src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=1800&q=80&auto=format&fit=crop"
+      src="/og-image.jpg"
       alt="Cata de café de especialidad en la comunidad Etiove — taza de espresso con vapor"
-      width="1800" height="900"
-      fetchpriority="low" loading="lazy"
+      width="1500" height="500"
+      fetchpriority="high"
       class="hero-bg-image"
       aria-hidden="false"
     />
@@ -182,7 +188,7 @@
     </div>
 
     <div class="download-group">
-      <a href="https://apps.apple.com/app/etiove" target="_blank" class="btn-download dark">
+      <a href="https://apps.apple.com/app/etiove" target="_blank" rel="noopener noreferrer" class="btn-download dark">
         <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
           <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
         </svg>
@@ -191,7 +197,7 @@
           <span class="btn-copy-main">App Store</span>
         </div>
       </a>
-      <a href="https://play.google.com/store/apps/details?id=com.zarezfamily.etiove" target="_blank" class="btn-download light">
+      <a href="https://play.google.com/store/apps/details?id=com.zarezfamily.etiove" target="_blank" rel="noopener noreferrer" class="btn-download light">
         <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
           <path d="M3.18 23.76c.3.17.64.24.99.19l12.6-7.27-2.72-2.72-10.87 9.8zm16.11-9.37L5.83 6.93l2.72 2.72 10.74-9.65zm1.61.93c.32-.18.5-.5.5-.87s-.18-.69-.5-.87L18.1 12l-2.59 2.59 2.6 2.6 2.79-1.87zM3.18.24C2.86.07 2.5 0 2.17.19c-.33.18-.5.5-.5.87v21.88c0 .37.17.69.5.87.16.09.34.13.5.13.17 0 .33-.04.49-.13l.02-.01 10.85-9.73-2.7-2.7L3.18.24z"/>
         </svg>
@@ -271,7 +277,7 @@
     <h2 class="app-title app-title-compact">Descarga Etiove</h2>
     <p class="app-sub">iOS y Android · Descarga gratuita</p>
     <div class="app-btns">
-      <a href="https://apps.apple.com/app/etiove" target="_blank" class="btn-app">
+      <a href="https://apps.apple.com/app/etiove" target="_blank" rel="noopener noreferrer" class="btn-app">
         <svg class="btn-app-icon" viewBox="0 0 24 24" fill="currentColor">
           <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
         </svg>
@@ -280,7 +286,7 @@
           <span class="btn-app-main">App Store</span>
         </div>
       </a>
-      <a href="https://play.google.com/store/apps/details?id=com.zarezfamily.etiove" target="_blank" class="btn-app">
+      <a href="https://play.google.com/store/apps/details?id=com.zarezfamily.etiove" target="_blank" rel="noopener noreferrer" class="btn-app">
         <svg class="btn-app-icon" viewBox="0 0 24 24" fill="currentColor">
           <path d="M3.18 23.76c.3.17.64.24.99.19l12.6-7.27-2.72-2.72-10.87 9.8zm16.11-9.37L5.83 6.93l2.72 2.72 10.74-9.65zm1.61.93c.32-.18.5-.5.5-.87s-.18-.69-.5-.87L18.1 12l-2.59 2.59 2.6 2.6 2.79-1.87zM3.18.24C2.86.07 2.5 0 2.17.19c-.33.18-.5.5-.5.87v21.88c0 .37.17.69.5.87.16.09.34.13.5.13.17 0 .33-.04.49-.13l.02-.01 10.85-9.73-2.7-2.7L3.18.24z"/>
         </svg>
@@ -312,13 +318,13 @@
       <span class="footer-copy-center">
         <span class="footer-wordmark-sm">Etiove</span>
         <span class="social-row-inline">
-          <a class="social-link" href="https://instagram.com/etiove_cafe" target="_blank" aria-label="Instagram @etiove_cafe">
+          <a class="social-link" href="https://instagram.com/etiove_cafe" target="_blank" rel="noopener noreferrer" aria-label="Instagram @etiove_cafe">
             <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
           </a>
-          <a class="social-link" href="https://x.com/etiove_cafe" target="_blank" aria-label="X @etiove_cafe">
+          <a class="social-link" href="https://x.com/etiove_cafe" target="_blank" rel="noopener noreferrer" aria-label="X @etiove_cafe">
             <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
           </a>
-          <a class="social-link" href="https://tiktok.com/@etiove" target="_blank" aria-label="TikTok @etiove">
+          <a class="social-link" href="https://tiktok.com/@etiove" target="_blank" rel="noopener noreferrer" aria-label="TikTok @etiove">
             <svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.16 8.16 0 004.77 1.52V6.75a4.85 4.85 0 01-1-.06z"/></svg>
           </a>
         </span>
@@ -353,7 +359,6 @@
   </button>
 
   <script type="module" src="/site.js"></script>
-  <script type="module" src="/quiz.js"></script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",

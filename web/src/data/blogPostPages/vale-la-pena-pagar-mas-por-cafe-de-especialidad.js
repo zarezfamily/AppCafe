@@ -231,6 +231,46 @@ const valeLaPenaPagarMasPorCafeDeEspecialidad = {
     wordCount: 1091,
     timeRequired: 'PT8M'
   },
+  extraJsonLd: [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: '¿Vale la pena pagar más por café de especialidad?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Sí, si valoras mejor sabor, más frescura, trazabilidad y una cadena de valor más justa. No siempre significa lujo: muchas veces significa comprar menos cantidad, pero mucho mejor café.'
+          }
+        },
+        {
+          '@type': 'Question',
+          name: '¿En qué se nota pagar más por el café?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Se nota en el origen identificable, el tueste reciente, la ausencia de sabores quemados o rancios y una taza con más dulzor, limpieza y matices. También suele haber más información útil para prepararlo bien.'
+          }
+        },
+        {
+          '@type': 'Question',
+          name: '¿Es mejor comprar café caro o mejorar la preparación?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Lo ideal es combinar ambas cosas, pero mejorar un poco el café y ajustar molienda, agua y receta suele tener más impacto que gastar mucho sin cuidar la preparación.'
+          }
+        },
+        {
+          '@type': 'Question',
+          name: '¿Qué precio razonable tiene un buen café de especialidad?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Depende del origen y el proceso, pero en España es habitual encontrar bolsas de 250 g con buena relación calidad-precio en un rango medio, sin necesidad de irse a microlotes muy caros.'
+          }
+        }
+      ]
+    }
+  ],
   breadcrumbJsonLd: {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',

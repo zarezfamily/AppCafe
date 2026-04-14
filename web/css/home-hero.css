@@ -225,9 +225,29 @@
 
 @media (max-width: 768px) {
   .hero { padding: 100px 24px 60px; }
+  .hero-bg-image { opacity: 0.3; }
+  .aura-1,
+  .aura-2 { opacity: 0.45; }
 }
 
 @media (prefers-color-scheme: dark) {
   .btn-download.dark { background: #f0e8de; color: #1a110a; }
   .btn-download.light { background: rgba(255,255,255,0.08); color: #f0e8de; border-color: rgba(240,232,222,0.45); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aura-1,
+  .aura-2,
+  .hero-seal,
+  .hero-eyebrow,
+  .hero-title,
+  .hero-tagline,
+  .divider-line,
+  .download-group {
+    animation: none !important;
+  }
+  .aura-1,
+  .aura-2 {
+    opacity: 0.28;
+  }
 }

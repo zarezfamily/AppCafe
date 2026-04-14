@@ -93,6 +93,7 @@ function renderBlogIndexPage() {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Blog Etiove | Café de Especialidad</title>
   <meta name="description" content="Guías, tutoriales y análisis para amantes del café de especialidad. Aprende, cata y elige mejor cada taza con Etiove." />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
   <link rel="canonical" href="https://etiove.com/blog/" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Etiove" />
@@ -104,10 +105,12 @@ function renderBlogIndexPage() {
   <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1500" />
   <meta property="og:image:height" content="500" />
+  <meta property="og:image:alt" content="Blog Etiove sobre cafe de especialidad" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Blog Etiove | Café de Especialidad" />
   <meta name="twitter:description" content="Guías y contenido para amantes del café de especialidad." />
   <meta name="twitter:image" content="https://etiove.com/og-image.jpg" />
+  <meta name="twitter:image:alt" content="Blog Etiove sobre cafe de especialidad" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:wght@400;500&display=swap" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

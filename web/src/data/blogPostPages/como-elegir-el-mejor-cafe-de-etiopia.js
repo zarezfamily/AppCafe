@@ -231,6 +231,46 @@ const comoElegirElMejorCafeDeEtiopia = {
     wordCount: 525,
     timeRequired: 'PT6M'
   },
+  extraJsonLd: [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: '¿Qué región de Etiopía elegir para empezar?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yirgacheffe suele ser ideal para empezar si buscas un perfil floral y limpio. Sidamo funciona bien si prefieres equilibrio y fruta suave, y Guji encaja mejor si quieres una taza más dulce y expresiva.'
+          }
+        },
+        {
+          '@type': 'Question',
+          name: '¿Qué diferencia hay entre un etíope lavado y uno natural?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'El proceso lavado suele dar más claridad, notas florales y acidez brillante. El natural ofrece más fruta madura, dulzor y cuerpo. No es que uno sea mejor que otro: depende del perfil que te guste.'
+          }
+        },
+        {
+          '@type': 'Question',
+          name: '¿Qué altitud es buena en un café de Etiopía?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Por encima de 1.800 metros suele ser una señal muy positiva. A esa altitud el grano desarrolla más densidad y complejidad aromática, algo muy valorado en cafés etíopes de calidad.'
+          }
+        },
+        {
+          '@type': 'Question',
+          name: '¿Qué método resalta mejor un café etíope?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Los métodos de filtro como V60, Chemex o Kalita suelen resaltar mejor sus notas florales, cítricas y frutales. En espresso también puede brillar, pero el filtro muestra más claramente el origen.'
+          }
+        }
+      ]
+    }
+  ],
   breadcrumbJsonLd: {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',

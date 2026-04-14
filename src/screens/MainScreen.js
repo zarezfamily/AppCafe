@@ -18,9 +18,9 @@ import {
   queryCollection,
   setDocument,
   updateDocument,
-} from '../../firestoreService';
-import { restoreAuthTokenFromSecureStore } from '../../authService';
-import { uploadImageToStorage } from '../../storageService';
+} from '../services/firestoreService';
+import { restoreAuthTokenFromSecureStore } from '../services/authService';
+import { uploadImageToStorage } from '../services/storageService';
 import { CardHorizontal, CardVertical } from '../components/Cards';
 import PackshotImage from '../components/PackshotImage';
 import SearchInput from '../components/SearchInput';

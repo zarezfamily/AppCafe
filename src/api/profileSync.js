@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { getDocument } from '../../firestoreService';
+import { getDocument } from '../services/firestoreService';
 
 export function useProfileRealtimeSync(user, setPerfil) {
   useEffect(() => {

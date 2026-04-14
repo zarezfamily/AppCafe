@@ -1,5 +1,5 @@
-import { getDocument, setDocument } from '../../../firestoreService';
-import { uploadImageToStorage } from '../../../storageService';
+import { getDocument, setDocument } from '../../services/firestoreService';
+import { uploadImageToStorage } from '../../services/storageService';
 import { buildProfileDraft } from './profileValidation';
 
 const DEFAULT_MOTTO = '"Ninguno de nosotros es tan listo como todos nosotros."';

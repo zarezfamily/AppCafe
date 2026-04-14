@@ -917,6 +917,7 @@ ${renderScrollTopButton()}
       postSlug: '${post.slug}',
     };
   </script>
+  <script src="/js/config.js"></script>
   <script src="/blog/post-shared.js" defer></script>
   <script type="module" src="/blog/post-page.js"></script>
 ${renderBlogPostFooter()}

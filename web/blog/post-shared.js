@@ -6,10 +6,11 @@
   'use strict';
 
   // ─── CONFIG ────────────────────────────────────────────────────────────────
-  const FIREBASE_PROJECT_ID = 'miappdecafe';
-  const FIREBASE_API_KEY    = 'AIzaSyA1BcU0iRk3HyFtV92CLrnalHFKLaOWH24';
-  const FIREBASE_IOS_BUNDLE = 'com.zarezfamily.etiove';
-  const BASE_URL = `https://europe-west1-firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
+  const {
+    apiKey: FIREBASE_API_KEY,
+    iosBundleId: FIREBASE_IOS_BUNDLE,
+    baseUrl: BASE_URL,
+  } = window.ETIOVE_CONFIG;
 
   const cfg = (window.ETIOVE_BLOG_POST_CONFIG) || {};
   const postSlug = String(cfg.postSlug || '').trim() ||

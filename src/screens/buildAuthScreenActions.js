@@ -1,4 +1,4 @@
-import { loginUser, registerUser, resetPassword } from '../../authService';
+import { loginUser, registerUser, resetPassword } from '../services/authService';
 import {
   authenticateWithFaceId,
   getFaceIdAvailability,

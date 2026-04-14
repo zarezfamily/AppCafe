@@ -1,9 +1,11 @@
 (() => {
-  const FIREBASE_PROJECT_ID = 'miappdecafe';
-  const FIREBASE_API_KEY = 'AIzaSyA1BcU0iRk3HyFtV92CLrnalHFKLaOWH24';
-  const FIREBASE_IOS_BUNDLE_ID = 'com.zarezfamily.etiove';
-  const BASE_URL = `https://europe-west1-firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
-  const FIREBASE_STORAGE_BUCKET = `${FIREBASE_PROJECT_ID}.appspot.com`;
+  const {
+    projectId: FIREBASE_PROJECT_ID,
+    apiKey: FIREBASE_API_KEY,
+    iosBundleId: FIREBASE_IOS_BUNDLE_ID,
+    baseUrl: BASE_URL,
+    storageBucket: FIREBASE_STORAGE_BUCKET,
+  } = window.ETIOVE_CONFIG;
 
   const params = new URLSearchParams(window.location.search);
 

@@ -72,9 +72,7 @@ function normalizarOfertaGoogle(raw) {
   const link = normalizarGoogleLink(raw.link);
 
   const tienda = decodeHtmlText(
-    raw.store ||
-      raw.merchant ||
-      (link ? inferTiendaFromLink(link) : 'Google Shopping')
+    raw.store || raw.merchant || (link ? inferTiendaFromLink(link) : 'Google Shopping')
   );
 
   const titulo = stripHtmlTags(raw.title || 'Oferta de café');
@@ -87,9 +85,7 @@ function normalizarOfertaGoogle(raw) {
     titulo,
     tienda,
     precio,
-    precioTexto: Number.isFinite(precio)
-      ? `${precio.toFixed(2)}€`
-      : priceText,
+    precioTexto: Number.isFinite(precio) ? `${precio.toFixed(2)}€` : priceText,
     link,
     fuente: 'Google',
   };
@@ -104,8 +100,7 @@ function extraerOfertasGoogleBusqueda(html) {
 
     const linkMatch = block.match(/^\/url\?q=([^&"]+)/i);
     const titleMatch =
-      block.match(/<h3[^>]*>(.*?)<\/h3>/i) ||
-      block.match(/aria-label="([^"]{8,160})"/i);
+      block.match(/<h3[^>]*>(.*?)<\/h3>/i) || block.match(/aria-label="([^"]{8,160})"/i);
 
     const priceMatch = block.match(/(\d{1,4}(?:[.,]\d{2})\s?€)/i);
 
@@ -128,13 +123,9 @@ function extraerOfertasGoogleBusqueda(html) {
 
 export function extraerOfertasGoogle(html) {
   if (
-    /trouble accessing Google Search|unusual traffic|SG_SS|detected unusual traffic/i.test(
-      html
-    )
+    /trouble accessing Google Search|unusual traffic|SG_SS|detected unusual traffic/i.test(html)
   ) {
-    throw new Error(
-      'Google ha bloqueado temporalmente la consulta de ofertas'
-    );
+    throw new Error('Google ha bloqueado temporalmente la consulta de ofertas');
   }
 
   const candidates = [];
@@ -169,9 +160,7 @@ export function extraerOfertasGoogle(html) {
     }
   });
 
-  extraerOfertasGoogleBusqueda(html).forEach((offer) =>
-    candidates.push(offer)
-  );
+  extraerOfertasGoogleBusqueda(html).forEach((offer) => candidates.push(offer));
 
   const seen = new Set();
 
@@ -196,10 +185,7 @@ export function buildGoogleOfferSearchUrls(cafeNombre) {
   ];
 }
 
-export async function fetchGoogleOffersForCafe(
-  cafeNombre,
-  fetchImpl = fetch
-) {
+export async function fetchGoogleOffersForCafe(cafeNombre, fetchImpl = fetch) {
   const endpoints = buildGoogleOfferSearchUrls(cafeNombre);
 
   let ofertas = [];

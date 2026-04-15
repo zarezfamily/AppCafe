@@ -11,3 +11,6 @@ android/
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
+
+web/community.min.js
+web/blog/*.html

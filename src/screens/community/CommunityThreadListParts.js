@@ -159,7 +159,9 @@ function CommunityThreadListCard({
             </View>
             <View>
               <Text style={s.forumAuthorName}>{thread.authorName || 'Usuario'}</Text>
-              {thread.authorIsPremium && PremiumBadge ? <PremiumBadge style={{ marginTop: 4 }} /> : null}
+              {thread.authorIsPremium && PremiumBadge ? (
+                <PremiumBadge style={{ marginTop: 4 }} />
+              ) : null}
               <Text style={s.forumAuthorLevel}>{thread.authorLevel || 'Novato'}</Text>
             </View>
           </View>

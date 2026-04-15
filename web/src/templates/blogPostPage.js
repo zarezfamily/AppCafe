@@ -233,6 +233,7 @@ function renderBlogPostPage(post) {
     articleSection,
   });
   const sharedInlineCss = `
+    .post-body p, .post-body li { text-align: justify; }
     :root { --blog-nav-blur: 12px; }
     body > nav,
     .site-nav {

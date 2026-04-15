@@ -10,8 +10,14 @@ const {
 } = require('./cafe-de-especialidad-crece-en-espana-2026');
 const { guiaDeMoliendaPorMetodo } = require('./guia-de-molienda-por-metodo');
 const { comoElegirElMejorCafeDeEtiopia } = require('./como-elegir-el-mejor-cafe-de-etiopia');
+const { mejorCafeSupermercadoEspana } = require('./mejor-cafe-supermercado-espana');
+const { mejorCafeMercadona } = require('./mejor-cafe-mercadona');
+const { mejorCafeEnGranoCalidadPrecio } = require('./mejor-cafe-en-grano-calidad-precio');
 
 const blogPosts = [
+  mejorCafeEnGranoCalidadPrecio,
+  mejorCafeMercadona,
+  mejorCafeSupermercadoEspana,
   coldBrewEnCasaGuiaCompleta,
   arabicaVsRobusta,
   cafeDeEspecialidadVsCafeNormal,
@@ -31,5 +37,8 @@ module.exports = {
   cafeDeEspecialidadCreceEnEspana_2026,
   guiaDeMoliendaPorMetodo,
   comoElegirElMejorCafeDeEtiopia,
+  mejorCafeSupermercadoEspana,
+  mejorCafeMercadona,
+  mejorCafeEnGranoCalidadPrecio,
   blogPosts,
 };

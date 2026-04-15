@@ -287,12 +287,21 @@
       return;
     }
     const auth = getAuth();
+    const normAlias = (s) =>
+      String(s || '')
+        .trim()
+        .toLowerCase()
+        .replace(/^@/, '');
+    console.log('[etiove] auth uid:', auth.uid, '| alias:', auth.alias, '| !!token:', !!auth.token);
+    list.forEach((c) =>
+      console.log('[etiove] comment authorUid:', c.authorUid, '| authorName:', c.authorName)
+    );
     listEl.innerHTML = list
       .map((c) => {
         const isOwner =
-          auth.uid &&
-          ((c.authorUid && c.authorUid === auth.uid) ||
-            (!c.authorUid && auth.alias && c.authorName === auth.alias));
+          auth.token &&
+          ((auth.uid && c.authorUid && c.authorUid === auth.uid) ||
+            (auth.alias && normAlias(c.authorName) === normAlias(auth.alias)));
         const deleteBtn = isOwner
           ? `<button class="comment-delete-btn" data-id="${escapeHtml(c.id)}" title="Borrar comentario" style="background:none;border:none;cursor:pointer;font-size:13px;color:#c0554a;margin-left:10px;padding:0;font-family:inherit;opacity:0.7;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.7">✕ Borrar</button>`
           : '';

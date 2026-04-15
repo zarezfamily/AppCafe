@@ -27,310 +27,203 @@
     <link rel="stylesheet" href="/about.css" />
   </head>
   <body>
-    <nav class="nav">
-      <div class="nav-inner">
-        <a class="brand" href="/">ETIOVE</a>
-        <div class="nav-links">
-          <a class="nav-link" href="/">Inicio</a>
-          <a class="nav-link" href="/blog/">Blog</a>
-          <a class="nav-link" href="/comunidad.html">Comunidad</a>
-          <a class="btn btn-secondary" href="#cta">Probar ETIOVE</a>
-        </div>
+    <nav>
+      <a class="nav-wordmark" href="/">Etiove</a>
+      <div class="nav-links" id="navLinks">
+        <a class="nav-link" href="/">Inicio</a>
+        <a class="nav-link" href="/blog/">Blog</a>
+        <a class="nav-link" href="/comunidad.html">Comunidad</a>
       </div>
+      <button class="nav-hamburger" id="navHamburger" aria-label="Menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
     </nav>
 
-    <header class="hero">
-      <div class="container hero-grid">
-        <div>
-          <span class="eyebrow">App de café de especialidad</span>
-          <h1>Descubre, guarda y valora los mejores cafés de especialidad.</h1>
-          <p>
-            ETIOVE nace para ayudarte a encontrar cafés que de verdad merecen la pena, recordar
-            cuáles te gustaron y construir tu propio mapa de favoritos.
-          </p>
-          <div class="hero-actions">
-            <a class="btn btn-primary" href="#cta">Quiero probar ETIOVE</a>
-            <a class="btn btn-secondary" href="#features">Ver cómo funciona</a>
-          </div>
-          <p class="hero-note">
-            Pensada para amantes del café de especialidad que quieren descubrir mejor, elegir mejor
-            y disfrutar más.
-          </p>
-        </div>
-
-        <div class="phone">
-          <div class="phone-screen">
-            <div class="screen-top">
-              <span>ETIOVE</span>
-              <span>☕ 09:41</span>
-            </div>
-
-            <div class="mock-card">
-              <span class="badge">Recomendado para ti</span>
-              <p class="mock-title">Etiopía Natural · Fresa · Floral</p>
-              <p class="mock-sub">Filtrado · Tueste medio · 4.8/5</p>
-            </div>
-
-            <div class="mock-grid">
-              <div class="mock-card">
-                <p class="mock-title">Tus favoritos</p>
-                <p class="mock-sub">12 cafés guardados</p>
-              </div>
-              <div class="mock-card">
-                <p class="mock-title">Catados</p>
-                <p class="mock-sub">28 cafés valorados</p>
-              </div>
-            </div>
-
-            <div class="mock-card">
-              <span class="badge">Nueva valoración</span>
-              <p class="mock-title">Kenya AA</p>
-              <p class="mock-sub">Acidez brillante · Fruta roja · 4.6/5</p>
-            </div>
-
-            <div class="mock-card">
-              <span class="badge">Descubre</span>
-              <p class="mock-title">Cafés similares a tu perfil</p>
-              <p class="mock-sub">Recomendaciones basadas en tus gustos y valoraciones.</p>
-            </div>
-          </div>
-        </div>
+    <div class="page-hero" id="main-content">
+      <p class="page-eyebrow">¡Nueva app!</p>
+      <h1 class="page-title">Descubre la app <em>Etiove</em></h1>
+      <p class="page-lead">
+        La app para descubrir, guardar y valorar cafés de especialidad. Disponible gratis para iOS y
+        Android.<br />
+        Pensada para amantes del café de especialidad que quieren descubrir mejor, elegir mejor y
+        disfrutar más.
+      </p>
+      <div style="margin-top: 32px; display: flex; gap: 18px; justify-content: center">
+        <a
+          href="https://apps.apple.com/app/etiove"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="cta-btn"
+        >
+          <svg
+            class="btn-app-icon"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            style="width: 20px; height: 20px"
+          >
+            <path
+              d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"
+            />
+          </svg>
+          <span>App Store</span>
+        </a>
+        <a
+          href="https://play.google.com/store/apps/details?id=com.zarezfamily.etiove"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="cta-btn"
+        >
+          <svg
+            class="btn-app-icon"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            style="width: 20px; height: 20px"
+          >
+            <path
+              d="M3.18 23.76c.3.17.64.24.99.19l12.6-7.27-2.72-2.72-10.87 9.8zm16.11-9.37L5.83 6.93l2.72 2.72 10.74-9.65zm1.61.93c.32-.18.5-.5.5-.87s-.18-.69-.5-.87L18.1 12l-2.59 2.59 2.6 2.6 2.79-1.87zM3.18.24C2.86.07 2.5 0 2.17.19c-.33.18-.5.5-.5.87v21.88c0 .37.17.69.5.87.16.09.34.13.5.13.17 0 .33-.04.49-.13l.02-.01 10.85-9.73-2.7-2.7L3.18.24z"
+            />
+          </svg>
+          <span>Google Play</span>
+        </a>
       </div>
-    </header>
+    </div>
 
-    <section class="section">
-      <div class="container">
-        <div class="section-head">
-          <h2>El problema no es encontrar café. Es encontrar el correcto para ti.</h2>
-          <p>
-            Hay demasiadas opciones, demasiadas marcas y poca claridad. ETIOVE te ayuda a convertir
-            el ruido en una experiencia más simple, personal y útil.
-          </p>
-        </div>
-
-        <div class="problem-grid">
-          <nav>
-            <a class="nav-wordmark" href="/">Etiove</a>
-            <div class="nav-links" id="navLinks">
-              <a class="nav-link" href="/etiove-app.html">La app</a>
-              <a class="nav-link" href="/blog/">Blog</a>
-              <a class="nav-link" href="/comunidad.html">Comunidad</a>
-            </div>
-            <button class="nav-hamburger" id="navHamburger" aria-label="Menú" aria-expanded="false">
-              <span></span><span></span><span></span>
-            </button>
-          </nav>
-
-          <div class="page-hero" id="main-content">
-            <p class="page-eyebrow">¡Nueva app!</p>
-            <h1 class="page-title">Descubre la app <em>Etiove</em></h1>
-            <p class="page-lead">
-              La app para descubrir, guardar y valorar cafés de especialidad. Disponible gratis para
-              iOS y Android.
-            </p>
-            <div
-              class="app-btns"
-              style="margin-top: 32px; display: flex; gap: 18px; justify-content: center"
-            >
-              <a
-                href="https://apps.apple.com/app/etiove"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="cta-btn"
-              >
-                <svg
-                  class="btn-app-icon"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  style="width: 20px; height: 20px"
-                >
-                  <path
-                    d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"
-                  />
-                </svg>
-                <span>App Store</span>
-              </a>
-              <a
-                href="https://play.google.com/store/apps/details?id=com.zarezfamily.etiove"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="cta-btn"
-              >
-                <svg
-                  class="btn-app-icon"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  style="width: 20px; height: 20px"
-                >
-                  <path
-                    d="M3.18 23.76c.3.17.64.24.99.19l12.6-7.27-2.72-2.72-10.87 9.8zm16.11-9.37L5.83 6.93l2.72 2.72 10.74-9.65zm1.61.93c.32-.18.5-.5.5-.87s-.18-.69-.5-.87L18.1 12l-2.59 2.59 2.6 2.6 2.79-1.87zM3.18.24C2.86.07 2.5 0 2.17.19c-.33.18-.5.5-.5.87v21.88c0 .37.17.69.5.87.16.09.34.13.5.13.17 0 .33-.04.49-.13l.02-.01 10.85-9.73-2.7-2.7L3.18.24z"
-                  />
-                </svg>
-                <span>Google Play</span>
-              </a>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-icon">📉</div>
-            <h3>Poca información útil</h3>
-            <p>
+    <div class="content">
+      <div class="section">
+        <h2>El problema no es encontrar café. Es encontrar el correcto para ti.</h2>
+        <p>
+          Hay demasiadas opciones, demasiadas marcas y poca claridad. ETIOVE te ayuda a convertir el
+          ruido en una experiencia más simple, personal y útil.
+        </p>
+        <div class="values-grid">
+          <div class="value-card">
+            <div class="value-num">📉</div>
+            <p class="value-title">Poca información útil</p>
+            <p class="value-text">
               Muchas veces solo ves marketing, pero no una forma clara de comparar, guardar y
               valorar cafés.
             </p>
           </div>
         </div>
       </div>
-    </section>
 
-    <section class="section" id="features">
-      <div class="container">
-        <div class="section-head">
-          <h2>Qué puedes hacer con ETIOVE</h2>
-          <p>
-            Todo está pensado para ayudarte a descubrir mejores cafés y construir tu propio
-            criterio.
-          </p>
-        </div>
-
-        <div class="features">
-          <div class="card">
-            <div class="card-icon">🔎</div>
-            <h3>Descubrir cafés de especialidad</h3>
-            <p>
+      <div class="section" id="features">
+        <h2>Qué puedes hacer con ETIOVE</h2>
+        <p>
+          Todo está pensado para ayudarte a descubrir mejores cafés y construir tu propio criterio.
+        </p>
+        <div class="values-grid">
+          <div class="value-card">
+            <div class="value-num">🔎</div>
+            <p class="value-title">Descubrir cafés de especialidad</p>
+            <p class="value-text">
               Explora cafés por perfil sensorial, origen, proceso y estilo para encontrar opciones
               que sí encajan contigo.
             </p>
           </div>
-
-          <div class="card">
-            <div class="card-icon">⭐</div>
-            <h3>Valorar cada café</h3>
-            <p>
+          <div class="value-card">
+            <div class="value-num">⭐</div>
+            <p class="value-title">Valorar cada café</p>
+            <p class="value-text">
               Puntúa tus cafés y guarda impresiones reales para entender qué te gusta y por qué.
             </p>
           </div>
-
-          <div class="card">
-            <div class="card-icon">💾</div>
-            <h3>Guardar favoritos</h3>
-            <p>Crea tu colección personal y vuelve a esos cafés que sí quieres repetir.</p>
+          <div class="value-card">
+            <div class="value-num">💾</div>
+            <p class="value-title">Guardar favoritos</p>
+            <p class="value-text">
+              Crea tu colección personal y vuelve a esos cafés que sí quieres repetir.
+            </p>
           </div>
-
-          <div class="card">
-            <div class="card-icon">🧭</div>
-            <h3>Aprender tu perfil</h3>
-            <p>
+          <div class="value-card">
+            <div class="value-num">🧭</div>
+            <p class="value-title">Aprender tu perfil</p>
+            <p class="value-text">
               Convierte tus preferencias en algo medible: más claridad, mejores elecciones, más
               disfrute.
             </p>
           </div>
         </div>
       </div>
-    </section>
 
-    <section class="section">
-      <div class="container">
-        <div class="section-head">
-          <h2>Por qué ETIOVE es diferente</h2>
-          <p>
-            No es solo contenido. No es solo un listado. Es una herramienta para descubrir, decidir
-            y recordar.
-          </p>
-        </div>
-
-        <div class="value-grid">
-          <div class="card">
-            <div class="card-icon">📱</div>
-            <h3>Nacida como app</h3>
-            <p>
+      <div class="section">
+        <h2>Por qué ETIOVE es diferente</h2>
+        <p>
+          No es solo contenido. No es solo un listado. Es una herramienta para descubrir, decidir y
+          recordar.
+        </p>
+        <div class="values-grid">
+          <div class="value-card">
+            <div class="value-num">📱</div>
+            <p class="value-title">Nacida como app</p>
+            <p class="value-text">
               ETIOVE no nace para escribir artículos: nace para ayudarte a encontrar los mejores
               cafés de especialidad.
             </p>
           </div>
-          <div class="card">
-            <div class="card-icon">☕</div>
-            <h3>Enfocada en café real</h3>
-            <p>
+          <div class="value-card">
+            <div class="value-num">☕</div>
+            <p class="value-title">Enfocada en café real</p>
+            <p class="value-text">
               Menos ruido, menos marketing vacío. Más foco en cafés que valen la pena y experiencias
               que recuerdas.
             </p>
           </div>
-          <div class="card">
-            <div class="card-icon">🫶</div>
-            <h3>Pensada para amantes del café</h3>
-            <p>
+          <div class="value-card">
+            <div class="value-num">🫶</div>
+            <p class="value-title">Pensada para amantes del café</p>
+            <p class="value-text">
               Si ya te importa lo que bebes, ETIOVE te ayuda a elevar esa experiencia y hacerla más
               útil cada día.
             </p>
           </div>
         </div>
       </div>
-    </section>
 
-    <section class="section">
-      <div class="container">
-        <div class="section-head">
-          <h2>Cómo funciona</h2>
-          <p>Simple, rápido y pensado para que empieces a usarlo desde el primer día.</p>
-        </div>
-
-        <div class="steps">
-          <div class="step">
-            <div class="step-num">1</div>
-            <div>
-              <h3>Explora cafés</h3>
-              <p>Descubre cafés de especialidad y filtra por lo que realmente te interesa.</p>
-            </div>
-          </div>
-
-          <div class="step">
-            <div class="step-num">2</div>
-            <div>
-              <h3>Guarda tus favoritos</h3>
-              <p>
-                Ten siempre a mano los cafés que más te gustaron y evita volver a empezar desde
-                cero.
-              </p>
-            </div>
-          </div>
-
-          <div class="step">
-            <div class="step-num">3</div>
-            <div>
-              <h3>Valora y mejora</h3>
-              <p>
-                Registra tus opiniones, entiende mejor tus gustos y afina tus decisiones futuras.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="cta-panel" id="cta">
-          <div>
-            <h2>Empieza a descubrir mejores cafés con ETIOVE.</h2>
-            <p>
-              Si quieres ser de los primeros en probar la app, deja tu interés y te avisaremos
-              cuando esté lista.
+      <div class="section">
+        <h2>Cómo funciona</h2>
+        <p>Simple, rápido y pensado para que empieces a usarlo desde el primer día.</p>
+        <div class="values-grid">
+          <div class="value-card">
+            <div class="value-num">1</div>
+            <p class="value-title">Explora cafés</p>
+            <p class="value-text">
+              Descubre cafés de especialidad y filtra por lo que realmente te interesa.
             </p>
           </div>
-          <div>
-            <a
-              class="btn btn-primary"
-              href="mailto:hola@etiove.com?subject=Quiero%20probar%20ETIOVE&body=Hola,%20quiero%20probar%20la%20app%20ETIOVE."
-            >
-              Quiero acceso
-            </a>
+          <div class="value-card">
+            <div class="value-num">2</div>
+            <p class="value-title">Guarda tus favoritos</p>
+            <p class="value-text">
+              Ten siempre a mano los cafés que más te gustaron y evita volver a empezar desde cero.
+            </p>
+          </div>
+          <div class="value-card">
+            <div class="value-num">3</div>
+            <p class="value-title">Valora y mejora</p>
+            <p class="value-text">
+              Registra tus opiniones, entiende mejor tus gustos y afina tus decisiones futuras.
+            </p>
           </div>
         </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="container">
-        <div class="section-head">
-          <h2>Preguntas frecuentes</h2>
+        <div class="cta-block" id="cta">
+          <p class="cta-eyebrow">Acceso anticipado</p>
+          <h2 class="cta-title">Empieza a descubrir mejores cafés con ETIOVE.</h2>
+          <p class="cta-sub">
+            Si quieres ser de los primeros en probar la app, deja tu interés y te avisaremos cuando
+            esté lista.
+          </p>
+          <a
+            class="cta-btn"
+            href="mailto:hola@etiove.com?subject=Quiero%20probar%20ETIOVE&body=Hola,%20quiero%20probar%20la%20app%20ETIOVE."
+          >
+            Quiero acceso
+          </a>
         </div>
+      </div>
 
+      <div class="section">
+        <h2>Preguntas frecuentes</h2>
         <div class="faq">
           <details>
             <summary>¿ETIOVE es una app o una web?</summary>
@@ -339,7 +232,6 @@
               La web ayuda a explicar, atraer usuarios y ampliar la experiencia.
             </p>
           </details>
-
           <details>
             <summary>¿Qué podré hacer dentro de ETIOVE?</summary>
             <p>
@@ -347,7 +239,6 @@
               encajan más contigo.
             </p>
           </details>
-
           <details>
             <summary>¿Está pensada solo para expertos?</summary>
             <p>
@@ -355,7 +246,6 @@
               ya lleva tiempo explorándolo.
             </p>
           </details>
-
           <details>
             <summary>¿Cuándo estará disponible?</summary>
             <p>
@@ -365,8 +255,7 @@
           </details>
         </div>
       </div>
-    </section>
-
+    </div>
     <footer>
       <nav class="footer-nav" aria-label="Navegación del sitio">
         <div class="footer-nav-group">
@@ -377,10 +266,8 @@
           <a class="footer-nav-link" href="/#quizweb">Quiz de sabor</a>
         </div>
       </nav>
-
       <p class="footer-copy">
         <span>© 2026 Etiove. Hecho con ☕ en España.</span>
-
         <span class="footer-copy-center">
           <span class="footer-wordmark-sm">Etiove</span>
           <span class="social-row-inline">
@@ -425,7 +312,6 @@
             </a>
           </span>
         </span>
-
         <span class="footer-legal-links">
           <a class="footer-legal-link" href="/privacidad.html">Privacidad</a>
           <a class="footer-legal-link" href="/cookies.html">Cookies</a>

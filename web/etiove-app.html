@@ -1,688 +1,757 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ETIOVE | Descubre los mejores cafés de especialidad</title>
-  <meta name="description" content="Descubre, guarda y valora los mejores cafés de especialidad con ETIOVE. Encuentra tu café perfecto." />
-  <link rel="canonical" href="https://etiove.com/etiove-app.html" />
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="ETIOVE | Descubre los mejores cafés de especialidad" />
-  <meta property="og:description" content="La app para descubrir, guardar y valorar cafés de especialidad." />
-  <meta property="og:url" content="https://etiove.com/etiove-app.html" />
-  <meta property="og:image" content="https://etiove.com/og-image.jpg" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="ETIOVE | Descubre los mejores cafés de especialidad" />
-  <meta name="twitter:description" content="La app para descubrir, guardar y valorar cafés de especialidad." />
-  <meta name="twitter:image" content="https://etiove.com/og-image.jpg" />
-  <style>
-    :root {
-      --bg: #111111;
-      --panel: #1b1b1b;
-      --panel-2: #242424;
-      --text: #ffffff;
-      --muted: #cfcfcf;
-      --soft: #9f9f9f;
-      --accent: #d4a373;
-      --accent-dark: #b78452;
-      --border: rgba(255,255,255,0.08);
-      --max: 1120px;
-    }
-
-    * { box-sizing: border-box; }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background:
-        radial-gradient(circle at top left, rgba(212,163,115,0.18), transparent 32%),
-        linear-gradient(180deg, #0f0f0f 0%, #151515 100%);
-      color: var(--text);
-      line-height: 1.6;
-    }
-
-    a { color: inherit; }
-
-    .container {
-      width: min(var(--max), calc(100% - 40px));
-      margin: 0 auto;
-    }
-
-    .nav {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      backdrop-filter: blur(14px);
-      background: rgba(17,17,17,0.82);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .nav-inner {
-      width: min(var(--max), calc(100% - 40px));
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 0;
-    }
-
-    .brand {
-      font-weight: 800;
-      letter-spacing: 0.18em;
-      text-decoration: none;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 18px;
-      align-items: center;
-    }
-
-    .nav-link {
-      text-decoration: none;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .nav-link:hover { color: var(--text); }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 14px 22px;
-      border-radius: 12px;
-      text-decoration: none;
-      font-weight: 700;
-      transition: transform .18s ease, opacity .18s ease, background .18s ease;
-      border: 1px solid transparent;
-      cursor: pointer;
-    }
-
-    .btn:hover {
-      transform: translateY(-1px);
-      opacity: 0.96;
-    }
-
-    .btn-primary {
-      background: var(--accent);
-      color: #111;
-    }
-
-    .btn-primary:hover {
-      background: var(--accent-dark);
-    }
-
-    .btn-secondary {
-      background: transparent;
-      color: var(--text);
-      border-color: var(--border);
-    }
-
-    .hero {
-      padding: 72px 0 48px;
-    }
-
-    .hero-grid {
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 36px;
-      align-items: center;
-    }
-
-    .eyebrow {
-      display: inline-block;
-      margin-bottom: 14px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background: rgba(212,163,115,0.14);
-      color: var(--accent);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    h1 {
-      margin: 0 0 16px;
-      font-size: clamp(2.2rem, 5vw, 4.4rem);
-      line-height: 1.04;
-      letter-spacing: -0.03em;
-    }
-
-    .hero p {
-      margin: 0 0 24px;
-      font-size: 1.08rem;
-      color: var(--muted);
-      max-width: 60ch;
-    }
-
-    .hero-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 22px;
-    }
-
-    .hero-note {
-      color: var(--soft);
-      font-size: 0.95rem;
-    }
-
-    .phone {
-      background: linear-gradient(180deg, #262626 0%, #1a1a1a 100%);
-      border: 1px solid var(--border);
-      border-radius: 28px;
-      padding: 18px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
-      max-width: 420px;
-      margin-left: auto;
-    }
-
-    .phone-screen {
-      background: #121212;
-      border-radius: 22px;
-      padding: 18px;
-      min-height: 560px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .screen-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      color: var(--soft);
-      font-size: 12px;
-      margin-bottom: 8px;
-    }
-
-    .mock-card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 16px;
-    }
-
-    .mock-title {
-      font-weight: 800;
-      margin: 0 0 6px;
-      font-size: 1rem;
-    }
-
-    .mock-sub {
-      margin: 0;
-      color: var(--soft);
-      font-size: 0.92rem;
-    }
-
-    .mock-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 5px 9px;
-      border-radius: 999px;
-      background: rgba(212,163,115,0.15);
-      color: var(--accent);
-      font-size: 11px;
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
-
-    .section {
-      padding: 36px 0;
-    }
-
-    .section-head {
-      max-width: 760px;
-      margin-bottom: 24px;
-    }
-
-    h2 {
-      margin: 0 0 12px;
-      font-size: clamp(1.7rem, 3vw, 2.8rem);
-      line-height: 1.1;
-    }
-
-    .section-head p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 1.04rem;
-    }
-
-    .problem-grid,
-    .features,
-    .value-grid {
-      display: grid;
-      gap: 18px;
-    }
-
-    .problem-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-
-    .features {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    .value-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-
-    .card {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 22px;
-    }
-
-    .card h3 {
-      margin: 0 0 10px;
-      font-size: 1.1rem;
-    }
-
-    .card p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 0.98rem;
-    }
-
-    .card-icon {
-      font-size: 1.5rem;
-      margin-bottom: 12px;
-    }
-
-    .steps {
-      display: grid;
-      gap: 16px;
-    }
-
-    .step {
-      display: grid;
-      grid-template-columns: 52px 1fr;
-      gap: 16px;
-      align-items: start;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 18px;
-    }
-
-    .step-num {
-      width: 52px;
-      height: 52px;
-      display: grid;
-      place-items: center;
-      border-radius: 14px;
-      background: rgba(212,163,115,0.14);
-      color: var(--accent);
-      font-weight: 800;
-      font-size: 1.05rem;
-    }
-
-    .step h3 {
-      margin: 0 0 6px;
-    }
-
-    .step p {
-      margin: 0;
-      color: var(--muted);
-    }
-
-    .cta-panel {
-      margin: 32px 0 20px;
-      background: linear-gradient(135deg, rgba(212,163,115,0.16), rgba(255,255,255,0.03));
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 28px;
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 18px;
-      align-items: center;
-    }
-
-    .cta-panel h2 {
-      margin-bottom: 8px;
-    }
-
-    .cta-panel p {
-      margin: 0;
-      color: var(--muted);
-      max-width: 58ch;
-    }
-
-    .faq {
-      display: grid;
-      gap: 12px;
-    }
-
-    details {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 16px 18px;
-    }
-
-    summary {
-      cursor: pointer;
-      font-weight: 700;
-    }
-
-    details p {
-      color: var(--muted);
-      margin: 12px 0 0;
-    }
-
-    .footer {
-      padding: 30px 0 50px;
-      color: var(--soft);
-      font-size: 0.94rem;
-    }
-
-    .footer-inner {
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      border-top: 1px solid var(--border);
-      padding-top: 22px;
-      flex-wrap: wrap;
-    }
-
-    @media (max-width: 920px) {
-      .hero-grid,
-      .problem-grid,
-      .value-grid,
-      .features,
-      .cta-panel {
-        grid-template-columns: 1fr;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ETIOVE | Descubre los mejores cafés de especialidad</title>
+    <meta
+      name="description"
+      content="Descubre, guarda y valora los mejores cafés de especialidad con ETIOVE. Encuentra tu café perfecto."
+    />
+    <link rel="canonical" href="https://etiove.com/etiove-app.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="ETIOVE | Descubre los mejores cafés de especialidad" />
+    <meta
+      property="og:description"
+      content="La app para descubrir, guardar y valorar cafés de especialidad."
+    />
+    <meta property="og:url" content="https://etiove.com/etiove-app.html" />
+    <meta property="og:image" content="https://etiove.com/og-image.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ETIOVE | Descubre los mejores cafés de especialidad" />
+    <meta
+      name="twitter:description"
+      content="La app para descubrir, guardar y valorar cafés de especialidad."
+    />
+    <meta name="twitter:image" content="https://etiove.com/og-image.jpg" />
+    <style>
+      :root {
+        --bg: #111111;
+        --panel: #1b1b1b;
+        --panel-2: #242424;
+        --text: #ffffff;
+        --muted: #cfcfcf;
+        --soft: #9f9f9f;
+        --accent: #d4a373;
+        --accent-dark: #b78452;
+        --border: rgba(255, 255, 255, 0.08);
+        --max: 1120px;
       }
 
-      .phone {
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
         margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background:
+          radial-gradient(circle at top left, rgba(212, 163, 115, 0.18), transparent 32%),
+          linear-gradient(180deg, #0f0f0f 0%, #151515 100%);
+        color: var(--text);
+        line-height: 1.6;
       }
-    }
 
-    @media (max-width: 640px) {
+      a {
+        color: inherit;
+      }
+
+      .container {
+        width: min(var(--max), calc(100% - 40px));
+        margin: 0 auto;
+      }
+
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        backdrop-filter: blur(14px);
+        background: rgba(17, 17, 17, 0.82);
+        border-bottom: 1px solid var(--border);
+      }
+
       .nav-inner {
-        flex-direction: column;
-        gap: 12px;
+        width: min(var(--max), calc(100% - 40px));
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 0;
       }
 
-      .step {
-        grid-template-columns: 1fr;
+      .brand {
+        font-weight: 800;
+        letter-spacing: 0.18em;
+        text-decoration: none;
       }
 
-      .step-num {
-        width: 44px;
-        height: 44px;
+      .nav-links {
+        display: flex;
+        gap: 18px;
+        align-items: center;
+      }
+
+      .nav-link {
+        text-decoration: none;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .nav-link:hover {
+        color: var(--text);
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 14px 22px;
         border-radius: 12px;
+        text-decoration: none;
+        font-weight: 700;
+        transition:
+          transform 0.18s ease,
+          opacity 0.18s ease,
+          background 0.18s ease;
+        border: 1px solid transparent;
+        cursor: pointer;
+      }
+
+      .btn:hover {
+        transform: translateY(-1px);
+        opacity: 0.96;
+      }
+
+      .btn-primary {
+        background: var(--accent);
+        color: #111;
+      }
+
+      .btn-primary:hover {
+        background: var(--accent-dark);
+      }
+
+      .btn-secondary {
+        background: transparent;
+        color: var(--text);
+        border-color: var(--border);
       }
 
       .hero {
-        padding-top: 46px;
+        padding: 72px 0 48px;
       }
-    }
-  </style>
-</head>
-<body>
-  <nav class="nav">
-    <div class="nav-inner">
-      <a class="brand" href="/">ETIOVE</a>
-      <div class="nav-links">
-        <a class="nav-link" href="/">Inicio</a>
-        <a class="nav-link" href="/blog/">Blog</a>
-        <a class="nav-link" href="/comunidad.html">Comunidad</a>
-        <a class="btn btn-secondary" href="#cta">Probar ETIOVE</a>
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 36px;
+        align-items: center;
+      }
+
+      .eyebrow {
+        display: inline-block;
+        margin-bottom: 14px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(212, 163, 115, 0.14);
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 0 0 16px;
+        font-size: clamp(2.2rem, 5vw, 4.4rem);
+        line-height: 1.04;
+        letter-spacing: -0.03em;
+      }
+
+      .hero p {
+        margin: 0 0 24px;
+        font-size: 1.08rem;
+        color: var(--muted);
+        max-width: 60ch;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 22px;
+      }
+
+      .hero-note {
+        color: var(--soft);
+        font-size: 0.95rem;
+      }
+
+      .phone {
+        background: linear-gradient(180deg, #262626 0%, #1a1a1a 100%);
+        border: 1px solid var(--border);
+        border-radius: 28px;
+        padding: 18px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+        max-width: 420px;
+        margin-left: auto;
+      }
+
+      .phone-screen {
+        background: #121212;
+        border-radius: 22px;
+        padding: 18px;
+        min-height: 560px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      .screen-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: var(--soft);
+        font-size: 12px;
+        margin-bottom: 8px;
+      }
+
+      .mock-card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 16px;
+      }
+
+      .mock-title {
+        font-weight: 800;
+        margin: 0 0 6px;
+        font-size: 1rem;
+      }
+
+      .mock-sub {
+        margin: 0;
+        color: var(--soft);
+        font-size: 0.92rem;
+      }
+
+      .mock-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 5px 9px;
+        border-radius: 999px;
+        background: rgba(212, 163, 115, 0.15);
+        color: var(--accent);
+        font-size: 11px;
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
+
+      .section {
+        padding: 36px 0;
+      }
+
+      .section-head {
+        max-width: 760px;
+        margin-bottom: 24px;
+      }
+
+      h2 {
+        margin: 0 0 12px;
+        font-size: clamp(1.7rem, 3vw, 2.8rem);
+        line-height: 1.1;
+      }
+
+      .section-head p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 1.04rem;
+      }
+
+      .problem-grid,
+      .features,
+      .value-grid {
+        display: grid;
+        gap: 18px;
+      }
+
+      .problem-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .features {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .value-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 22px;
+      }
+
+      .card h3 {
+        margin: 0 0 10px;
+        font-size: 1.1rem;
+      }
+
+      .card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.98rem;
+      }
+
+      .card-icon {
+        font-size: 1.5rem;
+        margin-bottom: 12px;
+      }
+
+      .steps {
+        display: grid;
+        gap: 16px;
+      }
+
+      .step {
+        display: grid;
+        grid-template-columns: 52px 1fr;
+        gap: 16px;
+        align-items: start;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 18px;
+      }
+
+      .step-num {
+        width: 52px;
+        height: 52px;
+        display: grid;
+        place-items: center;
+        border-radius: 14px;
+        background: rgba(212, 163, 115, 0.14);
+        color: var(--accent);
+        font-weight: 800;
+        font-size: 1.05rem;
+      }
+
+      .step h3 {
+        margin: 0 0 6px;
+      }
+
+      .step p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .cta-panel {
+        margin: 32px 0 20px;
+        background: linear-gradient(135deg, rgba(212, 163, 115, 0.16), rgba(255, 255, 255, 0.03));
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 28px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 18px;
+        align-items: center;
+      }
+
+      .cta-panel h2 {
+        margin-bottom: 8px;
+      }
+
+      .cta-panel p {
+        margin: 0;
+        color: var(--muted);
+        max-width: 58ch;
+      }
+
+      .faq {
+        display: grid;
+        gap: 12px;
+      }
+
+      details {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 16px 18px;
+      }
+
+      summary {
+        cursor: pointer;
+        font-weight: 700;
+      }
+
+      details p {
+        color: var(--muted);
+        margin: 12px 0 0;
+      }
+
+      .footer {
+        padding: 30px 0 50px;
+        color: var(--soft);
+        font-size: 0.94rem;
+      }
+
+      .footer-inner {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        border-top: 1px solid var(--border);
+        padding-top: 22px;
+        flex-wrap: wrap;
+      }
+
+      @media (max-width: 920px) {
+        .hero-grid,
+        .problem-grid,
+        .value-grid,
+        .features,
+        .cta-panel {
+          grid-template-columns: 1fr;
+        }
+
+        .phone {
+          margin: 0;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .nav-inner {
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .step {
+          grid-template-columns: 1fr;
+        }
+
+        .step-num {
+          width: 44px;
+          height: 44px;
+          border-radius: 12px;
+        }
+
+        .hero {
+          padding-top: 46px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="nav">
+      <div class="nav-inner">
+        <a class="brand" href="/">ETIOVE</a>
+        <div class="nav-links">
+          <a class="nav-link" href="/">Inicio</a>
+          <a class="nav-link" href="/blog/">Blog</a>
+          <a class="nav-link" href="/comunidad.html">Comunidad</a>
+          <a class="btn btn-secondary" href="#cta">Probar ETIOVE</a>
+        </div>
       </div>
-    </div>
-  </nav>
+    </nav>
 
-  <header class="hero">
-    <div class="container hero-grid">
-      <div>
-        <span class="eyebrow">App de café de especialidad</span>
-        <h1>Descubre, guarda y valora los mejores cafés de especialidad.</h1>
-        <p>
-          ETIOVE nace para ayudarte a encontrar cafés que de verdad merecen la pena,
-          recordar cuáles te gustaron y construir tu propio mapa de favoritos.
-        </p>
-        <div class="hero-actions">
-          <a class="btn btn-primary" href="#cta">Quiero probar ETIOVE</a>
-          <a class="btn btn-secondary" href="#features">Ver cómo funciona</a>
-        </div>
-        <p class="hero-note">
-          Pensada para amantes del café de especialidad que quieren descubrir mejor, elegir mejor y disfrutar más.
-        </p>
-      </div>
-
-      <div class="phone">
-        <div class="phone-screen">
-          <div class="screen-top">
-            <span>ETIOVE</span>
-            <span>☕ 09:41</span>
-          </div>
-
-          <div class="mock-card">
-            <span class="badge">Recomendado para ti</span>
-            <p class="mock-title">Etiopía Natural · Fresa · Floral</p>
-            <p class="mock-sub">Filtrado · Tueste medio · 4.8/5</p>
-          </div>
-
-          <div class="mock-grid">
-            <div class="mock-card">
-              <p class="mock-title">Tus favoritos</p>
-              <p class="mock-sub">12 cafés guardados</p>
-            </div>
-            <div class="mock-card">
-              <p class="mock-title">Catados</p>
-              <p class="mock-sub">28 cafés valorados</p>
-            </div>
-          </div>
-
-          <div class="mock-card">
-            <span class="badge">Nueva valoración</span>
-            <p class="mock-title">Kenya AA</p>
-            <p class="mock-sub">Acidez brillante · Fruta roja · 4.6/5</p>
-          </div>
-
-          <div class="mock-card">
-            <span class="badge">Descubre</span>
-            <p class="mock-title">Cafés similares a tu perfil</p>
-            <p class="mock-sub">Recomendaciones basadas en tus gustos y valoraciones.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <section class="section">
-    <div class="container">
-      <div class="section-head">
-        <h2>El problema no es encontrar café. Es encontrar el correcto para ti.</h2>
-        <p>
-          Hay demasiadas opciones, demasiadas marcas y poca claridad.
-          ETIOVE te ayuda a convertir el ruido en una experiencia más simple, personal y útil.
-        </p>
-      </div>
-
-      <div class="problem-grid">
-        <div class="card">
-          <div class="card-icon">😵‍💫</div>
-          <h3>Demasiadas opciones</h3>
-          <p>No siempre sabes qué café comprar, cuál merece la pena o cuál encaja con tus gustos.</p>
-        </div>
-        <div class="card">
-          <div class="card-icon">🧠</div>
-          <h3>Es difícil recordar</h3>
-          <p>Pruebas un café increíble y a las semanas ya no recuerdas ni el nombre ni por qué te gustó.</p>
-        </div>
-        <div class="card">
-          <div class="card-icon">📉</div>
-          <h3>Poca información útil</h3>
-          <p>Muchas veces solo ves marketing, pero no una forma clara de comparar, guardar y valorar cafés.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="features">
-    <div class="container">
-      <div class="section-head">
-        <h2>Qué puedes hacer con ETIOVE</h2>
-        <p>
-          Todo está pensado para ayudarte a descubrir mejores cafés y construir tu propio criterio.
-        </p>
-      </div>
-
-      <div class="features">
-        <div class="card">
-          <div class="card-icon">🔎</div>
-          <h3>Descubrir cafés de especialidad</h3>
-          <p>Explora cafés por perfil sensorial, origen, proceso y estilo para encontrar opciones que sí encajan contigo.</p>
-        </div>
-
-        <div class="card">
-          <div class="card-icon">⭐</div>
-          <h3>Valorar cada café</h3>
-          <p>Puntúa tus cafés y guarda impresiones reales para entender qué te gusta y por qué.</p>
-        </div>
-
-        <div class="card">
-          <div class="card-icon">💾</div>
-          <h3>Guardar favoritos</h3>
-          <p>Crea tu colección personal y vuelve a esos cafés que sí quieres repetir.</p>
-        </div>
-
-        <div class="card">
-          <div class="card-icon">🧭</div>
-          <h3>Aprender tu perfil</h3>
-          <p>Convierte tus preferencias en algo medible: más claridad, mejores elecciones, más disfrute.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="container">
-      <div class="section-head">
-        <h2>Por qué ETIOVE es diferente</h2>
-        <p>
-          No es solo contenido. No es solo un listado. Es una herramienta para descubrir, decidir y recordar.
-        </p>
-      </div>
-
-      <div class="value-grid">
-        <div class="card">
-          <div class="card-icon">📱</div>
-          <h3>Nacida como app</h3>
-          <p>ETIOVE no nace para escribir artículos: nace para ayudarte a encontrar los mejores cafés de especialidad.</p>
-        </div>
-        <div class="card">
-          <div class="card-icon">☕</div>
-          <h3>Enfocada en café real</h3>
-          <p>Menos ruido, menos marketing vacío. Más foco en cafés que valen la pena y experiencias que recuerdas.</p>
-        </div>
-        <div class="card">
-          <div class="card-icon">🫶</div>
-          <h3>Pensada para amantes del café</h3>
-          <p>Si ya te importa lo que bebes, ETIOVE te ayuda a elevar esa experiencia y hacerla más útil cada día.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="container">
-      <div class="section-head">
-        <h2>Cómo funciona</h2>
-        <p>Simple, rápido y pensado para que empieces a usarlo desde el primer día.</p>
-      </div>
-
-      <div class="steps">
-        <div class="step">
-          <div class="step-num">1</div>
-          <div>
-            <h3>Explora cafés</h3>
-            <p>Descubre cafés de especialidad y filtra por lo que realmente te interesa.</p>
-          </div>
-        </div>
-
-        <div class="step">
-          <div class="step-num">2</div>
-          <div>
-            <h3>Guarda tus favoritos</h3>
-            <p>Ten siempre a mano los cafés que más te gustaron y evita volver a empezar desde cero.</p>
-          </div>
-        </div>
-
-        <div class="step">
-          <div class="step-num">3</div>
-          <div>
-            <h3>Valora y mejora</h3>
-            <p>Registra tus opiniones, entiende mejor tus gustos y afina tus decisiones futuras.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="cta-panel" id="cta">
+    <header class="hero">
+      <div class="container hero-grid">
         <div>
-          <h2>Empieza a descubrir mejores cafés con ETIOVE.</h2>
+          <span class="eyebrow">App de café de especialidad</span>
+          <h1>Descubre, guarda y valora los mejores cafés de especialidad.</h1>
           <p>
-            Si quieres ser de los primeros en probar la app, deja tu interés y te avisaremos cuando esté lista.
+            ETIOVE nace para ayudarte a encontrar cafés que de verdad merecen la pena, recordar
+            cuáles te gustaron y construir tu propio mapa de favoritos.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#cta">Quiero probar ETIOVE</a>
+            <a class="btn btn-secondary" href="#features">Ver cómo funciona</a>
+          </div>
+          <p class="hero-note">
+            Pensada para amantes del café de especialidad que quieren descubrir mejor, elegir mejor
+            y disfrutar más.
           </p>
         </div>
-        <div>
-          <a class="btn btn-primary" href="mailto:hola@etiove.com?subject=Quiero%20probar%20ETIOVE&body=Hola,%20quiero%20probar%20la%20app%20ETIOVE.">
-            Quiero acceso
-          </a>
+
+        <div class="phone">
+          <div class="phone-screen">
+            <div class="screen-top">
+              <span>ETIOVE</span>
+              <span>☕ 09:41</span>
+            </div>
+
+            <div class="mock-card">
+              <span class="badge">Recomendado para ti</span>
+              <p class="mock-title">Etiopía Natural · Fresa · Floral</p>
+              <p class="mock-sub">Filtrado · Tueste medio · 4.8/5</p>
+            </div>
+
+            <div class="mock-grid">
+              <div class="mock-card">
+                <p class="mock-title">Tus favoritos</p>
+                <p class="mock-sub">12 cafés guardados</p>
+              </div>
+              <div class="mock-card">
+                <p class="mock-title">Catados</p>
+                <p class="mock-sub">28 cafés valorados</p>
+              </div>
+            </div>
+
+            <div class="mock-card">
+              <span class="badge">Nueva valoración</span>
+              <p class="mock-title">Kenya AA</p>
+              <p class="mock-sub">Acidez brillante · Fruta roja · 4.6/5</p>
+            </div>
+
+            <div class="mock-card">
+              <span class="badge">Descubre</span>
+              <p class="mock-title">Cafés similares a tu perfil</p>
+              <p class="mock-sub">Recomendaciones basadas en tus gustos y valoraciones.</p>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </header>
 
-  <section class="section">
-    <div class="container">
-      <div class="section-head">
-        <h2>Preguntas frecuentes</h2>
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <h2>El problema no es encontrar café. Es encontrar el correcto para ti.</h2>
+          <p>
+            Hay demasiadas opciones, demasiadas marcas y poca claridad. ETIOVE te ayuda a convertir
+            el ruido en una experiencia más simple, personal y útil.
+          </p>
+        </div>
+
+        <div class="problem-grid">
+          <div class="card">
+            <div class="card-icon">😵‍💫</div>
+            <h3>Demasiadas opciones</h3>
+            <p>
+              No siempre sabes qué café comprar, cuál merece la pena o cuál encaja con tus gustos.
+            </p>
+          </div>
+          <div class="card">
+            <div class="card-icon">🧠</div>
+            <h3>Es difícil recordar</h3>
+            <p>
+              Pruebas un café increíble y a las semanas ya no recuerdas ni el nombre ni por qué te
+              gustó.
+            </p>
+          </div>
+          <div class="card">
+            <div class="card-icon">📉</div>
+            <h3>Poca información útil</h3>
+            <p>
+              Muchas veces solo ves marketing, pero no una forma clara de comparar, guardar y
+              valorar cafés.
+            </p>
+          </div>
+        </div>
       </div>
+    </section>
 
-      <div class="faq">
-        <details>
-          <summary>¿ETIOVE es una app o una web?</summary>
-          <p>ETIOVE nace principalmente como app para descubrir y gestionar cafés de especialidad. La web ayuda a explicar, atraer usuarios y ampliar la experiencia.</p>
-        </details>
+    <section class="section" id="features">
+      <div class="container">
+        <div class="section-head">
+          <h2>Qué puedes hacer con ETIOVE</h2>
+          <p>
+            Todo está pensado para ayudarte a descubrir mejores cafés y construir tu propio
+            criterio.
+          </p>
+        </div>
 
-        <details>
-          <summary>¿Qué podré hacer dentro de ETIOVE?</summary>
-          <p>Descubrir cafés, guardar favoritos, valorar cafés probados y aprender qué perfiles encajan más contigo.</p>
-        </details>
+        <div class="features">
+          <div class="card">
+            <div class="card-icon">🔎</div>
+            <h3>Descubrir cafés de especialidad</h3>
+            <p>
+              Explora cafés por perfil sensorial, origen, proceso y estilo para encontrar opciones
+              que sí encajan contigo.
+            </p>
+          </div>
 
-        <details>
-          <summary>¿Está pensada solo para expertos?</summary>
-          <p>No. Está pensada tanto para quien empieza en el café de especialidad como para quien ya lleva tiempo explorándolo.</p>
-        </details>
+          <div class="card">
+            <div class="card-icon">⭐</div>
+            <h3>Valorar cada café</h3>
+            <p>
+              Puntúa tus cafés y guarda impresiones reales para entender qué te gusta y por qué.
+            </p>
+          </div>
 
-        <details>
-          <summary>¿Cuándo estará disponible?</summary>
-          <p>ETIOVE está en desarrollo. Si quieres acceso temprano, puedes apuntarte desde esta página y te avisaremos.</p>
-        </details>
+          <div class="card">
+            <div class="card-icon">💾</div>
+            <h3>Guardar favoritos</h3>
+            <p>Crea tu colección personal y vuelve a esos cafés que sí quieres repetir.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">🧭</div>
+            <h3>Aprender tu perfil</h3>
+            <p>
+              Convierte tus preferencias en algo medible: más claridad, mejores elecciones, más
+              disfrute.
+            </p>
+          </div>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <footer class="footer">
-    <div class="container footer-inner">
-      <span>© 2026 ETIOVE</span>
-      <span>Descubre, guarda y valora cafés de especialidad.</span>
-    </div>
-  </footer>
-</body>
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <h2>Por qué ETIOVE es diferente</h2>
+          <p>
+            No es solo contenido. No es solo un listado. Es una herramienta para descubrir, decidir
+            y recordar.
+          </p>
+        </div>
+
+        <div class="value-grid">
+          <div class="card">
+            <div class="card-icon">📱</div>
+            <h3>Nacida como app</h3>
+            <p>
+              ETIOVE no nace para escribir artículos: nace para ayudarte a encontrar los mejores
+              cafés de especialidad.
+            </p>
+          </div>
+          <div class="card">
+            <div class="card-icon">☕</div>
+            <h3>Enfocada en café real</h3>
+            <p>
+              Menos ruido, menos marketing vacío. Más foco en cafés que valen la pena y experiencias
+              que recuerdas.
+            </p>
+          </div>
+          <div class="card">
+            <div class="card-icon">🫶</div>
+            <h3>Pensada para amantes del café</h3>
+            <p>
+              Si ya te importa lo que bebes, ETIOVE te ayuda a elevar esa experiencia y hacerla más
+              útil cada día.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <h2>Cómo funciona</h2>
+          <p>Simple, rápido y pensado para que empieces a usarlo desde el primer día.</p>
+        </div>
+
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <div>
+              <h3>Explora cafés</h3>
+              <p>Descubre cafés de especialidad y filtra por lo que realmente te interesa.</p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">2</div>
+            <div>
+              <h3>Guarda tus favoritos</h3>
+              <p>
+                Ten siempre a mano los cafés que más te gustaron y evita volver a empezar desde
+                cero.
+              </p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-num">3</div>
+            <div>
+              <h3>Valora y mejora</h3>
+              <p>
+                Registra tus opiniones, entiende mejor tus gustos y afina tus decisiones futuras.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="cta-panel" id="cta">
+          <div>
+            <h2>Empieza a descubrir mejores cafés con ETIOVE.</h2>
+            <p>
+              Si quieres ser de los primeros en probar la app, deja tu interés y te avisaremos
+              cuando esté lista.
+            </p>
+          </div>
+          <div>
+            <a
+              class="btn btn-primary"
+              href="mailto:hola@etiove.com?subject=Quiero%20probar%20ETIOVE&body=Hola,%20quiero%20probar%20la%20app%20ETIOVE."
+            >
+              Quiero acceso
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <h2>Preguntas frecuentes</h2>
+        </div>
+
+        <div class="faq">
+          <details>
+            <summary>¿ETIOVE es una app o una web?</summary>
+            <p>
+              ETIOVE nace principalmente como app para descubrir y gestionar cafés de especialidad.
+              La web ayuda a explicar, atraer usuarios y ampliar la experiencia.
+            </p>
+          </details>
+
+          <details>
+            <summary>¿Qué podré hacer dentro de ETIOVE?</summary>
+            <p>
+              Descubrir cafés, guardar favoritos, valorar cafés probados y aprender qué perfiles
+              encajan más contigo.
+            </p>
+          </details>
+
+          <details>
+            <summary>¿Está pensada solo para expertos?</summary>
+            <p>
+              No. Está pensada tanto para quien empieza en el café de especialidad como para quien
+              ya lleva tiempo explorándolo.
+            </p>
+          </details>
+
+          <details>
+            <summary>¿Cuándo estará disponible?</summary>
+            <p>
+              ETIOVE está en desarrollo. Si quieres acceso temprano, puedes apuntarte desde esta
+              página y te avisaremos.
+            </p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="container footer-inner">
+        <span>© 2026 ETIOVE</span>
+        <span>Descubre, guarda y valora cafés de especialidad.</span>
+      </div>
+    </footer>
+  </body>
 </html>

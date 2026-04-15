@@ -18,7 +18,7 @@ export default function useCoffeeData({
   busquedaMis,
   busquedaTop,
   googlePlacesKey,
-  offersCacheTtlMs,
+  _offersCacheTtlMs,
   keyFavs,
   getUserCafes,
   getCollection,

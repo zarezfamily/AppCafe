@@ -17,7 +17,7 @@ function decodeHtmlText(value) {
     .replace(/\\u003e/g, '>')
     .replace(/\\u00a0/g, ' ')
     .replace(/\\u20ac/g, '€')
-    .replace(/\\\//g, '/')
+    .replace(/\\\//g, '/') // ESTE es correcto (no tocar más)
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/&amp;/g, '&')
@@ -115,13 +115,13 @@ export function extraerOfertasGoogle(html) {
 
   const candidates = [];
   const patterns = [
-    /"title":"([^\"]+?)".*?"price":"([^\"]+?)".*?"merchantName":"([^\"]+?)".*?"url":"([^\"]+?)"/g,
-    /"fullTitle":"([^\"]+?)".*?"price":"([^\"]+?)".*?"merchantName":"([^\"]+?)".*?"url":"([^\"]+?)"/g,
-    /"title":"([^\"]+?)".*?"merchantName":"([^\"]+?)".*?"price":"([^\"]+?)".*?"url":"([^\"]+?)"/g,
-    /"name":"([^\"]+?)".*?"price":"([^\"]+?)".*?"sellerName":"([^\"]+?)".*?"url":"([^\"]+?)"/g,
-    /"title":"([^\"]+?)".*?"formattedPrice":"([^\"]+?)".*?"merchantName":"([^\"]+?)".*?"url":"([^\"]+?)"/g,
-    /"productTitle":"([^\"]+?)".*?"price":"([^\"]+?)".*?"storeName":"([^\"]+?)".*?"url":"([^\"]+?)"/g,
-    /"title":"([^\"]+?)".*?"priceAmount":"([^\"]+?)".*?"merchantName":"([^\"]+?)".*?"url":"([^\"]+?)"/g,
+    /"title":"([^"]+?)".*?"price":"([^"]+?)".*?"merchantName":"([^"]+?)".*?"url":"([^"]+?)"/g,
+    /"fullTitle":"([^"]+?)".*?"price":"([^"]+?)".*?"merchantName":"([^"]+?)".*?"url":"([^"]+?)"/g,
+    /"title":"([^"]+?)".*?"merchantName":"([^"]+?)".*?"price":"([^"]+?)".*?"url":"([^"]+?)"/g,
+    /"name":"([^"]+?)".*?"price":"([^"]+?)".*?"sellerName":"([^"]+?)".*?"url":"([^"]+?)"/g,
+    /"title":"([^"]+?)".*?"formattedPrice":"([^"]+?)".*?"merchantName":"([^"]+?)".*?"url":"([^"]+?)"/g,
+    /"productTitle":"([^"]+?)".*?"price":"([^"]+?)".*?"storeName":"([^"]+?)".*?"url":"([^"]+?)"/g,
+    /"title":"([^"]+?)".*?"priceAmount":"([^"]+?)".*?"merchantName":"([^"]+?)".*?"url":"([^"]+?)"/g,
   ];
 
   patterns.forEach((pattern, index) => {

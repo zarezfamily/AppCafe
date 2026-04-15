@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import MemberInfoModal from '../components/MemberInfoModal';
 import {
   BlogSection,

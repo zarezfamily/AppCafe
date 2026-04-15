@@ -18,8 +18,6 @@ export default function CommunityTab({
   setForumThread,
   forumCreateOpen,
   setForumCreateOpen,
-  forumSort,
-  setForumSort,
   forumLoading,
   forumThreadsByCategory,
   forumError,
@@ -67,8 +65,6 @@ export default function CommunityTab({
   perfil,
 }) {
   const {
-    isAdmin,
-    isStaff,
     showCategories,
     showThreadList,
     showThreadDetail,
@@ -139,6 +135,7 @@ export default function CommunityTab({
   return (
     <View style={{ flex: 1 }}>
       <MemberInfoModal visible={showMemberInfo} onClose={() => setShowMemberInfo(false)} />
+
       {showCategories && (
         <View style={{ flex: 1 }}>
           <Animated.View style={{ flex: 1, opacity: communityHeroAnim }}>
@@ -148,11 +145,9 @@ export default function CommunityTab({
       )}
 
       {showThreadList && <CommunityThreadListView {...threadListViewProps} />}
-
       {showThreadDetail && <CommunityThreadDetailView {...threadDetailViewProps} />}
 
       <CommunityCreateThreadModal {...createModalProps} />
-
       <CommunityEditItemModal {...editModalProps} />
     </View>
   );

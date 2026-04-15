@@ -54,7 +54,7 @@ export async function syncPendingCatas(uploadFn) {
     try {
       await uploadFn(cata);
       subidas++;
-    } catch (e) {
+    } catch (_e) {
       // Si falla, dejamos la cata pendiente
       break;
     }

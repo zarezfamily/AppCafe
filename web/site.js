@@ -1,9 +1,11 @@
 import { initCookieBanner } from '/js/shared/cookieBanner.js';
+import { initMobileNav } from '/js/shared/mobileNav.js';
 import { initRevealOnScroll } from '/js/shared/reveal.js';
 import { initScrollTop } from '/js/shared/scrollTop.js';
 import { initServiceWorkerUpdates } from '/js/shared/serviceWorker.js';
 
-initRevealOnScroll({ threshold: 0.1, staggerMs: 100 });
+initMobileNav({ triggerId: 'navHamburger', navId: 'navLinks' });
+initRevealOnScroll({ threshold: 0.05, staggerMs: 80 });
 initScrollTop({ buttonId: 'scrollTopBtn', threshold: 320 });
 initCookieBanner({
   bannerId: 'cookieBanner',

@@ -176,9 +176,13 @@ footer {
 .cookie-btn-reject:hover { color: rgba(246,239,231,0.85); border-color: rgba(246,239,231,0.5); }
 
 @media (max-width: 768px) {
-  footer { padding: 40px 24px 36px; }
-  .footer-nav { grid-column: 1; grid-row: 1; }
-  .footer-copy { flex-direction: column; align-items: flex-start; }
+  footer { padding: 40px 24px 36px; text-align: center; }
+  .footer-nav { grid-column: 1; grid-row: 1; align-items: center; }
+  .footer-nav-group { justify-content: center; }
+  .footer-copy { flex-direction: column; align-items: center; }
+  .footer-legal { justify-content: center; }
+  .footer-legal-links { justify-content: center; }
+  .footer-copy-center { justify-content: center; }
 }
 
 @media (prefers-color-scheme: dark) {

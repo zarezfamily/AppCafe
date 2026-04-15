@@ -1,4 +1,7 @@
+import { initMobileNav } from '/js/shared/mobileNav.js';
 import { initScrollTop } from '/js/shared/scrollTop.js';
+
+initMobileNav({ triggerId: 'navHamburger', navId: 'navLinks' });
 import {
   ensureCardBaseContent,
   ensureSearchIndex,

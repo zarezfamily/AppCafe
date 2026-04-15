@@ -23,7 +23,6 @@ function renderLegalFooter() {
         <a class="footer-nav-link" href="/blog/">Blog</a>
         <a class="footer-nav-link" href="/comunidad.html">Comunidad</a>
         <a class="footer-nav-link" href="/#quizweb">Quiz de sabor</a>
-        <a class="footer-nav-link" href="/about.html">Sobre Etiove</a>
       </div>
     </nav>
 
@@ -54,7 +53,6 @@ function renderSiteFooter() {
         <a class="footer-nav-link" href="/blog/">Blog</a>
         <a class="footer-nav-link" href="/comunidad.html">Comunidad</a>
         <a class="footer-nav-link" href="/#quizweb">Quiz de sabor</a>
-        <a class="footer-nav-link" href="/about.html">Sobre Etiove</a>
       </div>
     </nav>
 

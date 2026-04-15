@@ -1,6 +1,6 @@
 // Etiove Service Worker — PWA offline shell
 // Versión: incrementar para forzar actualización del caché
-const CACHE_VERSION = 'etiove-v5';
+const CACHE_VERSION = 'etiove-v6';
 
 // Assets del shell que se cachean en la instalación (siempre disponibles offline)
 const SHELL_ASSETS = [

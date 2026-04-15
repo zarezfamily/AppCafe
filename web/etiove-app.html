@@ -24,433 +24,7 @@
       content="La app para descubrir, guardar y valorar cafés de especialidad."
     />
     <meta name="twitter:image" content="https://etiove.com/og-image.jpg" />
-    <style>
-      :root {
-        --bg: #111111;
-        --panel: #1b1b1b;
-        --panel-2: #242424;
-        --text: #ffffff;
-        --muted: #cfcfcf;
-        --soft: #9f9f9f;
-        --accent: #d4a373;
-        --accent-dark: #b78452;
-        --border: rgba(255, 255, 255, 0.08);
-        --max: 1120px;
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      html {
-        scroll-behavior: smooth;
-      }
-
-      body {
-        margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        background:
-          radial-gradient(circle at top left, rgba(212, 163, 115, 0.18), transparent 32%),
-          linear-gradient(180deg, #0f0f0f 0%, #151515 100%);
-        color: var(--text);
-        line-height: 1.6;
-      }
-
-      a {
-        color: inherit;
-      }
-
-      .container {
-        width: min(var(--max), calc(100% - 40px));
-        margin: 0 auto;
-      }
-
-      .nav {
-        position: sticky;
-        top: 0;
-        z-index: 20;
-        backdrop-filter: blur(14px);
-        background: rgba(17, 17, 17, 0.82);
-        border-bottom: 1px solid var(--border);
-      }
-
-      .nav-inner {
-        width: min(var(--max), calc(100% - 40px));
-        margin: 0 auto;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 16px 0;
-      }
-
-      .brand {
-        font-weight: 800;
-        letter-spacing: 0.18em;
-        text-decoration: none;
-      }
-
-      .nav-links {
-        display: flex;
-        gap: 18px;
-        align-items: center;
-      }
-
-      .nav-link {
-        text-decoration: none;
-        color: var(--muted);
-        font-size: 14px;
-      }
-
-      .nav-link:hover {
-        color: var(--text);
-      }
-
-      .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        padding: 14px 22px;
-        border-radius: 12px;
-        text-decoration: none;
-        font-weight: 700;
-        transition:
-          transform 0.18s ease,
-          opacity 0.18s ease,
-          background 0.18s ease;
-        border: 1px solid transparent;
-        cursor: pointer;
-      }
-
-      .btn:hover {
-        transform: translateY(-1px);
-        opacity: 0.96;
-      }
-
-      .btn-primary {
-        background: var(--accent);
-        color: #111;
-      }
-
-      .btn-primary:hover {
-        background: var(--accent-dark);
-      }
-
-      .btn-secondary {
-        background: transparent;
-        color: var(--text);
-        border-color: var(--border);
-      }
-
-      .hero {
-        padding: 72px 0 48px;
-      }
-
-      .hero-grid {
-        display: grid;
-        grid-template-columns: 1.1fr 0.9fr;
-        gap: 36px;
-        align-items: center;
-      }
-
-      .eyebrow {
-        display: inline-block;
-        margin-bottom: 14px;
-        padding: 6px 10px;
-        border-radius: 999px;
-        background: rgba(212, 163, 115, 0.14);
-        color: var(--accent);
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-      }
-
-      h1 {
-        margin: 0 0 16px;
-        font-size: clamp(2.2rem, 5vw, 4.4rem);
-        line-height: 1.04;
-        letter-spacing: -0.03em;
-      }
-
-      .hero p {
-        margin: 0 0 24px;
-        font-size: 1.08rem;
-        color: var(--muted);
-        max-width: 60ch;
-      }
-
-      .hero-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        margin-bottom: 22px;
-      }
-
-      .hero-note {
-        color: var(--soft);
-        font-size: 0.95rem;
-      }
-
-      .phone {
-        background: linear-gradient(180deg, #262626 0%, #1a1a1a 100%);
-        border: 1px solid var(--border);
-        border-radius: 28px;
-        padding: 18px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
-        max-width: 420px;
-        margin-left: auto;
-      }
-
-      .phone-screen {
-        background: #121212;
-        border-radius: 22px;
-        padding: 18px;
-        min-height: 560px;
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
-      }
-
-      .screen-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        color: var(--soft);
-        font-size: 12px;
-        margin-bottom: 8px;
-      }
-
-      .mock-card {
-        background: var(--panel);
-        border: 1px solid var(--border);
-        border-radius: 18px;
-        padding: 16px;
-      }
-
-      .mock-title {
-        font-weight: 800;
-        margin: 0 0 6px;
-        font-size: 1rem;
-      }
-
-      .mock-sub {
-        margin: 0;
-        color: var(--soft);
-        font-size: 0.92rem;
-      }
-
-      .mock-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-      }
-
-      .badge {
-        display: inline-block;
-        padding: 5px 9px;
-        border-radius: 999px;
-        background: rgba(212, 163, 115, 0.15);
-        color: var(--accent);
-        font-size: 11px;
-        font-weight: 700;
-        margin-bottom: 10px;
-      }
-
-      .section {
-        padding: 36px 0;
-      }
-
-      .section-head {
-        max-width: 760px;
-        margin-bottom: 24px;
-      }
-
-      h2 {
-        margin: 0 0 12px;
-        font-size: clamp(1.7rem, 3vw, 2.8rem);
-        line-height: 1.1;
-      }
-
-      .section-head p {
-        margin: 0;
-        color: var(--muted);
-        font-size: 1.04rem;
-      }
-
-      .problem-grid,
-      .features,
-      .value-grid {
-        display: grid;
-        gap: 18px;
-      }
-
-      .problem-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
-
-      .features {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .value-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
-
-      .card {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid var(--border);
-        border-radius: 18px;
-        padding: 22px;
-      }
-
-      .card h3 {
-        margin: 0 0 10px;
-        font-size: 1.1rem;
-      }
-
-      .card p {
-        margin: 0;
-        color: var(--muted);
-        font-size: 0.98rem;
-      }
-
-      .card-icon {
-        font-size: 1.5rem;
-        margin-bottom: 12px;
-      }
-
-      .steps {
-        display: grid;
-        gap: 16px;
-      }
-
-      .step {
-        display: grid;
-        grid-template-columns: 52px 1fr;
-        gap: 16px;
-        align-items: start;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid var(--border);
-        border-radius: 18px;
-        padding: 18px;
-      }
-
-      .step-num {
-        width: 52px;
-        height: 52px;
-        display: grid;
-        place-items: center;
-        border-radius: 14px;
-        background: rgba(212, 163, 115, 0.14);
-        color: var(--accent);
-        font-weight: 800;
-        font-size: 1.05rem;
-      }
-
-      .step h3 {
-        margin: 0 0 6px;
-      }
-
-      .step p {
-        margin: 0;
-        color: var(--muted);
-      }
-
-      .cta-panel {
-        margin: 32px 0 20px;
-        background: linear-gradient(135deg, rgba(212, 163, 115, 0.16), rgba(255, 255, 255, 0.03));
-        border: 1px solid var(--border);
-        border-radius: 24px;
-        padding: 28px;
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 18px;
-        align-items: center;
-      }
-
-      .cta-panel h2 {
-        margin-bottom: 8px;
-      }
-
-      .cta-panel p {
-        margin: 0;
-        color: var(--muted);
-        max-width: 58ch;
-      }
-
-      .faq {
-        display: grid;
-        gap: 12px;
-      }
-
-      details {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        padding: 16px 18px;
-      }
-
-      summary {
-        cursor: pointer;
-        font-weight: 700;
-      }
-
-      details p {
-        color: var(--muted);
-        margin: 12px 0 0;
-      }
-
-      .footer {
-        padding: 30px 0 50px;
-        color: var(--soft);
-        font-size: 0.94rem;
-      }
-
-      .footer-inner {
-        display: flex;
-        justify-content: space-between;
-        gap: 16px;
-        border-top: 1px solid var(--border);
-        padding-top: 22px;
-        flex-wrap: wrap;
-      }
-
-      @media (max-width: 920px) {
-        .hero-grid,
-        .problem-grid,
-        .value-grid,
-        .features,
-        .cta-panel {
-          grid-template-columns: 1fr;
-        }
-
-        .phone {
-          margin: 0;
-        }
-      }
-
-      @media (max-width: 640px) {
-        .nav-inner {
-          flex-direction: column;
-          gap: 12px;
-        }
-
-        .step {
-          grid-template-columns: 1fr;
-        }
-
-        .step-num {
-          width: 44px;
-          height: 44px;
-          border-radius: 12px;
-        }
-
-        .hero {
-          padding-top: 46px;
-        }
-      }
-    </style>
+    <link rel="stylesheet" href="/about.css" />
   </head>
   <body>
     <nav class="nav">
@@ -535,20 +109,36 @@
         </div>
 
         <div class="problem-grid">
-          <div class="card">
-            <div class="card-icon">😵‍💫</div>
-            <h3>Demasiadas opciones</h3>
-            <p>
-              No siempre sabes qué café comprar, cuál merece la pena o cuál encaja con tus gustos.
+          <nav>
+            <a class="nav-wordmark" href="/">Etiove</a>
+            <div class="nav-links" id="navLinks">
+              <a class="nav-link" href="/etiove-app.html">La app</a>
+              <a class="nav-link" href="/blog/">Blog</a>
+              <a class="nav-link" href="/comunidad.html">Comunidad</a>
+            </div>
+            <button class="nav-hamburger" id="navHamburger" aria-label="Menú" aria-expanded="false">
+              <span></span><span></span><span></span>
+            </button>
+          </nav>
+
+          <div class="page-hero" id="main-content">
+            <p class="page-eyebrow">¡Nueva app!</p>
+            <h1 class="page-title">
+              Descubre la app <em>Etiove</em>
+            </h1>
+            <p class="page-lead">
+              La app para descubrir, guardar y valorar cafés de especialidad. Disponible gratis para iOS y Android.
             </p>
-          </div>
-          <div class="card">
-            <div class="card-icon">🧠</div>
-            <h3>Es difícil recordar</h3>
-            <p>
-              Pruebas un café increíble y a las semanas ya no recuerdas ni el nombre ni por qué te
-              gustó.
-            </p>
+            <div class="app-btns" style="margin-top:32px;display:flex;gap:18px;justify-content:center;">
+              <a href="https://apps.apple.com/app/etiove" target="_blank" rel="noopener noreferrer" class="cta-btn">
+                <svg class="btn-app-icon" viewBox="0 0 24 24" fill="currentColor" style="width:20px;height:20px;"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                <span>App Store</span>
+              </a>
+              <a href="https://play.google.com/store/apps/details?id=com.zarezfamily.etiove" target="_blank" rel="noopener noreferrer" class="cta-btn">
+                <svg class="btn-app-icon" viewBox="0 0 24 24" fill="currentColor" style="width:20px;height:20px;"><path d="M3.18 23.76c.3.17.64.24.99.19l12.6-7.27-2.72-2.72-10.87 9.8zm16.11-9.37L5.83 6.93l2.72 2.72 10.74-9.65zm1.61.93c.32-.18.5-.5.5-.87s-.18-.69-.5-.87L18.1 12l-2.59 2.59 2.6 2.6 2.79-1.87zM3.18.24C2.86.07 2.5 0 2.17.19c-.33.18-.5.5-.5.87v21.88c0 .37.17.69.5.87.16.09.34.13.5.13.17 0 .33-.04.49-.13l.02-.01 10.85-9.73-2.7-2.7L3.18.24z"/></svg>
+                <span>Google Play</span>
+              </a>
+            </div>
           </div>
           <div class="card">
             <div class="card-icon">📉</div>
@@ -747,11 +337,41 @@
       </div>
     </section>
 
-    <footer class="footer">
-      <div class="container footer-inner">
-        <span>© 2026 ETIOVE</span>
-        <span>Descubre, guarda y valora cafés de especialidad.</span>
-      </div>
+    <footer>
+      <nav class="footer-nav" aria-label="Navegación del sitio">
+        <div class="footer-nav-group">
+          <span class="footer-nav-label">Explorar</span>
+          <a class="footer-nav-link" href="/">Inicio</a>
+          <a class="footer-nav-link" href="/blog/">Blog</a>
+          <a class="footer-nav-link" href="/comunidad.html">Comunidad</a>
+          <a class="footer-nav-link" href="/#quizweb">Quiz de sabor</a>
+        </div>
+      </nav>
+
+      <p class="footer-copy">
+        <span>© 2026 Etiove. Hecho con ☕ en España.</span>
+
+        <span class="footer-copy-center">
+          <span class="footer-wordmark-sm">Etiove</span>
+          <span class="social-row-inline">
+            <a class="social-link" href="https://instagram.com/etiove_cafe" target="_blank" rel="noopener noreferrer" aria-label="Instagram @etiove_cafe">
+              <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            </a>
+            <a class="social-link" href="https://x.com/etiove_cafe" target="_blank" rel="noopener noreferrer" aria-label="X @etiove_cafe">
+              <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+            <a class="social-link" href="https://tiktok.com/@etiove" target="_blank" rel="noopener noreferrer" aria-label="TikTok @etiove">
+              <svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.16 8.16 0 004.77 1.52V6.75a4.85 4.85 0 01-1-.06z"/></svg>
+            </a>
+          </span>
+        </span>
+
+        <span class="footer-legal-links">
+          <a class="footer-legal-link" href="/privacidad.html">Privacidad</a>
+          <a class="footer-legal-link" href="/cookies.html">Cookies</a>
+          <a class="footer-legal-link" href="/terminos.html">Términos</a>
+        </span>
+      </p>
     </footer>
   </body>
 </html>

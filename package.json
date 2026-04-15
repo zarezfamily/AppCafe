@@ -2,6 +2,7 @@
   "name": "etiove",
   "version": "1.0.0",
   "main": "node_modules/expo/AppEntry.js",
+  "private": true,
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -26,7 +27,8 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier . --write",
     "format:check": "prettier . --check .",
-    "validate": "npm run format:check && npm run lint"
+    "validate": "npm run format:check && npm run lint",
+    "prepare": "husky"
   },
   "dependencies": {
     "@expo-google-fonts/playfair-display": "^0.4.2",
@@ -61,7 +63,16 @@
     "eslint": "^9.25.1",
     "eslint-plugin-react": "^7.37.5",
     "globals": "^16.0.0",
-    "prettier": "^3.5.3"
+    "prettier": "^3.5.3",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.2"
   },
-  "private": true
+  "lint-staged": {
+    "*.{js,jsx,json,md,yml,yaml}": [
+      "prettier --write"
+    ],
+    "*.{js,jsx}": [
+      "eslint --fix"
+    ]
+  }
 }

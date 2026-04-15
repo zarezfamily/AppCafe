@@ -23,9 +23,9 @@ export default function CommunityModalActions({
       <TouchableOpacity
         style={[s.redBtn, { flex: 1, marginTop: 0 }]}
         onPress={onSubmit}
-        disabled={!!loading}
+        disabled={loading}
       >
-        {!!loading ? (
+        {loading ? (
           <ActivityIndicator color="#fff" />
         ) : (
           <Text style={s.redBtnText}>{submitLabel}</Text>

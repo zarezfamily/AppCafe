@@ -29,7 +29,7 @@ export default function CataDetailModal({
   if (cata) lastCataRef.current = cata;
 
   useEffect(() => {
-    if (!!visible) {
+    if (visible) {
       setShouldRender(true);
       Animated.parallel([
         Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
@@ -48,7 +48,7 @@ export default function CataDetailModal({
         if (finished) setShouldRender(false);
       });
     }
-  }, [visible]);
+  }, [visible, fadeAnim, slideAnim]);
 
   if (!shouldRender || !lastCataRef.current) return null;
   const cataData = lastCataRef.current;
@@ -63,7 +63,7 @@ export default function CataDetailModal({
   });
 
   return (
-    <Modal visible={!!visible} animationType="none" transparent onRequestClose={onClose}>
+    <Modal visible={visible} animationType="none" transparent onRequestClose={onClose}>
       <Animated.View
         style={{
           flex: 1,
@@ -88,7 +88,6 @@ export default function CataDetailModal({
         }}
       >
         <ScrollView contentContainerStyle={{ paddingBottom: Platform.OS === 'ios' ? 40 : 20 }}>
-          {/* Header */}
           <View
             style={{
               flexDirection: 'row',
@@ -105,7 +104,6 @@ export default function CataDetailModal({
             </TouchableOpacity>
           </View>
 
-          {/* Foto grande */}
           {cataData.foto && (
             <Image
               source={{ uri: cataData.foto }}
@@ -118,7 +116,6 @@ export default function CataDetailModal({
           )}
 
           <View style={{ paddingHorizontal: 16, paddingTop: 16 }}>
-            {/* Café + Puntuación */}
             <View style={{ marginBottom: 20 }}>
               <Text
                 style={{
@@ -140,7 +137,6 @@ export default function CataDetailModal({
               </View>
             </View>
 
-            {/* Fecha */}
             <View
               style={{
                 marginBottom: 16,
@@ -172,7 +168,6 @@ export default function CataDetailModal({
               </Text>
             </View>
 
-            {/* Parámetros */}
             <View style={{ marginBottom: 20 }}>
               <Text
                 style={{
@@ -198,7 +193,6 @@ export default function CataDetailModal({
               </View>
             </View>
 
-            {/* Contexto */}
             <View
               style={{
                 marginBottom: 16,
@@ -232,7 +226,6 @@ export default function CataDetailModal({
               </View>
             </View>
 
-            {/* Notas */}
             {cataData.notas && (
               <View style={{ marginBottom: 20 }}>
                 <Text
@@ -254,7 +247,6 @@ export default function CataDetailModal({
               </View>
             )}
 
-            {/* Acciones */}
             <View style={{ flexDirection: 'row', gap: 10 }}>
               <TouchableOpacity
                 onPress={() => {

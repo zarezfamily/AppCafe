@@ -64,7 +64,7 @@ export default function CataFormModal({
   const [mostrarListaCafes, setMostrarListaCafes] = useState(false);
 
   useEffect(() => {
-    if (!!visible) {
+    if (visible) {
       Animated.parallel([
         Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
         Animated.spring(slideAnim, {
@@ -80,7 +80,7 @@ export default function CataFormModal({
         Animated.timing(slideAnim, { toValue: 600, duration: 200, useNativeDriver: true }),
       ]).start();
     }
-  }, [visible]);
+  }, [visible, fadeAnim, slideAnim]);
 
   const handleDateChange = (_event, selectedDate) => {
     if (selectedDate) {
@@ -117,10 +117,9 @@ export default function CataFormModal({
       alert('Ingresa el nombre del café');
       return;
     }
-    // Chequear conexión
+
     const net = await NetInfo.fetch();
     if (!net.isConnected) {
-      // Guardar offline
       await saveCataOffline({
         cafeNombre,
         cafeId,
@@ -142,8 +141,9 @@ export default function CataFormModal({
       onClose();
       return;
     }
+
     await onSave();
-    // Intentar sincronizar pendientes después de guardar online
+
     try {
       await syncPendingCatas(onSave);
     } catch {}
@@ -158,7 +158,7 @@ export default function CataFormModal({
   if (!visible || visible === 'false') return null;
 
   return (
-    <Modal visible={!!visible} animationType="none" transparent onRequestClose={onClose}>
+    <Modal visible={visible} animationType="none" transparent onRequestClose={onClose}>
       <Animated.View
         style={{
           flex: 1,
@@ -192,7 +192,6 @@ export default function CataFormModal({
             keyboardDismissMode="on-drag"
             contentContainerStyle={{ paddingBottom: 110, paddingHorizontal: 16, paddingTop: 12 }}
           >
-            {/* Header */}
             <View
               style={{
                 flexDirection: 'row',
@@ -202,12 +201,11 @@ export default function CataFormModal({
               }}
             >
               <Text style={s.sectionTitle}>{isEditing ? 'Editar Cata' : 'Nueva Cata'}</Text>
-              <TouchableOpacity onPress={onClose} disabled={!!guardando} style={{ padding: 6 }}>
+              <TouchableOpacity onPress={onClose} disabled={guardando} style={{ padding: 6 }}>
                 <Ionicons name="close" size={24} color={theme.text.primary} />
               </TouchableOpacity>
             </View>
 
-            {/* Café */}
             <Text style={[s.label, { marginTop: 0 }]}>Café</Text>
             <TouchableOpacity
               onPress={() => setMostrarListaCafes(!mostrarListaCafes)}
@@ -294,7 +292,6 @@ export default function CataFormModal({
               />
             )}
 
-            {/* Fecha y Hora */}
             <View style={{ flexDirection: 'row', gap: 12, marginBottom: 16 }}>
               <View style={{ flex: 1 }}>
                 <Text style={[s.label, { marginTop: 0 }]}>Fecha</Text>
@@ -339,7 +336,6 @@ export default function CataFormModal({
               />
             )}
 
-            {/* Método */}
             <Text style={[s.label, { marginBottom: 8 }]}>Método de Preparación</Text>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
               {METODOS_PREPARACION.map((metodo) => (
@@ -366,7 +362,6 @@ export default function CataFormModal({
               ))}
             </View>
 
-            {/* Parámetros */}
             <View style={{ flexDirection: 'row', gap: 12, marginBottom: 16 }}>
               <View style={{ flex: 1 }}>
                 <Text style={[s.label, { marginTop: 0 }]}>Dosis (g)</Text>
@@ -421,7 +416,6 @@ export default function CataFormModal({
               </View>
             </View>
 
-            {/* Puntuación */}
             <Text style={[s.label, { marginBottom: 8 }]}>Puntuación</Text>
             <View style={{ flexDirection: 'row', gap: 8, marginBottom: 16 }}>
               {[1, 2, 3, 4, 5].map((num) => (
@@ -449,7 +443,6 @@ export default function CataFormModal({
               ))}
             </View>
 
-            {/* Contexto */}
             <Text style={[s.label, { marginBottom: 8 }]}>Contexto / Estado de ánimo</Text>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
               {CONTEXTOS.map((ctx) => (
@@ -476,11 +469,10 @@ export default function CataFormModal({
               ))}
             </View>
 
-            {/* Foto */}
             <Text style={[s.label, { marginBottom: 8 }]}>Foto (opcional)</Text>
             <TouchableOpacity
               onPress={handleSelectFoto}
-              disabled={!!guardando}
+              disabled={guardando}
               style={{
                 borderWidth: 2,
                 borderColor: '#e8dfd5',
@@ -516,7 +508,6 @@ export default function CataFormModal({
               )}
             </TouchableOpacity>
 
-            {/* Notas */}
             <Text style={[s.label, { marginBottom: 0 }]}>Notas personales</Text>
             <TextInput
               style={[s.input, { minHeight: 100, textAlignVertical: 'top' }]}
@@ -532,7 +523,6 @@ export default function CataFormModal({
             </Text>
           </ScrollView>
 
-          {/* Botones fijos */}
           <View
             style={{
               paddingHorizontal: 16,
@@ -546,7 +536,7 @@ export default function CataFormModal({
             <View style={{ flexDirection: 'row', gap: 10 }}>
               <TouchableOpacity
                 onPress={onClose}
-                disabled={!!guardando}
+                disabled={guardando}
                 style={{
                   flex: 1,
                   paddingVertical: 12,
@@ -568,7 +558,7 @@ export default function CataFormModal({
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={handleSave}
-                disabled={!!guardando || !cafeNombre.trim()}
+                disabled={guardando || !cafeNombre.trim()}
                 style={{
                   flex: 1,
                   paddingVertical: 12,

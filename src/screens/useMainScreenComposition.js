@@ -5,7 +5,6 @@ import {
 } from '../core/notifications';
 import { formatRelativeTime } from '../core/utils';
 import useGamification from '../hooks/useGamification';
-import useMainScreenBootstrap from './useMainScreenBootstrap';
 import {
   buildMainScreenBootstrapInput,
   buildMainScreenDomainInput,
@@ -24,8 +23,8 @@ import {
   KEY_ONBOARDING_DONE,
   KEY_PROFILE,
   KEY_VOTES,
-  THEME,
 } from './mainScreenConfig';
+import useMainScreenBootstrap from './useMainScreenBootstrap';
 import useMainScreenDomain from './useMainScreenDomain';
 import useMainScreenEffects from './useMainScreenEffects';
 import useMainScreenForum from './useMainScreenForum';

@@ -1,4 +1,4 @@
-import { Platform, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { PREMIUM_ACCENT, PREMIUM_ACCENT_DEEP, THEME } from '../constants/theme';
 
 export const shared = StyleSheet.create({
@@ -92,7 +92,6 @@ export const shared = StyleSheet.create({
     backgroundColor: '#f9f2ea',
   },
   authSecondaryBtnText: { color: THEME.brand.accentDeep, fontWeight: '700', fontSize: 15 },
-  // Packshot
   packshotFrame: {
     backgroundColor: '#ffffff',
     borderRadius: 18,
@@ -121,7 +120,6 @@ export const shared = StyleSheet.create({
   packshotCardImage: { width: '86%', height: '86%' },
   packshotListFrame: { width: 68, height: 88, borderRadius: 14, padding: 8 },
   packshotListImage: { width: '88%', height: '88%' },
-  // Form
   formScroll: { padding: 20, paddingTop: 52, paddingBottom: 50 },
   formTitle: { fontSize: 26, fontWeight: '700', color: '#111', marginBottom: 20 },
   fotoEmpty: {

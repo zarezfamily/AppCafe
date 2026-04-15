@@ -137,6 +137,45 @@ function renderRelatedPostsSection(post) {
     </section>`;
 }
 
+function slugFromUrl(url) {
+  if (!url) return null;
+  const match = String(url).match(/\/blog\/([^/]+?)(?:\.html)?$/);
+  return match ? match[1] : null;
+}
+
+function renderPostNavSection(post) {
+  // Skip if bodyHtml already has a post-nav (old posts with embedded nav)
+  if (String(post.bodyHtml || '').includes('post-nav')) {
+    return '';
+  }
+  const { prevUrl, nextUrl } = post;
+  if (!prevUrl && !nextUrl) return '';
+
+  const prevSlug = slugFromUrl(prevUrl);
+  const nextSlug = slugFromUrl(nextUrl);
+  const prevPost = prevSlug ? blogPosts.find((p) => p.slug === prevSlug) : null;
+  const nextPost = nextSlug ? blogPosts.find((p) => p.slug === nextSlug) : null;
+
+  const prevLink = prevPost
+    ? `<a class="post-nav-link" href="/blog/${prevPost.slug}.html">
+        <p class="post-nav-label">← Anterior</p>
+        <p class="post-nav-title">${prevPost.title}</p>
+      </a>`
+    : '';
+  const nextLink = nextPost
+    ? `<a class="post-nav-link post-nav-link--align-end" href="/blog/${nextPost.slug}.html">
+        <p class="post-nav-label">Siguiente →</p>
+        <p class="post-nav-title">${nextPost.title}</p>
+      </a>`
+    : '';
+
+  return `
+    <nav class="post-nav" aria-label="Navegación entre artículos">
+      ${prevLink}
+      ${nextLink}
+    </nav>`;
+}
+
 function buildRelatedPostsJsonLd(post) {
   const relatedPosts = findRelatedPosts(post);
   if (!relatedPosts.length) {
@@ -227,6 +266,7 @@ function renderBlogPostPage(post) {
       .slice(0, 6)
       .join(', ');
   const relatedPostsSection = renderRelatedPostsSection(post);
+  const postNavSection = renderPostNavSection(post);
   const editorialMetaSection = renderEditorialMeta(post, {
     articleDatePublished,
     articleDateModified,
@@ -925,7 +965,7 @@ ${beforeNavHtml}${renderBlogPostNav()}
 ${editorialMetaSection}
 
   <main class="${bodyWrapperClass}">${innerOpen}
-${post.bodyHtml}${relatedPostsSection}${innerClose}
+${post.bodyHtml}${relatedPostsSection}${postNavSection}${innerClose}
   </main>
 
 ${renderScrollTopButton()}

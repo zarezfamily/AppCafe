@@ -144,6 +144,17 @@
     return docToObject(await res.json());
   };
 
+  const deleteComment = async (docId) => {
+    const auth = getAuth();
+    const headers = { ...baseHeaders() };
+    if (auth.token) headers['Authorization'] = `Bearer ${auth.token}`;
+    const res = await fetch(`${BASE_URL}/blog_comentarios/${docId}?key=${FIREBASE_API_KEY}`, {
+      method: 'DELETE',
+      headers,
+    });
+    if (!res.ok) throw new Error('delete_failed');
+  };
+
   // ─── READING PROGRESS BAR ─────────────────────────────────────────────────
   const initReadingProgress = () => {
     const bar = document.createElement('div');
@@ -275,19 +286,50 @@
         '<p style="font-size:14px;color:#9a7963;margin-top:8px;">Sé el primero en comentar este artículo.</p>';
       return;
     }
+    const auth = getAuth();
     listEl.innerHTML = list
-      .map(
-        (c) => `
-      <div class="comment-item">
+      .map((c) => {
+        const isOwner =
+          auth.uid &&
+          ((c.authorUid && c.authorUid === auth.uid) ||
+            (!c.authorUid && auth.alias && c.authorName === auth.alias));
+        const deleteBtn = isOwner
+          ? `<button class="comment-delete-btn" data-id="${escapeHtml(c.id)}" title="Borrar comentario" style="background:none;border:none;cursor:pointer;font-size:13px;color:#c0554a;margin-left:10px;padding:0;font-family:inherit;opacity:0.7;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.7">✕ Borrar</button>`
+          : '';
+        return `
+      <div class="comment-item" data-comment-id="${escapeHtml(c.id)}">
         <p class="comment-meta">
           <strong>${escapeHtml(c.authorName || 'Catador')}</strong>
-          · ${fmtDate(c.createdAt)}
+          · ${fmtDate(c.createdAt)}${deleteBtn}
         </p>
         <p class="comment-body">${escapeHtml(c.body || '')}</p>
       </div>
-    `
-      )
+    `;
+      })
       .join('');
+
+    // Attach delete handlers
+    listEl.querySelectorAll('.comment-delete-btn').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        if (!confirm('¿Borrar este comentario?')) return;
+        const docId = btn.dataset.id;
+        btn.disabled = true;
+        btn.textContent = 'Borrando…';
+        try {
+          await deleteComment(docId);
+          const item = listEl.querySelector(`[data-comment-id="${docId}"]`);
+          if (item) item.remove();
+          if (!listEl.querySelector('.comment-item')) {
+            listEl.innerHTML =
+              '<p style="font-size:14px;color:#9a7963;margin-top:8px;">Sé el primero en comentar este artículo.</p>';
+          }
+        } catch {
+          btn.disabled = false;
+          btn.textContent = '✕ Borrar';
+          alert('No se pudo borrar. Inténtalo de nuevo.');
+        }
+      });
+    });
   };
 
   const initComments = async () => {

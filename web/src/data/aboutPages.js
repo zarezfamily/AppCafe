@@ -79,25 +79,31 @@ const aboutPages = [
   {
     slug: 'about',
     title: 'Sobre Etiove | La comunidad de café de especialidad',
-    description: 'Etiove nació de la convicción de que el café de especialidad merece una comunidad a su altura. Conoce nuestra historia, misión y valores.',
+    description:
+      'Etiove nació de la convicción de que el café de especialidad merece una comunidad a su altura. Conoce nuestra historia, misión y valores.',
     canonicalUrl: 'https://etiove.com/about.html',
     robots: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1',
     ogTitle: 'Sobre Etiove | La comunidad de café de especialidad',
-    ogDescription: 'Etiove nació de la convicción de que el café de especialidad merece una comunidad a su altura.',
+    ogDescription:
+      'Etiove nació de la convicción de que el café de especialidad merece una comunidad a su altura.',
     schemaName: 'Sobre Etiove',
-    schemaDescription: 'Historia, misión y valores de Etiove, la mayor comunidad de café de especialidad en español.',
+    schemaDescription:
+      'Historia, misión y valores de Etiove, la mayor comunidad de café de especialidad en español.',
     bodyHtml: aboutSectionsHtml,
   },
   {
     slug: 'sobre',
     title: 'Sobre Etiove | La comunidad de café de especialidad',
-    description: 'Etiove nació de la convicción de que el café de especialidad merece una comunidad a su altura. Conoce nuestra historia, misión y valores.',
+    description:
+      'Etiove nació de la convicción de que el café de especialidad merece una comunidad a su altura. Conoce nuestra historia, misión y valores.',
     canonicalUrl: 'https://etiove.com/about.html',
     robots: 'noindex, follow',
     ogTitle: 'Sobre Etiove | La comunidad de café de especialidad',
-    ogDescription: 'Etiove nació de la convicción de que el café de especialidad merece una comunidad a su altura.',
+    ogDescription:
+      'Etiove nació de la convicción de que el café de especialidad merece una comunidad a su altura.',
     schemaName: 'Sobre Etiove',
-    schemaDescription: 'Historia, misión y valores de Etiove, la mayor comunidad de café de especialidad en español.',
+    schemaDescription:
+      'Historia, misión y valores de Etiove, la mayor comunidad de café de especialidad en español.',
     bodyHtml: aboutSectionsHtml,
   },
 ];

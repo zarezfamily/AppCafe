@@ -1,7 +1,11 @@
 function parsePrecio(value) {
   if (typeof value === 'number') return value;
   if (!value) return Number.POSITIVE_INFINITY;
-  const n = Number(String(value).replace(',', '.').replace(/[^\d.]/g, ''));
+  const n = Number(
+    String(value)
+      .replace(',', '.')
+      .replace(/[^\d.]/g, '')
+  );
   return Number.isFinite(n) && n > 0 ? n : Number.POSITIVE_INFINITY;
 }
 
@@ -56,7 +60,9 @@ function inferTiendaFromLink(link) {
 function normalizarOfertaGoogle(raw) {
   const precio = parsePrecio(raw.price);
   const link = normalizarGoogleLink(raw.link);
-  const tienda = decodeHtmlText(raw.store || raw.merchant || (link ? inferTiendaFromLink(link) : 'Google Shopping'));
+  const tienda = decodeHtmlText(
+    raw.store || raw.merchant || (link ? inferTiendaFromLink(link) : 'Google Shopping')
+  );
   const titulo = stripHtmlTags(raw.title || 'Oferta de café');
   const priceText = decodeHtmlText(raw.price || 'Precio no visible');
 
@@ -80,7 +86,8 @@ function extraerOfertasGoogleBusqueda(html) {
   cards.forEach((fragment) => {
     const block = `/url?q=${fragment.slice(0, 1800)}`;
     const linkMatch = block.match(/^\/url\?q=([^&"]+)/i);
-    const titleMatch = block.match(/<h3[^>]*>(.*?)<\/h3>/i) || block.match(/aria-label="([^"]{8,160})"/i);
+    const titleMatch =
+      block.match(/<h3[^>]*>(.*?)<\/h3>/i) || block.match(/aria-label="([^"]{8,160})"/i);
     const priceMatch = block.match(/(\d{1,4}(?:[\.,]\d{2})\s?€)/i);
     if (!linkMatch || !titleMatch || !priceMatch) return;
 
@@ -100,7 +107,9 @@ function extraerOfertasGoogleBusqueda(html) {
 }
 
 export function extraerOfertasGoogle(html) {
-  if (/trouble accessing Google Search|unusual traffic|SG_SS|detected unusual traffic/i.test(html)) {
+  if (
+    /trouble accessing Google Search|unusual traffic|SG_SS|detected unusual traffic/i.test(html)
+  ) {
     throw new Error('Google ha bloqueado temporalmente la consulta de ofertas');
   }
 

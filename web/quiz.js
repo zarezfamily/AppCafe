@@ -1,5 +1,10 @@
 import { QUIZ, QUIZ_STEP_NUMERALS } from '/quizData.js';
-import { clearQuizProfile, loadQuizProfile, renderQuizSummary, saveQuizProfile } from '/quizProfile.js';
+import {
+  clearQuizProfile,
+  loadQuizProfile,
+  renderQuizSummary,
+  saveQuizProfile,
+} from '/quizProfile.js';
 import { ensureQuizStyles } from '/quizStyles.js';
 
 function renderQuiz() {
@@ -101,13 +106,17 @@ function renderQuiz() {
     }
 
     const cols = question.opciones.length === 3 ? 'cols-3' : '';
-    const optionsHtml = question.opciones.map((option, index) => `
+    const optionsHtml = question.opciones
+      .map(
+        (option, index) => `
       <button class="eq-option" data-value="${option.value}">
         <span class="eq-option-num">${QUIZ_STEP_NUMERALS[index]}</span>
         <span class="eq-option-label">${option.label}</span>
         <span class="eq-option-desc">${option.desc}</span>
       </button>
-    `).join('');
+    `
+      )
+      .join('');
 
     inner.innerHTML = `
       <div class="eq-progress">${progressHtml}</div>
@@ -126,7 +135,9 @@ function renderQuiz() {
 
     inner.querySelectorAll('.eq-option').forEach((button) => {
       button.onclick = () => {
-        inner.querySelectorAll('.eq-option').forEach((optionButton) => optionButton.classList.remove('selected'));
+        inner
+          .querySelectorAll('.eq-option')
+          .forEach((optionButton) => optionButton.classList.remove('selected'));
         button.classList.add('selected');
         prefs[question.id] = button.dataset.value;
         setTimeout(() => {

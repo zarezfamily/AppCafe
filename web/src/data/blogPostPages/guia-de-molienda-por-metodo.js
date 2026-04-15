@@ -1,20 +1,25 @@
 const guiaDeMoliendaPorMetodo = {
   slug: 'guia-de-molienda-por-metodo',
   title: 'Guía de Molienda por Método',
-  description: 'Aprende el punto de molienda ideal para V60, Chemex, AeroPress, French Press y espresso sin perder dulzor ni claridad.',
-  ogDescription: 'La molienda correcta para cada método: V60, Chemex, AeroPress, French Press y espresso, con ajustes rápidos cuando algo falla.',
-  twitterDescription: 'Qué tan fino o grueso moler para cada método y cómo corregir tu extracción en segundos.',
+  description:
+    'Aprende el punto de molienda ideal para V60, Chemex, AeroPress, French Press y espresso sin perder dulzor ni claridad.',
+  ogDescription:
+    'La molienda correcta para cada método: V60, Chemex, AeroPress, French Press y espresso, con ajustes rápidos cuando algo falla.',
+  twitterDescription:
+    'Qué tan fino o grueso moler para cada método y cómo corregir tu extracción en segundos.',
   canonicalUrl: 'https://etiove.com/blog/guia-de-molienda-por-metodo.html',
   prevUrl: 'https://etiove.com/blog/como-elegir-el-mejor-cafe-de-etiopia.html',
   nextUrl: 'https://etiove.com/blog/cafe-de-especialidad-crece-en-espana-2026.html',
   ogImageAlt: 'Guía de molienda por método para café de especialidad',
   hero: {
-    image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1400&q=80&auto=format&fit=crop',
-    imageSocial: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1200&q=85&auto=format&fit=crop',
+    image:
+      'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1400&q=80&auto=format&fit=crop',
+    imageSocial:
+      'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1200&q=85&auto=format&fit=crop',
     imageAlt: 'Molinillo manual y granos de café de especialidad',
     tag: 'Tutorial · 04 abril 2026 · 6 min de lectura',
     title: 'Guía de Molienda por Método',
-    meta: 'Por el equipo de Etiove · Foto: Unsplash'
+    meta: 'Por el equipo de Etiove · Foto: Unsplash',
   },
   inlineCss: String.raw`*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -417,12 +422,13 @@ const guiaDeMoliendaPorMetodo = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: 'Guía de Molienda por Método: de V60 a Espresso',
-    description: 'Aprende el punto de molienda ideal para V60, Chemex, AeroPress, French Press y espresso sin perder dulzor ni claridad.',
+    description:
+      'Aprende el punto de molienda ideal para V60, Chemex, AeroPress, French Press y espresso sin perder dulzor ni claridad.',
     datePublished: '2026-04-02',
     dateModified: '2026-04-02',
     author: {
       '@type': 'Organization',
-      name: 'Etiove'
+      name: 'Etiove',
     },
     publisher: {
       '@type': 'Organization',
@@ -432,22 +438,22 @@ const guiaDeMoliendaPorMetodo = {
         '@type': 'ImageObject',
         url: 'https://etiove.com/favicon.svg',
         width: 512,
-        height: 512
-      }
+        height: 512,
+      },
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': 'https://etiove.com/blog/guia-de-molienda-por-metodo.html'
+      '@id': 'https://etiove.com/blog/guia-de-molienda-por-metodo.html',
     },
     image: {
       '@type': 'ImageObject',
       url: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1400&q=80&auto=format&fit=crop',
       width: 1400,
       height: 700,
-      caption: 'Molinillo manual y granos de café de especialidad'
+      caption: 'Molinillo manual y granos de café de especialidad',
     },
     wordCount: 524,
-    timeRequired: 'PT7M'
+    timeRequired: 'PT7M',
   },
   extraJsonLd: [
     {
@@ -459,35 +465,35 @@ const guiaDeMoliendaPorMetodo = {
           name: '¿Qué molienda usar para V60?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Para V60 suele funcionar una molienda media, parecida al azúcar de mesa. Si el café sale amargo, prueba un punto más grueso; si sale ácido o aguado, un punto más fino.'
-          }
+            text: 'Para V60 suele funcionar una molienda media, parecida al azúcar de mesa. Si el café sale amargo, prueba un punto más grueso; si sale ácido o aguado, un punto más fino.',
+          },
         },
         {
           '@type': 'Question',
           name: '¿Qué molienda necesita la prensa francesa?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'La prensa francesa necesita molienda gruesa. Si mueles demasiado fino, pasarán más sedimentos a la taza y aumentará el riesgo de sobreextracción y amargor.'
-          }
+            text: 'La prensa francesa necesita molienda gruesa. Si mueles demasiado fino, pasarán más sedimentos a la taza y aumentará el riesgo de sobreextracción y amargor.',
+          },
         },
         {
           '@type': 'Question',
           name: '¿Cómo sé si debo moler más fino o más grueso?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Si el café sale ácido, plano o demasiado rápido, suele pedir una molienda más fina. Si sale amargo, seco o tarda demasiado, normalmente conviene moler más grueso.'
-          }
+            text: 'Si el café sale ácido, plano o demasiado rápido, suele pedir una molienda más fina. Si sale amargo, seco o tarda demasiado, normalmente conviene moler más grueso.',
+          },
         },
         {
           '@type': 'Question',
           name: '¿Se puede usar la misma molienda para todos los métodos?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'No es lo ideal. Cada método necesita una resistencia distinta al paso del agua, así que espresso, V60, AeroPress y prensa francesa requieren ajustes diferentes para extraer bien.'
-          }
-        }
-      ]
-    }
+            text: 'No es lo ideal. Cada método necesita una resistencia distinta al paso del agua, así que espresso, V60, AeroPress y prensa francesa requieren ajustes diferentes para extraer bien.',
+          },
+        },
+      ],
+    },
   ],
   breadcrumbJsonLd: {
     '@context': 'https://schema.org',
@@ -497,21 +503,21 @@ const guiaDeMoliendaPorMetodo = {
         '@type': 'ListItem',
         position: 1,
         name: 'Inicio',
-        item: 'https://etiove.com/'
+        item: 'https://etiove.com/',
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'Blog',
-        item: 'https://etiove.com/blog/'
+        item: 'https://etiove.com/blog/',
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: 'Guía de Molienda por Método: de V60 a Espresso',
-        item: 'https://etiove.com/blog/guia-de-molienda-por-metodo.html'
-      }
-    ]
+        item: 'https://etiove.com/blog/guia-de-molienda-por-metodo.html',
+      },
+    ],
   },
   bodyHtml: String.raw`<article class="article">
 
@@ -731,7 +737,7 @@ const guiaDeMoliendaPorMetodo = {
         <p class="post-nav-label">Siguiente →</p>
         <p class="post-nav-title">El Café de Especialidad Crece un 34% en España</p>
       </a>
-    </nav>`
+    </nav>`,
 };
 
 module.exports = {

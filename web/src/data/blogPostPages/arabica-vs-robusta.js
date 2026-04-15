@@ -1,22 +1,28 @@
 const arabicaVsRobusta = {
   slug: 'arabica-vs-robusta',
   title: 'Arábica vs Robusta: La Diferencia que Cambia tu Café',
-  description: '¿Qué diferencia hay entre café arábica y robusta? Sabor, cafeína, precio, cultivo y cuándo usar cada uno. La guía definitiva en español.',
-  ogDescription: '¿Qué diferencia hay entre café arábica y robusta? Sabor, cafeína, precio, cultivo y cuándo usar cada uno. La guía definitiva en español.',
+  description:
+    '¿Qué diferencia hay entre café arábica y robusta? Sabor, cafeína, precio, cultivo y cuándo usar cada uno. La guía definitiva en español.',
+  ogDescription:
+    '¿Qué diferencia hay entre café arábica y robusta? Sabor, cafeína, precio, cultivo y cuándo usar cada uno. La guía definitiva en español.',
   twitterTitle: 'Arábica vs Robusta: La Diferencia que Cambia tu Café',
-  twitterDescription: 'Sabor, cafeína, precio y cuándo usar cada variedad. Todo lo que necesitas saber sobre arábica y robusta.',
+  twitterDescription:
+    'Sabor, cafeína, precio y cuándo usar cada variedad. Todo lo que necesitas saber sobre arábica y robusta.',
   canonicalUrl: 'https://etiove.com/blog/arabica-vs-robusta.html',
   prevUrl: '/blog/cold-brew-en-casa-guia-completa.html',
-  extraHeadHtml: '<link rel="search" type="application/opensearchdescription+xml" title="Blog Etiove" href="/opensearch.xml" />',
+  extraHeadHtml:
+    '<link rel="search" type="application/opensearchdescription+xml" title="Blog Etiove" href="/opensearch.xml" />',
   bodyWrapperClass: 'container',
   bodyInnerClass: 'post-body',
   hero: {
-    image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=1400&q=80&auto=format&fit=crop',
-    imageSocial: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=1200&q=85&auto=format&fit=crop',
+    image:
+      'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=1400&q=80&auto=format&fit=crop',
+    imageSocial:
+      'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=1200&q=85&auto=format&fit=crop',
     imageAlt: 'Granos de café arábica de especialidad en mano',
     tag: 'Guía · 10 abril 2026 · 6 min de lectura',
     title: 'Arábica vs Robusta: La Diferencia que Cambia tu Café',
-    meta: 'Por el equipo de Etiove · Foto: Unsplash'
+    meta: 'Por el equipo de Etiove · Foto: Unsplash',
   },
   inlineCss: String.raw`*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --ink: #1c120d; --ink-soft: #5d4030; --ink-muted: #9a7963; --cream: #f6efe7; --cream-alt: #fffaf5; --accent: #8f5e3b; --accent-deep: #5d4030; --border: #e4d3c2; --border-soft: rgba(228,211,194,0.5); }
@@ -81,12 +87,13 @@ const arabicaVsRobusta = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: 'Arábica vs Robusta: La Diferencia que Cambia tu Café',
-    description: '¿Qué diferencia hay entre café arábica y robusta? Sabor, cafeína, precio, cultivo y cuándo usar cada uno.',
+    description:
+      '¿Qué diferencia hay entre café arábica y robusta? Sabor, cafeína, precio, cultivo y cuándo usar cada uno.',
     datePublished: '2026-04-10',
     dateModified: '2026-04-10',
     author: {
       '@type': 'Organization',
-      name: 'Etiove'
+      name: 'Etiove',
     },
     publisher: {
       '@type': 'Organization',
@@ -96,22 +103,22 @@ const arabicaVsRobusta = {
         '@type': 'ImageObject',
         url: 'https://etiove.com/favicon.svg',
         width: 512,
-        height: 512
-      }
+        height: 512,
+      },
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': 'https://etiove.com/blog/arabica-vs-robusta.html'
+      '@id': 'https://etiove.com/blog/arabica-vs-robusta.html',
     },
     image: {
       '@type': 'ImageObject',
       url: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=1400&q=80&auto=format&fit=crop',
       width: 1400,
       height: 700,
-      caption: 'Granos de café arábica de especialidad'
+      caption: 'Granos de café arábica de especialidad',
     },
     wordCount: 1150,
-    timeRequired: 'PT6M'
+    timeRequired: 'PT6M',
   },
   extraJsonLd: [
     {
@@ -123,35 +130,35 @@ const arabicaVsRobusta = {
           name: '¿Cuál tiene más cafeína, arábica o robusta?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'El robusta tiene casi el doble de cafeína que el arábica: entre 2,7% y 4% en robusta frente al 1,2% a 1,5% del arábica. Si buscas efecto estimulante máximo, el robusta gana. Si buscas sabor complejo, el arábica es muy superior.'
-          }
+            text: 'El robusta tiene casi el doble de cafeína que el arábica: entre 2,7% y 4% en robusta frente al 1,2% a 1,5% del arábica. Si buscas efecto estimulante máximo, el robusta gana. Si buscas sabor complejo, el arábica es muy superior.',
+          },
         },
         {
           '@type': 'Question',
           name: '¿El café de especialidad es siempre arábica?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Casi siempre sí. El café de especialidad (puntuación SCA de 80+) es prácticamente siempre de la especie arábica. El robusta raramente alcanza esas puntuaciones por su perfil sensorial más limitado, aunque existen robustas de calidad para espresso.'
-          }
+            text: 'Casi siempre sí. El café de especialidad (puntuación SCA de 80+) es prácticamente siempre de la especie arábica. El robusta raramente alcanza esas puntuaciones por su perfil sensorial más limitado, aunque existen robustas de calidad para espresso.',
+          },
         },
         {
           '@type': 'Question',
           name: '¿Por qué el robusta es más barato que el arábica?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'El arábica es más difícil de cultivar: necesita altitud, temperaturas específicas, más agua y es más susceptible a plagas. El robusta crece en climas más duros y produce más kilos por árbol, lo que reduce el coste de producción considerablemente.'
-          }
+            text: 'El arábica es más difícil de cultivar: necesita altitud, temperaturas específicas, más agua y es más susceptible a plagas. El robusta crece en climas más duros y produce más kilos por árbol, lo que reduce el coste de producción considerablemente.',
+          },
         },
         {
           '@type': 'Question',
           name: '¿Qué es mejor para espresso, arábica o robusta?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Depende del resultado que busques. El arábica de especialidad da espressos complejos con notas frutales y achocolatadas. El robusta añade más crema (crema más densa y persistente) y más cafeína. Muchos blends de espresso italianos mezclan ambos por esta razón.'
-          }
-        }
-      ]
-    }
+            text: 'Depende del resultado que busques. El arábica de especialidad da espressos complejos con notas frutales y achocolatadas. El robusta añade más crema (crema más densa y persistente) y más cafeína. Muchos blends de espresso italianos mezclan ambos por esta razón.',
+          },
+        },
+      ],
+    },
   ],
   breadcrumbJsonLd: {
     '@context': 'https://schema.org',
@@ -161,21 +168,21 @@ const arabicaVsRobusta = {
         '@type': 'ListItem',
         position: 1,
         name: 'Inicio',
-        item: 'https://etiove.com/'
+        item: 'https://etiove.com/',
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'Blog',
-        item: 'https://etiove.com/blog/'
+        item: 'https://etiove.com/blog/',
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: 'Arábica vs Robusta: La Diferencia que Cambia tu Café',
-        item: 'https://etiove.com/blog/arabica-vs-robusta.html'
-      }
-    ]
+        item: 'https://etiove.com/blog/arabica-vs-robusta.html',
+      },
+    ],
   },
   bodyHtml: String.raw`<p>Si alguna vez has leído el packaging de un café y has visto "100% arábica" impreso en grande, ya sabes que es un argumento de venta. Pero ¿qué significa realmente? ¿Es siempre mejor el arábica que el robusta? ¿Por qué existe el robusta si el arábica es superior? La respuesta, como casi todo en el café, es más interesante de lo que parece.</p>
 
@@ -331,7 +338,7 @@ const arabicaVsRobusta = {
       <a class="post-nav-link" href="/blog/cold-brew-en-casa-guia-completa.html">
         <p class="post-nav-label">← Anterior</p>
         <p class="post-nav-title">Cold Brew en Casa: Guía Completa</p>
-      </a></div>`
+      </a></div>`,
 };
 
 module.exports = {

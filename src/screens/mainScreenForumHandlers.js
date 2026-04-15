@@ -48,7 +48,8 @@ export function createMainScreenForumHandlers({
   showDialog,
 }) {
   const hasUserVotedForoItem = (item) => !!user?.uid && csvToSet(item?.voterUids).has(user.uid);
-  const hasUserReportedForoItem = (item) => !!user?.uid && csvToSet(item?.reporterUids).has(user.uid);
+  const hasUserReportedForoItem = (item) =>
+    !!user?.uid && csvToSet(item?.reporterUids).has(user.uid);
   const isForumOwner = (item) => !!user?.uid && item?.authorUid === user.uid;
 
   const cargarForo = async () => {
@@ -62,7 +63,9 @@ export function createMainScreenForumHandlers({
       const canReadThread = (thread) => thread?.accessLevel !== 'registered_only' || !!user?.uid;
       const visibleThreads = (hilos || []).filter(canReadThread);
       const visibleThreadIds = new Set(visibleThreads.map((thread) => thread.id));
-      const visibleReplies = (respuestas || []).filter((reply) => visibleThreadIds.has(reply.threadId));
+      const visibleReplies = (respuestas || []).filter((reply) =>
+        visibleThreadIds.has(reply.threadId)
+      );
 
       setForumThreads(visibleThreads);
       setForumReplies(visibleReplies);
@@ -91,7 +94,8 @@ export function createMainScreenForumHandlers({
     if (!title) return showDialog('Título vacío', 'Escribe un título para tu hilo.');
     if (title.length > 120) return showDialog('Título demasiado largo', 'Máximo 120 caracteres.');
     if (!body) return showDialog('Contenido vacío', 'Escribe algo para publicar.');
-    if (body.length > 1000) return showDialog('Contenido demasiado largo', 'Máximo 1000 caracteres.');
+    if (body.length > 1000)
+      return showDialog('Contenido demasiado largo', 'Máximo 1000 caracteres.');
 
     setForumSaving(true);
     try {
@@ -151,7 +155,8 @@ export function createMainScreenForumHandlers({
       return showDialog('Acción no permitida', 'Ya votaste este contenido. No puedes reportarlo.');
     }
     const reporters = csvToSet(item.reporterUids);
-    if (reporters.has(user.uid)) return showDialog('Reporte enviado', 'Ya reportaste este contenido.');
+    if (reporters.has(user.uid))
+      return showDialog('Reporte enviado', 'Ya reportaste este contenido.');
     reporters.add(user.uid);
     const ok = await updateDocument(collection, item.id, {
       reportedCount: Number(item.reportedCount || 0) + 1,
@@ -166,7 +171,8 @@ export function createMainScreenForumHandlers({
     if (!forumThread?.id) return;
     const text = forumReplyText.trim();
     if (!text) return;
-    if (text.length > 1000) return showDialog('Respuesta demasiado larga', 'Máximo 1000 caracteres.');
+    if (text.length > 1000)
+      return showDialog('Respuesta demasiado larga', 'Máximo 1000 caracteres.');
 
     setForumSendingReply(true);
     try {
@@ -218,7 +224,8 @@ export function createMainScreenForumHandlers({
     if (!forumEditTarget?.id || !forumEditCollection) return;
     const body = forumEditBody.trim();
     if (!body) return showDialog('Contenido vacío', 'Escribe contenido para guardar.');
-    if (body.length > 1000) return showDialog('Contenido demasiado largo', 'Máximo 1000 caracteres.');
+    if (body.length > 1000)
+      return showDialog('Contenido demasiado largo', 'Máximo 1000 caracteres.');
 
     let payload = { body };
     if (forumEditCollection === 'foro_hilos') {
@@ -253,7 +260,9 @@ export function createMainScreenForumHandlers({
             if (collection === 'foro_hilos') {
               const relatedReplies = forumReplies.filter((reply) => reply.threadId === item.id);
               if (relatedReplies.length > 0) {
-                await Promise.allSettled(relatedReplies.map((reply) => deleteDocument('foro_respuestas', reply.id)));
+                await Promise.allSettled(
+                  relatedReplies.map((reply) => deleteDocument('foro_respuestas', reply.id))
+                );
               }
               await deleteDocument('foro_hilos', item.id);
               if (forumThread?.id === item.id) setForumThread(null);
@@ -264,10 +273,15 @@ export function createMainScreenForumHandlers({
                   .filter((reply) => reply.parentId === item.id)
                   .forEach((reply) => repliesToDelete.push(reply.id));
               }
-              await Promise.allSettled(repliesToDelete.map((id) => deleteDocument('foro_respuestas', id)));
+              await Promise.allSettled(
+                repliesToDelete.map((id) => deleteDocument('foro_respuestas', id))
+              );
               if (forumThread?.id === item.threadId) {
                 await updateDocument('foro_hilos', item.threadId, {
-                  replyCount: Math.max(0, Number(forumThread.replyCount || 0) - repliesToDelete.length),
+                  replyCount: Math.max(
+                    0,
+                    Number(forumThread.replyCount || 0) - repliesToDelete.length
+                  ),
                 });
               }
             }

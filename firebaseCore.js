@@ -4,14 +4,16 @@ const appConfig = require('./app.json');
 
 export const FIREBASE_PROJECT_ID = process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID;
 export const FIREBASE_API_KEY = process.env.EXPO_PUBLIC_FIREBASE_API_KEY;
-export const FIREBASE_STORAGE_BUCKET = process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET || (
-  FIREBASE_PROJECT_ID ? `${FIREBASE_PROJECT_ID}.appspot.com` : null
-);
+export const FIREBASE_STORAGE_BUCKET =
+  process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET ||
+  (FIREBASE_PROJECT_ID ? `${FIREBASE_PROJECT_ID}.appspot.com` : null);
 const IOS_BUNDLE_ID = appConfig?.expo?.ios?.bundleIdentifier || null;
 const ANDROID_PACKAGE = appConfig?.expo?.android?.package || null;
 
 if (!FIREBASE_PROJECT_ID || !FIREBASE_API_KEY) {
-  console.warn('[Firebase] Faltan variables de entorno EXPO_PUBLIC_FIREBASE_PROJECT_ID y EXPO_PUBLIC_FIREBASE_API_KEY');
+  console.warn(
+    '[Firebase] Faltan variables de entorno EXPO_PUBLIC_FIREBASE_PROJECT_ID y EXPO_PUBLIC_FIREBASE_API_KEY'
+  );
 }
 
 export const BASE_URL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;

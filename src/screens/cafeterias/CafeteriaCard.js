@@ -1,10 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 
-import {
-  PREMIUM_ACCENT,
-  THEME,
-} from '../../constants/theme';
+import { PREMIUM_ACCENT, THEME } from '../../constants/theme';
 
 export default function CafeteriaCard({ item, index, styles, onPress }) {
   return (
@@ -26,7 +23,12 @@ export default function CafeteriaCard({ item, index, styles, onPress }) {
         </View>
 
         {item.abierto !== null && (
-          <View style={[styles.cardEstado, { backgroundColor: item.abierto ? THEME.status.success : THEME.status.danger }]}>
+          <View
+            style={[
+              styles.cardEstado,
+              { backgroundColor: item.abierto ? THEME.status.success : THEME.status.danger },
+            ]}
+          >
             <Text style={styles.cardEstadoText}>{item.abierto ? 'Abierto' : 'Cerrado'}</Text>
           </View>
         )}
@@ -55,7 +57,9 @@ export default function CafeteriaCard({ item, index, styles, onPress }) {
           <View style={styles.cardTag}>
             <Ionicons name="location-outline" size={11} color={PREMIUM_ACCENT} />
             <Text style={styles.cardTagText}>
-              {item.distancia < 1000 ? `${item.distancia}m` : `${(item.distancia / 1000).toFixed(1)}km`}
+              {item.distancia < 1000
+                ? `${item.distancia}m`
+                : `${(item.distancia / 1000).toFixed(1)}km`}
             </Text>
           </View>
 

@@ -15,7 +15,10 @@ export function createMainScreenOfferHandlers({
 }) {
   const guardarCacheOfertas = async (nextByCafe) => {
     try {
-      await SecureStore.setItemAsync(keyOffersCache, JSON.stringify({ byCafe: nextByCafe, savedAt: Date.now() }));
+      await SecureStore.setItemAsync(
+        keyOffersCache,
+        JSON.stringify({ byCafe: nextByCafe, savedAt: Date.now() })
+      );
     } catch {}
   };
 
@@ -24,7 +27,12 @@ export function createMainScreenOfferHandlers({
 
     const now = Date.now();
     const cached = ofertasPorCafe[cafe.id];
-    if (!forceRefresh && cached?.updatedAt && Array.isArray(cached?.offers) && (now - cached.updatedAt) <= offersCacheTtlMs) {
+    if (
+      !forceRefresh &&
+      cached?.updatedAt &&
+      Array.isArray(cached?.offers) &&
+      now - cached.updatedAt <= offersCacheTtlMs
+    ) {
       return;
     }
 

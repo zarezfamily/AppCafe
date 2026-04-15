@@ -20,7 +20,10 @@ ${renderJsonLd(json)}
 }
 
 function stripHtml(value) {
-  return String(value || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  return String(value || '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function slugToUrl(slug) {
@@ -75,13 +78,22 @@ function findRelatedPosts(currentPost) {
     return [];
   }
 
-  const currentTerms = new Set(String(currentMeta.search || '').split(/\s+/).filter(Boolean));
+  const currentTerms = new Set(
+    String(currentMeta.search || '')
+      .split(/\s+/)
+      .filter(Boolean)
+  );
 
   return blogPosts
     .filter((item) => item.slug !== currentPost.slug)
     .map((item) => {
-      const itemTerms = String(item.search || '').split(/\s+/).filter(Boolean);
-      const sharedTerms = itemTerms.reduce((count, term) => count + (currentTerms.has(term) ? 1 : 0), 0);
+      const itemTerms = String(item.search || '')
+        .split(/\s+/)
+        .filter(Boolean);
+      const sharedTerms = itemTerms.reduce(
+        (count, term) => count + (currentTerms.has(term) ? 1 : 0),
+        0
+      );
       const categoryBoost = item.category === currentMeta.category ? 10 : 0;
 
       return {
@@ -103,14 +115,18 @@ function renderRelatedPostsSection(post) {
     return '';
   }
 
-  const itemList = relatedPosts.map((item) => `
+  const itemList = relatedPosts
+    .map(
+      (item) => `
       <a class="related-card" href="/blog/${item.slug}.html">
         <img class="related-thumb" src="${item.image}" alt="${item.imageAlt}" loading="lazy" width="400" height="225" />
         <div class="related-body">
           <span class="related-tag">${item.categoryLabel}</span>
           <p class="related-title">${item.title}</p>
         </div>
-      </a>`).join('');
+      </a>`
+    )
+    .join('');
 
   return `
     <section class="related-section" aria-labelledby="related-posts-title">
@@ -141,11 +157,7 @@ function buildRelatedPostsJsonLd(post) {
 }
 
 function renderEditorialMeta(post, options) {
-  const {
-    articleDatePublished,
-    articleDateModified,
-    articleSection,
-  } = options;
+  const { articleDatePublished, articleDateModified, articleSection } = options;
   const publishedLabel = formatIsoDateEs(articleDatePublished);
   const modifiedLabel = formatIsoDateEs(articleDateModified);
   const readingTime = post.articleJsonLd?.timeRequired
@@ -171,11 +183,15 @@ function renderEditorialMeta(post, options) {
         <div class="editorial-meta-item">
           <span class="editorial-meta-label">Lectura</span>
           <span class="editorial-meta-value">${readingTime || 'Lectura breve'}</span>
-        </div>${showModified ? `
+        </div>${
+          showModified
+            ? `
         <div class="editorial-meta-item editorial-meta-item-wide">
           <span class="editorial-meta-label">Actualizado</span>
           <span class="editorial-meta-value">${modifiedLabel}</span>
-        </div>` : ''}
+        </div>`
+            : ''
+        }
       </div>
     </section>`;
 }
@@ -198,18 +214,18 @@ function renderBlogPostPage(post) {
     ...(post.extraJsonLd || []),
     ...(relatedPostsJsonLd ? [relatedPostsJsonLd] : []),
   ];
-  const extraJsonLdBlocks = extraJsonLd
-    .map((json) => renderJsonLdBlock(json))
-    .join('\n');
+  const extraJsonLdBlocks = extraJsonLd.map((json) => renderJsonLdBlock(json)).join('\n');
   const articleDatePublished = post.articleJsonLd?.datePublished || '';
   const articleDateModified = post.articleJsonLd?.dateModified || articleDatePublished;
   const articleSection = post.articleSection || post.hero?.tag?.split('·')[0]?.trim() || 'Blog';
-  const articleTags = post.keywords || stripHtml(post.description)
-    .split(/[,.]/)
-    .map((token) => token.trim())
-    .filter(Boolean)
-    .slice(0, 6)
-    .join(', ');
+  const articleTags =
+    post.keywords ||
+    stripHtml(post.description)
+      .split(/[,.]/)
+      .map((token) => token.trim())
+      .filter(Boolean)
+      .slice(0, 6)
+      .join(', ');
   const relatedPostsSection = renderRelatedPostsSection(post);
   const editorialMetaSection = renderEditorialMeta(post, {
     articleDatePublished,

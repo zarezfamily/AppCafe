@@ -12,7 +12,9 @@ function escapeHtml(value) {
 }
 
 function renderPostCards() {
-  return blogPosts.map((post) => `
+  return blogPosts
+    .map(
+      (post) => `
         <article class="card" data-category="${escapeHtml(post.category)}" data-post-url="/blog/${escapeHtml(post.slug)}.html" data-search="${escapeHtml(post.search)}">
           <a class="card-link" href="/blog/${escapeHtml(post.slug)}.html">
             <div class="card-thumb">
@@ -26,12 +28,18 @@ function renderPostCards() {
               <span class="read-link">Leer artículo <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
             </div>
           </a>
-        </article>`).join('\n');
+        </article>`
+    )
+    .join('\n');
 }
 
 function renderFilterButtons() {
-  return blogCategories.map((category, index) => `
-        <button class="filter-btn${index === 0 ? ' active' : ''}" data-filter="${escapeHtml(category.slug)}">${escapeHtml(category.label)}</button>`).join('');
+  return blogCategories
+    .map(
+      (category, index) => `
+        <button class="filter-btn${index === 0 ? ' active' : ''}" data-filter="${escapeHtml(category.slug)}">${escapeHtml(category.label)}</button>`
+    )
+    .join('');
 }
 
 function renderItemListJson() {
@@ -42,39 +50,43 @@ function renderItemListJson() {
     name: post.title,
   }));
 
-  return JSON.stringify({
-    '@context': 'https://schema.org',
-    '@graph': [
-      {
-        '@type': 'Blog',
-        '@id': 'https://etiove.com/blog/#blog',
-        name: 'Blog Etiove',
-        description: 'Guías, tutoriales y análisis para amantes del café de especialidad.',
-        url: 'https://etiove.com/blog/',
-        inLanguage: 'es-ES',
-        publisher: {
-          '@type': 'Organization',
-          '@id': 'https://etiove.com/#organization',
-          name: 'Etiove',
-          url: 'https://etiove.com/',
-          logo: {
-            '@type': 'ImageObject',
-            url: 'https://etiove.com/favicon.svg',
-            width: 512,
-            height: 512,
+  return JSON.stringify(
+    {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'Blog',
+          '@id': 'https://etiove.com/blog/#blog',
+          name: 'Blog Etiove',
+          description: 'Guías, tutoriales y análisis para amantes del café de especialidad.',
+          url: 'https://etiove.com/blog/',
+          inLanguage: 'es-ES',
+          publisher: {
+            '@type': 'Organization',
+            '@id': 'https://etiove.com/#organization',
+            name: 'Etiove',
+            url: 'https://etiove.com/',
+            logo: {
+              '@type': 'ImageObject',
+              url: 'https://etiove.com/favicon.svg',
+              width: 512,
+              height: 512,
+            },
           },
         },
-      },
-      {
-        '@type': 'ItemList',
-        '@id': 'https://etiove.com/blog/#posts',
-        name: 'Artículos del blog Etiove',
-        url: 'https://etiove.com/blog/',
-        numberOfItems: blogPosts.length,
-        itemListElement,
-      },
-    ],
-  }, null, 2);
+        {
+          '@type': 'ItemList',
+          '@id': 'https://etiove.com/blog/#posts',
+          name: 'Artículos del blog Etiove',
+          url: 'https://etiove.com/blog/',
+          numberOfItems: blogPosts.length,
+          itemListElement,
+        },
+      ],
+    },
+    null,
+    2
+  );
 }
 
 function renderBlogIndexPage() {

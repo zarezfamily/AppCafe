@@ -14,12 +14,7 @@ import {
 } from './mainScreenConfig';
 import buildMainScreenTabPropGroups from './buildMainScreenTabPropGroups';
 
-export function buildMainScreenDomainInput({
-  user,
-  screenUi,
-  gamification,
-  services,
-}) {
+export function buildMainScreenDomainInput({ user, screenUi, gamification, services }) {
   const {
     addDocument,
     deleteDocument,
@@ -62,20 +57,9 @@ export function buildMainScreenDomainInput({
   };
 }
 
-export function buildMainScreenForumInput({
-  user,
-  screenUi,
-  profileSummary,
-  domain,
-  services,
-}) {
-  const {
-    addDocument,
-    deleteDocument,
-    getCollection,
-    updateDocument,
-    uploadImageToStorage,
-  } = services;
+export function buildMainScreenForumInput({ user, screenUi, profileSummary, domain, services }) {
+  const { addDocument, deleteDocument, getCollection, updateDocument, uploadImageToStorage } =
+    services;
 
   return {
     user,

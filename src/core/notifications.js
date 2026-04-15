@@ -36,8 +36,11 @@ export const registerForPushNotificationsAsync = async () => {
       return { status: finalStatus, token: null };
     }
 
-    const projectId = Constants?.expoConfig?.extra?.eas?.projectId || Constants?.easConfig?.projectId || undefined;
-    const tokenResponse = await Notifications.getExpoPushTokenAsync(projectId ? { projectId } : undefined);
+    const projectId =
+      Constants?.expoConfig?.extra?.eas?.projectId || Constants?.easConfig?.projectId || undefined;
+    const tokenResponse = await Notifications.getExpoPushTokenAsync(
+      projectId ? { projectId } : undefined
+    );
     return {
       status: finalStatus,
       token: tokenResponse?.data || null,

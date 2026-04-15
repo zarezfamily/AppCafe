@@ -2,7 +2,8 @@ const legalPages = [
   {
     slug: 'privacidad',
     title: 'Política de Privacidad',
-    description: 'Política de privacidad de Etiove. Cómo recopilamos, usamos y protegemos tus datos personales conforme al RGPD.',
+    description:
+      'Política de privacidad de Etiove. Cómo recopilamos, usamos y protegemos tus datos personales conforme al RGPD.',
     lastUpdated: '9 de abril de 2026',
     bodyHtml: `
       <h2>1. Responsable del tratamiento</h2>
@@ -94,7 +95,8 @@ const legalPages = [
   {
     slug: 'terminos',
     title: 'Términos y Condiciones',
-    description: 'Términos y condiciones de uso de Etiove. Condiciones de acceso y uso de la app y la comunidad.',
+    description:
+      'Términos y condiciones de uso de Etiove. Condiciones de acceso y uso de la app y la comunidad.',
     lastUpdated: '9 de abril de 2026',
     bodyHtml: `
       <h2>1. Aceptación de los términos</h2>

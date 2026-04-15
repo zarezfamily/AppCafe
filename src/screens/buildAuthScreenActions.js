@@ -60,21 +60,23 @@ export function buildAuthSubmitHandler({
   };
 }
 
-export function buildAuthFaceIdHandler({
-  showDialog,
-  setCargando,
-  onAuth,
-}) {
+export function buildAuthFaceIdHandler({ showDialog, setCargando, onAuth }) {
   return async function handleFaceId() {
     try {
       if (shouldBlockFaceIdInExpoGo()) {
-        showDialog('Face ID en Expo Go', 'En Expo Go Face ID puede fallar. Usa un build de desarrollo o TestFlight para biometría real.');
+        showDialog(
+          'Face ID en Expo Go',
+          'En Expo Go Face ID puede fallar. Usa un build de desarrollo o TestFlight para biometría real.'
+        );
         return;
       }
 
       const faceIdAvailable = await getFaceIdAvailability();
       if (!faceIdAvailable) {
-        showDialog('Face ID no disponible', 'Este dispositivo no tiene Face ID listo para usar ahora mismo.');
+        showDialog(
+          'Face ID no disponible',
+          'Este dispositivo no tiene Face ID listo para usar ahora mismo.'
+        );
         return;
       }
 

@@ -29,10 +29,7 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "permissions": [
-        "android.permission.CAMERA",
-        "android.permission.READ_EXTERNAL_STORAGE"
-      ]
+      "permissions": ["android.permission.CAMERA", "android.permission.READ_EXTERNAL_STORAGE"]
     },
     "plugins": [
       [

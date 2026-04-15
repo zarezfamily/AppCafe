@@ -16,11 +16,15 @@ export const uploadImageToStorage = async (uri, folder = 'uploads') => {
 
   const safeFolder = String(folder || 'uploads').replace(/[^a-zA-Z0-9_\-/]/g, '');
   const fileName = `${safeFolder}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.jpg`;
-  const bucketCandidates = Array.from(new Set([
-    FIREBASE_STORAGE_BUCKET,
-    FIREBASE_PROJECT_ID ? `${FIREBASE_PROJECT_ID}.appspot.com` : null,
-    FIREBASE_PROJECT_ID ? `${FIREBASE_PROJECT_ID}.firebasestorage.app` : null,
-  ].filter(Boolean)));
+  const bucketCandidates = Array.from(
+    new Set(
+      [
+        FIREBASE_STORAGE_BUCKET,
+        FIREBASE_PROJECT_ID ? `${FIREBASE_PROJECT_ID}.appspot.com` : null,
+        FIREBASE_PROJECT_ID ? `${FIREBASE_PROJECT_ID}.firebasestorage.app` : null,
+      ].filter(Boolean)
+    )
+  );
 
   const headers = {
     'Content-Type': 'image/jpeg',
@@ -51,7 +55,8 @@ export const uploadImageToStorage = async (uri, folder = 'uploads') => {
         : `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodedName}?alt=media`;
     }
 
-    lastError = upJson?.error?.message || `No se pudo subir imagen a Firebase Storage (${upRes.status})`;
+    lastError =
+      upJson?.error?.message || `No se pudo subir imagen a Firebase Storage (${upRes.status})`;
     if (upRes.status !== 404) {
       break;
     }

@@ -9,7 +9,9 @@ export function AuthInlineNotice({ styles, dialogVisible, dialogConfig, setDialo
   return (
     <View style={styles.inlineNotice}>
       <Text style={styles.inlineNoticeTitle}>{dialogConfig.title || 'Aviso'}</Text>
-      {!!dialogConfig.description && <Text style={styles.inlineNoticeText}>{dialogConfig.description}</Text>}
+      {!!dialogConfig.description && (
+        <Text style={styles.inlineNoticeText}>{dialogConfig.description}</Text>
+      )}
       <TouchableOpacity onPress={() => setDialogVisible(false)} style={styles.inlineNoticeBtn}>
         <Text style={styles.inlineNoticeBtnText}>Cerrar</Text>
       </TouchableOpacity>
@@ -65,17 +67,9 @@ export function AuthRememberToggle({ styles, recordar, setRecordar, borrarCreds 
           if (!nextValue) borrarCreds();
         }}
         activeOpacity={0.85}
-        style={[
-          styles.rememberToggle,
-          !!recordar && styles.rememberToggleActive,
-        ]}
+        style={[styles.rememberToggle, !!recordar && styles.rememberToggleActive]}
       >
-        <View
-          style={[
-            styles.rememberToggleKnob,
-            !!recordar && styles.rememberToggleKnobActive,
-          ]}
-        />
+        <View style={[styles.rememberToggleKnob, !!recordar && styles.rememberToggleKnobActive]} />
       </TouchableOpacity>
       <Text style={styles.rememberText}>Recordar contraseña</Text>
     </View>
@@ -94,12 +88,24 @@ export function AuthActionButtons({
 }) {
   return (
     <>
-      <TouchableOpacity style={styles.primaryBtn} onPress={handleSubmit} disabled={disablePrimaryAction}>
-        {!!cargando ? <ActivityIndicator color={AUTH_COLORS.primaryText} /> : <Text style={styles.primaryBtnText}>{primaryAction}</Text>}
+      <TouchableOpacity
+        style={styles.primaryBtn}
+        onPress={handleSubmit}
+        disabled={disablePrimaryAction}
+      >
+        {!!cargando ? (
+          <ActivityIndicator color={AUTH_COLORS.primaryText} />
+        ) : (
+          <Text style={styles.primaryBtnText}>{primaryAction}</Text>
+        )}
       </TouchableOpacity>
 
       {showFaceIdButton && (
-        <TouchableOpacity style={styles.secondaryBtn} onPress={handleFaceId} disabled={disableSecondaryAction}>
+        <TouchableOpacity
+          style={styles.secondaryBtn}
+          onPress={handleFaceId}
+          disabled={disableSecondaryAction}
+        >
           <Ionicons name="scan-outline" size={22} color={AUTH_COLORS.accent} />
           <Text style={styles.secondaryBtnText}>Entrar con Face ID</Text>
         </TouchableOpacity>

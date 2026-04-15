@@ -32,9 +32,12 @@ export const saveCollectionOfflineCache = async (uid, payload) => {
   try {
     await ensureCacheDir();
     const path = getCollectionCachePath(uid);
-    await FileSystem.writeAsStringAsync(path, JSON.stringify({
-      ...payload,
-      updatedAt: payload.updatedAt || Date.now(),
-    }));
+    await FileSystem.writeAsStringAsync(
+      path,
+      JSON.stringify({
+        ...payload,
+        updatedAt: payload.updatedAt || Date.now(),
+      })
+    );
   } catch {}
 };

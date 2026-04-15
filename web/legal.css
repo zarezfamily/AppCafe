@@ -1,4 +1,10 @@
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 :root {
   --ink: #1c120d;
@@ -9,10 +15,12 @@
   --accent: #8f5e3b;
   --accent-deep: #5d4030;
   --border: #e4d3c2;
-  --border-soft: rgba(228,211,194,0.5);
+  --border-soft: rgba(228, 211, 194, 0.5);
 }
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+}
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -32,7 +40,7 @@ nav {
   align-items: center;
   justify-content: space-between;
   padding: 20px 40px;
-  background: rgba(246,239,231,.97);
+  background: rgba(246, 239, 231, 0.97);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-soft);
 }
@@ -60,10 +68,12 @@ nav {
   text-transform: uppercase;
   color: var(--ink-muted);
   text-decoration: none;
-  transition: color .3s;
+  transition: color 0.3s;
 }
 
-.nav-link:hover { color: var(--accent); }
+.nav-link:hover {
+  color: var(--accent);
+}
 
 .nav-hamburger {
   display: none;
@@ -100,7 +110,7 @@ nav {
 
 .page-title {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(28px,5vw,44px);
+  font-size: clamp(28px, 5vw, 44px);
   font-weight: 500;
   color: var(--ink);
   line-height: 1.15;
@@ -117,7 +127,7 @@ nav {
 
 .legal-body h2 {
   font-family: 'Playfair Display', serif;
-  font-size: clamp(18px,2.5vw,24px);
+  font-size: clamp(18px, 2.5vw, 24px);
   font-weight: 500;
   color: var(--ink);
   margin: 40px 0 14px;
@@ -213,7 +223,9 @@ footer {
   transition: color 0.2s;
 }
 
-.footer-nav-link:hover { color: var(--accent); }
+.footer-nav-link:hover {
+  color: var(--accent);
+}
 
 .footer-legal-link {
   font-size: 11px;
@@ -223,7 +235,9 @@ footer {
   color: var(--ink-muted);
   text-decoration: none;
   opacity: 0.7;
-  transition: opacity 0.2s, color 0.2s;
+  transition:
+    opacity 0.2s,
+    color 0.2s;
 }
 
 .footer-legal-link:hover {
@@ -326,10 +340,12 @@ footer {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 18px rgba(28,18,13,.22);
+  box-shadow: 0 4px 18px rgba(28, 18, 13, 0.22);
   opacity: 0;
   transform: translateY(12px);
-  transition: opacity .3s, transform .3s;
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
   pointer-events: none;
   z-index: 200;
 }
@@ -340,7 +356,9 @@ footer {
   pointer-events: auto;
 }
 
-.scroll-top:hover { background: var(--accent); }
+.scroll-top:hover {
+  background: var(--accent);
+}
 
 @media (max-width: 768px) {
   nav {
@@ -358,7 +376,7 @@ footer {
     top: 100%;
     left: 0;
     right: 0;
-    background: rgba(246,239,231,.97);
+    background: rgba(246, 239, 231, 0.97);
     padding: 20px 40px;
   }
 

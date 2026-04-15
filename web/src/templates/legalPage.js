@@ -1,8 +1,4 @@
-const {
-  renderLegalFooter,
-  renderLegalNav,
-  renderScrollTopButton,
-} = require('./partials');
+const { renderLegalFooter, renderLegalNav, renderScrollTopButton } = require('./partials');
 
 function renderLegalPage(page) {
   return `<!DOCTYPE html>

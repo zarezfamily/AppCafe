@@ -76,65 +76,68 @@ export default function InicioTab({
       <SearchInput
         value={busqueda}
         onChangeText={setBusqueda}
-        onSearch={(q) => { setBusqueda(q); }}
+        onSearch={(q) => {
+          setBusqueda(q);
+        }}
         allCafes={allCafes}
         placeholder="Buscar cualquier café..."
       />
 
-      {busqueda.trim()
-        ? <>
-            <SearchResultsSection
-              s={s}
-              allCafes={allCafes}
-              busqueda={busqueda}
-              filtrar={filtrar}
-              CardVertical={CardVertical}
-              setCafeDetalle={setCafeDetalle}
-              favs={favs}
-              toggleFav={toggleFav}
-            />
-          </>
-        : <>
-            <LatestSection
-              s={s}
-              setActiveTab={setActiveTab}
-              cargando={cargando}
-              premiumAccent={premiumAccent}
-              ultimosGlobal={ultimosGlobal}
-              CardHorizontal={CardHorizontal}
-              setCafeDetalle={setCafeDetalle}
-              favs={favs}
-              toggleFav={toggleFav}
-            />
+      {busqueda.trim() ? (
+        <>
+          <SearchResultsSection
+            s={s}
+            allCafes={allCafes}
+            busqueda={busqueda}
+            filtrar={filtrar}
+            CardVertical={CardVertical}
+            setCafeDetalle={setCafeDetalle}
+            favs={favs}
+            toggleFav={toggleFav}
+          />
+        </>
+      ) : (
+        <>
+          <LatestSection
+            s={s}
+            setActiveTab={setActiveTab}
+            cargando={cargando}
+            premiumAccent={premiumAccent}
+            ultimosGlobal={ultimosGlobal}
+            CardHorizontal={CardHorizontal}
+            setCafeDetalle={setCafeDetalle}
+            favs={favs}
+            toggleFav={toggleFav}
+          />
 
-            <TopCountrySection
-              s={s}
-              setActiveTab={setActiveTab}
-              perfil={perfil}
-              flag={flag}
-              cargando={cargando}
-              premiumAccent={premiumAccent}
-              topCafesVista={topCafesVista}
-              CardHorizontal={CardHorizontal}
-              setCafeDetalle={setCafeDetalle}
-              favs={favs}
-              toggleFav={toggleFav}
-            />
+          <TopCountrySection
+            s={s}
+            setActiveTab={setActiveTab}
+            perfil={perfil}
+            flag={flag}
+            cargando={cargando}
+            premiumAccent={premiumAccent}
+            topCafesVista={topCafesVista}
+            CardHorizontal={CardHorizontal}
+            setCafeDetalle={setCafeDetalle}
+            favs={favs}
+            toggleFav={toggleFav}
+          />
 
-            <BlogSection s={s} />
+          <BlogSection s={s} />
 
-            <NearbyCafeteriasSection
-              s={s}
-              setActiveTab={setActiveTab}
-              cargandoCafInicio={cargandoCafInicio}
-              premiumAccent={premiumAccent}
-              errorCafInicio={errorCafInicio}
-              cafeteriasInicio={cafeteriasInicio}
-              cargarCafeteriasInicio={cargarCafeteriasInicio}
-              theme={theme}
-            />
-          </>
-      }
+          <NearbyCafeteriasSection
+            s={s}
+            setActiveTab={setActiveTab}
+            cargandoCafInicio={cargandoCafInicio}
+            premiumAccent={premiumAccent}
+            errorCafInicio={errorCafInicio}
+            cafeteriasInicio={cafeteriasInicio}
+            cargarCafeteriasInicio={cargarCafeteriasInicio}
+            theme={theme}
+          />
+        </>
+      )}
     </View>
   );
 }

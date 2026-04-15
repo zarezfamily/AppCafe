@@ -28,18 +28,32 @@ export default function useMainScreenBootstrap({
   showDialog,
 }) {
   const isExpoGo = Constants.appOwnership === 'expo';
-  const [newsletterState, setNewsletterState] = useState({ subscribed: false, createdAt: '', subscribedAt: '', updatedAt: '' });
+  const [newsletterState, setNewsletterState] = useState({
+    subscribed: false,
+    createdAt: '',
+    subscribedAt: '',
+    updatedAt: '',
+  });
   const [newsletterLoading, setNewsletterLoading] = useState(false);
   const [newsletterSaving, setNewsletterSaving] = useState(false);
-  const [interactionFeedbackSettings, setInteractionFeedbackSettings] = useState({ enabled: true, mode: 'haptic' });
+  const [interactionFeedbackSettings, setInteractionFeedbackSettings] = useState({
+    enabled: true,
+    mode: 'haptic',
+  });
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [notificationsReady, setNotificationsReady] = useState(false);
   const [pushToken, setPushToken] = useState(null);
 
   useEffect(() => {
-    SecureStore.getItemAsync(keys.favs).then((v) => v && setFavs(JSON.parse(v))).catch(() => {});
-    SecureStore.getItemAsync(keys.votes).then((v) => v && setVotes(JSON.parse(v))).catch(() => {});
-    SecureStore.getItemAsync(keys.profile).then((v) => v && setPerfil(JSON.parse(v))).catch(() => {});
+    SecureStore.getItemAsync(keys.favs)
+      .then((v) => v && setFavs(JSON.parse(v)))
+      .catch(() => {});
+    SecureStore.getItemAsync(keys.votes)
+      .then((v) => v && setVotes(JSON.parse(v)))
+      .catch(() => {});
+    SecureStore.getItemAsync(keys.profile)
+      .then((v) => v && setPerfil(JSON.parse(v)))
+      .catch(() => {});
     SecureStore.getItemAsync(keys.offersCache)
       .then((v) => {
         if (!v) return;
@@ -49,7 +63,7 @@ export default function useMainScreenBootstrap({
         const fresh = {};
         Object.entries(cache).forEach(([cafeId, entry]) => {
           if (!entry?.updatedAt || !Array.isArray(entry?.offers)) return;
-          if ((now - entry.updatedAt) <= offersCacheTtlMs) fresh[cafeId] = entry;
+          if (now - entry.updatedAt <= offersCacheTtlMs) fresh[cafeId] = entry;
         });
         setOfertasPorCafe(fresh);
       })
@@ -78,7 +92,9 @@ export default function useMainScreenBootstrap({
 
     if (isExpoGo) return undefined;
 
-    const notificationSubscription = Notifications.addNotificationResponseReceivedListener(() => {});
+    const notificationSubscription = Notifications.addNotificationResponseReceivedListener(
+      () => {}
+    );
     return () => {
       notificationSubscription.remove();
     };
@@ -189,11 +205,12 @@ export default function useMainScreenBootstrap({
     const syncSnapshot = async () => {
       const stored = await SecureStore.getItemAsync(key).catch(() => null);
       const prev = stored ? JSON.parse(stored) : null;
-      const shouldNotify = communityNotificationBootRef.current
-        && prev?.latestCafeId
-        && prev.latestCafeId !== nextSnapshot.latestCafeId
-        && nextSnapshot.latestCafeUid
-        && nextSnapshot.latestCafeUid !== user.uid;
+      const shouldNotify =
+        communityNotificationBootRef.current &&
+        prev?.latestCafeId &&
+        prev.latestCafeId !== nextSnapshot.latestCafeId &&
+        nextSnapshot.latestCafeUid &&
+        nextSnapshot.latestCafeUid !== user.uid;
 
       if (shouldNotify) {
         await scheduleEtioveNotification({
@@ -208,7 +225,15 @@ export default function useMainScreenBootstrap({
     };
 
     syncSnapshot();
-  }, [allCafes, communityNotificationBootRef, isExpoGo, keys.notifyCommunitySnapshot, notificationsReady, scheduleEtioveNotification, user?.uid]);
+  }, [
+    allCafes,
+    communityNotificationBootRef,
+    isExpoGo,
+    keys.notifyCommunitySnapshot,
+    notificationsReady,
+    scheduleEtioveNotification,
+    user?.uid,
+  ]);
 
   useEffect(() => {
     if (!user?.uid || isExpoGo || forumThreads.length === 0 || !notificationsReady) return;
@@ -252,10 +277,19 @@ export default function useMainScreenBootstrap({
     };
 
     syncSnapshot();
-  }, [forumNotificationBootRef, forumThreads, isExpoGo, keys.notifyForumSnapshot, notificationsReady, scheduleEtioveNotification, user?.uid]);
+  }, [
+    forumNotificationBootRef,
+    forumThreads,
+    isExpoGo,
+    keys.notifyForumSnapshot,
+    notificationsReady,
+    scheduleEtioveNotification,
+    user?.uid,
+  ]);
 
   useEffect(() => {
-    if (!user?.uid || isExpoGo || allCafes.length === 0 || favs.length === 0 || !notificationsReady) return;
+    if (!user?.uid || isExpoGo || allCafes.length === 0 || favs.length === 0 || !notificationsReady)
+      return;
     const favoriteMap = allCafes
       .filter((cafe) => favs.includes(cafe.id))
       .reduce((acc, cafe) => {
@@ -296,7 +330,16 @@ export default function useMainScreenBootstrap({
     };
 
     syncSnapshot();
-  }, [allCafes, favoriteNotificationBootRef, favs, isExpoGo, keys.notifyFavoritesSnapshot, notificationsReady, scheduleEtioveNotification, user?.uid]);
+  }, [
+    allCafes,
+    favoriteNotificationBootRef,
+    favs,
+    isExpoGo,
+    keys.notifyFavoritesSnapshot,
+    notificationsReady,
+    scheduleEtioveNotification,
+    user?.uid,
+  ]);
 
   const guardarNewsletter = async (nextSubscribed) => {
     if (!user?.uid) return;
@@ -320,7 +363,7 @@ export default function useMainScreenBootstrap({
         subscribed: nextSubscribed,
         source: 'app_mas',
         createdAt: newsletterState.createdAt || now,
-        subscribedAt: nextSubscribed ? (newsletterState.subscribedAt || now) : '',
+        subscribedAt: nextSubscribed ? newsletterState.subscribedAt || now : '',
         unsubscribedAt: nextSubscribed ? '' : now,
         updatedAt: now,
       };

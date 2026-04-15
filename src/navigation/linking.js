@@ -1,4 +1,3 @@
-
 const linking = {
   prefixes: ['https://etiove.com', 'etiove://'],
   config: {

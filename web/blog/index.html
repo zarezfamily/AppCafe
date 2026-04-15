@@ -1,349 +1,666 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="shortcut icon" href="/favicon.ico" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-  <meta name="apple-mobile-web-app-title" content="Etiove" />
-  <meta name="theme-color" content="#21150f" />
-  <link rel="manifest" href="/site.webmanifest" />
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Blog Etiove | Café de Especialidad</title>
-  <meta name="description" content="Guías, tutoriales y análisis para amantes del café de especialidad. Aprende, cata y elige mejor cada taza con Etiove." />
-  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-  <link rel="canonical" href="https://etiove.com/blog/" />
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="Etiove" />
-  <meta property="og:locale" content="es_ES" />
-  <meta property="og:title" content="Blog Etiove | Café de Especialidad" />
-  <meta property="og:description" content="Guías y contenido para amantes del café de especialidad: aprende, cata y elige mejor cada taza." />
-  <meta property="og:url" content="https://etiove.com/blog/" />
-  <meta property="og:image" content="https://etiove.com/og-image.jpg" />
-  <meta property="og:image:type" content="image/jpeg" />
-  <meta property="og:image:width" content="1500" />
-  <meta property="og:image:height" content="500" />
-  <meta property="og:image:alt" content="Blog Etiove sobre cafe de especialidad" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Blog Etiove | Café de Especialidad" />
-  <meta name="twitter:description" content="Guías y contenido para amantes del café de especialidad." />
-  <meta name="twitter:image" content="https://etiove.com/og-image.jpg" />
-  <meta name="twitter:image:alt" content="Blog Etiove sobre cafe de especialidad" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:wght@400;500&display=swap" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/blog/index.css" />
-  <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "Blog",
-      "@id": "https://etiove.com/blog/#blog",
-      "name": "Blog Etiove",
-      "description": "Guías, tutoriales y análisis para amantes del café de especialidad.",
-      "url": "https://etiove.com/blog/",
-      "inLanguage": "es-ES",
-      "publisher": {
-        "@type": "Organization",
-        "@id": "https://etiove.com/#organization",
-        "name": "Etiove",
-        "url": "https://etiove.com/",
-        "logo": {
-          "@type": "ImageObject",
-          "url": "https://etiove.com/favicon.svg",
-          "width": 512,
-          "height": 512
-        }
+  <head>
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Etiove" />
+    <meta name="theme-color" content="#21150f" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blog Etiove | Café de Especialidad</title>
+    <meta
+      name="description"
+      content="Guías, tutoriales y análisis para amantes del café de especialidad. Aprende, cata y elige mejor cada taza con Etiove."
+    />
+    <meta
+      name="robots"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    />
+    <link rel="canonical" href="https://etiove.com/blog/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Etiove" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:title" content="Blog Etiove | Café de Especialidad" />
+    <meta
+      property="og:description"
+      content="Guías y contenido para amantes del café de especialidad: aprende, cata y elige mejor cada taza."
+    />
+    <meta property="og:url" content="https://etiove.com/blog/" />
+    <meta property="og:image" content="https://etiove.com/og-image.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1500" />
+    <meta property="og:image:height" content="500" />
+    <meta property="og:image:alt" content="Blog Etiove sobre cafe de especialidad" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Blog Etiove | Café de Especialidad" />
+    <meta
+      name="twitter:description"
+      content="Guías y contenido para amantes del café de especialidad."
+    />
+    <meta name="twitter:image" content="https://etiove.com/og-image.jpg" />
+    <meta name="twitter:image:alt" content="Blog Etiove sobre cafe de especialidad" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:wght@400;500&display=swap"
+    />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/blog/index.css" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Blog",
+            "@id": "https://etiove.com/blog/#blog",
+            "name": "Blog Etiove",
+            "description": "Guías, tutoriales y análisis para amantes del café de especialidad.",
+            "url": "https://etiove.com/blog/",
+            "inLanguage": "es-ES",
+            "publisher": {
+              "@type": "Organization",
+              "@id": "https://etiove.com/#organization",
+              "name": "Etiove",
+              "url": "https://etiove.com/",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://etiove.com/favicon.svg",
+                "width": 512,
+                "height": 512
+              }
+            }
+          },
+          {
+            "@type": "ItemList",
+            "@id": "https://etiove.com/blog/#posts",
+            "name": "Artículos del blog Etiove",
+            "url": "https://etiove.com/blog/",
+            "numberOfItems": 8,
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "url": "https://etiove.com/blog/cold-brew-en-casa-guia-completa.html",
+                "name": "Cold Brew en Casa: Guía Completa para Hacerlo Perfecto"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "url": "https://etiove.com/blog/arabica-vs-robusta.html",
+                "name": "Arábica vs Robusta: La Diferencia que Cambia tu Café"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "url": "https://etiove.com/blog/cafe-de-especialidad-vs-cafe-normal.html",
+                "name": "Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real?"
+              },
+              {
+                "@type": "ListItem",
+                "position": 4,
+                "url": "https://etiove.com/blog/por-que-mi-cafe-sabe-amargo.html",
+                "name": "¿Por qué mi café sabe amargo? 7 causas y sus soluciones"
+              },
+              {
+                "@type": "ListItem",
+                "position": 5,
+                "url": "https://etiove.com/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html",
+                "name": "¿Vale la Pena Pagar Más por Café de Especialidad?"
+              },
+              {
+                "@type": "ListItem",
+                "position": 6,
+                "url": "https://etiove.com/blog/cafe-de-especialidad-crece-en-espana-2026.html",
+                "name": "El Café de Especialidad Crece un 34% en España"
+              },
+              {
+                "@type": "ListItem",
+                "position": 7,
+                "url": "https://etiove.com/blog/guia-de-molienda-por-metodo.html",
+                "name": "Guía de Molienda por Método: de V60 a Espresso"
+              },
+              {
+                "@type": "ListItem",
+                "position": 8,
+                "url": "https://etiove.com/blog/como-elegir-el-mejor-cafe-de-etiopia.html",
+                "name": "Cómo Elegir el Mejor Café de Etiopía: Guía Completa"
+              }
+            ]
+          }
+        ]
       }
-    },
-    {
-      "@type": "ItemList",
-      "@id": "https://etiove.com/blog/#posts",
-      "name": "Artículos del blog Etiove",
-      "url": "https://etiove.com/blog/",
-      "numberOfItems": 8,
-      "itemListElement": [
-        {
-          "@type": "ListItem",
-          "position": 1,
-          "url": "https://etiove.com/blog/cold-brew-en-casa-guia-completa.html",
-          "name": "Cold Brew en Casa: Guía Completa para Hacerlo Perfecto"
-        },
-        {
-          "@type": "ListItem",
-          "position": 2,
-          "url": "https://etiove.com/blog/arabica-vs-robusta.html",
-          "name": "Arábica vs Robusta: La Diferencia que Cambia tu Café"
-        },
-        {
-          "@type": "ListItem",
-          "position": 3,
-          "url": "https://etiove.com/blog/cafe-de-especialidad-vs-cafe-normal.html",
-          "name": "Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real?"
-        },
-        {
-          "@type": "ListItem",
-          "position": 4,
-          "url": "https://etiove.com/blog/por-que-mi-cafe-sabe-amargo.html",
-          "name": "¿Por qué mi café sabe amargo? 7 causas y sus soluciones"
-        },
-        {
-          "@type": "ListItem",
-          "position": 5,
-          "url": "https://etiove.com/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html",
-          "name": "¿Vale la Pena Pagar Más por Café de Especialidad?"
-        },
-        {
-          "@type": "ListItem",
-          "position": 6,
-          "url": "https://etiove.com/blog/cafe-de-especialidad-crece-en-espana-2026.html",
-          "name": "El Café de Especialidad Crece un 34% en España"
-        },
-        {
-          "@type": "ListItem",
-          "position": 7,
-          "url": "https://etiove.com/blog/guia-de-molienda-por-metodo.html",
-          "name": "Guía de Molienda por Método: de V60 a Espresso"
-        },
-        {
-          "@type": "ListItem",
-          "position": 8,
-          "url": "https://etiove.com/blog/como-elegir-el-mejor-cafe-de-etiopia.html",
-          "name": "Cómo Elegir el Mejor Café de Etiopía: Guía Completa"
-        }
-      ]
-    }
-  ]
-}
-  </script>
-  <link rel="search" type="application/opensearchdescription+xml" title="Blog Etiove" href="/opensearch.xml" />
-</head>
-<body>
-
-  <nav>
-    <a class="nav-wordmark" href="/">Etiove</a>
-    <div class="nav-links" id="navLinks">
-      <a class="nav-link" href="/">Inicio</a>
-      <a class="nav-link" href="/blog/">Blog</a>
-      <a class="nav-link" href="/comunidad.html">Comunidad</a>
-    </div>
-    <button class="nav-hamburger" id="navHamburger" aria-label="Menú" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
-  </nav>
-
-  <section class="hero">
-    <div class="hero-bg"></div>
-    <div class="hero-overlay"></div>
-    <div class="aura aura-1" aria-hidden="true"></div>
-    <div class="aura aura-2" aria-hidden="true"></div>
-    <div class="hero-content">
-      <p class="hero-eyebrow">Blog Etiove &middot; Caf&eacute; de Especialidad</p>
-      <h1 class="hero-title">El Arte <em>del Caf&eacute;</em></h1>
-      <p class="hero-tagline">Gu&iacute;as, tutoriales y an&aacute;lisis para entender el origen, la molienda y cada m&eacute;todo de preparaci&oacute;n</p>
-      <div class="hero-divider"><span></span></div>
-      <span class="hero-badge">Contenido curado Etiove</span>
-    </div>
-    <div class="hero-scroll" aria-hidden="true">
-      <span>Scroll</span>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-    </div>
-  </section>
-
-  <section class="articles">
-    <div class="container">
-      <p class="section-label">Art&iacute;culos</p>
-      <h2 class="section-title">Aprende, cata y elige mejor</h2>
-      <p class="section-intro">Contenido editorial de Etiove para profundizar en café de especialidad, molienda, origen, métodos y decisiones de compra con más criterio.</p>
-
-      <div class="filters">
-
-        <button class="filter-btn active" data-filter="todos">Todos</button>
-        <button class="filter-btn" data-filter="tutorial">Tutorial</button>
-        <button class="filter-btn" data-filter="guia">Guía</button>
-        <button class="filter-btn" data-filter="analisis">Análisis</button>
-        <button class="filter-btn" data-filter="noticia">Noticia</button>
-        <div class="search-wrap">
-          <input id="postSearch" class="search-box" type="search" placeholder="Busca palabras o frases dentro de los posts" aria-label="Buscar dentro de los posts" />
-          <span id="searchCount" class="search-count">8 posts</span>
-          <button id="clearSearch" class="search-clear" type="button" aria-label="Limpiar búsqueda">×</button>
-        </div>
+    </script>
+    <link
+      rel="search"
+      type="application/opensearchdescription+xml"
+      title="Blog Etiove"
+      href="/opensearch.xml"
+    />
+  </head>
+  <body>
+    <nav>
+      <a class="nav-wordmark" href="/">Etiove</a>
+      <div class="nav-links" id="navLinks">
+        <a class="nav-link" href="/">Inicio</a>
+        <a class="nav-link" href="/blog/">Blog</a>
+        <a class="nav-link" href="/comunidad.html">Comunidad</a>
       </div>
-
-      <div id="searchStatus" class="search-status"></div>
-
-      <div class="grid" id="postGrid">
-
-        <article class="card" data-category="tutorial" data-post-url="/blog/cold-brew-en-casa-guia-completa.html" data-search="cold brew en casa guia completa cafe frio infusion fria ratio molienda tiempo temperatura receta metodo">
-          <a class="card-link" href="/blog/cold-brew-en-casa-guia-completa.html">
-            <div class="card-thumb">
-              <img src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=900&amp;q=80&amp;auto=format&amp;fit=crop" alt="Vaso de cold brew con hielo y café de especialidad" loading="lazy" width="900" height="248" />
-              <span class="card-tag">Tutorial</span>
-            </div>
-            <div class="card-body">
-              <p class="card-date">10 abril 2026</p>
-              <h2 class="card-title">Cold Brew en Casa: Guía Completa para Hacerlo Perfecto</h2>
-              <p class="card-excerpt">Ratio de café, molienda gruesa, 18 horas en la nevera. Todo lo que necesitas para hacer un cold brew perfecto sin equipamiento especial.</p>
-              <span class="read-link">Leer artículo <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
-            </div>
-          </a>
-        </article>
-
-        <article class="card" data-category="guia" data-post-url="/blog/arabica-vs-robusta.html" data-search="arabica vs robusta diferencia cafe arabica robusta cafeina sabor precio cultivo espresso blend especialidad">
-          <a class="card-link" href="/blog/arabica-vs-robusta.html">
-            <div class="card-thumb">
-              <img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=900&amp;q=80&amp;auto=format&amp;fit=crop" alt="Granos de café arábica de especialidad en mano" loading="lazy" width="900" height="248" />
-              <span class="card-tag">Guía</span>
-            </div>
-            <div class="card-body">
-              <p class="card-date">10 abril 2026</p>
-              <h2 class="card-title">Arábica vs Robusta: La Diferencia que Cambia tu Café</h2>
-              <p class="card-excerpt">Sabor, cafeína, precio y cuándo usar cada variedad. Todo lo que necesitas saber para entender qué hay realmente en tu taza.</p>
-              <span class="read-link">Leer artículo <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
-            </div>
-          </a>
-        </article>
-
-        <article class="card" data-category="analisis" data-post-url="/blog/cafe-de-especialidad-vs-cafe-normal.html" data-search="cafe de especialidad vs cafe normal diferencia que es especialidad sca puntuacion 80 puntos origen single origin trazabilidad tueste frescura precio productor sabor comparacion">
-          <a class="card-link" href="/blog/cafe-de-especialidad-vs-cafe-normal.html">
-            <div class="card-thumb">
-              <img src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=900&amp;q=80&amp;auto=format&amp;fit=crop" alt="Granos de café de especialidad de distintos orígenes" loading="lazy" width="900" height="248" />
-              <span class="card-tag">Análisis</span>
-            </div>
-            <div class="card-body">
-              <p class="card-date">09 abril 2026</p>
-              <h2 class="card-title">Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real?</h2>
-              <p class="card-excerpt">Puntuación SCA, trazabilidad, sabor y precio. Todo lo que diferencia un café de especialidad de uno del supermercado, explicado sin tecnicismos.</p>
-              <span class="read-link">Leer artículo <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
-            </div>
-          </a>
-        </article>
-
-        <article class="card" data-category="guia" data-post-url="/blog/por-que-mi-cafe-sabe-amargo.html" data-search="por que mi cafe sabe amargo causas soluciones sobreextraccion molienda temperatura agua cafetera italiana metodo preparacion amargor astringente">
-          <a class="card-link" href="/blog/por-que-mi-cafe-sabe-amargo.html">
-            <div class="card-thumb">
-              <img src="https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=900&amp;q=80&amp;auto=format&amp;fit=crop" alt="Taza de café con vapor, preparación en casa" loading="lazy" width="900" height="248" />
-              <span class="card-tag">Guía</span>
-            </div>
-            <div class="card-body">
-              <p class="card-date">08 abril 2026</p>
-              <h2 class="card-title">¿Por qué mi café sabe amargo? 7 causas y sus soluciones</h2>
-              <p class="card-excerpt">Sobreextracción, molienda incorrecta, agua demasiado caliente... Descubre las 7 causas reales de que tu café sepa amargo y cómo solucionarlas hoy.</p>
-              <span class="read-link">Leer artículo <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
-            </div>
-          </a>
-        </article>
-
-        <article class="card" data-category="analisis" data-post-url="/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html" data-search="vale la pena pagar mas por cafe de especialidad analisis precio calidad impacto social consumidor granos finca altura">
-          <a class="card-link" href="/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html">
-            <div class="card-thumb">
-              <img src="https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=900&amp;q=80&amp;auto=format&amp;fit=crop" alt="Granos de café seleccionados a mano en una finca de altura" loading="lazy" width="900" height="248" />
-              <span class="card-tag">Análisis</span>
-            </div>
-            <div class="card-body">
-              <p class="card-date">04 abril 2026</p>
-              <h2 class="card-title">¿Vale la Pena Pagar Más por Café de Especialidad?</h2>
-              <p class="card-excerpt">Un análisis honesto de qué hay detrás del precio: calidad real, impacto social y cuándo merece la pena el desembolso.</p>
-              <span class="read-link">Leer artículo <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
-            </div>
-          </a>
-        </article>
-
-        <article class="card" data-category="noticia" data-post-url="/blog/cafe-de-especialidad-crece-en-espana-2026.html" data-search="cafe de especialidad crece espana 2026 noticia mercado consumo cafeteria barista crecimiento">
-          <a class="card-link" href="/blog/cafe-de-especialidad-crece-en-espana-2026.html">
-            <div class="card-thumb">
-              <img src="https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=900&amp;q=80&amp;auto=format&amp;fit=crop" alt="Barista preparando café de especialidad en una cafetería moderna" loading="lazy" width="900" height="248" />
-              <span class="card-tag">Noticia</span>
-            </div>
-            <div class="card-body">
-              <p class="card-date">03 abril 2026</p>
-              <h2 class="card-title">El Café de Especialidad Crece un 34% en España</h2>
-              <p class="card-excerpt">El mercado supera los 220 millones de euros en 2025. Analizamos los datos, las causas y lo que significa para el consumidor.</p>
-              <span class="read-link">Leer artículo <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
-            </div>
-          </a>
-        </article>
-
-        <article class="card" data-category="tutorial" data-post-url="/blog/guia-de-molienda-por-metodo.html" data-search="guia de molienda por metodo tutorial v60 espresso aeropress chemex french press molinillo">
-          <a class="card-link" href="/blog/guia-de-molienda-por-metodo.html">
-            <div class="card-thumb">
-              <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=900&amp;q=80&amp;auto=format&amp;fit=crop" alt="Molinillo de café manual con granos de especialidad" loading="lazy" width="900" height="248" />
-              <span class="card-tag">Tutorial</span>
-            </div>
-            <div class="card-body">
-              <p class="card-date">02 abril 2026</p>
-              <h2 class="card-title">Guía de Molienda por Método: de V60 a Espresso</h2>
-              <p class="card-excerpt">Qué tan fino o grueso moler para V60, Chemex, AeroPress, French Press y espresso, con ajustes rápidos si tu taza sale ácida o amarga.</p>
-              <span class="read-link">Leer artículo <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
-            </div>
-          </a>
-        </article>
-
-        <article class="card" data-category="guia" data-post-url="/blog/como-elegir-el-mejor-cafe-de-etiopia.html" data-search="como elegir el mejor cafe de etiopia guia yirgacheffe guji origen proceso lavado natural altitud">
-          <a class="card-link" href="/blog/como-elegir-el-mejor-cafe-de-etiopia.html">
-            <div class="card-thumb">
-              <img src="https://images.unsplash.com/photo-1461988091159-192b6df7054f?w=900&amp;q=80&amp;auto=format&amp;fit=crop" alt="Cafetales en las tierras altas de Etiopía" loading="lazy" width="900" height="248" />
-              <span class="card-tag">Guía</span>
-            </div>
-            <div class="card-body">
-              <p class="card-date">01 abril 2026</p>
-              <h2 class="card-title">Cómo Elegir el Mejor Café de Etiopía: Guía Completa</h2>
-              <p class="card-excerpt">Desde Yirgacheffe hasta Guji. Cómo descifrar etiquetas, entender procesos de lavado y natural, y encontrar el perfil ideal para tu paladar.</p>
-              <span class="read-link">Leer artículo <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
-            </div>
-          </a>
-        </article>
-      </div>
-      <div id="blogPager"></div>
-    </div>
-  </section>
-
-
-  <footer>
-    <nav class="footer-nav" aria-label="Navegación del sitio">
-      <div class="footer-nav-group">
-        <span class="footer-nav-label">Explorar</span>
-        <a class="footer-nav-link" href="/">Inicio</a>
-        <a class="footer-nav-link" href="/blog/">Blog</a>
-        <a class="footer-nav-link" href="/comunidad.html">Comunidad</a>
-        <a class="footer-nav-link" href="/#quizweb">Quiz de sabor</a>
-      </div>
+      <button class="nav-hamburger" id="navHamburger" aria-label="Menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
     </nav>
 
-    <p class="footer-copy">
-      <span>© 2026 Etiove. Hecho con ☕ en España.</span>
+    <section class="hero">
+      <div class="hero-bg"></div>
+      <div class="hero-overlay"></div>
+      <div class="aura aura-1" aria-hidden="true"></div>
+      <div class="aura aura-2" aria-hidden="true"></div>
+      <div class="hero-content">
+        <p class="hero-eyebrow">Blog Etiove &middot; Caf&eacute; de Especialidad</p>
+        <h1 class="hero-title">El Arte <em>del Caf&eacute;</em></h1>
+        <p class="hero-tagline">
+          Gu&iacute;as, tutoriales y an&aacute;lisis para entender el origen, la molienda y cada
+          m&eacute;todo de preparaci&oacute;n
+        </p>
+        <div class="hero-divider"><span></span></div>
+        <span class="hero-badge">Contenido curado Etiove</span>
+      </div>
+      <div class="hero-scroll" aria-hidden="true">
+        <span>Scroll</span>
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </div>
+    </section>
 
-      <span class="footer-copy-center">
-        <span class="footer-wordmark-sm">Etiove</span>
+    <section class="articles">
+      <div class="container">
+        <p class="section-label">Art&iacute;culos</p>
+        <h2 class="section-title">Aprende, cata y elige mejor</h2>
+        <p class="section-intro">
+          Contenido editorial de Etiove para profundizar en café de especialidad, molienda, origen,
+          métodos y decisiones de compra con más criterio.
+        </p>
 
-        <span class="social-row-inline">
-          <a class="social-link" href="https://instagram.com/etiove_cafe" target="_blank" rel="noopener noreferrer" aria-label="Instagram @etiove_cafe">
-            <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-          </a>
-          <a class="social-link" href="https://x.com/etiove_cafe" target="_blank" rel="noopener noreferrer" aria-label="X @etiove_cafe">
-            <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-          </a>
-          <a class="social-link" href="https://tiktok.com/@etiove" target="_blank" rel="noopener noreferrer" aria-label="TikTok @etiove">
-            <svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.16 8.16 0 004.77 1.52V6.75a4.85 4.85 0 01-1-.06z"/></svg>
-          </a>
+        <div class="filters">
+          <button class="filter-btn active" data-filter="todos">Todos</button>
+          <button class="filter-btn" data-filter="tutorial">Tutorial</button>
+          <button class="filter-btn" data-filter="guia">Guía</button>
+          <button class="filter-btn" data-filter="analisis">Análisis</button>
+          <button class="filter-btn" data-filter="noticia">Noticia</button>
+          <div class="search-wrap">
+            <input
+              id="postSearch"
+              class="search-box"
+              type="search"
+              placeholder="Busca palabras o frases dentro de los posts"
+              aria-label="Buscar dentro de los posts"
+            />
+            <span id="searchCount" class="search-count">8 posts</span>
+            <button
+              id="clearSearch"
+              class="search-clear"
+              type="button"
+              aria-label="Limpiar búsqueda"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+
+        <div id="searchStatus" class="search-status"></div>
+
+        <div class="grid" id="postGrid">
+          <article
+            class="card"
+            data-category="tutorial"
+            data-post-url="/blog/cold-brew-en-casa-guia-completa.html"
+            data-search="cold brew en casa guia completa cafe frio infusion fria ratio molienda tiempo temperatura receta metodo"
+          >
+            <a class="card-link" href="/blog/cold-brew-en-casa-guia-completa.html">
+              <div class="card-thumb">
+                <img
+                  src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=900&amp;q=80&amp;auto=format&amp;fit=crop"
+                  alt="Vaso de cold brew con hielo y café de especialidad"
+                  loading="lazy"
+                  width="900"
+                  height="248"
+                />
+                <span class="card-tag">Tutorial</span>
+              </div>
+              <div class="card-body">
+                <p class="card-date">10 abril 2026</p>
+                <h2 class="card-title">Cold Brew en Casa: Guía Completa para Hacerlo Perfecto</h2>
+                <p class="card-excerpt">
+                  Ratio de café, molienda gruesa, 18 horas en la nevera. Todo lo que necesitas para
+                  hacer un cold brew perfecto sin equipamiento especial.
+                </p>
+                <span class="read-link"
+                  >Leer artículo
+                  <svg
+                    width="13"
+                    height="13"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" /></svg
+                ></span>
+              </div>
+            </a>
+          </article>
+
+          <article
+            class="card"
+            data-category="guia"
+            data-post-url="/blog/arabica-vs-robusta.html"
+            data-search="arabica vs robusta diferencia cafe arabica robusta cafeina sabor precio cultivo espresso blend especialidad"
+          >
+            <a class="card-link" href="/blog/arabica-vs-robusta.html">
+              <div class="card-thumb">
+                <img
+                  src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=900&amp;q=80&amp;auto=format&amp;fit=crop"
+                  alt="Granos de café arábica de especialidad en mano"
+                  loading="lazy"
+                  width="900"
+                  height="248"
+                />
+                <span class="card-tag">Guía</span>
+              </div>
+              <div class="card-body">
+                <p class="card-date">10 abril 2026</p>
+                <h2 class="card-title">Arábica vs Robusta: La Diferencia que Cambia tu Café</h2>
+                <p class="card-excerpt">
+                  Sabor, cafeína, precio y cuándo usar cada variedad. Todo lo que necesitas saber
+                  para entender qué hay realmente en tu taza.
+                </p>
+                <span class="read-link"
+                  >Leer artículo
+                  <svg
+                    width="13"
+                    height="13"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" /></svg
+                ></span>
+              </div>
+            </a>
+          </article>
+
+          <article
+            class="card"
+            data-category="analisis"
+            data-post-url="/blog/cafe-de-especialidad-vs-cafe-normal.html"
+            data-search="cafe de especialidad vs cafe normal diferencia que es especialidad sca puntuacion 80 puntos origen single origin trazabilidad tueste frescura precio productor sabor comparacion"
+          >
+            <a class="card-link" href="/blog/cafe-de-especialidad-vs-cafe-normal.html">
+              <div class="card-thumb">
+                <img
+                  src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=900&amp;q=80&amp;auto=format&amp;fit=crop"
+                  alt="Granos de café de especialidad de distintos orígenes"
+                  loading="lazy"
+                  width="900"
+                  height="248"
+                />
+                <span class="card-tag">Análisis</span>
+              </div>
+              <div class="card-body">
+                <p class="card-date">09 abril 2026</p>
+                <h2 class="card-title">
+                  Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real?
+                </h2>
+                <p class="card-excerpt">
+                  Puntuación SCA, trazabilidad, sabor y precio. Todo lo que diferencia un café de
+                  especialidad de uno del supermercado, explicado sin tecnicismos.
+                </p>
+                <span class="read-link"
+                  >Leer artículo
+                  <svg
+                    width="13"
+                    height="13"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" /></svg
+                ></span>
+              </div>
+            </a>
+          </article>
+
+          <article
+            class="card"
+            data-category="guia"
+            data-post-url="/blog/por-que-mi-cafe-sabe-amargo.html"
+            data-search="por que mi cafe sabe amargo causas soluciones sobreextraccion molienda temperatura agua cafetera italiana metodo preparacion amargor astringente"
+          >
+            <a class="card-link" href="/blog/por-que-mi-cafe-sabe-amargo.html">
+              <div class="card-thumb">
+                <img
+                  src="https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=900&amp;q=80&amp;auto=format&amp;fit=crop"
+                  alt="Taza de café con vapor, preparación en casa"
+                  loading="lazy"
+                  width="900"
+                  height="248"
+                />
+                <span class="card-tag">Guía</span>
+              </div>
+              <div class="card-body">
+                <p class="card-date">08 abril 2026</p>
+                <h2 class="card-title">¿Por qué mi café sabe amargo? 7 causas y sus soluciones</h2>
+                <p class="card-excerpt">
+                  Sobreextracción, molienda incorrecta, agua demasiado caliente... Descubre las 7
+                  causas reales de que tu café sepa amargo y cómo solucionarlas hoy.
+                </p>
+                <span class="read-link"
+                  >Leer artículo
+                  <svg
+                    width="13"
+                    height="13"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" /></svg
+                ></span>
+              </div>
+            </a>
+          </article>
+
+          <article
+            class="card"
+            data-category="analisis"
+            data-post-url="/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html"
+            data-search="vale la pena pagar mas por cafe de especialidad analisis precio calidad impacto social consumidor granos finca altura"
+          >
+            <a class="card-link" href="/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html">
+              <div class="card-thumb">
+                <img
+                  src="https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=900&amp;q=80&amp;auto=format&amp;fit=crop"
+                  alt="Granos de café seleccionados a mano en una finca de altura"
+                  loading="lazy"
+                  width="900"
+                  height="248"
+                />
+                <span class="card-tag">Análisis</span>
+              </div>
+              <div class="card-body">
+                <p class="card-date">04 abril 2026</p>
+                <h2 class="card-title">¿Vale la Pena Pagar Más por Café de Especialidad?</h2>
+                <p class="card-excerpt">
+                  Un análisis honesto de qué hay detrás del precio: calidad real, impacto social y
+                  cuándo merece la pena el desembolso.
+                </p>
+                <span class="read-link"
+                  >Leer artículo
+                  <svg
+                    width="13"
+                    height="13"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" /></svg
+                ></span>
+              </div>
+            </a>
+          </article>
+
+          <article
+            class="card"
+            data-category="noticia"
+            data-post-url="/blog/cafe-de-especialidad-crece-en-espana-2026.html"
+            data-search="cafe de especialidad crece espana 2026 noticia mercado consumo cafeteria barista crecimiento"
+          >
+            <a class="card-link" href="/blog/cafe-de-especialidad-crece-en-espana-2026.html">
+              <div class="card-thumb">
+                <img
+                  src="https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=900&amp;q=80&amp;auto=format&amp;fit=crop"
+                  alt="Barista preparando café de especialidad en una cafetería moderna"
+                  loading="lazy"
+                  width="900"
+                  height="248"
+                />
+                <span class="card-tag">Noticia</span>
+              </div>
+              <div class="card-body">
+                <p class="card-date">03 abril 2026</p>
+                <h2 class="card-title">El Café de Especialidad Crece un 34% en España</h2>
+                <p class="card-excerpt">
+                  El mercado supera los 220 millones de euros en 2025. Analizamos los datos, las
+                  causas y lo que significa para el consumidor.
+                </p>
+                <span class="read-link"
+                  >Leer artículo
+                  <svg
+                    width="13"
+                    height="13"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" /></svg
+                ></span>
+              </div>
+            </a>
+          </article>
+
+          <article
+            class="card"
+            data-category="tutorial"
+            data-post-url="/blog/guia-de-molienda-por-metodo.html"
+            data-search="guia de molienda por metodo tutorial v60 espresso aeropress chemex french press molinillo"
+          >
+            <a class="card-link" href="/blog/guia-de-molienda-por-metodo.html">
+              <div class="card-thumb">
+                <img
+                  src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=900&amp;q=80&amp;auto=format&amp;fit=crop"
+                  alt="Molinillo de café manual con granos de especialidad"
+                  loading="lazy"
+                  width="900"
+                  height="248"
+                />
+                <span class="card-tag">Tutorial</span>
+              </div>
+              <div class="card-body">
+                <p class="card-date">02 abril 2026</p>
+                <h2 class="card-title">Guía de Molienda por Método: de V60 a Espresso</h2>
+                <p class="card-excerpt">
+                  Qué tan fino o grueso moler para V60, Chemex, AeroPress, French Press y espresso,
+                  con ajustes rápidos si tu taza sale ácida o amarga.
+                </p>
+                <span class="read-link"
+                  >Leer artículo
+                  <svg
+                    width="13"
+                    height="13"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" /></svg
+                ></span>
+              </div>
+            </a>
+          </article>
+
+          <article
+            class="card"
+            data-category="guia"
+            data-post-url="/blog/como-elegir-el-mejor-cafe-de-etiopia.html"
+            data-search="como elegir el mejor cafe de etiopia guia yirgacheffe guji origen proceso lavado natural altitud"
+          >
+            <a class="card-link" href="/blog/como-elegir-el-mejor-cafe-de-etiopia.html">
+              <div class="card-thumb">
+                <img
+                  src="https://images.unsplash.com/photo-1461988091159-192b6df7054f?w=900&amp;q=80&amp;auto=format&amp;fit=crop"
+                  alt="Cafetales en las tierras altas de Etiopía"
+                  loading="lazy"
+                  width="900"
+                  height="248"
+                />
+                <span class="card-tag">Guía</span>
+              </div>
+              <div class="card-body">
+                <p class="card-date">01 abril 2026</p>
+                <h2 class="card-title">Cómo Elegir el Mejor Café de Etiopía: Guía Completa</h2>
+                <p class="card-excerpt">
+                  Desde Yirgacheffe hasta Guji. Cómo descifrar etiquetas, entender procesos de
+                  lavado y natural, y encontrar el perfil ideal para tu paladar.
+                </p>
+                <span class="read-link"
+                  >Leer artículo
+                  <svg
+                    width="13"
+                    height="13"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" /></svg
+                ></span>
+              </div>
+            </a>
+          </article>
+        </div>
+        <div id="blogPager"></div>
+      </div>
+    </section>
+
+    <footer>
+      <nav class="footer-nav" aria-label="Navegación del sitio">
+        <div class="footer-nav-group">
+          <span class="footer-nav-label">Explorar</span>
+          <a class="footer-nav-link" href="/">Inicio</a>
+          <a class="footer-nav-link" href="/blog/">Blog</a>
+          <a class="footer-nav-link" href="/comunidad.html">Comunidad</a>
+          <a class="footer-nav-link" href="/#quizweb">Quiz de sabor</a>
+        </div>
+      </nav>
+
+      <p class="footer-copy">
+        <span>© 2026 Etiove. Hecho con ☕ en España.</span>
+
+        <span class="footer-copy-center">
+          <span class="footer-wordmark-sm">Etiove</span>
+
+          <span class="social-row-inline">
+            <a
+              class="social-link"
+              href="https://instagram.com/etiove_cafe"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram @etiove_cafe"
+            >
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
+                />
+              </svg>
+            </a>
+            <a
+              class="social-link"
+              href="https://x.com/etiove_cafe"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="X @etiove_cafe"
+            >
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+                />
+              </svg>
+            </a>
+            <a
+              class="social-link"
+              href="https://tiktok.com/@etiove"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="TikTok @etiove"
+            >
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.16 8.16 0 004.77 1.52V6.75a4.85 4.85 0 01-1-.06z"
+                />
+              </svg>
+            </a>
+          </span>
         </span>
-      </span>
 
-      <span class="footer-legal-links">
-        <a class="footer-legal-link" href="/privacidad.html">Privacidad</a>
-        <a class="footer-legal-link" href="/cookies.html">Cookies</a>
-        <a class="footer-legal-link" href="/terminos.html">Términos</a>
-      </span>
-    </p>
-  </footer>
+        <span class="footer-legal-links">
+          <a class="footer-legal-link" href="/privacidad.html">Privacidad</a>
+          <a class="footer-legal-link" href="/cookies.html">Cookies</a>
+          <a class="footer-legal-link" href="/terminos.html">Términos</a>
+        </span>
+      </p>
+    </footer>
 
-  <button class="scroll-top" id="scrollTopBtn" aria-label="Volver arriba">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
-  </button>
-  <script type="module" src="/blog/index.js"></script>
-</body>
+    <button class="scroll-top" id="scrollTopBtn" aria-label="Volver arriba">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="18 15 12 9 6 15"></polyline>
+      </svg>
+    </button>
+    <script type="module" src="/blog/index.js"></script>
+  </body>
 </html>

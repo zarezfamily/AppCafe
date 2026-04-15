@@ -61,9 +61,17 @@ export default function useCoffeeData({
       const message = String(error?.message || error || '');
       console.log('[CoffeeData] Error cargar datos:', message);
       if (message.includes('NETWORK_UNAVAILABLE')) {
-        setErrorCargaDatos(cached ? 'Sin conexión. Mostrando datos guardados.' : 'Sin conexión. No se pudieron cargar tus datos.');
+        setErrorCargaDatos(
+          cached
+            ? 'Sin conexión. Mostrando datos guardados.'
+            : 'Sin conexión. No se pudieron cargar tus datos.'
+        );
       } else {
-        setErrorCargaDatos(cached ? 'No pudimos refrescar los datos. Mostrando la última copia guardada.' : 'No se pudieron cargar tus datos.');
+        setErrorCargaDatos(
+          cached
+            ? 'No pudimos refrescar los datos. Mostrando la última copia guardada.'
+            : 'No se pudieron cargar tus datos.'
+        );
       }
     } finally {
       setCargando(false);
@@ -82,7 +90,9 @@ export default function useCoffeeData({
     setErrorCafInicio(null);
     try {
       if (!isGooglePlacesConfigured(googlePlacesKey)) {
-        setErrorCafInicio('Configura una Google Places API key valida para activar cafeterias cercanas.');
+        setErrorCafInicio(
+          'Configura una Google Places API key valida para activar cafeterias cercanas.'
+        );
         setCafeteriasInicio([]);
         return;
       }
@@ -127,7 +137,8 @@ export default function useCoffeeData({
         maxResultCount: 12,
         radiusMeters: 5000,
         rankPreference: 'DISTANCE',
-        fieldMask: 'places.id,places.displayName,places.formattedAddress,places.location,places.rating,places.userRatingCount,places.currentOpeningHours,places.photos,places.types',
+        fieldMask:
+          'places.id,places.displayName,places.formattedAddress,places.location,places.rating,places.userRatingCount,places.currentOpeningHours,places.photos,places.types',
       });
 
       const mapped = mapPlacesToHomeNearbyCafeterias({
@@ -142,9 +153,13 @@ export default function useCoffeeData({
     } catch (e) {
       const msg = String(e?.message || '');
       if (msg.includes('GOOGLE_PLACES_KEY_NOT_CONFIGURED')) {
-        setErrorCafInicio('Configura una Google Places API key valida para activar cafeterias cercanas.');
+        setErrorCafInicio(
+          'Configura una Google Places API key valida para activar cafeterias cercanas.'
+        );
       } else if (msg.includes('GOOGLE_PLACES_API_ERROR')) {
-        setErrorCafInicio('Google Places no esta disponible: revisa API key, permisos y facturacion.');
+        setErrorCafInicio(
+          'Google Places no esta disponible: revisa API key, permisos y facturacion.'
+        );
       } else {
         setErrorCafInicio('No se pudieron cargar cafeterías cercanas.');
       }
@@ -212,7 +227,10 @@ export default function useCoffeeData({
   const favCafes = useMemo(() => allCafes.filter((c) => favs.includes(c.id)), [allCafes, favs]);
   const cafesFiltrados = useMemo(() => filtrar(misCafes, busquedaMis), [misCafes, busquedaMis]);
   const topFiltrados = useMemo(() => filtrar(topCafes, busquedaTop), [topCafes, busquedaTop]);
-  const topCafesVista = useMemo(() => selectTopCoffeesForCountry(topCafes, perfil.pais), [topCafes, perfil.pais]);
+  const topCafesVista = useMemo(
+    () => selectTopCoffeesForCountry(topCafes, perfil.pais),
+    [topCafes, perfil.pais]
+  );
   const ultimosGlobal = allCafes.slice(0, 10);
   const ultimos100 = allCafes.slice(0, 100);
   const top100 = topCafesVista.slice(0, 100);

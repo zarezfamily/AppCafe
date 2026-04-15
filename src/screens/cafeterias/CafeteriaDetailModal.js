@@ -24,7 +24,11 @@ export default function CafeteriaDetailModal({ cafeteria, styles, onClose, abrir
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.detHero}>
             {cafeteria.foto ? (
-              <Image source={{ uri: cafeteria.foto }} style={StyleSheet.absoluteFillObject} resizeMode="cover" />
+              <Image
+                source={{ uri: cafeteria.foto }}
+                style={StyleSheet.absoluteFillObject}
+                resizeMode="cover"
+              />
             ) : (
               <View style={styles.detPlaceholder}>
                 <Text style={styles.detPlaceholderEmoji}>☕</Text>
@@ -45,10 +49,14 @@ export default function CafeteriaDetailModal({ cafeteria, styles, onClose, abrir
               <View
                 style={[
                   styles.badgeEstado,
-                  { backgroundColor: cafeteria.abierto ? THEME.status.success : THEME.status.danger },
+                  {
+                    backgroundColor: cafeteria.abierto ? THEME.status.success : THEME.status.danger,
+                  },
                 ]}
               >
-                <Text style={styles.badgeEstadoText}>{cafeteria.abierto ? '🟢 Abierto ahora' : '🔴 Cerrado'}</Text>
+                <Text style={styles.badgeEstadoText}>
+                  {cafeteria.abierto ? '🟢 Abierto ahora' : '🔴 Cerrado'}
+                </Text>
               </View>
             )}
 
@@ -75,7 +83,9 @@ export default function CafeteriaDetailModal({ cafeteria, styles, onClose, abrir
               <View style={styles.detInfoItem}>
                 <Ionicons name="location" size={20} color={PREMIUM_ACCENT} />
                 <Text style={styles.detInfoLabel}>
-                  {cafeteria.distancia < 1000 ? `${cafeteria.distancia}m` : `${(cafeteria.distancia / 1000).toFixed(1)}km`}
+                  {cafeteria.distancia < 1000
+                    ? `${cafeteria.distancia}m`
+                    : `${(cafeteria.distancia / 1000).toFixed(1)}km`}
                 </Text>
               </View>
 
@@ -130,7 +140,11 @@ export default function CafeteriaDetailModal({ cafeteria, styles, onClose, abrir
             {cafeteria.fotos && cafeteria.fotos.length > 1 && (
               <View style={styles.seccion}>
                 <Text style={styles.secTitulo}>📸 Fotos</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 8 }}>
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  style={{ marginTop: 8 }}
+                >
                   {cafeteria.fotos.map(
                     (foto, index) =>
                       foto && (
@@ -158,7 +172,8 @@ export default function CafeteriaDetailModal({ cafeteria, styles, onClose, abrir
                 <Text style={styles.secTitulo}>📍 Dirección</Text>
                 <Text style={styles.secTexto}>{cafeteria.direccion}</Text>
                 <Text style={[styles.secTexto, { marginTop: 6 }]}>
-                  Coordenadas: {Number(cafeteria.lat).toFixed(5)}, {Number(cafeteria.lon).toFixed(5)}
+                  Coordenadas: {Number(cafeteria.lat).toFixed(5)},{' '}
+                  {Number(cafeteria.lon).toFixed(5)}
                 </Text>
               </View>
             )}
@@ -168,7 +183,10 @@ export default function CafeteriaDetailModal({ cafeteria, styles, onClose, abrir
                 <Text style={styles.secTitulo}>📞 Contacto</Text>
 
                 {cafeteria.telefono && (
-                  <TouchableOpacity onPress={() => Linking.openURL(`tel:${cafeteria.telefono}`)} style={styles.contactBtn}>
+                  <TouchableOpacity
+                    onPress={() => Linking.openURL(`tel:${cafeteria.telefono}`)}
+                    style={styles.contactBtn}
+                  >
                     <Ionicons name="call-outline" size={16} color={PREMIUM_ACCENT} />
                     <Text style={styles.contactText}>{cafeteria.telefono}</Text>
                   </TouchableOpacity>
@@ -177,7 +195,11 @@ export default function CafeteriaDetailModal({ cafeteria, styles, onClose, abrir
                 {cafeteria.web && (
                   <TouchableOpacity
                     onPress={() =>
-                      Linking.openURL(cafeteria.web.startsWith('http') ? cafeteria.web : `https://${cafeteria.web}`)
+                      Linking.openURL(
+                        cafeteria.web.startsWith('http')
+                          ? cafeteria.web
+                          : `https://${cafeteria.web}`
+                      )
                     }
                     style={styles.contactBtn}
                   >
@@ -190,7 +212,10 @@ export default function CafeteriaDetailModal({ cafeteria, styles, onClose, abrir
               </View>
             )}
 
-            <TouchableOpacity style={[styles.primaryButton, { marginTop: 8 }]} onPress={() => abrirMaps(cafeteria)}>
+            <TouchableOpacity
+              style={[styles.primaryButton, { marginTop: 8 }]}
+              onPress={() => abrirMaps(cafeteria)}
+            >
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                 <Ionicons name="navigate-outline" size={20} color="#fff" />
                 <Text style={styles.primaryButtonText}>Cómo llegar</Text>

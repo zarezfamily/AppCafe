@@ -27,24 +27,33 @@ export default function useForumState() {
   const forumThreadScrollRef = useRef(null);
   const forumReplyInputRef = useRef(null);
 
-  const forumThreadsByCategory = useMemo(() => (
-    forumCategory
-      ? forumThreads
-          .filter((t) => t.categoryId === forumCategory.id)
-          .sort((a, b) => {
-            if (forumSort === 'recent') return new Date(b.createdAt) - new Date(a.createdAt);
-            return (b.upvotes || 0) - (a.upvotes || 0);
-          })
-      : []
-  ), [forumCategory, forumThreads, forumSort]);
+  const forumThreadsByCategory = useMemo(
+    () =>
+      forumCategory
+        ? forumThreads
+            .filter((t) => t.categoryId === forumCategory.id)
+            .sort((a, b) => {
+              if (forumSort === 'recent') return new Date(b.createdAt) - new Date(a.createdAt);
+              return (b.upvotes || 0) - (a.upvotes || 0);
+            })
+        : [],
+    [forumCategory, forumThreads, forumSort]
+  );
 
-  const forumRepliesByThread = useMemo(() => (
-    forumThread
-      ? forumReplies.filter((r) => r.threadId === forumThread.id).sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
-      : []
-  ), [forumThread, forumReplies]);
+  const forumRepliesByThread = useMemo(
+    () =>
+      forumThread
+        ? forumReplies
+            .filter((r) => r.threadId === forumThread.id)
+            .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+        : [],
+    [forumThread, forumReplies]
+  );
 
-  const forumTopReplies = useMemo(() => forumRepliesByThread.filter((r) => !r.parentId), [forumRepliesByThread]);
+  const forumTopReplies = useMemo(
+    () => forumRepliesByThread.filter((r) => !r.parentId),
+    [forumRepliesByThread]
+  );
 
   return {
     forumCategory,

@@ -27,7 +27,9 @@ export default function SimpleCoffeeListTab({
         <Text style={s.pageTitle}>{title}</Text>
         <Text style={s.sectionSub}>{subtitle}</Text>
       </View>
-      {cargando ? <SkeletonVerticalList /> : (
+      {cargando ? (
+        <SkeletonVerticalList />
+      ) : (
         <View style={{ paddingHorizontal: 16, marginTop: 8 }}>
           {items.map((item) => (
             <CardVertical

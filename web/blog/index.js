@@ -71,9 +71,10 @@ const applyFilters = () => {
     const category = card.getAttribute('data-category');
     const haystack = normalize(card.dataset.search || '');
     const categoryMatch = activeFilter === 'todos' || category === activeFilter;
-    const queryMatch = !normalizedQuery
-      || haystack.includes(normalizedQuery)
-      || normalizedQuery.split(/\s+/).every((token) => haystack.includes(token));
+    const queryMatch =
+      !normalizedQuery ||
+      haystack.includes(normalizedQuery) ||
+      normalizedQuery.split(/\s+/).every((token) => haystack.includes(token));
 
     return categoryMatch && queryMatch;
   });

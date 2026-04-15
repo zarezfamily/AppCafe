@@ -8,8 +8,10 @@ export const AUTH_SCREEN_STORAGE_KEYS = {
 };
 
 export const loadStoredAuthState = async () => {
-  const rememberEnabled = (await SecureStore.getItemAsync(AUTH_SCREEN_STORAGE_KEYS.remember)) === 'true';
-  const hasAccount = (await SecureStore.getItemAsync(AUTH_SCREEN_STORAGE_KEYS.hasAccount)) === 'true';
+  const rememberEnabled =
+    (await SecureStore.getItemAsync(AUTH_SCREEN_STORAGE_KEYS.remember)) === 'true';
+  const hasAccount =
+    (await SecureStore.getItemAsync(AUTH_SCREEN_STORAGE_KEYS.hasAccount)) === 'true';
 
   if (!rememberEnabled) {
     return {

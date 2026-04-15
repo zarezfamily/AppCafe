@@ -1,15 +1,17 @@
-export const escapeHtml = (value) => String(value || '')
-  .replace(/&/g, '&amp;')
-  .replace(/</g, '&lt;')
-  .replace(/>/g, '&gt;')
-  .replace(/"/g, '&quot;')
-  .replace(/'/g, '&#39;');
+export const escapeHtml = (value) =>
+  String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 
-export const normalize = (value) => String(value || '')
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g, '')
-  .toLowerCase()
-  .trim();
+export const normalize = (value) =>
+  String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
 
 export const ensureCardBaseContent = (cards) => {
   cards.forEach((card) => {
@@ -27,9 +29,7 @@ const buildHighlightTerms = (query) => {
 
   const normalizedPhrase = normalize(raw);
   const tokenTerms = normalizedPhrase.split(/\s+/).filter((token) => token.length >= 2);
-  const merged = normalizedPhrase.includes(' ')
-    ? [normalizedPhrase, ...tokenTerms]
-    : tokenTerms;
+  const merged = normalizedPhrase.includes(' ') ? [normalizedPhrase, ...tokenTerms] : tokenTerms;
 
   return Array.from(new Set(merged)).sort((a, b) => b.length - a.length);
 };
@@ -39,7 +39,10 @@ const normalizeWithMap = (text) => {
   const charMap = [];
 
   Array.from(String(text || '')).forEach((char, index) => {
-    const normalizedChar = char.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const normalizedChar = char
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
 
     for (const mappedChar of normalizedChar) {
       normalizedText += mappedChar;
@@ -158,25 +161,27 @@ export const reorderCards = (normalizedQuery, cards, originalOrder) => {
 };
 
 export const ensureSearchIndex = async (cards) => {
-  await Promise.all(cards.map(async (card) => {
-    const url = card.getAttribute('data-post-url');
-    if (!url) return;
+  await Promise.all(
+    cards.map(async (card) => {
+      const url = card.getAttribute('data-post-url');
+      if (!url) return;
 
-    try {
-      const res = await fetch(url);
-      if (!res.ok) return;
-      const html = await res.text();
-      const doc = new DOMParser().parseFromString(html, 'text/html');
-      const content = [
-        doc.querySelector('title')?.textContent || '',
-        doc.querySelector('.hero-title')?.textContent || '',
-        doc.querySelector('.lead')?.textContent || '',
-        doc.querySelector('.article')?.textContent || '',
-      ].join(' ');
+      try {
+        const res = await fetch(url);
+        if (!res.ok) return;
+        const html = await res.text();
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const content = [
+          doc.querySelector('title')?.textContent || '',
+          doc.querySelector('.hero-title')?.textContent || '',
+          doc.querySelector('.lead')?.textContent || '',
+          doc.querySelector('.article')?.textContent || '',
+        ].join(' ');
 
-      card.dataset.search = `${card.dataset.search || ''} ${normalize(content)}`.trim();
-    } catch (_) {
-      /* ignore single post fetch failures */
-    }
-  }));
+        card.dataset.search = `${card.dataset.search || ''} ${normalize(content)}`.trim();
+      } catch (_) {
+        /* ignore single post fetch failures */
+      }
+    })
+  );
 };

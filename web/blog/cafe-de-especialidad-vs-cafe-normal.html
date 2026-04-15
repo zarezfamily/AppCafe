@@ -1,897 +1,1381 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="shortcut icon" href="/favicon.ico" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-  <meta name="apple-mobile-web-app-title" content="Etiove" />
-  <meta name="theme-color" content="#21150f" />
-  <link rel="manifest" href="/site.webmanifest" />
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real? | Blog Etiove</title>
-  <meta name="author" content="Etiove" />
-  <meta name="description" content="¿Qué diferencia hay entre un café de especialidad y uno del supermercado? Puntuación SCA, trazabilidad, sabor y precio explicados sin tecnicismos." />
-  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-  <meta name="keywords" content="¿Qué diferencia hay entre un café de especialidad y uno del supermercado? Puntuación SCA, trazabilidad, sabor y precio explicados sin tecnicismos" />
-  <link rel="canonical" href="https://etiove.com/blog/cafe-de-especialidad-vs-cafe-normal.html" />
-  <link rel="alternate" type="application/rss+xml" title="Blog Etiove - RSS" href="https://etiove.com/feed.xml" />
-  <link rel="prev" href="https://etiove.com/blog/por-que-mi-cafe-sabe-amargo.html" />
-  <meta property="og:type" content="article" />
-  <meta property="og:site_name" content="Etiove" />
-  <meta property="og:locale" content="es_ES" />
-  <meta property="og:title" content="Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real? | Blog Etiove" />
-  <meta property="og:description" content="¿Qué diferencia hay entre un café de especialidad y uno del supermercado? Puntuación SCA, trazabilidad, sabor y precio explicados sin tecnicismos." />
-  <meta property="og:url" content="https://etiove.com/blog/cafe-de-especialidad-vs-cafe-normal.html" />
-  <meta property="og:image" content="https://etiove.com/og-image.jpg" />
-  <meta property="og:image:type" content="image/jpeg" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="Café de especialidad vs café normal" />
-  <meta property="article:section" content="Análisis" />
-  <meta property="article:published_time" content="2026-04-09" />
-  <meta property="article:modified_time" content="2026-04-09" />
-  <meta property="og:updated_time" content="2026-04-09" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real?" />
-  <meta name="twitter:description" content="¿Qué diferencia hay entre un café de especialidad y uno del supermercado? Puntuación SCA, trazabilidad, sabor y precio explicados sin tecnicismos." />
-  <meta name="twitter:image" content="https://etiove.com/og-image.jpg" />
-  <meta name="twitter:image:alt" content="Café de especialidad vs café normal" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:wght@400;500&display=swap" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/blog/post-shell.css" />
-  <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --ink: #1c120d; --ink-soft: #5d4030; --ink-muted: #9a7963; --cream: #f6efe7; --cream-alt: #fffaf5; --accent: #8f5e3b; --accent-deep: #5d4030; --border: #e4d3c2; --border-soft: rgba(228,211,194,0.5); }
-    html { scroll-behavior: smooth; }
-    body { font-family: 'Source Serif 4', Georgia, serif; color: var(--ink); background: radial-gradient(circle at 10% -10%, rgba(143,94,59,.12) 0%, transparent 45%), radial-gradient(circle at 100% 20%, rgba(93,64,48,.07) 0%, transparent 42%), var(--cream); min-height: 100vh; line-height: 1.75; }
-    body > nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 20px 40px; background: rgba(246,239,231,.97); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-soft); }
-    .nav-wordmark { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 500; letter-spacing: 4px; color: var(--ink); text-decoration: none; text-transform: uppercase; }
-    .nav-links { display: flex; align-items: center; gap: 32px; }
-    .nav-link { font-family: -apple-system, sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-muted); text-decoration: none; transition: color .3s; }
-    .nav-link:hover { color: var(--accent); }
-    .post-hero { position: relative; margin-top: 62px; height: min(500px, 55vw); min-height: 240px; overflow: hidden; }
-    .hero-img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(28,18,13,.06) 0%, rgba(28,18,13,.5) 55%, rgba(28,18,13,.82) 100%); }
-    .hero-content { position: absolute; bottom: 0; left: 0; right: 0; padding: clamp(16px,4vw,44px); }
-    .hero-tag { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,236,210,.85); background: rgba(143,94,59,.65); border-radius: 999px; padding: 4px 10px; margin-bottom: 10px; }
-    .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(22px,3.5vw,44px); font-weight: 800; line-height: 1.12; color: #fff9f1; margin-bottom: 7px; }
-    .hero-meta { font-size: 12px; color: rgba(255,249,241,.6); }
-    .container { width: min(760px, 92vw); margin: 0 auto; padding: 40px 0 80px; position: relative; z-index: 1; }
-    .post-body { font-size: clamp(17px, 2vw, 19px); color: #2e1e15; }
-    h2 { font-family: 'Playfair Display', serif; font-size: clamp(24px,3.5vw,34px); font-weight: 500; color: var(--ink); margin: 48px 0 14px; line-height: 1.2; }
-    h3 { font-family: 'Playfair Display', serif; font-size: clamp(19px,2.5vw,24px); font-weight: 500; color: var(--ink-soft); margin: 32px 0 10px; }
-    p { margin-bottom: 18px; }
-    .causes { display: grid; gap: 16px; margin: 28px 0 36px; }
-    .cause-card { background: var(--cream-alt); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; display: grid; grid-template-columns: 48px 1fr; gap: 16px; align-items: start; transition: box-shadow .2s, transform .2s; }
-    .cause-card:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(28,18,13,.08); }
-    .cause-num { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 300; color: var(--border); line-height: 1; text-align: center; padding-top: 2px; }
-    .cause-body h3 { margin: 0 0 6px; font-size: 17px; color: var(--ink); }
-    .cause-body p { margin: 0; font-size: 15px; line-height: 1.65; color: var(--ink-soft); }
-    .cause-fix { margin-top: 10px; padding: 8px 12px; background: rgba(143,94,59,.07); border-radius: 8px; font-size: 13px; color: var(--accent-deep); font-weight: 600; }
-    .cause-fix::before { content: '→ '; }
-    .tip { border-left: 4px solid var(--accent); background: rgba(143,94,59,.07); border-radius: 0 12px 12px 0; padding: 18px 20px; margin: 32px 0; font-size: 17px; line-height: 1.7; }
-    .tip strong { color: var(--accent-deep); }
-    .table-wrap { overflow-x: auto; margin: 28px 0 36px; }
-    table { width: 100%; border-collapse: collapse; font-size: 15px; }
-    thead tr { background: var(--ink); color: #fff9f1; }
-    thead th { padding: 12px 16px; text-align: left; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; font-family: -apple-system, sans-serif; font-weight: 600; }
-    tbody tr { border-bottom: 1px solid var(--border); }
-    tbody tr:nth-child(even) { background: rgba(246,239,231,.5); }
-    tbody td { padding: 12px 16px; color: var(--ink-soft); line-height: 1.5; }
-    tbody td:first-child { color: var(--ink); font-weight: 600; }
-    .score-visual { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 28px 0 36px; }
-    .score-card { border-radius: 16px; padding: 24px; text-align: center; }
-    .score-card.specialty { background: linear-gradient(145deg,#1f130d,#2d1a10); border: 1px solid rgba(201,149,87,.35); }
-    .score-card.regular { background: var(--cream-alt); border: 1px solid var(--border); }
-    .score-label { font-family: -apple-system, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 12px; }
-    .score-card.specialty .score-label { color: rgba(205,165,120,.7); }
-    .score-card.regular .score-label { color: var(--ink-muted); }
-    .score-number { font-family: 'Playfair Display', serif; font-size: 52px; font-weight: 300; line-height: 1; margin-bottom: 6px; }
-    .score-card.specialty .score-number { color: #f4dfc8; }
-    .score-card.regular .score-number { color: var(--ink); }
-    .score-desc { font-size: 13px; line-height: 1.5; }
-    .score-card.specialty .score-desc { color: rgba(255,244,234,.55); }
-    .score-card.regular .score-desc { color: var(--ink-muted); }
-    .check { color: #4f7a53; font-weight: 700; }
-    .cross { color: #a44f45; font-weight: 700; }
-    .myths { display: grid; gap: 14px; margin: 24px 0 36px; }
-    .myth-card { background: var(--cream-alt); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: start; }
-    .myth-icon { font-size: 22px; padding-top: 2px; }
-    .myth-label { font-family: -apple-system, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
-    .myth-label.false { color: #a44f45; }
-    .myth-label.true { color: #4f7a53; }
-    .myth-card h3 { margin: 0 0 6px; font-size: 16px; color: var(--ink); }
-    .myth-card p { margin: 0; font-size: 15px; color: var(--ink-soft); line-height: 1.6; }
-    .origins { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0 32px; }
-    .origin-pill { display: inline-flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px 18px; background: var(--cream-alt); border: 1px solid var(--border); border-radius: 14px; min-width: 100px; transition: all .2s; }
-    .origin-pill:hover { border-color: var(--accent); transform: translateY(-2px); }
-    .origin-flag { font-size: 22px; }
-    .origin-name { font-family: -apple-system, sans-serif; font-size: 11px; font-weight: 700; color: var(--ink-soft); text-align: center; }
-    .origin-note { font-size: 10px; color: var(--ink-muted); text-align: center; }
-    @media (max-width: 600px) { .cause-card { grid-template-columns: 1fr; gap: 8px; } .score-visual { grid-template-columns: 1fr; } .myth-card { grid-template-columns: 1fr; gap: 6px; } .cta-box { padding: 28px 20px; } }
-
-    :root { --blog-nav-blur: 12px; }
-    body > nav,
-    .site-nav {
-      position: fixed !important;
-      top: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-      z-index: 100 !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: space-between !important;
-      padding: 20px 40px !important;
-      background: rgba(246, 239, 231, 0.97) !important;
-      backdrop-filter: blur(var(--blog-nav-blur)) !important;
-      -webkit-backdrop-filter: blur(var(--blog-nav-blur)) !important;
-      border-bottom: 1px solid var(--border-soft) !important;
-      box-sizing: border-box !important;
-    }
-    .nav-wordmark {
-      font-family: "Playfair Display", serif !important;
-      font-size: 22px !important;
-      font-weight: 500 !important;
-      letter-spacing: 4px !important;
-      color: var(--ink) !important;
-      text-decoration: none !important;
-      text-transform: uppercase !important;
-    }
-    .nav-links {
-      display: flex !important;
-      align-items: center !important;
-      gap: 32px !important;
-    }
-    .nav-link {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
-      font-size: 11px !important;
-      font-weight: 500 !important;
-      letter-spacing: 2px !important;
-      text-transform: uppercase !important;
-      color: var(--ink-muted) !important;
-      text-decoration: none !important;
-      transition: color 0.2s !important;
-    }
-    .nav-link:hover,
-    .nav-link--active {
-      color: var(--accent) !important;
-    }
-    .nav-hamburger {
-      display: none !important;
-      flex-direction: column !important;
-      gap: 5px !important;
-      padding: 6px !important;
-      border: none !important;
-      background: none !important;
-      cursor: pointer !important;
-    }
-    .nav-hamburger span {
-      display: block !important;
-      width: 22px !important;
-      height: 2px !important;
-      background: var(--ink) !important;
-      border-radius: 2px !important;
-      transition: transform 0.25s, opacity 0.25s !important;
-    }
-    footer {
-      position: relative !important;
-      z-index: 1 !important;
-      display: grid !important;
-      grid-template-columns: 1fr !important;
-      gap: 0 !important;
-      align-items: start !important;
-      padding: 32px 40px !important;
-      border-top: 1px solid var(--border-soft) !important;
-      background: #f6efe7 !important;
-      box-sizing: border-box !important;
-    }
-    .footer-copy {
-      display: flex !important;
-      flex-wrap: wrap !important;
-      align-items: center !important;
-      justify-content: space-between !important;
-      gap: 12px !important;
-      margin-top: 0 !important;
-      padding-top: 24px !important;
-      padding-bottom: 16px !important;
-      border-top: none !important;
-      color: var(--ink-muted) !important;
-      font-size: 11px !important;
-      font-weight: 300 !important;
-      letter-spacing: 0.5px !important;
-    }
-    .footer-copy-center,
-    .footer-legal-group {
-      display: flex !important;
-      flex-wrap: wrap !important;
-      align-items: center !important;
-      gap: 14px !important;
-    }
-    .footer-legal-group { gap: 20px !important; }
-    .footer-wordmark-sm {
-      color: var(--ink-soft) !important;
-      font-family: "Playfair Display", serif !important;
-      font-size: 20px !important;
-      font-weight: 400 !important;
-      letter-spacing: 6px !important;
-      text-transform: uppercase !important;
-    }
-    .social-row-inline {
-      display: flex !important;
-      align-items: center !important;
-      gap: 12px !important;
-    }
-    .social-link {
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      width: 38px !important;
-      height: 38px !important;
-      border: 1px solid var(--border) !important;
-      border-radius: 50% !important;
-      color: var(--ink-muted) !important;
-      text-decoration: none !important;
-      transition: all 0.3s !important;
-    }
-    .social-link:hover {
-      border-color: var(--accent) !important;
-      color: var(--accent) !important;
-      transform: translateY(-2px) !important;
-    }
-    .social-link svg {
-      width: 17px !important;
-      height: 17px !important;
-      fill: currentColor !important;
-    }
-    .footer-legal-link {
-      color: var(--ink-muted) !important;
-      font-size: 11px !important;
-      font-weight: 500 !important;
-      letter-spacing: 1px !important;
-      opacity: 0.7 !important;
-      text-decoration: none !important;
-      text-transform: uppercase !important;
-      transition: opacity 0.2s, color 0.2s !important;
-    }
-    .footer-legal-link:hover { color: var(--accent) !important; }
-    .post-hero {
-      position: relative !important;
-      margin-top: 62px !important;
-      height: min(500px, 55vw) !important;
-      min-height: 240px !important;
-      overflow: hidden !important;
-      background: #1c120d !important;
-    }
-    .hero-img {
-      width: 100% !important;
-      height: 100% !important;
-      object-fit: cover !important;
-      display: block !important;
-    }
-    .hero-overlay {
-      position: absolute !important;
-      inset: 0 !important;
-      background: linear-gradient(180deg, rgba(10, 8, 6, 0.2) 0%, rgba(10, 8, 6, 0.58) 100%) !important;
-      pointer-events: none !important;
-    }
-    .hero-content {
-      position: absolute !important;
-      left: 50% !important;
-      bottom: clamp(22px, 4vw, 42px) !important;
-      width: min(920px, calc(100% - 40px)) !important;
-      transform: translateX(-50%) !important;
-      z-index: 1 !important;
-      box-sizing: border-box !important;
-    }
-    .hero-tag {
-      display: inline-block !important;
-      margin-bottom: 10px !important;
-      padding: 4px 10px !important;
-      border-radius: 999px !important;
-      background: rgba(143, 94, 59, 0.65) !important;
-      color: rgba(255, 236, 210, 0.85) !important;
-      font-size: 10px !important;
-      font-weight: 700 !important;
-      letter-spacing: 2px !important;
-      text-transform: uppercase !important;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
-    }
-    .hero-title {
-      margin: 0 0 7px !important;
-      color: #fff9f1 !important;
-      font-family: "Playfair Display", serif !important;
-      font-size: clamp(22px, 3.5vw, 44px) !important;
-      font-weight: 800 !important;
-      line-height: 1.12 !important;
-      text-wrap: balance !important;
-    }
-    .hero-meta {
-      color: rgba(255, 249, 241, 0.6) !important;
-      font-size: 12px !important;
-      line-height: 1.5 !important;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
-    }
-    .editorial-meta {
-      max-width: min(920px, calc(100% - 40px)) !important;
-      margin: 24px auto 8px !important;
-      background: rgba(255, 250, 245, 0.92) !important;
-      border: 1px solid var(--border, #e4d3c2) !important;
-      border-radius: 16px !important;
-      box-shadow: 0 16px 40px rgba(28, 18, 13, 0.06) !important;
-      box-sizing: border-box !important;
-    }
-    .editorial-meta-grid {
-      display: grid !important;
-      grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-      gap: 0 !important;
-    }
-    .editorial-meta-item {
-      padding: 16px 18px !important;
-      border-right: 1px solid rgba(228, 211, 194, 0.7) !important;
-    }
-    .editorial-meta-item:last-child { border-right: 0 !important; }
-    .editorial-meta-item-wide { grid-column: span 2 !important; }
-    .editorial-meta-label {
-      display: block !important;
-      margin-bottom: 6px !important;
-      color: var(--ink-muted, #8b7355) !important;
-      font-size: 10px !important;
-      font-weight: 700 !important;
-      letter-spacing: 1.8px !important;
-      text-transform: uppercase !important;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
-    }
-    .editorial-meta-value {
-      display: block !important;
-      color: var(--ink, #1c120d) !important;
-      font-size: 14px !important;
-      line-height: 1.45 !important;
-    }
-    .post-body blockquote,
-    blockquote.pull-quote,
-    .pull-quote {
-      margin: 28px 0 !important;
-      padding: 18px 20px !important;
-      border-left: 4px solid var(--accent) !important;
-      border-radius: 0 14px 14px 0 !important;
-      background: rgba(143, 94, 59, 0.07) !important;
-      color: var(--ink-soft) !important;
-      box-sizing: border-box !important;
-    }
-    .post-body blockquote p,
-    .pull-quote p {
-      margin: 0 !important;
-      color: var(--ink-soft) !important;
-      font-size: 17px !important;
-      line-height: 1.65 !important;
-      font-style: italic !important;
-    }
-    .post-body blockquote cite,
-    .pull-quote cite {
-      display: block !important;
-      margin-top: 10px !important;
-      color: var(--ink-muted) !important;
-      font-size: 12px !important;
-      font-style: normal !important;
-    }
-    .tip,
-    .info-box,
-    .note-box,
-    .summary-box,
-    .callout {
-      margin: 32px 0 !important;
-      padding: 18px 20px !important;
-      border: 1px solid rgba(143, 94, 59, 0.22) !important;
-      border-left: 4px solid var(--accent) !important;
-      border-radius: 0 14px 14px 0 !important;
-      background: linear-gradient(180deg, rgba(255, 251, 247, 0.96) 0%, rgba(249, 241, 233, 0.92) 100%) !important;
-      color: var(--ink-soft) !important;
-      box-sizing: border-box !important;
-    }
-    .tip strong,
-    .info-box strong,
-    .note-box strong,
-    .summary-box strong,
-    .callout strong {
-      color: var(--accent-deep) !important;
-    }
-    .post-body table,
-    table.compare-table {
-      width: 100% !important;
-      margin: 28px 0 36px !important;
-      border-collapse: collapse !important;
-      border-spacing: 0 !important;
-      overflow: hidden !important;
-      border: 1px solid var(--border) !important;
-      border-radius: 16px !important;
-      background: rgba(255, 250, 245, 0.92) !important;
-      box-shadow: 0 12px 28px rgba(28, 18, 13, 0.05) !important;
-    }
-    .post-body thead tr,
-    table.compare-table thead tr {
-      background: var(--ink) !important;
-      color: #fff9f1 !important;
-    }
-    .post-body thead th,
-    table.compare-table thead th {
-      padding: 12px 16px !important;
-      color: inherit !important;
-      text-align: left !important;
-      font-size: 11px !important;
-      font-weight: 700 !important;
-      letter-spacing: 1.5px !important;
-      text-transform: uppercase !important;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
-    }
-    .post-body tbody tr,
-    table.compare-table tbody tr {
-      border-bottom: 1px solid var(--border) !important;
-    }
-    .post-body tbody tr:nth-child(even),
-    table.compare-table tbody tr:nth-child(even) {
-      background: rgba(246, 239, 231, 0.5) !important;
-    }
-    .post-body tbody tr:last-child,
-    table.compare-table tbody tr:last-child {
-      border-bottom: 0 !important;
-    }
-    .post-body td,
-    .post-body th,
-    table.compare-table td,
-    table.compare-table th {
-      padding: 12px 16px !important;
-      vertical-align: top !important;
-    }
-    .post-body td,
-    table.compare-table td {
-      color: var(--ink-soft) !important;
-      font-size: 15px !important;
-      line-height: 1.55 !important;
-    }
-    .post-body td:first-child,
-    table.compare-table td:first-child {
-      color: var(--ink) !important;
-      font-weight: 600 !important;
-    }
-    .post-body figure {
-      margin: 32px 0 !important;
-    }
-    .post-body figcaption {
-      margin-top: 10px !important;
-      color: var(--ink-muted) !important;
-      font-size: 13px !important;
-      line-height: 1.5 !important;
-      text-align: center !important;
-    }
-    .post-actions {
-      margin-top: 36px !important;
-      padding-top: 22px !important;
-      border-top: 1px solid var(--border) !important;
-    }
-    .section-label,
-    .section-label--accent {
-      margin-bottom: 11px !important;
-      color: var(--ink-muted) !important;
-      font-size: 10px !important;
-      font-weight: 700 !important;
-      letter-spacing: 2px !important;
-      text-transform: uppercase !important;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
-    }
-    .share-row {
-      display: flex !important;
-      gap: 9px !important;
-      flex-wrap: wrap !important;
-      margin-bottom: 24px !important;
-    }
-    .share-btn {
-      display: inline-flex !important;
-      align-items: center !important;
-      gap: 7px !important;
-      border: 1px solid var(--border) !important;
-      border-radius: 999px !important;
-      padding: 8px 14px !important;
-      background: var(--cream-alt) !important;
-      color: var(--ink-soft) !important;
-      text-decoration: none !important;
-      font-weight: 700 !important;
-      font-size: 13px !important;
-      font-family: inherit !important;
-      cursor: pointer !important;
-      transition: border-color 0.2s, color 0.2s !important;
-      box-sizing: border-box !important;
-    }
-    .share-btn:hover {
-      border-color: var(--accent) !important;
-      color: var(--accent) !important;
-    }
-    .share-btn svg {
-      width: 14px !important;
-      height: 14px !important;
-      flex-shrink: 0 !important;
-      fill: currentColor !important;
-      stroke: currentColor !important;
-    }
-    .comment-help {
-      margin-bottom: 10px !important;
-      color: var(--ink-soft) !important;
-      font-size: 14px !important;
-    }
-    .comment-help a {
-      color: var(--accent) !important;
-      font-weight: 700 !important;
-      text-decoration: none !important;
-    }
-    .comment-box {
-      width: 100% !important;
-      min-height: 88px !important;
-      padding: 11px 13px !important;
-      margin-bottom: 10px !important;
-      border: 1px solid var(--border) !important;
-      border-radius: 12px !important;
-      background: #fff !important;
-      color: var(--ink) !important;
-      font-size: 15px !important;
-      font-family: inherit !important;
-      resize: vertical !important;
-      box-sizing: border-box !important;
-    }
-    .comment-send {
-      border: none !important;
-      border-radius: 999px !important;
-      padding: 10px 20px !important;
-      background: var(--accent-deep) !important;
-      color: #fff !important;
-      font-weight: 700 !important;
-      font-size: 13px !important;
-      cursor: pointer !important;
-      font-family: inherit !important;
-      transition: opacity 0.2s, background 0.2s !important;
-    }
-    .comment-send:hover { background: var(--accent) !important; }
-    .comment-send:disabled {
-      opacity: 0.45 !important;
-      cursor: not-allowed !important;
-    }
-    .comment-status {
-      margin-top: 10px !important;
-      font-size: 13px !important;
-      color: var(--ink-soft) !important;
-    }
-    .comment-list {
-      margin-top: 18px !important;
-      display: grid !important;
-      gap: 9px !important;
-    }
-    .comment-item {
-      border: 1px solid var(--border) !important;
-      border-radius: 12px !important;
-      background: rgba(255,250,245,0.75) !important;
-      padding: 13px !important;
-    }
-    .comment-meta {
-      margin-bottom: 5px !important;
-      color: #7b6049 !important;
-      font-size: 12px !important;
-    }
-    .comment-body {
-      margin: 0 !important;
-      color: #38251c !important;
-      font-size: 15px !important;
-      line-height: 1.65 !important;
-      white-space: pre-wrap !important;
-    }
-    .editorial-meta {
-      max-width: min(920px, calc(100% - 40px));
-      margin: 24px auto 8px;
-      background: rgba(255, 250, 245, 0.92);
-      border: 1px solid var(--border, #e4d3c2);
-      border-radius: 16px;
-      box-shadow: 0 16px 40px rgba(28,18,13,0.06);
-    }
-    .editorial-meta-grid {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 0;
-    }
-    .editorial-meta-item {
-      padding: 16px 18px;
-      border-right: 1px solid rgba(228,211,194,0.7);
-    }
-    .editorial-meta-item:last-child { border-right: 0; }
-    .editorial-meta-item-wide { grid-column: span 2; }
-    .editorial-meta-label {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 1.8px;
-      text-transform: uppercase;
-      color: var(--ink-muted, #8b7355);
-    }
-    .editorial-meta-value {
-      display: block;
-      color: var(--ink, #1c120d);
-      font-size: 14px;
-      line-height: 1.45;
-    }
-    .related-section { margin: 48px 0 0; }
-    .related-label {
-      font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
-      color: var(--ink-muted, #8b7355); margin-bottom: 8px;
-    }
-    .related-heading {
-      font-family: 'Playfair Display', serif; font-size: clamp(22px, 3vw, 30px);
-      line-height: 1.2; color: var(--ink, #1c120d); margin-bottom: 16px;
-    }
-    .related-grid {
-      display: grid !important;
-      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-      gap: 16px !important;
-      width: 100% !important;
-      align-items: stretch !important;
-    }
-    .related-grid > .related-card:last-child:nth-child(odd) {
-      grid-column: 1 / -1 !important;
-    }
-    .related-card {
-      display: flex !important; flex-direction: column !important; width: 100% !important; height: 100% !important; text-decoration: none !important; background: var(--cream-alt, #fffaf5) !important;
-      border: 1px solid var(--border, #e4d3c2) !important; border-radius: 14px !important; overflow: hidden !important;
-      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s !important;
-      box-sizing: border-box !important;
-    }
-    .related-card:hover {
-      transform: translateY(-2px); box-shadow: 0 10px 24px rgba(28,18,13,0.08);
-      border-color: var(--accent, #8f5e3b);
-    }
-    .related-thumb {
-      width: 100% !important;
-      aspect-ratio: 16/9 !important;
-      object-fit: cover !important;
-      display: block !important;
-      flex-shrink: 0 !important;
-    }
-    .related-body {
-      display: flex !important;
-      flex: 1 1 auto !important;
-      flex-direction: column !important;
-      justify-content: flex-start !important;
-      padding: 14px 16px 16px !important;
-      min-height: 118px !important;
-      box-sizing: border-box !important;
-    }
-    .related-tag {
-      display: inline-block !important; margin-bottom: 8px !important; font-size: 10px !important; font-weight: 700 !important;
-      letter-spacing: 1.6px !important; text-transform: uppercase !important; color: var(--accent, #8f5e3b) !important;
-    }
-    .related-title {
-      margin: 0 !important;
-      color: var(--ink, #1c120d) !important;
-      font-family: "Playfair Display", serif !important;
-      font-size: 17px !important;
-      line-height: 1.35 !important;
-      text-wrap: balance !important;
-    }
-    @media (max-width: 720px) {
-      body > nav,
-      .site-nav { padding: 16px 20px !important; }
-      .nav-hamburger { display: flex !important; }
+  <head>
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Etiove" />
+    <meta name="theme-color" content="#21150f" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real? | Blog Etiove</title>
+    <meta name="author" content="Etiove" />
+    <meta
+      name="description"
+      content="¿Qué diferencia hay entre un café de especialidad y uno del supermercado? Puntuación SCA, trazabilidad, sabor y precio explicados sin tecnicismos."
+    />
+    <meta
+      name="robots"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    />
+    <meta
+      name="keywords"
+      content="¿Qué diferencia hay entre un café de especialidad y uno del supermercado? Puntuación SCA, trazabilidad, sabor y precio explicados sin tecnicismos"
+    />
+    <link rel="canonical" href="https://etiove.com/blog/cafe-de-especialidad-vs-cafe-normal.html" />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="Blog Etiove - RSS"
+      href="https://etiove.com/feed.xml"
+    />
+    <link rel="prev" href="https://etiove.com/blog/por-que-mi-cafe-sabe-amargo.html" />
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="Etiove" />
+    <meta property="og:locale" content="es_ES" />
+    <meta
+      property="og:title"
+      content="Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real? | Blog Etiove"
+    />
+    <meta
+      property="og:description"
+      content="¿Qué diferencia hay entre un café de especialidad y uno del supermercado? Puntuación SCA, trazabilidad, sabor y precio explicados sin tecnicismos."
+    />
+    <meta
+      property="og:url"
+      content="https://etiove.com/blog/cafe-de-especialidad-vs-cafe-normal.html"
+    />
+    <meta property="og:image" content="https://etiove.com/og-image.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Café de especialidad vs café normal" />
+    <meta property="article:section" content="Análisis" />
+    <meta property="article:published_time" content="2026-04-09" />
+    <meta property="article:modified_time" content="2026-04-09" />
+    <meta property="og:updated_time" content="2026-04-09" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real?"
+    />
+    <meta
+      name="twitter:description"
+      content="¿Qué diferencia hay entre un café de especialidad y uno del supermercado? Puntuación SCA, trazabilidad, sabor y precio explicados sin tecnicismos."
+    />
+    <meta name="twitter:image" content="https://etiove.com/og-image.jpg" />
+    <meta name="twitter:image:alt" content="Café de especialidad vs café normal" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:wght@400;500&display=swap"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/blog/post-shell.css" />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --ink: #1c120d;
+        --ink-soft: #5d4030;
+        --ink-muted: #9a7963;
+        --cream: #f6efe7;
+        --cream-alt: #fffaf5;
+        --accent: #8f5e3b;
+        --accent-deep: #5d4030;
+        --border: #e4d3c2;
+        --border-soft: rgba(228, 211, 194, 0.5);
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: 'Source Serif 4', Georgia, serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at 10% -10%, rgba(143, 94, 59, 0.12) 0%, transparent 45%),
+          radial-gradient(circle at 100% 20%, rgba(93, 64, 48, 0.07) 0%, transparent 42%),
+          var(--cream);
+        min-height: 100vh;
+        line-height: 1.75;
+      }
+      body > nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 40px;
+        background: rgba(246, 239, 231, 0.97);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border-soft);
+      }
+      .nav-wordmark {
+        font-family: 'Playfair Display', serif;
+        font-size: 22px;
+        font-weight: 500;
+        letter-spacing: 4px;
+        color: var(--ink);
+        text-decoration: none;
+        text-transform: uppercase;
+      }
       .nav-links {
-        display: none !important;
+        display: flex;
+        align-items: center;
+        gap: 32px;
+      }
+      .nav-link {
+        font-family: -apple-system, sans-serif;
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--ink-muted);
+        text-decoration: none;
+        transition: color 0.3s;
+      }
+      .nav-link:hover {
+        color: var(--accent);
+      }
+      .post-hero {
+        position: relative;
+        margin-top: 62px;
+        height: min(500px, 55vw);
+        min-height: 240px;
+        overflow: hidden;
+      }
+      .hero-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to bottom,
+          rgba(28, 18, 13, 0.06) 0%,
+          rgba(28, 18, 13, 0.5) 55%,
+          rgba(28, 18, 13, 0.82) 100%
+        );
+      }
+      .hero-content {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: clamp(16px, 4vw, 44px);
+      }
+      .hero-tag {
+        display: inline-block;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: rgba(255, 236, 210, 0.85);
+        background: rgba(143, 94, 59, 0.65);
+        border-radius: 999px;
+        padding: 4px 10px;
+        margin-bottom: 10px;
+      }
+      .hero-title {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(22px, 3.5vw, 44px);
+        font-weight: 800;
+        line-height: 1.12;
+        color: #fff9f1;
+        margin-bottom: 7px;
+      }
+      .hero-meta {
+        font-size: 12px;
+        color: rgba(255, 249, 241, 0.6);
+      }
+      .container {
+        width: min(760px, 92vw);
+        margin: 0 auto;
+        padding: 40px 0 80px;
+        position: relative;
+        z-index: 1;
+      }
+      .post-body {
+        font-size: clamp(17px, 2vw, 19px);
+        color: #2e1e15;
+      }
+      h2 {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(24px, 3.5vw, 34px);
+        font-weight: 500;
+        color: var(--ink);
+        margin: 48px 0 14px;
+        line-height: 1.2;
+      }
+      h3 {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(19px, 2.5vw, 24px);
+        font-weight: 500;
+        color: var(--ink-soft);
+        margin: 32px 0 10px;
+      }
+      p {
+        margin-bottom: 18px;
+      }
+      .causes {
+        display: grid;
+        gap: 16px;
+        margin: 28px 0 36px;
+      }
+      .cause-card {
+        background: var(--cream-alt);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 22px 24px;
+        display: grid;
+        grid-template-columns: 48px 1fr;
+        gap: 16px;
+        align-items: start;
+        transition:
+          box-shadow 0.2s,
+          transform 0.2s;
+      }
+      .cause-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 32px rgba(28, 18, 13, 0.08);
+      }
+      .cause-num {
+        font-family: 'Playfair Display', serif;
+        font-size: 28px;
+        font-weight: 300;
+        color: var(--border);
+        line-height: 1;
+        text-align: center;
+        padding-top: 2px;
+      }
+      .cause-body h3 {
+        margin: 0 0 6px;
+        font-size: 17px;
+        color: var(--ink);
+      }
+      .cause-body p {
+        margin: 0;
+        font-size: 15px;
+        line-height: 1.65;
+        color: var(--ink-soft);
+      }
+      .cause-fix {
+        margin-top: 10px;
+        padding: 8px 12px;
+        background: rgba(143, 94, 59, 0.07);
+        border-radius: 8px;
+        font-size: 13px;
+        color: var(--accent-deep);
+        font-weight: 600;
+      }
+      .cause-fix::before {
+        content: '→ ';
+      }
+      .tip {
+        border-left: 4px solid var(--accent);
+        background: rgba(143, 94, 59, 0.07);
+        border-radius: 0 12px 12px 0;
+        padding: 18px 20px;
+        margin: 32px 0;
+        font-size: 17px;
+        line-height: 1.7;
+      }
+      .tip strong {
+        color: var(--accent-deep);
+      }
+      .table-wrap {
+        overflow-x: auto;
+        margin: 28px 0 36px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 15px;
+      }
+      thead tr {
+        background: var(--ink);
+        color: #fff9f1;
+      }
+      thead th {
+        padding: 12px 16px;
+        text-align: left;
+        font-size: 11px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        font-family: -apple-system, sans-serif;
+        font-weight: 600;
+      }
+      tbody tr {
+        border-bottom: 1px solid var(--border);
+      }
+      tbody tr:nth-child(even) {
+        background: rgba(246, 239, 231, 0.5);
+      }
+      tbody td {
+        padding: 12px 16px;
+        color: var(--ink-soft);
+        line-height: 1.5;
+      }
+      tbody td:first-child {
+        color: var(--ink);
+        font-weight: 600;
+      }
+      .score-visual {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin: 28px 0 36px;
+      }
+      .score-card {
+        border-radius: 16px;
+        padding: 24px;
+        text-align: center;
+      }
+      .score-card.specialty {
+        background: linear-gradient(145deg, #1f130d, #2d1a10);
+        border: 1px solid rgba(201, 149, 87, 0.35);
+      }
+      .score-card.regular {
+        background: var(--cream-alt);
+        border: 1px solid var(--border);
+      }
+      .score-label {
+        font-family: -apple-system, sans-serif;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 2.5px;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+      }
+      .score-card.specialty .score-label {
+        color: rgba(205, 165, 120, 0.7);
+      }
+      .score-card.regular .score-label {
+        color: var(--ink-muted);
+      }
+      .score-number {
+        font-family: 'Playfair Display', serif;
+        font-size: 52px;
+        font-weight: 300;
+        line-height: 1;
+        margin-bottom: 6px;
+      }
+      .score-card.specialty .score-number {
+        color: #f4dfc8;
+      }
+      .score-card.regular .score-number {
+        color: var(--ink);
+      }
+      .score-desc {
+        font-size: 13px;
+        line-height: 1.5;
+      }
+      .score-card.specialty .score-desc {
+        color: rgba(255, 244, 234, 0.55);
+      }
+      .score-card.regular .score-desc {
+        color: var(--ink-muted);
+      }
+      .check {
+        color: #4f7a53;
+        font-weight: 700;
+      }
+      .cross {
+        color: #a44f45;
+        font-weight: 700;
+      }
+      .myths {
+        display: grid;
+        gap: 14px;
+        margin: 24px 0 36px;
+      }
+      .myth-card {
+        background: var(--cream-alt);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 20px 22px;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 14px;
+        align-items: start;
+      }
+      .myth-icon {
+        font-size: 22px;
+        padding-top: 2px;
+      }
+      .myth-label {
+        font-family: -apple-system, sans-serif;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+      }
+      .myth-label.false {
+        color: #a44f45;
+      }
+      .myth-label.true {
+        color: #4f7a53;
+      }
+      .myth-card h3 {
+        margin: 0 0 6px;
+        font-size: 16px;
+        color: var(--ink);
+      }
+      .myth-card p {
+        margin: 0;
+        font-size: 15px;
+        color: var(--ink-soft);
+        line-height: 1.6;
+      }
+      .origins {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 20px 0 32px;
+      }
+      .origin-pill {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        padding: 14px 18px;
+        background: var(--cream-alt);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        min-width: 100px;
+        transition: all 0.2s;
+      }
+      .origin-pill:hover {
+        border-color: var(--accent);
+        transform: translateY(-2px);
+      }
+      .origin-flag {
+        font-size: 22px;
+      }
+      .origin-name {
+        font-family: -apple-system, sans-serif;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--ink-soft);
+        text-align: center;
+      }
+      .origin-note {
+        font-size: 10px;
+        color: var(--ink-muted);
+        text-align: center;
+      }
+      @media (max-width: 600px) {
+        .cause-card {
+          grid-template-columns: 1fr;
+          gap: 8px;
+        }
+        .score-visual {
+          grid-template-columns: 1fr;
+        }
+        .myth-card {
+          grid-template-columns: 1fr;
+          gap: 6px;
+        }
+        .cta-box {
+          padding: 28px 20px;
+        }
+      }
+
+      :root {
+        --blog-nav-blur: 12px;
+      }
+      body > nav,
+      .site-nav {
         position: fixed !important;
-        inset: 0 !important;
-        z-index: 150 !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 100 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 20px 40px !important;
+        background: rgba(246, 239, 231, 0.97) !important;
+        backdrop-filter: blur(var(--blog-nav-blur)) !important;
+        -webkit-backdrop-filter: blur(var(--blog-nav-blur)) !important;
+        border-bottom: 1px solid var(--border-soft) !important;
+        box-sizing: border-box !important;
+      }
+      .nav-wordmark {
+        font-family: 'Playfair Display', serif !important;
+        font-size: 22px !important;
+        font-weight: 500 !important;
+        letter-spacing: 4px !important;
+        color: var(--ink) !important;
+        text-decoration: none !important;
+        text-transform: uppercase !important;
+      }
+      .nav-links {
+        display: flex !important;
+        align-items: center !important;
+        gap: 32px !important;
+      }
+      .nav-link {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+        font-size: 11px !important;
+        font-weight: 500 !important;
+        letter-spacing: 2px !important;
+        text-transform: uppercase !important;
+        color: var(--ink-muted) !important;
+        text-decoration: none !important;
+        transition: color 0.2s !important;
+      }
+      .nav-link:hover,
+      .nav-link--active {
+        color: var(--accent) !important;
+      }
+      .nav-hamburger {
+        display: none !important;
         flex-direction: column !important;
+        gap: 5px !important;
+        padding: 6px !important;
+        border: none !important;
+        background: none !important;
+        cursor: pointer !important;
+      }
+      .nav-hamburger span {
+        display: block !important;
+        width: 22px !important;
+        height: 2px !important;
+        background: var(--ink) !important;
+        border-radius: 2px !important;
+        transition:
+          transform 0.25s,
+          opacity 0.25s !important;
+      }
+      footer {
+        position: relative !important;
+        z-index: 1 !important;
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 0 !important;
+        align-items: start !important;
+        padding: 32px 40px !important;
+        border-top: 1px solid var(--border-soft) !important;
+        background: #f6efe7 !important;
+        box-sizing: border-box !important;
+      }
+      .footer-copy {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 12px !important;
+        margin-top: 0 !important;
+        padding-top: 24px !important;
+        padding-bottom: 16px !important;
+        border-top: none !important;
+        color: var(--ink-muted) !important;
+        font-size: 11px !important;
+        font-weight: 300 !important;
+        letter-spacing: 0.5px !important;
+      }
+      .footer-copy-center,
+      .footer-legal-group {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        align-items: center !important;
+        gap: 14px !important;
+      }
+      .footer-legal-group {
+        gap: 20px !important;
+      }
+      .footer-wordmark-sm {
+        color: var(--ink-soft) !important;
+        font-family: 'Playfair Display', serif !important;
+        font-size: 20px !important;
+        font-weight: 400 !important;
+        letter-spacing: 6px !important;
+        text-transform: uppercase !important;
+      }
+      .social-row-inline {
+        display: flex !important;
+        align-items: center !important;
+        gap: 12px !important;
+      }
+      .social-link {
+        display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 32px !important;
-        padding: 40px 24px !important;
-        background: rgba(246, 239, 231, 0.98) !important;
-        backdrop-filter: blur(16px) !important;
+        width: 38px !important;
+        height: 38px !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 50% !important;
+        color: var(--ink-muted) !important;
+        text-decoration: none !important;
+        transition: all 0.3s !important;
       }
-      .nav-links.open { display: flex !important; }
-      .nav-link {
-        font-size: 16px !important;
-        letter-spacing: 3px !important;
+      .social-link:hover {
+        border-color: var(--accent) !important;
+        color: var(--accent) !important;
+        transform: translateY(-2px) !important;
       }
-      footer { padding: 28px 20px !important; }
-      .footer-copy {
-        flex-direction: column !important;
-        align-items: flex-start !important;
+      .social-link svg {
+        width: 17px !important;
+        height: 17px !important;
+        fill: currentColor !important;
       }
-      .post-hero { height: min(280px, 62vw) !important; }
-      .hero-content { width: calc(100% - 32px) !important; }
-      .editorial-meta-grid { grid-template-columns: 1fr 1fr; }
-      .editorial-meta-item:nth-child(2n) { border-right: 0; }
-      .editorial-meta-item:nth-child(n + 3) { border-top: 1px solid rgba(228,211,194,0.7); }
-      .editorial-meta-item-wide { grid-column: span 2; }
-      .related-grid { grid-template-columns: 1fr !important; }
-    }
-    @media (max-width: 480px) {
-      .post-hero { height: min(220px, 56vw) !important; }
-      .hero-title { font-size: 20px !important; }
-      .editorial-meta { max-width: calc(100% - 24px); }
-      .editorial-meta-grid { grid-template-columns: 1fr; }
+      .footer-legal-link {
+        color: var(--ink-muted) !important;
+        font-size: 11px !important;
+        font-weight: 500 !important;
+        letter-spacing: 1px !important;
+        opacity: 0.7 !important;
+        text-decoration: none !important;
+        text-transform: uppercase !important;
+        transition:
+          opacity 0.2s,
+          color 0.2s !important;
+      }
+      .footer-legal-link:hover {
+        color: var(--accent) !important;
+      }
+      .post-hero {
+        position: relative !important;
+        margin-top: 62px !important;
+        height: min(500px, 55vw) !important;
+        min-height: 240px !important;
+        overflow: hidden !important;
+        background: #1c120d !important;
+      }
+      .hero-img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        display: block !important;
+      }
+      .hero-overlay {
+        position: absolute !important;
+        inset: 0 !important;
+        background: linear-gradient(
+          180deg,
+          rgba(10, 8, 6, 0.2) 0%,
+          rgba(10, 8, 6, 0.58) 100%
+        ) !important;
+        pointer-events: none !important;
+      }
+      .hero-content {
+        position: absolute !important;
+        left: 50% !important;
+        bottom: clamp(22px, 4vw, 42px) !important;
+        width: min(920px, calc(100% - 40px)) !important;
+        transform: translateX(-50%) !important;
+        z-index: 1 !important;
+        box-sizing: border-box !important;
+      }
+      .hero-tag {
+        display: inline-block !important;
+        margin-bottom: 10px !important;
+        padding: 4px 10px !important;
+        border-radius: 999px !important;
+        background: rgba(143, 94, 59, 0.65) !important;
+        color: rgba(255, 236, 210, 0.85) !important;
+        font-size: 10px !important;
+        font-weight: 700 !important;
+        letter-spacing: 2px !important;
+        text-transform: uppercase !important;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+      }
+      .hero-title {
+        margin: 0 0 7px !important;
+        color: #fff9f1 !important;
+        font-family: 'Playfair Display', serif !important;
+        font-size: clamp(22px, 3.5vw, 44px) !important;
+        font-weight: 800 !important;
+        line-height: 1.12 !important;
+        text-wrap: balance !important;
+      }
+      .hero-meta {
+        color: rgba(255, 249, 241, 0.6) !important;
+        font-size: 12px !important;
+        line-height: 1.5 !important;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+      }
+      .editorial-meta {
+        max-width: min(920px, calc(100% - 40px)) !important;
+        margin: 24px auto 8px !important;
+        background: rgba(255, 250, 245, 0.92) !important;
+        border: 1px solid var(--border, #e4d3c2) !important;
+        border-radius: 16px !important;
+        box-shadow: 0 16px 40px rgba(28, 18, 13, 0.06) !important;
+        box-sizing: border-box !important;
+      }
+      .editorial-meta-grid {
+        display: grid !important;
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        gap: 0 !important;
+      }
       .editorial-meta-item {
-        border-right: 0;
-        border-top: 1px solid rgba(228,211,194,0.7);
+        padding: 16px 18px !important;
+        border-right: 1px solid rgba(228, 211, 194, 0.7) !important;
       }
-      .editorial-meta-item:first-child { border-top: 0; }
-      .editorial-meta-item-wide { grid-column: span 1; }
+      .editorial-meta-item:last-child {
+        border-right: 0 !important;
+      }
+      .editorial-meta-item-wide {
+        grid-column: span 2 !important;
+      }
+      .editorial-meta-label {
+        display: block !important;
+        margin-bottom: 6px !important;
+        color: var(--ink-muted, #8b7355) !important;
+        font-size: 10px !important;
+        font-weight: 700 !important;
+        letter-spacing: 1.8px !important;
+        text-transform: uppercase !important;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+      }
+      .editorial-meta-value {
+        display: block !important;
+        color: var(--ink, #1c120d) !important;
+        font-size: 14px !important;
+        line-height: 1.45 !important;
+      }
+      .post-body blockquote,
+      blockquote.pull-quote,
+      .pull-quote {
+        margin: 28px 0 !important;
+        padding: 18px 20px !important;
+        border-left: 4px solid var(--accent) !important;
+        border-radius: 0 14px 14px 0 !important;
+        background: rgba(143, 94, 59, 0.07) !important;
+        color: var(--ink-soft) !important;
+        box-sizing: border-box !important;
+      }
+      .post-body blockquote p,
+      .pull-quote p {
+        margin: 0 !important;
+        color: var(--ink-soft) !important;
+        font-size: 17px !important;
+        line-height: 1.65 !important;
+        font-style: italic !important;
+      }
+      .post-body blockquote cite,
+      .pull-quote cite {
+        display: block !important;
+        margin-top: 10px !important;
+        color: var(--ink-muted) !important;
+        font-size: 12px !important;
+        font-style: normal !important;
+      }
+      .tip,
+      .info-box,
+      .note-box,
+      .summary-box,
+      .callout {
+        margin: 32px 0 !important;
+        padding: 18px 20px !important;
+        border: 1px solid rgba(143, 94, 59, 0.22) !important;
+        border-left: 4px solid var(--accent) !important;
+        border-radius: 0 14px 14px 0 !important;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 251, 247, 0.96) 0%,
+          rgba(249, 241, 233, 0.92) 100%
+        ) !important;
+        color: var(--ink-soft) !important;
+        box-sizing: border-box !important;
+      }
+      .tip strong,
+      .info-box strong,
+      .note-box strong,
+      .summary-box strong,
+      .callout strong {
+        color: var(--accent-deep) !important;
+      }
       .post-body table,
       table.compare-table {
+        width: 100% !important;
+        margin: 28px 0 36px !important;
+        border-collapse: collapse !important;
+        border-spacing: 0 !important;
+        overflow: hidden !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 16px !important;
+        background: rgba(255, 250, 245, 0.92) !important;
+        box-shadow: 0 12px 28px rgba(28, 18, 13, 0.05) !important;
+      }
+      .post-body thead tr,
+      table.compare-table thead tr {
+        background: var(--ink) !important;
+        color: #fff9f1 !important;
+      }
+      .post-body thead th,
+      table.compare-table thead th {
+        padding: 12px 16px !important;
+        color: inherit !important;
+        text-align: left !important;
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        letter-spacing: 1.5px !important;
+        text-transform: uppercase !important;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+      }
+      .post-body tbody tr,
+      table.compare-table tbody tr {
+        border-bottom: 1px solid var(--border) !important;
+      }
+      .post-body tbody tr:nth-child(even),
+      table.compare-table tbody tr:nth-child(even) {
+        background: rgba(246, 239, 231, 0.5) !important;
+      }
+      .post-body tbody tr:last-child,
+      table.compare-table tbody tr:last-child {
+        border-bottom: 0 !important;
+      }
+      .post-body td,
+      .post-body th,
+      table.compare-table td,
+      table.compare-table th {
+        padding: 12px 16px !important;
+        vertical-align: top !important;
+      }
+      .post-body td,
+      table.compare-table td {
+        color: var(--ink-soft) !important;
+        font-size: 15px !important;
+        line-height: 1.55 !important;
+      }
+      .post-body td:first-child,
+      table.compare-table td:first-child {
+        color: var(--ink) !important;
+        font-weight: 600 !important;
+      }
+      .post-body figure {
+        margin: 32px 0 !important;
+      }
+      .post-body figcaption {
+        margin-top: 10px !important;
+        color: var(--ink-muted) !important;
+        font-size: 13px !important;
+        line-height: 1.5 !important;
+        text-align: center !important;
+      }
+      .post-actions {
+        margin-top: 36px !important;
+        padding-top: 22px !important;
+        border-top: 1px solid var(--border) !important;
+      }
+      .section-label,
+      .section-label--accent {
+        margin-bottom: 11px !important;
+        color: var(--ink-muted) !important;
+        font-size: 10px !important;
+        font-weight: 700 !important;
+        letter-spacing: 2px !important;
+        text-transform: uppercase !important;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+      }
+      .share-row {
+        display: flex !important;
+        gap: 9px !important;
+        flex-wrap: wrap !important;
+        margin-bottom: 24px !important;
+      }
+      .share-btn {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 7px !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 999px !important;
+        padding: 8px 14px !important;
+        background: var(--cream-alt) !important;
+        color: var(--ink-soft) !important;
+        text-decoration: none !important;
+        font-weight: 700 !important;
+        font-size: 13px !important;
+        font-family: inherit !important;
+        cursor: pointer !important;
+        transition:
+          border-color 0.2s,
+          color 0.2s !important;
+        box-sizing: border-box !important;
+      }
+      .share-btn:hover {
+        border-color: var(--accent) !important;
+        color: var(--accent) !important;
+      }
+      .share-btn svg {
+        width: 14px !important;
+        height: 14px !important;
+        flex-shrink: 0 !important;
+        fill: currentColor !important;
+        stroke: currentColor !important;
+      }
+      .comment-help {
+        margin-bottom: 10px !important;
+        color: var(--ink-soft) !important;
+        font-size: 14px !important;
+      }
+      .comment-help a {
+        color: var(--accent) !important;
+        font-weight: 700 !important;
+        text-decoration: none !important;
+      }
+      .comment-box {
+        width: 100% !important;
+        min-height: 88px !important;
+        padding: 11px 13px !important;
+        margin-bottom: 10px !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 12px !important;
+        background: #fff !important;
+        color: var(--ink) !important;
+        font-size: 15px !important;
+        font-family: inherit !important;
+        resize: vertical !important;
+        box-sizing: border-box !important;
+      }
+      .comment-send {
+        border: none !important;
+        border-radius: 999px !important;
+        padding: 10px 20px !important;
+        background: var(--accent-deep) !important;
+        color: #fff !important;
+        font-weight: 700 !important;
+        font-size: 13px !important;
+        cursor: pointer !important;
+        font-family: inherit !important;
+        transition:
+          opacity 0.2s,
+          background 0.2s !important;
+      }
+      .comment-send:hover {
+        background: var(--accent) !important;
+      }
+      .comment-send:disabled {
+        opacity: 0.45 !important;
+        cursor: not-allowed !important;
+      }
+      .comment-status {
+        margin-top: 10px !important;
+        font-size: 13px !important;
+        color: var(--ink-soft) !important;
+      }
+      .comment-list {
+        margin-top: 18px !important;
+        display: grid !important;
+        gap: 9px !important;
+      }
+      .comment-item {
+        border: 1px solid var(--border) !important;
+        border-radius: 12px !important;
+        background: rgba(255, 250, 245, 0.75) !important;
+        padding: 13px !important;
+      }
+      .comment-meta {
+        margin-bottom: 5px !important;
+        color: #7b6049 !important;
+        font-size: 12px !important;
+      }
+      .comment-body {
+        margin: 0 !important;
+        color: #38251c !important;
+        font-size: 15px !important;
+        line-height: 1.65 !important;
+        white-space: pre-wrap !important;
+      }
+      .editorial-meta {
+        max-width: min(920px, calc(100% - 40px));
+        margin: 24px auto 8px;
+        background: rgba(255, 250, 245, 0.92);
+        border: 1px solid var(--border, #e4d3c2);
+        border-radius: 16px;
+        box-shadow: 0 16px 40px rgba(28, 18, 13, 0.06);
+      }
+      .editorial-meta-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0;
+      }
+      .editorial-meta-item {
+        padding: 16px 18px;
+        border-right: 1px solid rgba(228, 211, 194, 0.7);
+      }
+      .editorial-meta-item:last-child {
+        border-right: 0;
+      }
+      .editorial-meta-item-wide {
+        grid-column: span 2;
+      }
+      .editorial-meta-label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+        color: var(--ink-muted, #8b7355);
+      }
+      .editorial-meta-value {
+        display: block;
+        color: var(--ink, #1c120d);
+        font-size: 14px;
+        line-height: 1.45;
+      }
+      .related-section {
+        margin: 48px 0 0;
+      }
+      .related-label {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--ink-muted, #8b7355);
+        margin-bottom: 8px;
+      }
+      .related-heading {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(22px, 3vw, 30px);
+        line-height: 1.2;
+        color: var(--ink, #1c120d);
+        margin-bottom: 16px;
+      }
+      .related-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 16px !important;
+        width: 100% !important;
+        align-items: stretch !important;
+      }
+      .related-grid > .related-card:last-child:nth-child(odd) {
+        grid-column: 1 / -1 !important;
+      }
+      .related-card {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        height: 100% !important;
+        text-decoration: none !important;
+        background: var(--cream-alt, #fffaf5) !important;
+        border: 1px solid var(--border, #e4d3c2) !important;
+        border-radius: 14px !important;
+        overflow: hidden !important;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s,
+          border-color 0.2s !important;
+        box-sizing: border-box !important;
+      }
+      .related-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(28, 18, 13, 0.08);
+        border-color: var(--accent, #8f5e3b);
+      }
+      .related-thumb {
+        width: 100% !important;
+        aspect-ratio: 16/9 !important;
+        object-fit: cover !important;
         display: block !important;
-        overflow-x: auto !important;
-        white-space: nowrap !important;
+        flex-shrink: 0 !important;
       }
-    }
-  
-  </style>
-  <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Article",
-  "headline": "Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real?",
-  "description": "Puntuación SCA, trazabilidad, sabor y precio. Todo lo que diferencia un café de especialidad de uno del supermercado, explicado sin tecnicismos.",
-  "datePublished": "2026-04-09",
-  "dateModified": "2026-04-09",
-  "author": {
-    "@type": "Organization",
-    "name": "Etiove"
-  },
-  "publisher": {
-    "@type": "Organization",
-    "name": "Etiove",
-    "url": "https://etiove.com",
-    "logo": {
-      "@type": "ImageObject",
-      "url": "https://etiove.com/favicon.svg",
-      "width": 512,
-      "height": 512
-    }
-  },
-  "mainEntityOfPage": {
-    "@type": "WebPage",
-    "@id": "https://etiove.com/blog/cafe-de-especialidad-vs-cafe-normal.html"
-  },
-  "image": {
-    "@type": "ImageObject",
-    "url": "https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=1400&q=80&auto=format&fit=crop",
-    "width": 1400,
-    "height": 700,
-    "caption": "Granos de café de especialidad de distintos orígenes"
-  },
-  "wordCount": 1119,
-  "timeRequired": "PT8M"
-}
-  </script>
-  <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "¿Qué diferencia hay entre café de especialidad y café normal?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "El café de especialidad supera los 80 puntos SCA, ofrece trazabilidad del origen, menos defectos, tueste más fresco y perfiles de sabor definidos. El café comercial no tiene ese umbral de calidad ni el mismo nivel de información sobre finca, variedad o proceso."
+      .related-body {
+        display: flex !important;
+        flex: 1 1 auto !important;
+        flex-direction: column !important;
+        justify-content: flex-start !important;
+        padding: 14px 16px 16px !important;
+        min-height: 118px !important;
+        box-sizing: border-box !important;
       }
-    },
-    {
-      "@type": "Question",
-      "name": "¿El café de especialidad siempre es más caro?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Sí, suele costar más por kilo, pero también paga mejor al productor, se selecciona mejor, se tuesta en lotes más pequeños y suele rendir más en taza porque aporta más sabor sin necesidad de sobrecargar la dosis."
+      .related-tag {
+        display: inline-block !important;
+        margin-bottom: 8px !important;
+        font-size: 10px !important;
+        font-weight: 700 !important;
+        letter-spacing: 1.6px !important;
+        text-transform: uppercase !important;
+        color: var(--accent, #8f5e3b) !important;
       }
-    },
-    {
-      "@type": "Question",
-      "name": "¿Cómo sé si un café realmente es de especialidad?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Busca fecha de tueste, origen concreto, altitud, variedad, proceso y tostador identificable. Si el paquete solo dice mezcla, intensidad o sabor fuerte, pero no aporta trazabilidad, normalmente no está orientado a especialidad."
+      .related-title {
+        margin: 0 !important;
+        color: var(--ink, #1c120d) !important;
+        font-family: 'Playfair Display', serif !important;
+        font-size: 17px !important;
+        line-height: 1.35 !important;
+        text-wrap: balance !important;
       }
-    },
-    {
-      "@type": "Question",
-      "name": "¿El café de especialidad tiene más cafeína?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "No necesariamente. La cafeína depende más de la especie, el tueste, la receta y la dosis. Un arábica de especialidad puede tener menos cafeína que un blend comercial con robusta."
+      @media (max-width: 720px) {
+        body > nav,
+        .site-nav {
+          padding: 16px 20px !important;
+        }
+        .nav-hamburger {
+          display: flex !important;
+        }
+        .nav-links {
+          display: none !important;
+          position: fixed !important;
+          inset: 0 !important;
+          z-index: 150 !important;
+          flex-direction: column !important;
+          align-items: center !important;
+          justify-content: center !important;
+          gap: 32px !important;
+          padding: 40px 24px !important;
+          background: rgba(246, 239, 231, 0.98) !important;
+          backdrop-filter: blur(16px) !important;
+        }
+        .nav-links.open {
+          display: flex !important;
+        }
+        .nav-link {
+          font-size: 16px !important;
+          letter-spacing: 3px !important;
+        }
+        footer {
+          padding: 28px 20px !important;
+        }
+        .footer-copy {
+          flex-direction: column !important;
+          align-items: flex-start !important;
+        }
+        .post-hero {
+          height: min(280px, 62vw) !important;
+        }
+        .hero-content {
+          width: calc(100% - 32px) !important;
+        }
+        .editorial-meta-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .editorial-meta-item:nth-child(2n) {
+          border-right: 0;
+        }
+        .editorial-meta-item:nth-child(n + 3) {
+          border-top: 1px solid rgba(228, 211, 194, 0.7);
+        }
+        .editorial-meta-item-wide {
+          grid-column: span 2;
+        }
+        .related-grid {
+          grid-template-columns: 1fr !important;
+        }
       }
-    }
-  ]
-}
-  </script>
-  <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "ItemList",
-  "name": "Artículos relacionados con Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real?",
-  "itemListElement": [
-    {
-      "@type": "ListItem",
-      "position": 1,
-      "url": "https://etiove.com/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html",
-      "name": "¿Vale la Pena Pagar Más por Café de Especialidad?"
-    },
-    {
-      "@type": "ListItem",
-      "position": 2,
-      "url": "https://etiove.com/blog/arabica-vs-robusta.html",
-      "name": "Arábica vs Robusta: La Diferencia que Cambia tu Café"
-    },
-    {
-      "@type": "ListItem",
-      "position": 3,
-      "url": "https://etiove.com/blog/como-elegir-el-mejor-cafe-de-etiopia.html",
-      "name": "Cómo Elegir el Mejor Café de Etiopía: Guía Completa"
-    }
-  ]
-}
-  </script>
-  <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
-  <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    {
-      "@type": "ListItem",
-      "position": 1,
-      "name": "Inicio",
-      "item": "https://etiove.com/"
-    },
-    {
-      "@type": "ListItem",
-      "position": 2,
-      "name": "Blog",
-      "item": "https://etiove.com/blog/"
-    },
-    {
-      "@type": "ListItem",
-      "position": 3,
-      "name": "Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real?",
-      "item": "https://etiove.com/blog/cafe-de-especialidad-vs-cafe-normal.html"
-    }
-  ]
-}
-  </script>
-</head>
-<body>
+      @media (max-width: 480px) {
+        .post-hero {
+          height: min(220px, 56vw) !important;
+        }
+        .hero-title {
+          font-size: 20px !important;
+        }
+        .editorial-meta {
+          max-width: calc(100% - 24px);
+        }
+        .editorial-meta-grid {
+          grid-template-columns: 1fr;
+        }
+        .editorial-meta-item {
+          border-right: 0;
+          border-top: 1px solid rgba(228, 211, 194, 0.7);
+        }
+        .editorial-meta-item:first-child {
+          border-top: 0;
+        }
+        .editorial-meta-item-wide {
+          grid-column: span 1;
+        }
+        .post-body table,
+        table.compare-table {
+          display: block !important;
+          overflow-x: auto !important;
+          white-space: nowrap !important;
+        }
+      }
+    </style>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": "Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real?",
+        "description": "Puntuación SCA, trazabilidad, sabor y precio. Todo lo que diferencia un café de especialidad de uno del supermercado, explicado sin tecnicismos.",
+        "datePublished": "2026-04-09",
+        "dateModified": "2026-04-09",
+        "author": {
+          "@type": "Organization",
+          "name": "Etiove"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "Etiove",
+          "url": "https://etiove.com",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://etiove.com/favicon.svg",
+            "width": 512,
+            "height": 512
+          }
+        },
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "https://etiove.com/blog/cafe-de-especialidad-vs-cafe-normal.html"
+        },
+        "image": {
+          "@type": "ImageObject",
+          "url": "https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=1400&q=80&auto=format&fit=crop",
+          "width": 1400,
+          "height": 700,
+          "caption": "Granos de café de especialidad de distintos orígenes"
+        },
+        "wordCount": 1119,
+        "timeRequired": "PT8M"
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "¿Qué diferencia hay entre café de especialidad y café normal?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "El café de especialidad supera los 80 puntos SCA, ofrece trazabilidad del origen, menos defectos, tueste más fresco y perfiles de sabor definidos. El café comercial no tiene ese umbral de calidad ni el mismo nivel de información sobre finca, variedad o proceso."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿El café de especialidad siempre es más caro?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sí, suele costar más por kilo, pero también paga mejor al productor, se selecciona mejor, se tuesta en lotes más pequeños y suele rendir más en taza porque aporta más sabor sin necesidad de sobrecargar la dosis."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿Cómo sé si un café realmente es de especialidad?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Busca fecha de tueste, origen concreto, altitud, variedad, proceso y tostador identificable. Si el paquete solo dice mezcla, intensidad o sabor fuerte, pero no aporta trazabilidad, normalmente no está orientado a especialidad."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "¿El café de especialidad tiene más cafeína?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No necesariamente. La cafeína depende más de la especie, el tueste, la receta y la dosis. Un arábica de especialidad puede tener menos cafeína que un blend comercial con robusta."
+            }
+          }
+        ]
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        "name": "Artículos relacionados con Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real?",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "url": "https://etiove.com/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html",
+            "name": "¿Vale la Pena Pagar Más por Café de Especialidad?"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "url": "https://etiove.com/blog/arabica-vs-robusta.html",
+            "name": "Arábica vs Robusta: La Diferencia que Cambia tu Café"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "url": "https://etiove.com/blog/como-elegir-el-mejor-cafe-de-etiopia.html",
+            "name": "Cómo Elegir el Mejor Café de Etiopía: Guía Completa"
+          }
+        ]
+      }
+    </script>
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Inicio",
+            "item": "https://etiove.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Blog",
+            "item": "https://etiove.com/blog/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real?",
+            "item": "https://etiove.com/blog/cafe-de-especialidad-vs-cafe-normal.html"
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <nav class="site-nav" aria-label="Navegación principal">
+      <a class="nav-wordmark" href="/">Etiove</a>
+      <button
+        class="nav-hamburger"
+        id="navHamburger"
+        aria-label="Menú"
+        aria-expanded="false"
+        aria-controls="navLinks"
+      >
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-links" id="navLinks">
+        <a class="nav-link" href="/">Inicio</a>
+        <a class="nav-link nav-link--active" href="/blog/">Blog</a>
+        <a class="nav-link" href="/comunidad.html">Comunidad</a>
+      </div>
+    </nav>
 
-  <nav class="site-nav" aria-label="Navegación principal">
-    <a class="nav-wordmark" href="/">Etiove</a>
-    <button class="nav-hamburger" id="navHamburger" aria-label="Menú" aria-expanded="false" aria-controls="navLinks"><span></span><span></span><span></span></button>
-    <div class="nav-links" id="navLinks">
-      <a class="nav-link" href="/">Inicio</a>
-      <a class="nav-link nav-link--active" href="/blog/">Blog</a>
-      <a class="nav-link" href="/comunidad.html">Comunidad</a>
-    </div>
-  </nav>
-
-  <header class="post-hero">
-    <img
-      class="hero-img"
-      src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=1400&q=80&auto=format&fit=crop"
-      alt="Granos de café de especialidad de distintos orígenes"
-      loading="eager"
-      fetchpriority="high"
-      width="1400"
-      height="700" />
-    <div class="hero-overlay"></div>
-    <div class="hero-content">
-      <span class="hero-tag">Análisis · 09 abril 2026 · 9 min de lectura</span>
-      <h1 class="hero-title">Café de especialidad vs café normal</h1>
-      <div class="hero-meta">Por el equipo de Etiove · Foto: Unsplash</div>
-    </div>
-  </header>
+    <header class="post-hero">
+      <img
+        class="hero-img"
+        src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=1400&q=80&auto=format&fit=crop"
+        alt="Granos de café de especialidad de distintos orígenes"
+        loading="eager"
+        fetchpriority="high"
+        width="1400"
+        height="700"
+      />
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <span class="hero-tag">Análisis · 09 abril 2026 · 9 min de lectura</span>
+        <h1 class="hero-title">Café de especialidad vs café normal</h1>
+        <div class="hero-meta">Por el equipo de Etiove · Foto: Unsplash</div>
+      </div>
+    </header>
 
     <section class="editorial-meta" aria-label="Detalles del artículo">
       <div class="editorial-meta-grid">
@@ -914,284 +1398,464 @@
       </div>
     </section>
 
-  <main class="container">
-<div class="post-body">
+    <main class="container">
+      <div class="post-body">
+        <p>
+          Cuando alguien descubre el café de especialidad por primera vez, la pregunta inevitable
+          es: <em>¿qué tiene este que no tenga el que compro en el supermercado?</em> La respuesta
+          honesta es que la diferencia es enorme, pero no siempre donde la gente espera encontrarla.
+        </p>
 
-      <p>Cuando alguien descubre el café de especialidad por primera vez, la pregunta inevitable es: <em>¿qué tiene este que no tenga el que compro en el supermercado?</em> La respuesta honesta es que la diferencia es enorme, pero no siempre donde la gente espera encontrarla.</p>
+        <p>
+          No se trata únicamente de sabor, aunque el sabor es la consecuencia más evidente. La
+          diferencia empieza mucho antes de que el café llegue a tu taza.
+        </p>
 
-      <p>No se trata únicamente de sabor, aunque el sabor es la consecuencia más evidente. La diferencia empieza mucho antes de que el café llegue a tu taza.</p>
+        <h2>La definición oficial: la puntuación SCA</h2>
 
-      <h2>La definición oficial: la puntuación SCA</h2>
+        <p>
+          Existe una definición técnica y objetiva de qué es el café de especialidad. La
+          <strong>Specialty Coffee Association (SCA)</strong> establece que un café puede llamarse
+          de especialidad solo si obtiene <strong>80 puntos o más sobre 100</strong> en una cata
+          realizada por catadores certificados. Por debajo de ese umbral, es café comercial,
+          independientemente de lo que ponga en el packaging.
+        </p>
 
-      <p>Existe una definición técnica y objetiva de qué es el café de especialidad. La <strong>Specialty Coffee Association (SCA)</strong> establece que un café puede llamarse de especialidad solo si obtiene <strong>80 puntos o más sobre 100</strong> en una cata realizada por catadores certificados. Por debajo de ese umbral, es café comercial, independientemente de lo que ponga en el packaging.</p>
-
-      <div class="score-visual">
-        <div class="score-card specialty">
-          <p class="score-label">Café de especialidad</p>
-          <p class="score-number">80+</p>
-          <p class="score-desc">Puntos SCA mínimos para recibir la denominación</p>
-        </div>
-        <div class="score-card regular">
-          <p class="score-label">Café comercial</p>
-          <p class="score-number">&lt;80</p>
-          <p class="score-desc">Sin umbral mínimo de calidad estandarizado</p>
-        </div>
-      </div>
-
-      <p>Esa puntuación evalúa fragancia, aroma, sabor, aftertaste, acidez, cuerpo, balance, uniformidad, limpieza de taza y dulzura. No es una opinión: es una metodología reproducible con la que catadores de todo el mundo llegan a resultados consistentes.</p>
-
-      <h2>Las diferencias reales, punto por punto</h2>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Aspecto</th>
-              <th>Café de especialidad</th>
-              <th>Café comercial</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Puntuación SCA</td>
-              <td><span class="check">✓</span> 80 puntos o más</td>
-              <td><span class="cross">✗</span> Sin estándar mínimo</td>
-            </tr>
-            <tr>
-              <td>Trazabilidad</td>
-              <td><span class="check">✓</span> Finca, región, altitud, variedad</td>
-              <td><span class="cross">✗</span> Mezcla de múltiples orígenes y cosechas</td>
-            </tr>
-            <tr>
-              <td>Selección del grano</td>
-              <td><span class="check">✓</span> Selección manual, cero defectos primarios</td>
-              <td><span class="cross">✗</span> Selección industrial, defectos permitidos</td>
-            </tr>
-            <tr>
-              <td>Tueste</td>
-              <td><span class="check">✓</span> Artesanal, perfilado para cada lote</td>
-              <td><span class="cross">✗</span> Industrial, uniforme para toda la partida</td>
-            </tr>
-            <tr>
-              <td>Frescura</td>
-              <td><span class="check">✓</span> Fecha de tueste visible, consumo en semanas</td>
-              <td><span class="cross">✗</span> Fecha de caducidad lejana, meses en almacén</td>
-            </tr>
-            <tr>
-              <td>Precio al productor</td>
-              <td><span class="check">✓</span> Por encima del precio de commodity</td>
-              <td><span class="cross">✗</span> Ligado al precio de bolsa (commodity)</td>
-            </tr>
-            <tr>
-              <td>Perfil de sabor</td>
-              <td><span class="check">✓</span> Floral, frutal, chocolatado, especiado</td>
-              <td><span class="cross">✗</span> Amargo uniforme, sin notas diferenciadas</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <h2>El origen: por qué importa saber de dónde viene</h2>
-
-      <p>El café comercial suele ser una mezcla —un <em>blend</em>— de granos de distintos países, distintas cosechas y distintas calidades, mezclados para obtener un sabor consistente y predecible. No hay nada malo en ello técnicamente, pero significa que el sabor que compras es el resultado de una fórmula diseñada para ser neutral y no ofender a nadie.</p>
-
-      <p>El café de especialidad es lo opuesto. El origen único —<em>single origin</em>— es su seña de identidad. Cada región imprime características que no puedes encontrar en ningún otro lugar:</p>
-
-      <div class="origins">
-        <div class="origin-pill">
-          <span class="origin-flag">🇪🇹</span>
-          <span class="origin-name">Etiopía</span>
-          <span class="origin-note">Floral · Jazmín · Bergamota</span>
-        </div>
-        <div class="origin-pill">
-          <span class="origin-flag">🇨🇴</span>
-          <span class="origin-name">Colombia</span>
-          <span class="origin-note">Caramelo · Frutos rojos · Nuez</span>
-        </div>
-        <div class="origin-pill">
-          <span class="origin-flag">🇬🇹</span>
-          <span class="origin-name">Guatemala</span>
-          <span class="origin-note">Chocolate · Especias · Cítrico</span>
-        </div>
-        <div class="origin-pill">
-          <span class="origin-flag">🇰🇪</span>
-          <span class="origin-name">Kenia</span>
-          <span class="origin-note">Acidez viva · Grosella negra · Tomate</span>
-        </div>
-        <div class="origin-pill">
-          <span class="origin-flag">🇵🇦</span>
-          <span class="origin-name">Panamá</span>
-          <span class="origin-note">Geisha · Floral intenso · Melocotón</span>
-        </div>
-        <div class="origin-pill">
-          <span class="origin-flag">🇾🇪</span>
-          <span class="origin-name">Yemen</span>
-          <span class="origin-note">Miel · Especias · Fruta seca</span>
-        </div>
-      </div>
-
-      <p>Esa diversidad de perfiles no existe en el café comercial. Sencillamente no puede existir, porque la mezcla lo elimina.</p>
-
-      <h2>Los mitos más comunes</h2>
-
-      <div class="myths">
-        <div class="myth-card">
-          <span class="myth-icon">💭</span>
-          <div>
-            <p class="myth-label false">Falso</p>
-            <h3>«El café de especialidad es siempre caro»</h3>
-            <p>Un buen café de especialidad en grano cuesta entre 15 y 30 € los 250 g. Si lo comparas con lo que pagas en una cafetería por taza, el coste por preparación en casa es de 20-40 céntimos. No es caro: es una cuestión de perspectiva.</p>
+        <div class="score-visual">
+          <div class="score-card specialty">
+            <p class="score-label">Café de especialidad</p>
+            <p class="score-number">80+</p>
+            <p class="score-desc">Puntos SCA mínimos para recibir la denominación</p>
+          </div>
+          <div class="score-card regular">
+            <p class="score-label">Café comercial</p>
+            <p class="score-number">&lt;80</p>
+            <p class="score-desc">Sin umbral mínimo de calidad estandarizado</p>
           </div>
         </div>
-        <div class="myth-card">
-          <span class="myth-icon">💭</span>
-          <div>
-            <p class="myth-label false">Falso</p>
-            <h3>«Necesito equipo profesional para disfrutarlo»</h3>
-            <p>Una prensa francesa de 20 € y agua a 93 °C son suficientes para extraer todo el potencial de un buen café de especialidad. El equipo ayuda, pero el origen y la frescura del grano importan mucho más.</p>
+
+        <p>
+          Esa puntuación evalúa fragancia, aroma, sabor, aftertaste, acidez, cuerpo, balance,
+          uniformidad, limpieza de taza y dulzura. No es una opinión: es una metodología
+          reproducible con la que catadores de todo el mundo llegan a resultados consistentes.
+        </p>
+
+        <h2>Las diferencias reales, punto por punto</h2>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Aspecto</th>
+                <th>Café de especialidad</th>
+                <th>Café comercial</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Puntuación SCA</td>
+                <td><span class="check">✓</span> 80 puntos o más</td>
+                <td><span class="cross">✗</span> Sin estándar mínimo</td>
+              </tr>
+              <tr>
+                <td>Trazabilidad</td>
+                <td><span class="check">✓</span> Finca, región, altitud, variedad</td>
+                <td><span class="cross">✗</span> Mezcla de múltiples orígenes y cosechas</td>
+              </tr>
+              <tr>
+                <td>Selección del grano</td>
+                <td><span class="check">✓</span> Selección manual, cero defectos primarios</td>
+                <td><span class="cross">✗</span> Selección industrial, defectos permitidos</td>
+              </tr>
+              <tr>
+                <td>Tueste</td>
+                <td><span class="check">✓</span> Artesanal, perfilado para cada lote</td>
+                <td><span class="cross">✗</span> Industrial, uniforme para toda la partida</td>
+              </tr>
+              <tr>
+                <td>Frescura</td>
+                <td><span class="check">✓</span> Fecha de tueste visible, consumo en semanas</td>
+                <td><span class="cross">✗</span> Fecha de caducidad lejana, meses en almacén</td>
+              </tr>
+              <tr>
+                <td>Precio al productor</td>
+                <td><span class="check">✓</span> Por encima del precio de commodity</td>
+                <td><span class="cross">✗</span> Ligado al precio de bolsa (commodity)</td>
+              </tr>
+              <tr>
+                <td>Perfil de sabor</td>
+                <td><span class="check">✓</span> Floral, frutal, chocolatado, especiado</td>
+                <td><span class="cross">✗</span> Amargo uniforme, sin notas diferenciadas</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>El origen: por qué importa saber de dónde viene</h2>
+
+        <p>
+          El café comercial suele ser una mezcla —un <em>blend</em>— de granos de distintos países,
+          distintas cosechas y distintas calidades, mezclados para obtener un sabor consistente y
+          predecible. No hay nada malo en ello técnicamente, pero significa que el sabor que compras
+          es el resultado de una fórmula diseñada para ser neutral y no ofender a nadie.
+        </p>
+
+        <p>
+          El café de especialidad es lo opuesto. El origen único —<em>single origin</em>— es su seña
+          de identidad. Cada región imprime características que no puedes encontrar en ningún otro
+          lugar:
+        </p>
+
+        <div class="origins">
+          <div class="origin-pill">
+            <span class="origin-flag">🇪🇹</span>
+            <span class="origin-name">Etiopía</span>
+            <span class="origin-note">Floral · Jazmín · Bergamota</span>
+          </div>
+          <div class="origin-pill">
+            <span class="origin-flag">🇨🇴</span>
+            <span class="origin-name">Colombia</span>
+            <span class="origin-note">Caramelo · Frutos rojos · Nuez</span>
+          </div>
+          <div class="origin-pill">
+            <span class="origin-flag">🇬🇹</span>
+            <span class="origin-name">Guatemala</span>
+            <span class="origin-note">Chocolate · Especias · Cítrico</span>
+          </div>
+          <div class="origin-pill">
+            <span class="origin-flag">🇰🇪</span>
+            <span class="origin-name">Kenia</span>
+            <span class="origin-note">Acidez viva · Grosella negra · Tomate</span>
+          </div>
+          <div class="origin-pill">
+            <span class="origin-flag">🇵🇦</span>
+            <span class="origin-name">Panamá</span>
+            <span class="origin-note">Geisha · Floral intenso · Melocotón</span>
+          </div>
+          <div class="origin-pill">
+            <span class="origin-flag">🇾🇪</span>
+            <span class="origin-name">Yemen</span>
+            <span class="origin-note">Miel · Especias · Fruta seca</span>
           </div>
         </div>
-        <div class="myth-card">
-          <span class="myth-icon">💭</span>
-          <div>
-            <p class="myth-label false">Falso</p>
-            <h3>«El café de especialidad no tiene cafeína»</h3>
-            <p>La cafeína está determinada por la variedad y el método de preparación, no por la calidad. Un tueste claro de especialidad tiene incluso más cafeína que uno oscuro comercial, porque el tueste oscuro degrada parte de la cafeína.</p>
+
+        <p>
+          Esa diversidad de perfiles no existe en el café comercial. Sencillamente no puede existir,
+          porque la mezcla lo elimina.
+        </p>
+
+        <h2>Los mitos más comunes</h2>
+
+        <div class="myths">
+          <div class="myth-card">
+            <span class="myth-icon">💭</span>
+            <div>
+              <p class="myth-label false">Falso</p>
+              <h3>«El café de especialidad es siempre caro»</h3>
+              <p>
+                Un buen café de especialidad en grano cuesta entre 15 y 30 € los 250 g. Si lo
+                comparas con lo que pagas en una cafetería por taza, el coste por preparación en
+                casa es de 20-40 céntimos. No es caro: es una cuestión de perspectiva.
+              </p>
+            </div>
+          </div>
+          <div class="myth-card">
+            <span class="myth-icon">💭</span>
+            <div>
+              <p class="myth-label false">Falso</p>
+              <h3>«Necesito equipo profesional para disfrutarlo»</h3>
+              <p>
+                Una prensa francesa de 20 € y agua a 93 °C son suficientes para extraer todo el
+                potencial de un buen café de especialidad. El equipo ayuda, pero el origen y la
+                frescura del grano importan mucho más.
+              </p>
+            </div>
+          </div>
+          <div class="myth-card">
+            <span class="myth-icon">💭</span>
+            <div>
+              <p class="myth-label false">Falso</p>
+              <h3>«El café de especialidad no tiene cafeína»</h3>
+              <p>
+                La cafeína está determinada por la variedad y el método de preparación, no por la
+                calidad. Un tueste claro de especialidad tiene incluso más cafeína que uno oscuro
+                comercial, porque el tueste oscuro degrada parte de la cafeína.
+              </p>
+            </div>
+          </div>
+          <div class="myth-card">
+            <span class="myth-icon">💭</span>
+            <div>
+              <p class="myth-label false">Falso</p>
+              <h3>«Si no es amargo, no es café de verdad»</h3>
+              <p>
+                El amargor intenso es señal de sobreextracción o de tueste oscuro para enmascarar
+                defectos, no de calidad. Un café de especialidad bien preparado tiene acidez,
+                dulzura y complejidad. El amargor es solo uno de muchos elementos, no el
+                protagonista.
+              </p>
+            </div>
+          </div>
+          <div class="myth-card">
+            <span class="myth-icon">✓</span>
+            <div>
+              <p class="myth-label true">Cierto</p>
+              <h3>«El café de especialidad tiene un impacto social diferente»</h3>
+              <p>
+                El precio pagado al productor en el mercado de especialidad es significativamente
+                mayor que el precio de commodity. Elegir café de especialidad tiene un impacto
+                directo en las condiciones de vida de los agricultores que lo cultivan.
+              </p>
+            </div>
           </div>
         </div>
-        <div class="myth-card">
-          <span class="myth-icon">💭</span>
-          <div>
-            <p class="myth-label false">Falso</p>
-            <h3>«Si no es amargo, no es café de verdad»</h3>
-            <p>El amargor intenso es señal de sobreextracción o de tueste oscuro para enmascarar defectos, no de calidad. Un café de especialidad bien preparado tiene acidez, dulzura y complejidad. El amargor es solo uno de muchos elementos, no el protagonista.</p>
-          </div>
+
+        <h2>¿Cómo saber si lo que compro es de especialidad?</h2>
+
+        <p>Hay cuatro señales que nunca fallan:</p>
+
+        <p>
+          <strong>1. Fecha de tueste visible.</strong> No fecha de caducidad: fecha de tueste. Si el
+          paquete no la tiene, es café comercial independientemente de lo que diga la etiqueta.
+        </p>
+
+        <p>
+          <strong>2. Origen específico.</strong> No «blend arábica» ni «mezcla centroamericana».
+          País, región y si es posible la finca o la cooperativa.
+        </p>
+
+        <p>
+          <strong>3. Variedad del grano.</strong> Bourbon, Geisha, SL28, Typica, Caturra… Las
+          variedades de café son como las variedades de uva en el vino. Su presencia en el packaging
+          indica que alguien ha prestado atención al grano.
+        </p>
+
+        <p>
+          <strong>4. Proceso de beneficiado.</strong> Lavado, natural, honey, anaeróbico. El proceso
+          es cómo se separa la pulpa del grano tras la cosecha y tiene un impacto enorme en el
+          perfil de sabor final.
+        </p>
+
+        <div class="tip">
+          <strong>Tip de Etiove:</strong> La forma más sencilla de empezar es pedir en tu tostador
+          local un café de Etiopía de proceso lavado con tueste claro o medio. Es casi imposible que
+          no te sorprenda si vienes del café de supermercado. El perfil floral y frutal es tan
+          diferente que muchas personas no reconocen el sabor como café la primera vez.
         </div>
-        <div class="myth-card">
-          <span class="myth-icon">✓</span>
-          <div>
-            <p class="myth-label true">Cierto</p>
-            <h3>«El café de especialidad tiene un impacto social diferente»</h3>
-            <p>El precio pagado al productor en el mercado de especialidad es significativamente mayor que el precio de commodity. Elegir café de especialidad tiene un impacto directo en las condiciones de vida de los agricultores que lo cultivan.</p>
-          </div>
+
+        <h2>El primer sorbo que cambia todo</h2>
+
+        <p>
+          Hay un momento en el que mucha gente describe lo mismo: la primera vez que prueba un café
+          de especialidad bien preparado, la reacción no es «esto está bueno» sino «¿esto también es
+          café?». No es exageración. La distancia entre un café comercial de tueste oscuro y un
+          Yirgacheffe etíope de proceso lavado es comparable a la que hay entre un vino de tetrabrik
+          y un Borgoña.
+        </p>
+
+        <p>
+          No se trata de snobismo ni de gastar más. Se trata de entender que el café tiene un
+          potencial aromático y sensorial enorme que el mercado masivo ha ocultado durante décadas
+          detrás del amargor y la uniformidad.
+        </p>
+
+        <p>Una vez que lo descubres, es difícil volver atrás.</p>
+      </div>
+
+      <section class="post-actions" id="comentarios">
+        <p class="section-label section-label--accent">Comparte este artículo</p>
+        <div class="share-row">
+          <a id="shareX" class="share-btn" target="_blank" rel="noopener noreferrer" href="#"
+            ><svg viewBox="0 0 24 24">
+              <path
+                d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+              />
+            </svg>
+            Compartir en X</a
+          >
+          <button id="shareInstagram" class="share-btn" type="button">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
+              />
+            </svg>
+            Instagram
+          </button>
+          <button id="copyLink" class="share-btn" type="button">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" />
+              <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" />
+            </svg>
+            Copiar enlace
+          </button>
+        </div>
+        <p class="section-label section-label--accent">Respuestas</p>
+        <p id="commentHelp" class="comment-help"></p>
+        <textarea
+          id="commentBody"
+          class="comment-box"
+          maxlength="1000"
+          placeholder="¿Cuándo fue tu primer café de especialidad? ¿Qué cambió?"
+        ></textarea>
+        <button id="sendComment" class="comment-send" type="button">Publicar respuesta</button>
+        <div id="commentStatus" class="comment-status"></div>
+        <div id="commentList" class="comment-list"></div>
+      </section>
+
+      <div class="cta-box">
+        <p class="cta-eyebrow">Comunidad Etiove</p>
+        <h2 class="cta-title">Descubre tu primer café<br /><em>de especialidad</em></h2>
+        <p class="cta-sub">
+          En Etiove encontrarás recomendaciones, catadores y una comunidad que lleva años explorando
+          orígenes.
+        </p>
+        <div class="cta-btns">
+          <a class="cta-btn-primary" href="/#quizweb"
+            >Hacer el quiz de sabor
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" /></svg
+          ></a>
+          <a class="cta-btn-ghost" href="/comunidad.html">Ver la comunidad</a>
         </div>
       </div>
-
-      <h2>¿Cómo saber si lo que compro es de especialidad?</h2>
-
-      <p>Hay cuatro señales que nunca fallan:</p>
-
-      <p><strong>1. Fecha de tueste visible.</strong> No fecha de caducidad: fecha de tueste. Si el paquete no la tiene, es café comercial independientemente de lo que diga la etiqueta.</p>
-
-      <p><strong>2. Origen específico.</strong> No «blend arábica» ni «mezcla centroamericana». País, región y si es posible la finca o la cooperativa.</p>
-
-      <p><strong>3. Variedad del grano.</strong> Bourbon, Geisha, SL28, Typica, Caturra… Las variedades de café son como las variedades de uva en el vino. Su presencia en el packaging indica que alguien ha prestado atención al grano.</p>
-
-      <p><strong>4. Proceso de beneficiado.</strong> Lavado, natural, honey, anaeróbico. El proceso es cómo se separa la pulpa del grano tras la cosecha y tiene un impacto enorme en el perfil de sabor final.</p>
-
-      <div class="tip">
-        <strong>Tip de Etiove:</strong> La forma más sencilla de empezar es pedir en tu tostador local un café de Etiopía de proceso lavado con tueste claro o medio. Es casi imposible que no te sorprenda si vienes del café de supermercado. El perfil floral y frutal es tan diferente que muchas personas no reconocen el sabor como café la primera vez.
-      </div>
-
-      <h2>El primer sorbo que cambia todo</h2>
-
-      <p>Hay un momento en el que mucha gente describe lo mismo: la primera vez que prueba un café de especialidad bien preparado, la reacción no es «esto está bueno» sino «¿esto también es café?». No es exageración. La distancia entre un café comercial de tueste oscuro y un Yirgacheffe etíope de proceso lavado es comparable a la que hay entre un vino de tetrabrik y un Borgoña.</p>
-
-      <p>No se trata de snobismo ni de gastar más. Se trata de entender que el café tiene un potencial aromático y sensorial enorme que el mercado masivo ha ocultado durante décadas detrás del amargor y la uniformidad.</p>
-
-      <p>Una vez que lo descubres, es difícil volver atrás.</p>
-    </div>
-
-    <section class="post-actions" id="comentarios">
-      <p class="section-label section-label--accent">Comparte este artículo</p>
-      <div class="share-row">
-        <a id="shareX" class="share-btn" target="_blank" rel="noopener noreferrer" href="#"><svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg> Compartir en X</a>
-        <button id="shareInstagram" class="share-btn" type="button"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg> Instagram</button>
-        <button id="copyLink" class="share-btn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg> Copiar enlace</button>
-      </div>
-      <p class="section-label section-label--accent">Respuestas</p>
-      <p id="commentHelp" class="comment-help"></p>
-      <textarea id="commentBody" class="comment-box" maxlength="1000" placeholder="¿Cuándo fue tu primer café de especialidad? ¿Qué cambió?"></textarea>
-      <button id="sendComment" class="comment-send" type="button">Publicar respuesta</button>
-      <div id="commentStatus" class="comment-status"></div>
-      <div id="commentList" class="comment-list"></div>
-    </section>
-
-    <div class="cta-box">
-      <p class="cta-eyebrow">Comunidad Etiove</p>
-      <h2 class="cta-title">Descubre tu primer café<br><em>de especialidad</em></h2>
-      <p class="cta-sub">En Etiove encontrarás recomendaciones, catadores y una comunidad que lleva años explorando orígenes.</p>
-      <div class="cta-btns">
-        <a class="cta-btn-primary" href="/#quizweb">Hacer el quiz de sabor <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
-        <a class="cta-btn-ghost" href="/comunidad.html">Ver la comunidad</a>
-      </div>
-    </div>
-    <section class="related-section">
-      <p class="related-label">También te puede interesar</p>
-      <div class="related-grid">
-      <a class="related-card" href="/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html">
-        <img class="related-thumb" src="https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=400&q=75&auto=format&fit=crop" alt="¿Vale la Pena Pagar Más por Café de Especialidad?" loading="lazy" width="400" height="225" />
-        <div class="related-body">
-          <span class="related-tag">Análisis</span>
-          <p class="related-title">¿Vale la Pena Pagar Más por Café de Especialidad?</p>
-        </div>
-      </a>      <a class="related-card" href="/blog/cafe-de-especialidad-crece-en-espana-2026.html">
-        <img class="related-thumb" src="https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=400&q=75&auto=format&fit=crop" alt="El Café de Especialidad Crece un 34% en España" loading="lazy" width="400" height="225" />
-        <div class="related-body">
-          <span class="related-tag">Noticia</span>
-          <p class="related-title">El Café de Especialidad Crece un 34% en España</p>
-        </div>
-      </a>
-      </div>
-    </section>
-
-        <nav class="post-nav" aria-label="Otros artículos">
-      <a class="post-nav-link" href="/blog/por-que-mi-cafe-sabe-amargo.html">
-        <p class="post-nav-label">← Anterior</p>
-        <p class="post-nav-title">¿Por qué mi café sabe amargo? 7 causas y sus soluciones</p>
-      </a>
-    </nav>
-  </main>
-
-
-  <button class="scroll-top" id="scrollTopBtn" aria-label="Volver arriba">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
-  </button>
-  <script>
-    window.ETIOVE_BLOG_POST_CONFIG = {
-      postSlug: 'cafe-de-especialidad-vs-cafe-normal',
-    };
-  </script>
-  <script src="/js/config.js"></script>
-  <script src="/blog/post-shared.js" defer></script>
-  <script type="module" src="/blog/post-page.js"></script>
-
-  <footer>
-    <p class="footer-copy">
-      <span>© 2026 Etiove. Hecho con ☕ en España.</span>
-
-      <span class="footer-copy-center">
-        <span class="footer-wordmark-sm">Etiove</span>
-
-        <span class="social-row-inline">
-          <a class="social-link" href="https://instagram.com/etiove_cafe" target="_blank" rel="noopener noreferrer" aria-label="Instagram @etiove_cafe">
-            <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+      <section class="related-section">
+        <p class="related-label">También te puede interesar</p>
+        <div class="related-grid">
+          <a class="related-card" href="/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html">
+            <img
+              class="related-thumb"
+              src="https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=400&q=75&auto=format&fit=crop"
+              alt="¿Vale la Pena Pagar Más por Café de Especialidad?"
+              loading="lazy"
+              width="400"
+              height="225"
+            />
+            <div class="related-body">
+              <span class="related-tag">Análisis</span>
+              <p class="related-title">¿Vale la Pena Pagar Más por Café de Especialidad?</p>
+            </div>
           </a>
-          <a class="social-link" href="https://x.com/etiove_cafe" target="_blank" rel="noopener noreferrer" aria-label="X @etiove_cafe">
-            <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          <a class="related-card" href="/blog/cafe-de-especialidad-crece-en-espana-2026.html">
+            <img
+              class="related-thumb"
+              src="https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=400&q=75&auto=format&fit=crop"
+              alt="El Café de Especialidad Crece un 34% en España"
+              loading="lazy"
+              width="400"
+              height="225"
+            />
+            <div class="related-body">
+              <span class="related-tag">Noticia</span>
+              <p class="related-title">El Café de Especialidad Crece un 34% en España</p>
+            </div>
           </a>
-          <a class="social-link" href="https://tiktok.com/@etiove" target="_blank" rel="noopener noreferrer" aria-label="TikTok @etiove">
-            <svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.16 8.16 0 004.77 1.52V6.75a4.85 4.85 0 01-1-.06z"/></svg>
-          </a>
+        </div>
+      </section>
+
+      <nav class="post-nav" aria-label="Otros artículos">
+        <a class="post-nav-link" href="/blog/por-que-mi-cafe-sabe-amargo.html">
+          <p class="post-nav-label">← Anterior</p>
+          <p class="post-nav-title">¿Por qué mi café sabe amargo? 7 causas y sus soluciones</p>
+        </a>
+      </nav>
+    </main>
+
+    <button class="scroll-top" id="scrollTopBtn" aria-label="Volver arriba">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="18 15 12 9 6 15"></polyline>
+      </svg>
+    </button>
+    <script>
+      window.ETIOVE_BLOG_POST_CONFIG = {
+        postSlug: 'cafe-de-especialidad-vs-cafe-normal',
+      };
+    </script>
+    <script src="/js/config.js"></script>
+    <script src="/blog/post-shared.js" defer></script>
+    <script type="module" src="/blog/post-page.js"></script>
+
+    <footer>
+      <p class="footer-copy">
+        <span>© 2026 Etiove. Hecho con ☕ en España.</span>
+
+        <span class="footer-copy-center">
+          <span class="footer-wordmark-sm">Etiove</span>
+
+          <span class="social-row-inline">
+            <a
+              class="social-link"
+              href="https://instagram.com/etiove_cafe"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram @etiove_cafe"
+            >
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
+                />
+              </svg>
+            </a>
+            <a
+              class="social-link"
+              href="https://x.com/etiove_cafe"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="X @etiove_cafe"
+            >
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+                />
+              </svg>
+            </a>
+            <a
+              class="social-link"
+              href="https://tiktok.com/@etiove"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="TikTok @etiove"
+            >
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.16 8.16 0 004.77 1.52V6.75a4.85 4.85 0 01-1-.06z"
+                />
+              </svg>
+            </a>
+          </span>
         </span>
-      </span>
 
-      <span class="footer-legal-group">
-        <a class="footer-legal-link" href="/privacidad.html">Privacidad</a>
-        <a class="footer-legal-link" href="/cookies.html">Cookies</a>
-        <a class="footer-legal-link" href="/terminos.html">Términos</a>
-      </span>
-    </p>
-  </footer>
-</body>
+        <span class="footer-legal-group">
+          <a class="footer-legal-link" href="/privacidad.html">Privacidad</a>
+          <a class="footer-legal-link" href="/cookies.html">Cookies</a>
+          <a class="footer-legal-link" href="/terminos.html">Términos</a>
+        </span>
+      </p>
+    </footer>
+  </body>
 </html>

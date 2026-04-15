@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react';
 import { Animated, Easing, ScrollView, StyleSheet, View } from 'react-native';
 
-const CARD_BG    = '#f0e8df';
-const SHIMMER_W  = 140;
-const LOOP_MS    = 1100;
+const CARD_BG = '#f0e8df';
+const SHIMMER_W = 140;
+const LOOP_MS = 1100;
 
 function Shimmer({ x }) {
   return (
@@ -23,7 +23,7 @@ function useShimmer(toValue = 360) {
         duration: LOOP_MS,
         easing: Easing.linear,
         useNativeDriver: true,
-      }),
+      })
     );
     anim.start();
     return () => anim.stop();
@@ -89,14 +89,40 @@ export function SkeletonVerticalList({ count = 4 }) {
 }
 
 const styles = StyleSheet.create({
-  overflow:   { overflow: 'hidden' },
-  shimmer:    { position: 'absolute', top: 0, bottom: 0, width: SHIMMER_W, backgroundColor: 'rgba(255,255,255,0.36)' },
-  vertWrap:   { paddingHorizontal: 16, marginTop: 8 },
-  cardH:      { width: 160 },
-  cardHImg:   { width: 160, height: 200, borderRadius: 10, backgroundColor: CARD_BG, marginBottom: 8 },
-  lineOrigin: { height: 11, borderRadius: 6, backgroundColor: CARD_BG, marginBottom: 5, width: '70%' },
-  lineName:   { height: 14, borderRadius: 7, backgroundColor: CARD_BG, marginBottom: 5 },
+  overflow: { overflow: 'hidden' },
+  shimmer: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    width: SHIMMER_W,
+    backgroundColor: 'rgba(255,255,255,0.36)',
+  },
+  vertWrap: { paddingHorizontal: 16, marginTop: 8 },
+  cardH: { width: 160 },
+  cardHImg: {
+    width: 160,
+    height: 200,
+    borderRadius: 10,
+    backgroundColor: CARD_BG,
+    marginBottom: 8,
+  },
+  lineOrigin: {
+    height: 11,
+    borderRadius: 6,
+    backgroundColor: CARD_BG,
+    marginBottom: 5,
+    width: '70%',
+  },
+  lineName: { height: 14, borderRadius: 7, backgroundColor: CARD_BG, marginBottom: 5 },
   lineRating: { height: 11, borderRadius: 6, backgroundColor: CARD_BG, width: '45%' },
-  cardV:      { flexDirection: 'row', gap: 12, alignItems: 'center', marginBottom: 16, paddingBottom: 16, borderBottomWidth: 0.5, borderBottomColor: '#f0f0f0' },
-  cardVImg:   { width: 80, height: 100, borderRadius: 10, backgroundColor: CARD_BG, flexShrink: 0 },
+  cardV: {
+    flexDirection: 'row',
+    gap: 12,
+    alignItems: 'center',
+    marginBottom: 16,
+    paddingBottom: 16,
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#f0f0f0',
+  },
+  cardVImg: { width: 80, height: 100, borderRadius: 10, backgroundColor: CARD_BG, flexShrink: 0 },
 });

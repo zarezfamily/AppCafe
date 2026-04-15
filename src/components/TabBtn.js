@@ -17,8 +17,16 @@ export default function TabBtn({
   return (
     <TouchableOpacity style={s.tabBtn} onPress={() => onPress(tab)}>
       <View>
-        <Ionicons name={isActive ? icon : `${icon}-outline`} size={22} color={isActive ? accentColor : inactiveColor} />
-        {badge > 0 && <View style={s.tabBadge}><Text style={s.tabBadgeText}>{badge}</Text></View>}
+        <Ionicons
+          name={isActive ? icon : `${icon}-outline`}
+          size={22}
+          color={isActive ? accentColor : inactiveColor}
+        />
+        {badge > 0 && (
+          <View style={s.tabBadge}>
+            <Text style={s.tabBadgeText}>{badge}</Text>
+          </View>
+        )}
       </View>
       <Text style={[s.tabLabel, isActive && { color: accentColor }]}>{label}</Text>
     </TouchableOpacity>

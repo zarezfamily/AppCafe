@@ -1,19 +1,23 @@
 const comoElegirElMejorCafeDeEtiopia = {
   slug: 'como-elegir-el-mejor-cafe-de-etiopia',
   title: 'Cómo Elegir el Mejor Café de Etiopía',
-  description: 'Guía completa de Etiove para elegir café de Etiopía según región, proceso y altitud.',
-  ogDescription: 'Guía completa para elegir café etíope: regiones clave, proceso lavado vs natural y por qué su origen es único.',
+  description:
+    'Guía completa de Etiove para elegir café de Etiopía según región, proceso y altitud.',
+  ogDescription:
+    'Guía completa para elegir café etíope: regiones clave, proceso lavado vs natural y por qué su origen es único.',
   twitterDescription: 'Guía completa para elegir café etíope por región, proceso y altitud.',
   canonicalUrl: 'https://etiove.com/blog/como-elegir-el-mejor-cafe-de-etiopia.html',
   prevUrl: '',
   nextUrl: 'https://etiove.com/blog/guia-de-molienda-por-metodo.html',
   hero: {
-    image: 'https://images.unsplash.com/photo-1461988091159-192b6df7054f?w=1400&q=80&auto=format&fit=crop',
-    imageSocial: 'https://images.unsplash.com/photo-1461988091159-192b6df7054f?w=1200&q=85&auto=format&fit=crop',
+    image:
+      'https://images.unsplash.com/photo-1461988091159-192b6df7054f?w=1400&q=80&auto=format&fit=crop',
+    imageSocial:
+      'https://images.unsplash.com/photo-1461988091159-192b6df7054f?w=1200&q=85&auto=format&fit=crop',
     imageAlt: 'Cafetales en las tierras altas de Etiopía',
     tag: 'Guía · 03 abril 2026 · 5 min de lectura',
     title: 'Cómo Elegir el Mejor Café de Etiopía',
-    meta: 'Por el equipo de Etiove · Foto: Unsplash'
+    meta: 'Por el equipo de Etiove · Foto: Unsplash',
   },
   inlineCss: String.raw`    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -199,12 +203,13 @@ const comoElegirElMejorCafeDeEtiopia = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: 'Cómo Elegir el Mejor Café de Etiopía: Guía Completa',
-    description: 'Guía completa de Etiove para elegir café de Etiopía según región, proceso y altitud.',
+    description:
+      'Guía completa de Etiove para elegir café de Etiopía según región, proceso y altitud.',
     datePublished: '2026-04-01',
     dateModified: '2026-04-01',
     author: {
       '@type': 'Organization',
-      name: 'Etiove'
+      name: 'Etiove',
     },
     publisher: {
       '@type': 'Organization',
@@ -214,22 +219,22 @@ const comoElegirElMejorCafeDeEtiopia = {
         '@type': 'ImageObject',
         url: 'https://etiove.com/favicon.svg',
         width: 512,
-        height: 512
-      }
+        height: 512,
+      },
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': 'https://etiove.com/blog/como-elegir-el-mejor-cafe-de-etiopia.html'
+      '@id': 'https://etiove.com/blog/como-elegir-el-mejor-cafe-de-etiopia.html',
     },
     image: {
       '@type': 'ImageObject',
       url: 'https://images.unsplash.com/photo-1461988091159-192b6df7054f?w=1400&q=80&auto=format&fit=crop',
       width: 1400,
       height: 700,
-      caption: 'Cafetales en las tierras altas de Etiopía'
+      caption: 'Cafetales en las tierras altas de Etiopía',
     },
     wordCount: 525,
-    timeRequired: 'PT6M'
+    timeRequired: 'PT6M',
   },
   extraJsonLd: [
     {
@@ -241,35 +246,35 @@ const comoElegirElMejorCafeDeEtiopia = {
           name: '¿Qué región de Etiopía elegir para empezar?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Yirgacheffe suele ser ideal para empezar si buscas un perfil floral y limpio. Sidamo funciona bien si prefieres equilibrio y fruta suave, y Guji encaja mejor si quieres una taza más dulce y expresiva.'
-          }
+            text: 'Yirgacheffe suele ser ideal para empezar si buscas un perfil floral y limpio. Sidamo funciona bien si prefieres equilibrio y fruta suave, y Guji encaja mejor si quieres una taza más dulce y expresiva.',
+          },
         },
         {
           '@type': 'Question',
           name: '¿Qué diferencia hay entre un etíope lavado y uno natural?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'El proceso lavado suele dar más claridad, notas florales y acidez brillante. El natural ofrece más fruta madura, dulzor y cuerpo. No es que uno sea mejor que otro: depende del perfil que te guste.'
-          }
+            text: 'El proceso lavado suele dar más claridad, notas florales y acidez brillante. El natural ofrece más fruta madura, dulzor y cuerpo. No es que uno sea mejor que otro: depende del perfil que te guste.',
+          },
         },
         {
           '@type': 'Question',
           name: '¿Qué altitud es buena en un café de Etiopía?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Por encima de 1.800 metros suele ser una señal muy positiva. A esa altitud el grano desarrolla más densidad y complejidad aromática, algo muy valorado en cafés etíopes de calidad.'
-          }
+            text: 'Por encima de 1.800 metros suele ser una señal muy positiva. A esa altitud el grano desarrolla más densidad y complejidad aromática, algo muy valorado en cafés etíopes de calidad.',
+          },
         },
         {
           '@type': 'Question',
           name: '¿Qué método resalta mejor un café etíope?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Los métodos de filtro como V60, Chemex o Kalita suelen resaltar mejor sus notas florales, cítricas y frutales. En espresso también puede brillar, pero el filtro muestra más claramente el origen.'
-          }
-        }
-      ]
-    }
+            text: 'Los métodos de filtro como V60, Chemex o Kalita suelen resaltar mejor sus notas florales, cítricas y frutales. En espresso también puede brillar, pero el filtro muestra más claramente el origen.',
+          },
+        },
+      ],
+    },
   ],
   breadcrumbJsonLd: {
     '@context': 'https://schema.org',
@@ -279,21 +284,21 @@ const comoElegirElMejorCafeDeEtiopia = {
         '@type': 'ListItem',
         position: 1,
         name: 'Inicio',
-        item: 'https://etiove.com/'
+        item: 'https://etiove.com/',
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'Blog',
-        item: 'https://etiove.com/blog/'
+        item: 'https://etiove.com/blog/',
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: 'Cómo Elegir el Mejor Café de Etiopía: Guía Completa',
-        item: 'https://etiove.com/blog/como-elegir-el-mejor-cafe-de-etiopia.html'
-      }
-    ]
+        item: 'https://etiove.com/blog/como-elegir-el-mejor-cafe-de-etiopia.html',
+      },
+    ],
   },
   bodyHtml: String.raw`
     
@@ -514,7 +519,7 @@ const comoElegirElMejorCafeDeEtiopia = {
         <p class="post-nav-label">Siguiente →</p>
         <p class="post-nav-title">Guía de Molienda por Método: de V60 a Espresso</p>
       </a>
-    </nav>`
+    </nav>`,
 };
 
 module.exports = {

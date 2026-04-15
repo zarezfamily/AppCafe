@@ -1,6 +1,4 @@
-export function initServiceWorkerUpdates({
-  scriptUrl = '/sw.js',
-} = {}) {
+export function initServiceWorkerUpdates({ scriptUrl = '/sw.js' } = {}) {
   if (!('serviceWorker' in navigator)) {
     return;
   }

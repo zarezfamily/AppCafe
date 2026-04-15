@@ -1,23 +1,29 @@
 const coldBrewEnCasaGuiaCompleta = {
   slug: 'cold-brew-en-casa-guia-completa',
   title: 'Cold Brew en Casa: Guía Completa para Hacerlo Perfecto',
-  description: 'Aprende a hacer cold brew en casa paso a paso: ratio de café, molienda ideal, tiempo de infusión y los mejores cafés de especialidad para empezar.',
-  ogDescription: 'Aprende a hacer cold brew en casa paso a paso: ratio de café, molienda ideal, tiempo de infusión y los mejores cafés de especialidad para empezar.',
+  description:
+    'Aprende a hacer cold brew en casa paso a paso: ratio de café, molienda ideal, tiempo de infusión y los mejores cafés de especialidad para empezar.',
+  ogDescription:
+    'Aprende a hacer cold brew en casa paso a paso: ratio de café, molienda ideal, tiempo de infusión y los mejores cafés de especialidad para empezar.',
   twitterTitle: 'Cold Brew en Casa: Guía Completa para Hacerlo Perfecto',
-  twitterDescription: 'Ratio, molienda, tiempo de infusión y los mejores cafés de especialidad para hacer cold brew en casa.',
+  twitterDescription:
+    'Ratio, molienda, tiempo de infusión y los mejores cafés de especialidad para hacer cold brew en casa.',
   canonicalUrl: 'https://etiove.com/blog/cold-brew-en-casa-guia-completa.html',
   prevUrl: '/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html',
   nextUrl: '/blog/arabica-vs-robusta.html',
-  extraHeadHtml: '<link rel="search" type="application/opensearchdescription+xml" title="Blog Etiove" href="/opensearch.xml" />',
+  extraHeadHtml:
+    '<link rel="search" type="application/opensearchdescription+xml" title="Blog Etiove" href="/opensearch.xml" />',
   bodyWrapperClass: 'container',
   bodyInnerClass: 'post-body',
   hero: {
-    image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=1400&q=80&auto=format&fit=crop',
-    imageSocial: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=1200&q=85&auto=format&fit=crop',
+    image:
+      'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=1400&q=80&auto=format&fit=crop',
+    imageSocial:
+      'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=1200&q=85&auto=format&fit=crop',
     imageAlt: 'Vaso de cold brew con hielo y café de especialidad',
     tag: 'Tutorial · 10 abril 2026 · 7 min de lectura',
     title: 'Cold Brew en Casa: Guía Completa para Hacerlo Perfecto',
-    meta: 'Por el equipo de Etiove · Foto: Unsplash'
+    meta: 'Por el equipo de Etiove · Foto: Unsplash',
   },
   inlineCss: String.raw`*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --ink: #1c120d; --ink-soft: #5d4030; --ink-muted: #9a7963; --cream: #f6efe7; --cream-alt: #fffaf5; --accent: #8f5e3b; --accent-deep: #5d4030; --border: #e4d3c2; --border-soft: rgba(228,211,194,0.5); }
@@ -89,12 +95,13 @@ const coldBrewEnCasaGuiaCompleta = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: 'Cold Brew en Casa: Guía Completa para Hacerlo Perfecto',
-    description: 'Aprende a hacer cold brew en casa paso a paso: ratio de café, molienda ideal, tiempo de infusión y los mejores cafés de especialidad para empezar.',
+    description:
+      'Aprende a hacer cold brew en casa paso a paso: ratio de café, molienda ideal, tiempo de infusión y los mejores cafés de especialidad para empezar.',
     datePublished: '2026-04-10',
     dateModified: '2026-04-10',
     author: {
       '@type': 'Organization',
-      name: 'Etiove'
+      name: 'Etiove',
     },
     publisher: {
       '@type': 'Organization',
@@ -104,22 +111,22 @@ const coldBrewEnCasaGuiaCompleta = {
         '@type': 'ImageObject',
         url: 'https://etiove.com/favicon.svg',
         width: 512,
-        height: 512
-      }
+        height: 512,
+      },
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': 'https://etiove.com/blog/cold-brew-en-casa-guia-completa.html'
+      '@id': 'https://etiove.com/blog/cold-brew-en-casa-guia-completa.html',
     },
     image: {
       '@type': 'ImageObject',
       url: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=1400&q=80&auto=format&fit=crop',
       width: 1400,
       height: 700,
-      caption: 'Vaso de cold brew con hielo y café de especialidad'
+      caption: 'Vaso de cold brew con hielo y café de especialidad',
     },
     wordCount: 1200,
-    timeRequired: 'PT7M'
+    timeRequired: 'PT7M',
   },
   extraJsonLd: [
     {
@@ -131,35 +138,35 @@ const coldBrewEnCasaGuiaCompleta = {
           name: '¿Cuánto tiempo se tarda en hacer cold brew?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Entre 12 y 24 horas en la nevera. 18 horas es el punto óptimo para la mayoría de los cafés de especialidad: suficiente extracción sin amargor.'
-          }
+            text: 'Entre 12 y 24 horas en la nevera. 18 horas es el punto óptimo para la mayoría de los cafés de especialidad: suficiente extracción sin amargor.',
+          },
         },
         {
           '@type': 'Question',
           name: '¿Qué ratio de café se usa para cold brew?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'La ratio estándar es 1:8 (1g de café por 8ml de agua) para un concentrado, o 1:15 si prefieres tomarlo directamente sin diluir. Ajusta según tu gusto.'
-          }
+            text: 'La ratio estándar es 1:8 (1g de café por 8ml de agua) para un concentrado, o 1:15 si prefieres tomarlo directamente sin diluir. Ajusta según tu gusto.',
+          },
         },
         {
           '@type': 'Question',
           name: '¿Qué molienda es mejor para cold brew?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Molienda gruesa, similar a sal gorda o azúcar moreno. Una molienda fina sobreextrae el café durante las largas horas de infusión y produce un cold brew amargo y turbio.'
-          }
+            text: 'Molienda gruesa, similar a sal gorda o azúcar moreno. Una molienda fina sobreextrae el café durante las largas horas de infusión y produce un cold brew amargo y turbio.',
+          },
         },
         {
           '@type': 'Question',
           name: '¿Cuánto aguanta el cold brew en la nevera?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'El cold brew filtrado aguanta hasta 14 días en la nevera en un recipiente hermético. El concentrado sin diluir puede durar hasta 2 semanas.'
-          }
-        }
-      ]
-    }
+            text: 'El cold brew filtrado aguanta hasta 14 días en la nevera en un recipiente hermético. El concentrado sin diluir puede durar hasta 2 semanas.',
+          },
+        },
+      ],
+    },
   ],
   breadcrumbJsonLd: {
     '@context': 'https://schema.org',
@@ -169,21 +176,21 @@ const coldBrewEnCasaGuiaCompleta = {
         '@type': 'ListItem',
         position: 1,
         name: 'Inicio',
-        item: 'https://etiove.com/'
+        item: 'https://etiove.com/',
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'Blog',
-        item: 'https://etiove.com/blog/'
+        item: 'https://etiove.com/blog/',
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: 'Cold Brew en Casa: Guía Completa',
-        item: 'https://etiove.com/blog/cold-brew-en-casa-guia-completa.html'
-      }
-    ]
+        item: 'https://etiove.com/blog/cold-brew-en-casa-guia-completa.html',
+      },
+    ],
   },
   bodyHtml: String.raw`<p>El cold brew es el método de preparación de café que más ha crecido en popularidad en los últimos años — y con razón. Es suave, tiene un 67% menos de acidez que el café caliente, aguanta hasta dos semanas en la nevera y no requiere ningún equipamiento especial. Pero hacerlo bien en casa tiene sus claves, y la mayoría de errores vienen siempre de los mismos sitios.</p>
 
@@ -375,7 +382,7 @@ const coldBrewEnCasaGuiaCompleta = {
       <a class="post-nav-link post-nav-link--align-end" href="/blog/arabica-vs-robusta.html">
         <p class="post-nav-label">Siguiente →</p>
         <p class="post-nav-title">Arábica vs Robusta: la diferencia que cambia tu café</p>
-      </a></div>`
+      </a></div>`,
 };
 
 module.exports = {

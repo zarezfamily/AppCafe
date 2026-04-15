@@ -1,5 +1,8 @@
 import { useAuth } from '../context/AuthContext';
-import { registerForPushNotificationsAsync, scheduleEtioveNotification } from '../core/notifications';
+import {
+  registerForPushNotificationsAsync,
+  scheduleEtioveNotification,
+} from '../core/notifications';
 import { formatRelativeTime } from '../core/utils';
 import useGamification from '../hooks/useGamification';
 import useMainScreenBootstrap from './useMainScreenBootstrap';
@@ -62,12 +65,14 @@ export default function useMainScreenComposition({ onLogout, services, ui }) {
 
   const gamification = useGamification({ storageKey: KEY_GAMIFICATION });
 
-  const domain = useMainScreenDomain(buildMainScreenDomainInput({
-    user,
-    screenUi,
-    gamification,
-    services,
-  }));
+  const domain = useMainScreenDomain(
+    buildMainScreenDomainInput({
+      user,
+      screenUi,
+      gamification,
+      services,
+    })
+  );
 
   const profileSummary = useMainScreenProfileSummary({
     user,
@@ -78,26 +83,30 @@ export default function useMainScreenComposition({ onLogout, services, ui }) {
     setDocument,
   });
 
-  const forum = useMainScreenForum(buildMainScreenForumInput({
-    user,
-    screenUi,
-    profileSummary,
-    domain,
-    services,
-  }));
+  const forum = useMainScreenForum(
+    buildMainScreenForumInput({
+      user,
+      screenUi,
+      profileSummary,
+      domain,
+      services,
+    })
+  );
 
-  const bootstrap = useMainScreenBootstrap(buildMainScreenBootstrapInput({
-    user,
-    screenUi,
-    domain,
-    forum,
-    services,
-    notifications: {
-      registerForPushNotificationsAsync,
-      scheduleEtioveNotification,
-    },
-    bootstrapKeys: BOOTSTRAP_KEYS,
-  }));
+  const bootstrap = useMainScreenBootstrap(
+    buildMainScreenBootstrapInput({
+      user,
+      screenUi,
+      domain,
+      forum,
+      services,
+      notifications: {
+        registerForPushNotificationsAsync,
+        scheduleEtioveNotification,
+      },
+      bootstrapKeys: BOOTSTRAP_KEYS,
+    })
+  );
 
   useMainScreenEffects({
     brandCardAnim: screenUi.brandCardAnim,
@@ -112,27 +121,29 @@ export default function useMainScreenComposition({ onLogout, services, ui }) {
     cargarForo: forum.cargarForo,
   });
 
-  const tabProps = useMainScreenTabProps(buildMainScreenTabPropsInput({
-    styles,
-    components: {
-      SearchInput,
-      CardVertical,
-      CardHorizontal,
-      PackshotImage,
-      PremiumBadge,
-      DiarioCatasSection,
-    },
-    screenUi,
-    domain,
-    forum: {
-      ...forum,
-      formatRelativeTime,
-    },
-    bootstrap,
-    gamification,
-    profileSummary,
-    onLogout,
-  }));
+  const tabProps = useMainScreenTabProps(
+    buildMainScreenTabPropsInput({
+      styles,
+      components: {
+        SearchInput,
+        CardVertical,
+        CardHorizontal,
+        PackshotImage,
+        PremiumBadge,
+        DiarioCatasSection,
+      },
+      screenUi,
+      domain,
+      forum: {
+        ...forum,
+        formatRelativeTime,
+      },
+      bootstrap,
+      gamification,
+      profileSummary,
+      onLogout,
+    })
+  );
 
   return {
     user,

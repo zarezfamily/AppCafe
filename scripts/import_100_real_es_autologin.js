@@ -17,18 +17,23 @@ const signupTechUser = async (apiKey, bundleId) => {
   const email = `etiove.import.${Date.now()}@example.com`;
   const password = `E${Date.now()}aA123456`;
 
-  const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apiKey}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Ios-Bundle-Identifier': bundleId,
-    },
-    body: JSON.stringify({ email, password, returnSecureToken: true }),
-  });
+  const res = await fetch(
+    `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Ios-Bundle-Identifier': bundleId,
+      },
+      body: JSON.stringify({ email, password, returnSecureToken: true }),
+    }
+  );
 
   const json = await res.json();
   if (!res.ok || !json.idToken) {
-    throw new Error(`No se pudo obtener token de Firebase Auth: ${json?.error?.message || res.status}`);
+    throw new Error(
+      `No se pudo obtener token de Firebase Auth: ${json?.error?.message || res.status}`
+    );
   }
 
   return { token: json.idToken, email };
@@ -44,7 +49,9 @@ const signupTechUser = async (apiKey, bundleId) => {
     const bundleId = appJson?.expo?.ios?.bundleIdentifier || 'com.zarezfamily.etiove';
 
     if (!projectId || !apiKey) {
-      throw new Error('Faltan EXPO_PUBLIC_FIREBASE_PROJECT_ID o EXPO_PUBLIC_FIREBASE_API_KEY en .env');
+      throw new Error(
+        'Faltan EXPO_PUBLIC_FIREBASE_PROJECT_ID o EXPO_PUBLIC_FIREBASE_API_KEY en .env'
+      );
     }
 
     const auth = await signupTechUser(apiKey, bundleId);

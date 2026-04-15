@@ -22,11 +22,20 @@ const AUTH_MODE_COPY = {
   },
 };
 
-export default function buildAuthScreenViewModel({ modo, hasAccount, faceIdDisponible, faceIdGuardado, cargando }) {
+export default function buildAuthScreenViewModel({
+  modo,
+  hasAccount,
+  faceIdDisponible,
+  faceIdGuardado,
+  cargando,
+}) {
   const modeConfig = AUTH_MODE_COPY[modo] || AUTH_MODE_COPY.login;
-  const kicker = modo === 'login'
-    ? (hasAccount ? modeConfig.kicker.withAccount : modeConfig.kicker.withoutAccount)
-    : modeConfig.kicker;
+  const kicker =
+    modo === 'login'
+      ? hasAccount
+        ? modeConfig.kicker.withAccount
+        : modeConfig.kicker.withoutAccount
+      : modeConfig.kicker;
 
   return {
     kicker,

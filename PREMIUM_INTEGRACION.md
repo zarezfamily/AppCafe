@@ -65,7 +65,9 @@ if (!premium.isPremium && notebook.catas.length >= FREE_LIMITS.diarioCatasMax) {
 En los autores del foro:
 
 ```js
-{thread.authorIsPremium && <PremiumBadge />}
+{
+  thread.authorIsPremium && <PremiumBadge />;
+}
 ```
 
 ## 7. Estructura Firestore
@@ -74,6 +76,7 @@ Colección: `premium_users`
 Documento ID: `{uid}`
 
 Campos:
+
 - `plan`: `monthly` | `lifetime`
 - `activatedAt`: ISO string
 - `expiresAt`: ISO string | null

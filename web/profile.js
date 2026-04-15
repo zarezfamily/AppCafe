@@ -12,10 +12,10 @@
   // Extraer alias de URL limpia: /perfil/@zarez
   const pathAlias = (() => {
     const seg = window.location.pathname.replace(/\/+$/, '').split('/').pop() || '';
-    return seg.startsWith('@') ? seg.slice(1) : (seg !== 'perfil' && seg !== '' ? seg : '');
+    return seg.startsWith('@') ? seg.slice(1) : seg !== 'perfil' && seg !== '' ? seg : '';
   })();
 
-  const requestedUid  = String(params.get('uid')  || '').trim();
+  const requestedUid = String(params.get('uid') || '').trim();
   const requestedName = String(params.get('name') || pathAlias || '').trim();
 
   const auth = {
@@ -31,7 +31,9 @@
 
   // Si el usuario visita su propio perfil sin URL limpia, redirigir a @alias
   if (!requestedUid && !pathAlias && auth.uid) {
-    const ownAlias = String(localStorage.getItem('etiove_web_alias') || '').trim().replace(/^@/, '');
+    const ownAlias = String(localStorage.getItem('etiove_web_alias') || '')
+      .trim()
+      .replace(/^@/, '');
     const slug = ownAlias || auth.uid;
     window.history.replaceState(null, '', `/perfil/@${encodeURIComponent(slug)}`);
   }
@@ -107,21 +109,62 @@
   ];
 
   const ACHIEVEMENT_DEFS = [
-    { id: 'primera_cata', icon: '🥇', title: 'Ritual de inicio', desc: 'Valora 3 cafes y desbloquea tu primera insignia.' },
-    { id: 'fotografo', icon: '📸', title: 'Ojo barista', desc: 'Sube 12 fotos de tus cafes para destacar tu lado visual.' },
-    { id: 'viajero', icon: '🌍', title: 'Ruta de origen', desc: 'Prueba cafes de 8 paises distintos y amplia tu mapa sensorial.' },
-    { id: 'adicto', icon: '🔥', title: 'Tueste constante', desc: 'Valora 30 cafes y demuestra constancia de catador.' },
-    { id: 'maestro_catador', icon: '👑', title: 'Paladar Etiove', desc: 'Alcanza el nivel Maestro y corona tu perfil.' },
-    { id: 'coleccionista', icon: '❤️', title: 'Bodega signature', desc: 'Marca 25 favoritos y construye tu propia coleccion.' },
-    { id: 'critico', icon: '✍️', title: 'Cuaderno de cata', desc: 'Escribe 12 reseñas y convierte tu perfil en referencia.' },
-    { id: 'origen_unico', icon: '🌱', title: 'Lote de autor', desc: 'Prueba un origen especial como Geisha, Bourbon Pointu o Yemen.' },
+    {
+      id: 'primera_cata',
+      icon: '🥇',
+      title: 'Ritual de inicio',
+      desc: 'Valora 3 cafes y desbloquea tu primera insignia.',
+    },
+    {
+      id: 'fotografo',
+      icon: '📸',
+      title: 'Ojo barista',
+      desc: 'Sube 12 fotos de tus cafes para destacar tu lado visual.',
+    },
+    {
+      id: 'viajero',
+      icon: '🌍',
+      title: 'Ruta de origen',
+      desc: 'Prueba cafes de 8 paises distintos y amplia tu mapa sensorial.',
+    },
+    {
+      id: 'adicto',
+      icon: '🔥',
+      title: 'Tueste constante',
+      desc: 'Valora 30 cafes y demuestra constancia de catador.',
+    },
+    {
+      id: 'maestro_catador',
+      icon: '👑',
+      title: 'Paladar Etiove',
+      desc: 'Alcanza el nivel Maestro y corona tu perfil.',
+    },
+    {
+      id: 'coleccionista',
+      icon: '❤️',
+      title: 'Bodega signature',
+      desc: 'Marca 25 favoritos y construye tu propia coleccion.',
+    },
+    {
+      id: 'critico',
+      icon: '✍️',
+      title: 'Cuaderno de cata',
+      desc: 'Escribe 12 reseñas y convierte tu perfil en referencia.',
+    },
+    {
+      id: 'origen_unico',
+      icon: '🌱',
+      title: 'Lote de autor',
+      desc: 'Prueba un origen especial como Geisha, Bourbon Pointu o Yemen.',
+    },
   ];
 
-  const normalizeName = (value) => String(value || '')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .trim();
+  const normalizeName = (value) =>
+    String(value || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
 
   const setStatus = (text) => {
     if (el.status) el.status.textContent = text || '';
@@ -169,9 +212,8 @@
   const toFirestoreValue = (val) => {
     if (val === null || val === undefined) return { nullValue: null };
     if (typeof val === 'string') return { stringValue: val };
-    if (typeof val === 'number') return Number.isInteger(val)
-      ? { integerValue: String(val) }
-      : { doubleValue: val };
+    if (typeof val === 'number')
+      return Number.isInteger(val) ? { integerValue: String(val) } : { doubleValue: val };
     if (typeof val === 'boolean') return { booleanValue: val };
     return { stringValue: String(val) };
   };
@@ -248,12 +290,13 @@
       : `https://firebasestorage.googleapis.com/v0/b/${FIREBASE_STORAGE_BUCKET}/o/${encodedName}?alt=media`;
   };
 
-  const esc = (text) => String(text || '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+  const esc = (text) =>
+    String(text || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
 
   const fmtDate = (iso) => {
     try {
@@ -344,7 +387,13 @@
 
   const readDisplayNameFromRecord = (record) => {
     if (!record || typeof record !== 'object') return '';
-    const candidates = [record.displayName, record.alias, record.authorName, record.nombre, record.nickname];
+    const candidates = [
+      record.displayName,
+      record.alias,
+      record.authorName,
+      record.nombre,
+      record.nickname,
+    ];
     const hit = candidates.find((value) => String(value || '').trim());
     return String(hit || '').trim();
   };
@@ -369,20 +418,23 @@
       .trim();
   };
 
-  const parseCsvList = (value) => String(value || '')
-    .split(',')
-    .map((item) => String(item || '').trim())
-    .filter(Boolean);
+  const parseCsvList = (value) =>
+    String(value || '')
+      .split(',')
+      .map((item) => String(item || '').trim())
+      .filter(Boolean);
 
   const computeAchievementIds = (input) => {
     const stateLike = {
-      xp: Number(input && input.xp || 0),
-      votesCount: Number(input && input.votesCount || 0),
-      photosCount: Number(input && input.photosCount || 0),
-      reviewsCount: Number(input && input.reviewsCount || 0),
-      favoritesMarkedCount: Number(input && input.favoritesMarkedCount || 0),
+      xp: Number((input && input.xp) || 0),
+      votesCount: Number((input && input.votesCount) || 0),
+      photosCount: Number((input && input.photosCount) || 0),
+      reviewsCount: Number((input && input.reviewsCount) || 0),
+      favoritesMarkedCount: Number((input && input.favoritesMarkedCount) || 0),
       countriesRated: Array.isArray(input && input.countriesRated) ? input.countriesRated : [],
-      specialOriginsTasted: Array.isArray(input && input.specialOriginsTasted) ? input.specialOriginsTasted : [],
+      specialOriginsTasted: Array.isArray(input && input.specialOriginsTasted)
+        ? input.specialOriginsTasted
+        : [],
     };
     const level = getLevelFromXp(stateLike.xp);
     const out = [];
@@ -400,11 +452,14 @@
   const fetchAuthPhotoUrl = async () => {
     if (!auth.token) return '';
     try {
-      const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${FIREBASE_API_KEY}`, {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify({ idToken: auth.token }),
-      });
+      const res = await fetch(
+        `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${FIREBASE_API_KEY}`,
+        {
+          method: 'POST',
+          headers: authHeaders(),
+          body: JSON.stringify({ idToken: auth.token }),
+        }
+      );
       if (!res.ok) return '';
       const json = await res.json();
       const user = Array.isArray(json.users) ? json.users[0] : null;
@@ -417,7 +472,9 @@
   const fetchPrivateProfileCandidates = async () => {
     if (!auth.token || !isOwner()) return [];
     const collections = ['usuarios', 'users', 'profiles', 'perfiles'];
-    const docs = await Promise.all(collections.map((name) => getDocument(name, uid).catch(() => null)));
+    const docs = await Promise.all(
+      collections.map((name) => getDocument(name, uid).catch(() => null))
+    );
     return docs.filter(Boolean);
   };
 
@@ -425,11 +482,7 @@
     const fromProfile = readAvatarFromRecord(state.profile);
     if (fromProfile) return fromProfile;
 
-    const authored = [
-      ...state.threads,
-      ...state.replies,
-      ...state.blogComments,
-    ];
+    const authored = [...state.threads, ...state.replies, ...state.blogComments];
     const fromAuthored = authored
       .map((item) => readAvatarFromRecord(item))
       .find((value) => !!value);
@@ -440,8 +493,8 @@
     if (!isOwner()) return;
 
     const currentAvatar = resolvedProfileAvatar();
-    const currentMotto = String(state.profile && state.profile.motto || '').trim();
-    const currentName = String(state.profile && state.profile.displayName || '').trim();
+    const currentMotto = String((state.profile && state.profile.motto) || '').trim();
+    const currentName = String((state.profile && state.profile.displayName) || '').trim();
     if (currentAvatar && currentMotto && currentName) return;
 
     const local = getStoredProfileLocal();
@@ -455,18 +508,20 @@
       normalizeAvatarUrl(authPhotoUrl),
     ].find((value) => String(value || '').trim());
 
-    const fallbackMotto = [
-      currentMotto,
-      readMottoFromRecord(local),
-      ...privateDocs.map((doc) => readMottoFromRecord(doc)),
-    ].find((value) => String(value || '').trim()) || '';
+    const fallbackMotto =
+      [
+        currentMotto,
+        readMottoFromRecord(local),
+        ...privateDocs.map((doc) => readMottoFromRecord(doc)),
+      ].find((value) => String(value || '').trim()) || '';
 
-    const fallbackName = [
-      currentName,
-      readDisplayNameFromRecord(local),
-      ...privateDocs.map((doc) => readDisplayNameFromRecord(doc)),
-      getAuthorName(),
-    ].find((value) => String(value || '').trim()) || 'Catador';
+    const fallbackName =
+      [
+        currentName,
+        readDisplayNameFromRecord(local),
+        ...privateDocs.map((doc) => readDisplayNameFromRecord(doc)),
+        getAuthorName(),
+      ].find((value) => String(value || '').trim()) || 'Catador';
 
     if (!fallbackAvatar && !fallbackMotto && !fallbackName) return;
 
@@ -489,7 +544,10 @@
   const yearsSince = (dateText) => {
     const dt = new Date(dateText);
     if (Number.isNaN(dt.getTime())) return 'Miembro reciente';
-    const diffYears = Math.max(0, Math.floor((Date.now() - dt.getTime()) / (1000 * 60 * 60 * 24 * 365.25)));
+    const diffYears = Math.max(
+      0,
+      Math.floor((Date.now() - dt.getTime()) / (1000 * 60 * 60 * 24 * 365.25))
+    );
     if (diffYears === 0) return 'Miembro desde hace menos de 1 año';
     if (diffYears === 1) return 'Miembro desde hace 1 año';
     return `Miembro desde hace ${diffYears} años`;
@@ -502,7 +560,9 @@
       ...state.threads.map((item) => item.authorName),
       ...state.replies.map((item) => item.authorName),
       ...state.blogComments.map((item) => item.authorName),
-    ].map((value) => String(value || '').trim()).filter(Boolean);
+    ]
+      .map((value) => String(value || '').trim())
+      .filter(Boolean);
     return names[0] || 'Catador';
   };
 
@@ -511,7 +571,10 @@
       ...state.threads.map((item) => item.createdAt),
       ...state.replies.map((item) => item.createdAt),
       ...state.blogComments.map((item) => item.createdAt),
-    ].filter(Boolean).map((text) => new Date(text)).filter((dt) => !Number.isNaN(dt.getTime()));
+    ]
+      .filter(Boolean)
+      .map((text) => new Date(text))
+      .filter((dt) => !Number.isNaN(dt.getTime()));
     dates.sort((a, b) => a - b);
     return dates;
   };
@@ -523,12 +586,15 @@
     return sumThreads + sumReplies + sumBlogUp;
   };
 
-  const totalDownvotes = () => state.blogComments.reduce((acc, item) => acc + Number(item.downvotes || 0), 0);
+  const totalDownvotes = () =>
+    state.blogComments.reduce((acc, item) => acc + Number(item.downvotes || 0), 0);
 
   const countPhotos = () => {
     const authored = [...state.threads, ...state.replies, ...state.blogComments];
     return authored.reduce((acc, item) => {
-      const hasPhoto = !!String(item.image || item.photoUrl || item.foto || item.authorPhoto || '').trim();
+      const hasPhoto = !!String(
+        item.image || item.photoUrl || item.foto || item.authorPhoto || ''
+      ).trim();
       return acc + (hasPhoto ? 1 : 0);
     }, 0);
   };
@@ -539,13 +605,12 @@
     const reviewsCount = state.blogComments.length;
     const cafesAddedCount = state.threads.length;
     const favoritesMarkedCount = state.followingCount;
-    const xp = (
+    const xp =
       votesCount * XP_RULES.vote +
       photosCount * XP_RULES.photo +
       reviewsCount * XP_RULES.review +
       cafesAddedCount * XP_RULES.addCafe +
-      favoritesMarkedCount * XP_RULES.favorite
-    );
+      favoritesMarkedCount * XP_RULES.favorite;
     return { votesCount, photosCount, reviewsCount, cafesAddedCount, favoritesMarkedCount, xp };
   };
 
@@ -559,9 +624,7 @@
           specialOriginsTasted: parseCsvList(state.profile && state.profile.specialOriginsCsv),
         });
 
-    return ids
-      .map((id) => ACHIEVEMENT_DEFS.find((item) => item.id === id))
-      .filter(Boolean);
+    return ids.map((id) => ACHIEVEMENT_DEFS.find((item) => item.id === id)).filter(Boolean);
   };
 
   const getLevelFromXp = (xp) => {
@@ -576,20 +639,27 @@
     const aliasValue = getAuthorName();
     const ownerFullName = getOwnerFullName();
     const name = aliasValue;
-    const aliasHandle = `@${String(aliasValue || 'catador').replace(/^@+/, '').trim().replace(/\s+/g, '_')}`;
+    const aliasHandle = `@${String(aliasValue || 'catador')
+      .replace(/^@+/, '')
+      .trim()
+      .replace(/\s+/g, '_')}`;
     const first = name.slice(0, 1).toUpperCase() || '?';
     const allDates = collectDates();
     const sinceText = allDates.length ? yearsSince(allDates[0].toISOString()) : 'Miembro reciente';
     const avatarUrl = resolvedProfileAvatar();
-    const quote = String(state.profile && state.profile.motto || '').trim();
+    const quote = String((state.profile && state.profile.motto) || '').trim();
     const quoteText = formatMottoForDisplay(quote) || (isOwner() ? 'Añade una frase breve' : '');
     const member = computeMemberStats();
     const unlockedAchievements = resolveUnlockedAchievements();
     const currentLevel = getLevelFromXp(member.xp);
     const nextLevel = LEVELS.find((level) => level.minXp > member.xp) || null;
     const levelStartXp = currentLevel.minXp;
-    const levelRange = nextLevel ? Math.max(1, nextLevel.minXp - levelStartXp) : Math.max(1, member.xp);
-    const progress = nextLevel ? Math.max(0, Math.min(100, ((member.xp - levelStartXp) / levelRange) * 100)) : 100;
+    const levelRange = nextLevel
+      ? Math.max(1, nextLevel.minXp - levelStartXp)
+      : Math.max(1, member.xp);
+    const progress = nextLevel
+      ? Math.max(0, Math.min(100, ((member.xp - levelStartXp) / levelRange) * 100))
+      : 100;
 
     if (el.avatar) {
       const paintInitial = () => {
@@ -622,21 +692,37 @@
         if (auth.emailVerified) {
           el.alias.innerHTML = esc(aliasHandle) + VERIFIED_SVG;
         } else {
-          el.alias.innerHTML = esc(aliasHandle) + ` <button id="profileVerifyBtn" style="margin-left:7px;font-size:9px;letter-spacing:1px;text-transform:uppercase;background:rgba(255,232,198,0.18);border:1px solid rgba(245,202,156,0.4);color:#f4dfc8;border-radius:6px;padding:2px 8px;cursor:pointer;font-family:inherit;vertical-align:middle;transition:all 0.2s;" title="Verifica tu email">Verificar</button>`;
+          el.alias.innerHTML =
+            esc(aliasHandle) +
+            ` <button id="profileVerifyBtn" style="margin-left:7px;font-size:9px;letter-spacing:1px;text-transform:uppercase;background:rgba(255,232,198,0.18);border:1px solid rgba(245,202,156,0.4);color:#f4dfc8;border-radius:6px;padding:2px 8px;cursor:pointer;font-family:inherit;vertical-align:middle;transition:all 0.2s;" title="Verifica tu email">Verificar</button>`;
           setTimeout(() => {
             const vBtn = document.getElementById('profileVerifyBtn');
             if (!vBtn) return;
             vBtn.addEventListener('click', async () => {
-              vBtn.disabled = true; vBtn.textContent = 'Enviando...';
+              vBtn.disabled = true;
+              vBtn.textContent = 'Enviando...';
               try {
-                const res = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=AIzaSyA1BcU0iRk3HyFtV92CLrnalHFKLaOWH24', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json', 'X-Ios-Bundle-Identifier': 'com.zarezfamily.etiove' },
-                  body: JSON.stringify({ requestType: 'VERIFY_EMAIL', idToken: auth.token }),
-                });
-                if (res.ok) { vBtn.textContent = '✔ Email enviado'; }
-                else { vBtn.textContent = 'Error — reintenta'; vBtn.disabled = false; }
-              } catch { vBtn.textContent = 'Error — reintenta'; vBtn.disabled = false; }
+                const res = await fetch(
+                  'https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=AIzaSyA1BcU0iRk3HyFtV92CLrnalHFKLaOWH24',
+                  {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'X-Ios-Bundle-Identifier': 'com.zarezfamily.etiove',
+                    },
+                    body: JSON.stringify({ requestType: 'VERIFY_EMAIL', idToken: auth.token }),
+                  }
+                );
+                if (res.ok) {
+                  vBtn.textContent = '✔ Email enviado';
+                } else {
+                  vBtn.textContent = 'Error — reintenta';
+                  vBtn.disabled = false;
+                }
+              } catch {
+                vBtn.textContent = 'Error — reintenta';
+                vBtn.disabled = false;
+              }
             });
           }, 0);
         }
@@ -651,7 +737,10 @@
     if (el.since) el.since.textContent = sinceText;
     if (el.level) el.level.textContent = `${currentLevel.icon} ${currentLevel.name}`;
     if (el.xp) el.xp.textContent = `${member.xp} XP acumulados`;
-    if (el.nextLevel) el.nextLevel.textContent = nextLevel ? `Próximo nivel: ${nextLevel.name}` : 'Nivel máximo alcanzado';
+    if (el.nextLevel)
+      el.nextLevel.textContent = nextLevel
+        ? `Próximo nivel: ${nextLevel.name}`
+        : 'Nivel máximo alcanzado';
     if (el.nextXp) el.nextXp.textContent = nextLevel ? `${nextLevel.minXp} XP` : '';
     if (el.progressFill) el.progressFill.style.width = `${progress.toFixed(1)}%`;
     if (el.statVotes) el.statVotes.textContent = String(member.votesCount);
@@ -669,16 +758,22 @@
     }
     if (el.achievements && el.achievementsMeta && el.achievementsGrid) {
       if (unlockedAchievements.length) {
-        const selectedAchievement = unlockedAchievements.find((item) => item.id === state.selectedAchievementId) || unlockedAchievements[0];
+        const selectedAchievement =
+          unlockedAchievements.find((item) => item.id === state.selectedAchievementId) ||
+          unlockedAchievements[0];
         state.selectedAchievementId = selectedAchievement.id;
         el.achievements.style.display = '';
         el.achievementsMeta.textContent = `${unlockedAchievements.length} insignias desbloqueadas`;
-        el.achievementsGrid.innerHTML = unlockedAchievements.map((item) => `
+        el.achievementsGrid.innerHTML = unlockedAchievements
+          .map(
+            (item) => `
           <button class="achievement-chip${item.id === selectedAchievement.id ? ' active' : ''}" type="button" data-achievement-id="${esc(item.id)}" aria-pressed="${item.id === selectedAchievement.id ? 'true' : 'false'}" title="${esc(item.title)}">
             <span class="achievement-chip-icon">${esc(item.icon)}</span>
             <span class="achievement-chip-label">${esc(item.title)}</span>
           </button>
-        `).join('');
+        `
+          )
+          .join('');
         const existingHint = el.achievements.querySelector('.profile-achievement-hint');
         if (existingHint) existingHint.remove();
         const hint = document.createElement('p');
@@ -759,7 +854,9 @@
   const refreshFollowState = () => {
     state.followersCount = state.follows.filter((row) => row.targetUid === uid).length;
     state.followingCount = state.follows.filter((row) => row.followerUid === uid).length;
-    state.isFollowing = !!auth.uid && state.follows.some((row) => row.targetUid === uid && row.followerUid === auth.uid);
+    state.isFollowing =
+      !!auth.uid &&
+      state.follows.some((row) => row.targetUid === uid && row.followerUid === auth.uid);
   };
 
   const profileMap = () => {
@@ -798,9 +895,10 @@
     const map = profileMap();
     const hit = map.get(targetUid);
     if (hit && hit.displayName) return String(hit.displayName);
-    const fromForum = state.threads.find((item) => item.authorUid === targetUid)
-      || state.replies.find((item) => item.authorUid === targetUid)
-      || state.blogComments.find((item) => item.authorUid === targetUid);
+    const fromForum =
+      state.threads.find((item) => item.authorUid === targetUid) ||
+      state.replies.find((item) => item.authorUid === targetUid) ||
+      state.blogComments.find((item) => item.authorUid === targetUid);
     if (fromForum && fromForum.authorName) return String(fromForum.authorName);
     return queryName || 'Catador';
   };
@@ -812,9 +910,13 @@
   };
 
   const openProfile = (targetUid, name) => {
-    const safeUid   = String(targetUid || '').trim();
+    const safeUid = String(targetUid || '').trim();
     if (!safeUid) return;
-    const safeAlias = String(name || '').trim().replace(/^@+/, '').replace(/\s+/g, '_').toLowerCase();
+    const safeAlias = String(name || '')
+      .trim()
+      .replace(/^@+/, '')
+      .replace(/\s+/g, '_')
+      .toLowerCase();
     const slug = safeAlias || safeUid;
     window.location.href = `/perfil/@${encodeURIComponent(slug)}`;
   };
@@ -830,9 +932,27 @@
 
   const renderActivity = () => {
     const mixed = [
-      ...state.threads.map((item) => ({ type: 'hilo', title: item.title || 'Sin titulo', body: item.body || '', createdAt: item.createdAt, emoji: '💬' })),
-      ...state.replies.map((item) => ({ type: 'respuesta', title: 'Ha respondido en el foro', body: item.body || '', createdAt: item.createdAt, emoji: '☕' })),
-      ...state.blogComments.map((item) => ({ type: 'comentario', title: `Comentario en ${item.postSlug || 'blog'}`, body: item.body || '', createdAt: item.createdAt, emoji: '📝' })),
+      ...state.threads.map((item) => ({
+        type: 'hilo',
+        title: item.title || 'Sin titulo',
+        body: item.body || '',
+        createdAt: item.createdAt,
+        emoji: '💬',
+      })),
+      ...state.replies.map((item) => ({
+        type: 'respuesta',
+        title: 'Ha respondido en el foro',
+        body: item.body || '',
+        createdAt: item.createdAt,
+        emoji: '☕',
+      })),
+      ...state.blogComments.map((item) => ({
+        type: 'comentario',
+        title: `Comentario en ${item.postSlug || 'blog'}`,
+        body: item.body || '',
+        createdAt: item.createdAt,
+        emoji: '📝',
+      })),
     ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     if (!mixed.length) {
@@ -845,10 +965,18 @@
     const renderActivityPage = () => {
       const page = mixed.slice(0, (actPage + 1) * PAGE_SIZE);
       const hasMore = page.length < mixed.length;
-      el.content.innerHTML = page.map((item) => {
-      const typeClass = item.type === 'hilo' ? 'hilo' : item.type === 'respuesta' ? 'reply' : 'blog';
-      const typeLabel = item.type === 'hilo' ? 'Hilo' : item.type === 'respuesta' ? 'Respuesta' : 'Comentario';
-      return `
+      el.content.innerHTML =
+        page
+          .map((item) => {
+            const typeClass =
+              item.type === 'hilo' ? 'hilo' : item.type === 'respuesta' ? 'reply' : 'blog';
+            const typeLabel =
+              item.type === 'hilo'
+                ? 'Hilo'
+                : item.type === 'respuesta'
+                  ? 'Respuesta'
+                  : 'Comentario';
+            return `
       <article class="post-card">
         <div class="post-icon">${item.emoji}</div>
         <div class="post-body">
@@ -860,10 +988,17 @@
           ${item.body ? `<p class="post-body-text">${esc(item.body)}</p>` : ''}
         </div>
       </article>`;
-      }).join('')
-      + (hasMore ? `<div style="text-align:center;padding:20px 0;"><button class="mini-btn" id="actLoadMore" style="padding:10px 24px;font-size:13px;">Ver más</button></div>` : '');
+          })
+          .join('') +
+        (hasMore
+          ? `<div style="text-align:center;padding:20px 0;"><button class="mini-btn" id="actLoadMore" style="padding:10px 24px;font-size:13px;">Ver más</button></div>`
+          : '');
       const loadMoreBtn = document.getElementById('actLoadMore');
-      if (loadMoreBtn) loadMoreBtn.addEventListener('click', () => { actPage++; renderActivityPage(); });
+      if (loadMoreBtn)
+        loadMoreBtn.addEventListener('click', () => {
+          actPage++;
+          renderActivityPage();
+        });
     };
     renderActivityPage();
   };
@@ -876,7 +1011,8 @@
 
     el.content.innerHTML = state.threads
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-      .map((item) => `
+      .map(
+        (item) => `
         <article class="post-card">
           <div class="post-icon">💬</div>
           <div class="post-body">
@@ -888,7 +1024,9 @@
             ${item.body ? `<p class="post-body-text">${esc(short(item.body, 220))}</p>` : ''}
           </div>
         </article>
-      `).join('');
+      `
+      )
+      .join('');
   };
 
   const renderReplyList = () => {
@@ -899,7 +1037,8 @@
 
     el.content.innerHTML = state.replies
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-      .map((item) => `
+      .map(
+        (item) => `
         <article class="post-card">
           <div class="post-icon">☕</div>
           <div class="post-body">
@@ -910,7 +1049,9 @@
             <p class="post-body-text" style="-webkit-line-clamp:4;">${esc(short(item.body, 260))}</p>
           </div>
         </article>
-      `).join('');
+      `
+      )
+      .join('');
   };
 
   const renderBlogList = () => {
@@ -921,7 +1062,8 @@
 
     el.content.innerHTML = state.blogComments
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-      .map((item) => `
+      .map(
+        (item) => `
         <article class="post-card">
           <div class="post-icon">📝</div>
           <div class="post-body">
@@ -933,7 +1075,9 @@
             <p class="post-body-text" style="-webkit-line-clamp:4;">${esc(short(item.body, 260))}</p>
           </div>
         </article>
-      `).join('');
+      `
+      )
+      .join('');
   };
 
   const renderStats = () => {
@@ -957,9 +1101,11 @@
     const incoming = state.follows.filter((row) => row.targetUid === uid);
     if (!state.profilesLoaded) {
       renderEmpty('Cargando seguidores...');
-      ensureProfilesLoaded().then(() => renderFollowers()).catch(() => {
-        renderEmpty('No se pudieron cargar los seguidores.');
-      });
+      ensureProfilesLoaded()
+        .then(() => renderFollowers())
+        .catch(() => {
+          renderEmpty('No se pudieron cargar los seguidores.');
+        });
       return;
     }
     if (!incoming.length) {
@@ -983,16 +1129,19 @@
             <button class="mini-btn" type="button" data-open-profile="${esc(row.followerUid)}" data-open-name="${esc(name)}">Ver perfil</button>
           </article>
         `;
-      }).join('');
+      })
+      .join('');
   };
 
   const renderFollowing = () => {
     const outgoing = state.follows.filter((row) => row.followerUid === uid);
     if (!state.profilesLoaded) {
       renderEmpty('Cargando seguidos...');
-      ensureProfilesLoaded().then(() => renderFollowing()).catch(() => {
-        renderEmpty('No se pudieron cargar los seguidos.');
-      });
+      ensureProfilesLoaded()
+        .then(() => renderFollowing())
+        .catch(() => {
+          renderEmpty('No se pudieron cargar los seguidos.');
+        });
       return;
     }
     if (!outgoing.length) {
@@ -1016,10 +1165,9 @@
             <button class="mini-btn" type="button" data-open-profile="${esc(row.targetUid)}" data-open-name="${esc(name)}">Ver perfil</button>
           </article>
         `;
-      }).join('');
+      })
+      .join('');
   };
-
-
 
   // ─── EXPORTAR MIS DATOS (RGPD Art. 20 — Portabilidad) ───────────────────
   const exportMyData = () => {
@@ -1035,24 +1183,36 @@
       },
       profile: state.profile || {},
       threads: state.threads.map((t) => ({
-        id: t.id, title: t.title, body: t.body,
-        categoryId: t.categoryId, createdAt: t.createdAt,
-        upvotes: t.upvotes, accessLevel: t.accessLevel,
+        id: t.id,
+        title: t.title,
+        body: t.body,
+        categoryId: t.categoryId,
+        createdAt: t.createdAt,
+        upvotes: t.upvotes,
+        accessLevel: t.accessLevel,
       })),
       replies: state.replies.map((r) => ({
-        id: r.id, threadId: r.threadId, body: r.body,
-        createdAt: r.createdAt, upvotes: r.upvotes,
+        id: r.id,
+        threadId: r.threadId,
+        body: r.body,
+        createdAt: r.createdAt,
+        upvotes: r.upvotes,
       })),
       messages: state.messages
         .filter((m) => m.senderUid === auth.uid || m.recipientUid === auth.uid)
         .map((m) => ({
-          id: m.id, body: m.body, createdAt: m.createdAt,
+          id: m.id,
+          body: m.body,
+          createdAt: m.createdAt,
           direction: m.senderUid === auth.uid ? 'sent' : 'received',
           otherUser: m.senderUid === auth.uid ? m.recipientName : m.senderName,
         })),
       quizProfile: (() => {
-        try { return JSON.parse(localStorage.getItem('etiove_quiz_prefs') || 'null'); }
-        catch { return null; }
+        try {
+          return JSON.parse(localStorage.getItem('etiove_quiz_prefs') || 'null');
+        } catch {
+          return null;
+        }
       })(),
     };
 
@@ -1070,9 +1230,7 @@
   // ─── BADGE DE MENSAJES NO LEÍDOS ─────────────────────────────────────────
   const updateUnreadBadge = (messages) => {
     if (!auth.uid || !isOwner()) return;
-    const unread = messages.filter(
-      (m) => m.recipientUid === auth.uid && !m.read
-    ).length;
+    const unread = messages.filter((m) => m.recipientUid === auth.uid && !m.read).length;
     const tab = el.tabs.find((b) => b.getAttribute('data-tab') === 'messages');
     if (!tab) return;
 
@@ -1081,13 +1239,21 @@
       badge = document.createElement('span');
       badge.className = 'tab-unread-badge';
       badge.style.cssText = [
-        'display:inline-flex', 'align-items:center', 'justify-content:center',
-        'min-width:16px', 'height:16px',
-        'background:#c0392b', 'color:#fff',
-        'font-size:9px', 'font-weight:700',
-        'border-radius:8px', 'padding:0 4px',
-        'margin-left:5px', 'font-family:-apple-system,sans-serif',
-        'vertical-align:middle', 'letter-spacing:0',
+        'display:inline-flex',
+        'align-items:center',
+        'justify-content:center',
+        'min-width:16px',
+        'height:16px',
+        'background:#c0392b',
+        'color:#fff',
+        'font-size:9px',
+        'font-weight:700',
+        'border-radius:8px',
+        'padding:0 4px',
+        'margin-left:5px',
+        'font-family:-apple-system,sans-serif',
+        'vertical-align:middle',
+        'letter-spacing:0',
       ].join(';');
       tab.appendChild(badge);
     }
@@ -1103,13 +1269,13 @@
   // Mark messages as read when user opens the messages tab
   const markMessagesAsRead = async () => {
     if (!auth.uid || !isOwner()) return;
-    const unreadMsgs = state.messages.filter(
-      (m) => m.recipientUid === auth.uid && !m.read
-    );
+    const unreadMsgs = state.messages.filter((m) => m.recipientUid === auth.uid && !m.read);
     if (!unreadMsgs.length) return;
 
     // Optimistic update
-    unreadMsgs.forEach((m) => { m.read = true; });
+    unreadMsgs.forEach((m) => {
+      m.read = true;
+    });
     updateUnreadBadge(state.messages);
 
     // Persist to Firestore (fire and forget)
@@ -1126,9 +1292,11 @@
 
     if (!state.messagesLoaded) {
       renderEmpty('Cargando mensajes...');
-      ensureMessagesLoaded().then(() => renderMessages()).catch(() => {
-        renderEmpty('No se pudieron cargar los mensajes.');
-      });
+      ensureMessagesLoaded()
+        .then(() => renderMessages())
+        .catch(() => {
+          renderEmpty('No se pudieron cargar los mensajes.');
+        });
       return;
     }
 
@@ -1151,12 +1319,16 @@
       const sorted = rows.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       const page = sorted.slice(0, (msgPage + 1) * MSG_PAGE);
       const hasMoreMsgs = page.length < sorted.length;
-      el.content.innerHTML = page.map((row) => {
-        const mine = row.senderUid === auth.uid;
-        const isUnread = !mine && !row.read;
-        const otherUid = mine ? row.recipientUid : row.senderUid;
-        const otherName = mine ? (row.recipientName || userNameByUid(otherUid)) : (row.senderName || userNameByUid(otherUid));
-        return `
+      el.content.innerHTML =
+        page
+          .map((row) => {
+            const mine = row.senderUid === auth.uid;
+            const isUnread = !mine && !row.read;
+            const otherUid = mine ? row.recipientUid : row.senderUid;
+            const otherName = mine
+              ? row.recipientName || userNameByUid(otherUid)
+              : row.senderName || userNameByUid(otherUid);
+            return `
           <article class="msg-card${isUnread ? ' msg-unread' : ''}">
             <div class="msg-direction">
               <div class="msg-arrow ${mine ? 'out' : 'in'}">${mine ? '↗' : '↘'}</div>
@@ -1170,21 +1342,31 @@
             </div>
           </article>
         `;
-        }).join('')
-        + (hasMoreMsgs ? `<div style="text-align:center;padding:20px 0;"><button class="mini-btn" id="msgLoadMore" style="padding:10px 24px;font-size:13px;">Ver más mensajes</button></div>` : '');
+          })
+          .join('') +
+        (hasMoreMsgs
+          ? `<div style="text-align:center;padding:20px 0;"><button class="mini-btn" id="msgLoadMore" style="padding:10px 24px;font-size:13px;">Ver más mensajes</button></div>`
+          : '');
       const lmBtn = document.getElementById('msgLoadMore');
-      if (lmBtn) lmBtn.addEventListener('click', () => { msgPage++; renderMsgPage(); });
+      if (lmBtn)
+        lmBtn.addEventListener('click', () => {
+          msgPage++;
+          renderMsgPage();
+        });
       // Re-wire DM reply buttons
       el.content.querySelectorAll('[data-reply-dm]').forEach((btn) => {
-        btn.addEventListener('click', () => replyDirectMessage(btn.dataset.replyDm, btn.dataset.replyName));
+        btn.addEventListener('click', () =>
+          replyDirectMessage(btn.dataset.replyDm, btn.dataset.replyName)
+        );
       });
       el.content.querySelectorAll('[data-open-profile]').forEach((btn) => {
-        btn.addEventListener('click', () => openProfile(btn.dataset.openProfile, btn.dataset.openName));
+        btn.addEventListener('click', () =>
+          openProfile(btn.dataset.openProfile, btn.dataset.openName)
+        );
       });
     };
     renderMsgPage();
   };
-
 
   // ─── SCHEMA PERSON (SEO dinámico) ────────────────────────────────────────
   const injectPersonSchema = (profile, displayName) => {
@@ -1194,16 +1376,16 @@
     if (!uid || !displayName) return;
 
     const schema = {
-      "@context": "https://schema.org",
-      "@type": "Person",
-      "name": displayName,
-      "url": `https://etiove.com/perfil/?uid=${encodeURIComponent(uid)}`,
-      "description": `Perfil de ${displayName} en la comunidad Etiove de café de especialidad.`,
-      "memberOf": {
-        "@type": "Organization",
-        "name": "Etiove",
-        "url": "https://etiove.com"
-      }
+      '@context': 'https://schema.org',
+      '@type': 'Person',
+      name: displayName,
+      url: `https://etiove.com/perfil/?uid=${encodeURIComponent(uid)}`,
+      description: `Perfil de ${displayName} en la comunidad Etiove de café de especialidad.`,
+      memberOf: {
+        '@type': 'Organization',
+        name: 'Etiove',
+        url: 'https://etiove.com',
+      },
     };
 
     if (profile && (profile.photoURL || profile.avatarUrl)) {
@@ -1270,7 +1452,9 @@
     el.followBtn.disabled = true;
     setStatus(state.isFollowing ? 'Quitando seguimiento...' : 'Guardando seguimiento...');
 
-    const existing = state.follows.find((row) => row.targetUid === uid && row.followerUid === auth.uid);
+    const existing = state.follows.find(
+      (row) => row.targetUid === uid && row.followerUid === auth.uid
+    );
     let ok = false;
     if (existing) {
       ok = await deleteDocument('profile_follows', existing.id);
@@ -1295,9 +1479,14 @@
     setStatus(state.isFollowing ? 'Ahora sigues a este usuario.' : 'Ya no sigues a este usuario.');
   };
 
-
   // ─── INLINE MODAL (reemplaza window.prompt) ───────────────────────────────
-  const showInlineModal = ({ title, placeholder, initialValue = '', maxLength = 600, onConfirm }) => {
+  const showInlineModal = ({
+    title,
+    placeholder,
+    initialValue = '',
+    maxLength = 600,
+    onConfirm,
+  }) => {
     // Remove any existing modal
     const existing = document.getElementById('profileInlineModal');
     if (existing) existing.remove();
@@ -1305,9 +1494,14 @@
     const overlay = document.createElement('div');
     overlay.id = 'profileInlineModal';
     overlay.style.cssText = [
-      'position:fixed', 'inset:0', 'z-index:10000',
-      'background:rgba(28,18,13,0.55)', 'backdrop-filter:blur(4px)',
-      'display:flex', 'align-items:center', 'justify-content:center',
+      'position:fixed',
+      'inset:0',
+      'z-index:10000',
+      'background:rgba(28,18,13,0.55)',
+      'backdrop-filter:blur(4px)',
+      'display:flex',
+      'align-items:center',
+      'justify-content:center',
       'padding:24px',
     ].join(';');
 
@@ -1336,9 +1530,9 @@
 
     document.body.appendChild(overlay);
 
-    const input    = overlay.querySelector('#profileModalInput');
-    const counter  = overlay.querySelector('#profileModalCounter');
-    const cancelBtn  = overlay.querySelector('#profileModalCancel');
+    const input = overlay.querySelector('#profileModalInput');
+    const counter = overlay.querySelector('#profileModalCounter');
+    const cancelBtn = overlay.querySelector('#profileModalCancel');
     const confirmBtn = overlay.querySelector('#profileModalConfirm');
 
     input.focus();
@@ -1352,20 +1546,32 @@
     const close = () => overlay.remove();
 
     cancelBtn.addEventListener('click', close);
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) close();
+    });
     document.addEventListener('keydown', function esc(e) {
-      if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); }
+      if (e.key === 'Escape') {
+        close();
+        document.removeEventListener('keydown', esc);
+      }
     });
 
     // Focus trap
     const focusEls = [input, cancelBtn, confirmBtn].filter(Boolean);
-    const firstEl = focusEls[0], lastEl = focusEls[focusEls.length - 1];
+    const firstEl = focusEls[0],
+      lastEl = focusEls[focusEls.length - 1];
     overlay.addEventListener('keydown', (e) => {
       if (e.key !== 'Tab') return;
       if (e.shiftKey) {
-        if (document.activeElement === firstEl) { e.preventDefault(); lastEl.focus(); }
+        if (document.activeElement === firstEl) {
+          e.preventDefault();
+          lastEl.focus();
+        }
       } else {
-        if (document.activeElement === lastEl) { e.preventDefault(); firstEl.focus(); }
+        if (document.activeElement === lastEl) {
+          e.preventDefault();
+          firstEl.focus();
+        }
       }
     });
 
@@ -1383,24 +1589,31 @@
       placeholder: 'Escribe tu mensaje...',
       maxLength: 600,
       onConfirm: async (body) => {
-        if (!body || body.length < 2) { setStatus('El mensaje es demasiado corto.'); return; }
+        if (!body || body.length < 2) {
+          setStatus('El mensaje es demasiado corto.');
+          return;
+        }
         setStatus('Enviando mensaje...');
         const ok = await addDocument('direct_messages', {
-      senderUid: auth.uid,
-      senderName: String(localStorage.getItem('etiove_web_alias') || 'Catador'),
-      recipientUid: uid,
-      recipientName: getAuthorName(),
-      body,
-      createdAt: new Date().toISOString(),
-      read: false,
-    });
+          senderUid: auth.uid,
+          senderName: String(localStorage.getItem('etiove_web_alias') || 'Catador'),
+          recipientUid: uid,
+          recipientName: getAuthorName(),
+          body,
+          createdAt: new Date().toISOString(),
+          read: false,
+        });
 
-    if (!ok) {
-      setStatus('No se pudo enviar el mensaje.');
-      return;
-    }
+        if (!ok) {
+          setStatus('No se pudo enviar el mensaje.');
+          return;
+        }
         state.messages = await getCollection('direct_messages', 4000);
-        if (el.tabs.some((btn) => btn.classList.contains('active') && btn.getAttribute('data-tab') === 'messages')) {
+        if (
+          el.tabs.some(
+            (btn) => btn.classList.contains('active') && btn.getAttribute('data-tab') === 'messages'
+          )
+        ) {
           renderMessages();
         }
         setStatus('Mensaje directo enviado.');
@@ -1422,7 +1635,10 @@
       placeholder: 'Escribe tu respuesta...',
       maxLength: 600,
       onConfirm: async (body) => {
-        if (!body || body.length < 2) { setStatus('El mensaje es demasiado corto.'); return; }
+        if (!body || body.length < 2) {
+          setStatus('El mensaje es demasiado corto.');
+          return;
+        }
         const ok = await addDocument('direct_messages', {
           senderUid: auth.uid,
           senderName: String(localStorage.getItem('etiove_web_alias') || 'Catador'),
@@ -1432,7 +1648,10 @@
           createdAt: new Date().toISOString(),
           read: false,
         });
-        if (!ok) { setStatus('No se pudo enviar la respuesta.'); return; }
+        if (!ok) {
+          setStatus('No se pudo enviar la respuesta.');
+          return;
+        }
         state.messages = await getCollection('direct_messages', 4000);
         renderMessages();
         setStatus('Respuesta enviada.');
@@ -1442,7 +1661,9 @@
 
   const handleEditQuote = () => {
     if (!isOwner()) return;
-    const current = formatMottoForDisplay(String(state.profile && state.profile.motto || '').trim());
+    const current = formatMottoForDisplay(
+      String((state.profile && state.profile.motto) || '').trim()
+    );
     showInlineModal({
       title: 'Tu frase de perfil',
       placeholder: 'Una frase que te defina como catador...',
@@ -1450,17 +1671,17 @@
       maxLength: 200,
       onConfirm: async (motto) => {
         const ok = await updateDocument('user_profiles', uid, {
-      uid,
-      displayName: getAuthorName(),
-      avatarUrl: resolvedProfileAvatar(),
-      motto,
-      updatedAt: new Date().toISOString(),
-    });
+          uid,
+          displayName: getAuthorName(),
+          avatarUrl: resolvedProfileAvatar(),
+          motto,
+          updatedAt: new Date().toISOString(),
+        });
 
-    if (!ok) {
-      setStatus('No se pudo guardar la frase.');
-      return;
-    }
+        if (!ok) {
+          setStatus('No se pudo guardar la frase.');
+          return;
+        }
 
         state.profile = await getDocument('user_profiles', uid);
         renderHeader();
@@ -1471,7 +1692,8 @@
 
   const handlePhotoSelected = async (event) => {
     if (!isOwner()) return;
-    const file = event.target && event.target.files && event.target.files[0] ? event.target.files[0] : null;
+    const file =
+      event.target && event.target.files && event.target.files[0] ? event.target.files[0] : null;
     if (!file) return;
 
     setStatus('Subiendo foto...');
@@ -1481,7 +1703,7 @@
         uid,
         displayName: getAuthorName(),
         avatarUrl,
-        motto: String(state.profile && state.profile.motto || '').trim(),
+        motto: String((state.profile && state.profile.motto) || '').trim(),
         updatedAt: new Date().toISOString(),
       });
 
@@ -1543,13 +1765,19 @@
       el.content.addEventListener('click', (event) => {
         const openBtn = event.target.closest('[data-open-profile]');
         if (openBtn) {
-          openProfile(openBtn.getAttribute('data-open-profile'), openBtn.getAttribute('data-open-name'));
+          openProfile(
+            openBtn.getAttribute('data-open-profile'),
+            openBtn.getAttribute('data-open-name')
+          );
           return;
         }
 
         const replyBtn = event.target.closest('[data-reply-dm]');
         if (replyBtn) {
-          replyDirectMessage(replyBtn.getAttribute('data-reply-dm'), replyBtn.getAttribute('data-reply-name'));
+          replyDirectMessage(
+            replyBtn.getAttribute('data-reply-dm'),
+            replyBtn.getAttribute('data-reply-name')
+          );
         }
       });
     }
@@ -1590,14 +1818,19 @@
     // ── Resolver uid desde alias si viene de URL limpia /perfil/@alias ──────
     if (!uid && pathAlias) {
       try {
-        const normAlias = (v) => String(v || '').normalize('NFD')
-          .replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+        const normAlias = (v) =>
+          String(v || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .trim();
         const needle = normAlias(pathAlias);
         const profiles = await getCollection('user_profiles', 2000);
         resolvedProfilesCache = profiles;
-        const hit = profiles.find((p) =>
-          [p.displayName, p.alias, p.nickname].some((v) => normAlias(v) === needle)
-        ) || profiles.find((p) => String(p.uid || '').trim() === pathAlias);
+        const hit =
+          profiles.find((p) =>
+            [p.displayName, p.alias, p.nickname].some((v) => normAlias(v) === needle)
+          ) || profiles.find((p) => String(p.uid || '').trim() === pathAlias);
         if (hit && hit.uid) uid = String(hit.uid).trim();
       } catch (_) {}
     }

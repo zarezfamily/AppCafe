@@ -1,7 +1,4 @@
-const {
-  renderScrollTopButton,
-  renderSiteFooter,
-} = require('./partials');
+const { renderScrollTopButton, renderSiteFooter } = require('./partials');
 
 function renderAboutPage(page) {
   const canonicalUrl = page.canonicalUrl || `https://etiove.com/${page.slug}.html`;

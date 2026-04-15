@@ -63,44 +63,49 @@ exports.onCafeCreatedNotifyCommunity = onDocumentCreated('cafes/{cafeId}', async
     .filter((s) => s.notificationsEnabled !== false)
     .filter((s) => !!s.expoPushToken)
     .filter((s) => s.uid !== actorUid)
-    .map((s) => buildMessage(
-      s.expoPushToken,
-      'Nuevo café en la comunidad',
-      `${cafeName} ya está disponible en Etiove.`,
-      { type: 'community_new_cafe', cafeId: event.params.cafeId }
-    ));
+    .map((s) =>
+      buildMessage(
+        s.expoPushToken,
+        'Nuevo café en la comunidad',
+        `${cafeName} ya está disponible en Etiove.`,
+        { type: 'community_new_cafe', cafeId: event.params.cafeId }
+      )
+    );
 
   await sendExpoPushMessages(messages);
 });
 
-exports.onForumReplyCreatedNotifyThreadOwner = onDocumentCreated('foro_respuestas/{replyId}', async (event) => {
-  const reply = event.data?.data();
-  if (!reply?.threadId || !reply?.authorUid) return;
+exports.onForumReplyCreatedNotifyThreadOwner = onDocumentCreated(
+  'foro_respuestas/{replyId}',
+  async (event) => {
+    const reply = event.data?.data();
+    if (!reply?.threadId || !reply?.authorUid) return;
 
-  const threadRef = db.collection('foro_hilos').doc(String(reply.threadId));
-  const threadSnap = await threadRef.get();
-  if (!threadSnap.exists) return;
+    const threadRef = db.collection('foro_hilos').doc(String(reply.threadId));
+    const threadSnap = await threadRef.get();
+    if (!threadSnap.exists) return;
 
-  const thread = threadSnap.data() || {};
-  const ownerUid = String(thread.authorUid || '');
-  const replierUid = String(reply.authorUid || '');
-  if (!ownerUid || ownerUid === replierUid) return;
+    const thread = threadSnap.data() || {};
+    const ownerUid = String(thread.authorUid || '');
+    const replierUid = String(reply.authorUid || '');
+    if (!ownerUid || ownerUid === replierUid) return;
 
-  const ownerSubSnap = await db.collection('push_subscriptions').doc(ownerUid).get();
-  if (!ownerSubSnap.exists) return;
+    const ownerSubSnap = await db.collection('push_subscriptions').doc(ownerUid).get();
+    if (!ownerSubSnap.exists) return;
 
-  const ownerSub = ownerSubSnap.data() || {};
-  if (!ownerSub.expoPushToken || ownerSub.notificationsEnabled === false) return;
+    const ownerSub = ownerSubSnap.data() || {};
+    if (!ownerSub.expoPushToken || ownerSub.notificationsEnabled === false) return;
 
-  await sendExpoPushMessages([
-    buildMessage(
-      ownerSub.expoPushToken,
-      'Nueva respuesta en tu hilo',
-      `Han respondido en "${thread.title || 'tu hilo'}".`,
-      { type: 'forum_reply', threadId: String(reply.threadId) }
-    ),
-  ]);
-});
+    await sendExpoPushMessages([
+      buildMessage(
+        ownerSub.expoPushToken,
+        'Nueva respuesta en tu hilo',
+        `Han respondido en "${thread.title || 'tu hilo'}".`,
+        { type: 'forum_reply', threadId: String(reply.threadId) }
+      ),
+    ]);
+  }
+);
 
 exports.onCafeScoreChangedNotifyFans = onDocumentUpdated('cafes/{cafeId}', async (event) => {
   const before = event.data?.before?.data() || {};
@@ -124,22 +129,35 @@ exports.onCafeScoreChangedNotifyFans = onDocumentUpdated('cafes/{cafeId}', async
     .map((d) => d.data() || {})
     .filter((s) => !!s.expoPushToken)
     .filter((s) => s.notificationsEnabled !== false)
-    .map((s) => buildMessage(
-      s.expoPushToken,
-      'Cambió la puntuación de un favorito',
-      `${after.nombre || 'Tu café favorito'} ahora tiene ${next.toFixed(1)} puntos.`,
-      { type: 'favorite_score_changed', cafeId }
-    ));
+    .map((s) =>
+      buildMessage(
+        s.expoPushToken,
+        'Cambió la puntuación de un favorito',
+        `${after.nombre || 'Tu café favorito'} ahora tiene ${next.toFixed(1)} puntos.`,
+        { type: 'favorite_score_changed', cafeId }
+      )
+    );
 
   await sendExpoPushMessages(messages);
 });
 
 const UPLOAD_ALLOWED_MIME = new Set([
-  'image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif', 'image/heic', 'image/heif',
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'image/heic',
+  'image/heif',
 ]);
 const UPLOAD_EXT_MAP = {
-  'image/jpeg': 'jpg', 'image/jpg': 'jpg', 'image/png': 'png',
-  'image/webp': 'webp', 'image/gif': 'gif', 'image/heic': 'heic', 'image/heif': 'heif',
+  'image/jpeg': 'jpg',
+  'image/jpg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+  'image/gif': 'gif',
+  'image/heic': 'heic',
+  'image/heif': 'heif',
 };
 const UPLOAD_MAX_BYTES = 5 * 1024 * 1024;
 
@@ -200,5 +218,5 @@ exports.uploadForumImage = onRequest(
 
     const downloadUrl = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(fileName)}?alt=media&token=${downloadToken}`;
     res.status(200).json({ downloadUrl });
-  },
+  }
 );

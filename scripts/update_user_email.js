@@ -6,7 +6,9 @@ const FIREBASE_API_KEY = process.env.EXPO_PUBLIC_FIREBASE_API_KEY;
 const BASE_URL = `https://europe-west1-firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
 
 if (!FIREBASE_PROJECT_ID || !FIREBASE_API_KEY) {
-  console.error('Faltan variables de entorno EXPO_PUBLIC_FIREBASE_PROJECT_ID y/o EXPO_PUBLIC_FIREBASE_API_KEY');
+  console.error(
+    'Faltan variables de entorno EXPO_PUBLIC_FIREBASE_PROJECT_ID y/o EXPO_PUBLIC_FIREBASE_API_KEY'
+  );
   process.exit(1);
 }
 
@@ -21,8 +23,8 @@ async function updateEmail(uid, email) {
   const url = `${BASE_URL}/user_profiles/${uid}?key=${FIREBASE_API_KEY}`;
   const body = {
     fields: {
-      email: { stringValue: email }
-    }
+      email: { stringValue: email },
+    },
   };
   const res = await fetch(url, {
     method: 'PATCH',

@@ -27,7 +27,10 @@ function CommunityReplyChild({
         <View style={s.forumMetaActions}>
           <Text style={s.forumMetaText}>{formatRelativeTime(child.createdAt)}</Text>
           {canModerate && (
-            <TouchableOpacity style={s.forumDotsBtn} onPress={() => abrirMenuAutorForo('foro_respuestas', child)}>
+            <TouchableOpacity
+              style={s.forumDotsBtn}
+              onPress={() => abrirMenuAutorForo('foro_respuestas', child)}
+            >
               <Ionicons name="ellipsis-vertical" size={15} color={theme.brand.accentDeep} />
             </TouchableOpacity>
           )}
@@ -35,7 +38,10 @@ function CommunityReplyChild({
       </View>
       <Text style={s.forumThreadBody}>{child.body}</Text>
       <View style={{ flexDirection: 'row', gap: 10, marginTop: 6 }}>
-        <TouchableOpacity onPress={() => reportarForo('foro_respuestas', child)} disabled={childUserReported}>
+        <TouchableOpacity
+          onPress={() => reportarForo('foro_respuestas', child)}
+          disabled={childUserReported}
+        >
           <Text style={[s.forumActionText, childUserReported && s.forumActionTextDisabled]}>
             💔 NI FÚ NI FÁ {child.reportedCount || 0}
           </Text>
@@ -68,18 +74,25 @@ export default function CommunityReplyCard({
       <View style={s.forumMetaRow}>
         <View style={s.forumAuthorRow}>
           <View style={s.forumAvatar}>
-            <Text style={s.forumAvatarText}>{(reply.authorName || '?')[0]?.toUpperCase() || '?'}</Text>
+            <Text style={s.forumAvatarText}>
+              {(reply.authorName || '?')[0]?.toUpperCase() || '?'}
+            </Text>
           </View>
           <View>
             <Text style={s.forumAuthorName}>{reply.authorName || 'Usuario'}</Text>
-            {reply.authorIsPremium && PremiumBadge ? <PremiumBadge style={{ marginTop: 4 }} /> : null}
+            {reply.authorIsPremium && PremiumBadge ? (
+              <PremiumBadge style={{ marginTop: 4 }} />
+            ) : null}
             <Text style={s.forumAuthorLevel}>{reply.authorLevel || 'Novato'}</Text>
           </View>
         </View>
         <View style={s.forumMetaActions}>
           <Text style={s.forumMetaText}>{formatRelativeTime(reply.createdAt)}</Text>
           {canModerate && (
-            <TouchableOpacity style={s.forumDotsBtn} onPress={() => abrirMenuAutorForo('foro_respuestas', reply)}>
+            <TouchableOpacity
+              style={s.forumDotsBtn}
+              onPress={() => abrirMenuAutorForo('foro_respuestas', reply)}
+            >
               <Ionicons name="ellipsis-vertical" size={16} color={theme.brand.accentDeep} />
             </TouchableOpacity>
           )}
@@ -92,7 +105,10 @@ export default function CommunityReplyCard({
         <TouchableOpacity onPress={() => handleReplyPress(reply)}>
           <Text style={s.forumActionText}>↩ Responder</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => reportarForo('foro_respuestas', reply)} disabled={replyUserReported}>
+        <TouchableOpacity
+          onPress={() => reportarForo('foro_respuestas', reply)}
+          disabled={replyUserReported}
+        >
           <Text style={[s.forumActionText, replyUserReported && s.forumActionTextDisabled]}>
             💔 NI FÚ NI FÁ {reply.reportedCount || 0}
           </Text>

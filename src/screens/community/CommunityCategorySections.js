@@ -98,7 +98,9 @@ export function CommunityAchievementsSection({ gamification, achievementDefs }) 
 export function CommunityMotivationSection() {
   return (
     <View style={{ paddingHorizontal: 16, paddingBottom: 20, gap: 10 }}>
-      <Text style={{ fontSize: 14, fontWeight: '800', color: '#1f140f', marginBottom: 4 }}>⚡ Gana puntos</Text>
+      <Text style={{ fontSize: 14, fontWeight: '800', color: '#1f140f', marginBottom: 4 }}>
+        ⚡ Gana puntos
+      </Text>
       <View style={{ flexDirection: 'row', gap: 10 }}>
         <MotivationCard icon="💬" label="Responder" xp="+14 XP" />
         <MotivationCard icon="🆕" label="Crear tema" xp="+18 XP" />
@@ -120,7 +122,9 @@ export function CommunityCategoryList({
 }) {
   return (
     <View style={{ paddingHorizontal: 16, paddingBottom: 20 }}>
-      <Text style={{ fontSize: 14, fontWeight: '800', color: '#1f140f', marginBottom: 12 }}>Categorías</Text>
+      <Text style={{ fontSize: 14, fontWeight: '800', color: '#1f140f', marginBottom: 12 }}>
+        Categorías
+      </Text>
       <View style={{ gap: 10 }}>
         {forumCategories.map((cat, idx) => {
           const rowAnim = categoryRowAnimsRef.current[idx] || new Animated.Value(1);

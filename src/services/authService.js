@@ -151,8 +151,4 @@ export const sendEmailVerification = async (idToken) => {
   return res.ok;
 };
 
-export {
-  clearAuthToken,
-  getAuthToken,
-  setAuthToken,
-};
+export { clearAuthToken, getAuthToken, setAuthToken };

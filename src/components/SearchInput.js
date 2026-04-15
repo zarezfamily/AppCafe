@@ -7,11 +7,15 @@ import { shared } from '../styles/sharedStyles';
 
 export default function SearchInput({ value, onChangeText, onSearch, allCafes, placeholder }) {
   const [suggestions, setSuggestions] = useState([]);
-  const [show, setShow]               = useState(false);
+  const [show, setShow] = useState(false);
 
   const handleChange = (text) => {
     onChangeText(text);
-    if (text.length < 2) { setSuggestions([]); setShow(false); return; }
+    if (text.length < 2) {
+      setSuggestions([]);
+      setShow(false);
+      return;
+    }
     const q = normalize(text);
     const seen = new Set();
     const matches = [];
@@ -65,7 +69,14 @@ export default function SearchInput({ value, onChangeText, onSearch, allCafes, p
           onBlur={() => setTimeout(() => setShow(false), 200)}
         />
         {value.length > 0 && (
-          <TouchableOpacity onPress={() => { onChangeText(''); setSuggestions([]); setShow(false); onSearch?.(''); }}>
+          <TouchableOpacity
+            onPress={() => {
+              onChangeText('');
+              setSuggestions([]);
+              setShow(false);
+              onSearch?.('');
+            }}
+          >
             <Ionicons name="close-circle" size={18} color="#ccc" />
           </TouchableOpacity>
         )}
@@ -76,7 +87,12 @@ export default function SearchInput({ value, onChangeText, onSearch, allCafes, p
             <TouchableOpacity key={i} style={styles.suggItem} onPress={() => selectSuggestion(sg)}>
               <Ionicons name="search-outline" size={14} color={THEME.icon.muted} />
               <Text style={styles.suggText}>{sg}</Text>
-              <Ionicons name="arrow-up-outline" size={12} color="#ddd" style={{ marginLeft: 'auto', transform: [{ rotate: '45deg' }] }} />
+              <Ionicons
+                name="arrow-up-outline"
+                size={12}
+                color="#ddd"
+                style={{ marginLeft: 'auto', transform: [{ rotate: '45deg' }] }}
+              />
             </TouchableOpacity>
           ))}
         </View>
@@ -86,7 +102,28 @@ export default function SearchInput({ value, onChangeText, onSearch, allCafes, p
 }
 
 const styles = StyleSheet.create({
-  dropdown:  { position: 'absolute', top: 54, left: 16, right: 16, backgroundColor: '#fff', borderRadius: 12, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 8, shadowOffset: { width: 0, height: 4 }, elevation: 5, zIndex: 200 },
-  suggItem:  { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14, paddingVertical: 12, borderBottomWidth: 0.5, borderBottomColor: '#f5f5f5' },
-  suggText:  { fontSize: 14, color: '#333', flex: 1 },
+  dropdown: {
+    position: 'absolute',
+    top: 54,
+    left: 16,
+    right: 16,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 5,
+    zIndex: 200,
+  },
+  suggItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#f5f5f5',
+  },
+  suggText: { fontSize: 14, color: '#333', flex: 1 },
 });

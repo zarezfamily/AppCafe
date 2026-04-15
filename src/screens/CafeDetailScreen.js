@@ -58,7 +58,9 @@ export default function CafeDetailScreen({
     try {
       setMiVoto(estrellas);
       const nuevosVotos = votosActuales + 1;
-      const nuevaPuntuacion = Math.round(((puntuacionActual * votosActuales) + estrellas) / nuevosVotos);
+      const nuevaPuntuacion = Math.round(
+        (puntuacionActual * votosActuales + estrellas) / nuevosVotos
+      );
 
       await updateDocument('cafes', cafe.id, {
         votos: nuevosVotos,
@@ -74,7 +76,10 @@ export default function CafeDetailScreen({
 
       onVote?.(cafe);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-      showDialog('Gracias', `Has valorado este cafe con ${estrellas} estrellas.\nNueva puntuacion media: ${nuevaPuntuacion}.0`);
+      showDialog(
+        'Gracias',
+        `Has valorado este cafe con ${estrellas} estrellas.\nNueva puntuacion media: ${nuevaPuntuacion}.0`
+      );
     } catch {
       showDialog('Error', 'No se pudo guardar tu voto');
       setMiVoto(0);
@@ -97,7 +102,11 @@ export default function CafeDetailScreen({
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={det.hero}>
             <View style={[StyleSheet.absoluteFillObject, styles.packshotBg]}>
-              <PackshotImage uri={cafe.foto} frameStyle={s.packshotHeroFrame} imageStyle={s.packshotHeroImage} />
+              <PackshotImage
+                uri={cafe.foto}
+                frameStyle={s.packshotHeroFrame}
+                imageStyle={s.packshotHeroImage}
+              />
             </View>
             <View style={det.heroGrad} />
             <TouchableOpacity style={det.backBtn} onPress={onClose}>
@@ -128,13 +137,46 @@ export default function CafeDetailScreen({
             <Text style={det.nombre}>{cafe.nombre}</Text>
             {cafe.finca && <Text style={det.finca}>{cafe.finca}</Text>}
             <View style={det.originRow}>
-              {cafe.pais && <Text style={det.originText}>🌍 {cafe.pais}{cafe.region ? `, ${cafe.region}` : ''}</Text>}
+              {cafe.pais && (
+                <Text style={det.originText}>
+                  🌍 {cafe.pais}
+                  {cafe.region ? `, ${cafe.region}` : ''}
+                </Text>
+              )}
             </View>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={det.chipsWrap}>
-              {cafe.variedad && <Chip det={det} label={cafe.variedad} icon="leaf-outline" premiumAccent={premiumAccent} />}
-              {cafe.proceso && <Chip det={det} label={cafe.proceso} icon="water-outline" premiumAccent={premiumAccent} />}
-              {cafe.tueste && <Chip det={det} label={`Tueste ${cafe.tueste}`} icon="flame-outline" premiumAccent={premiumAccent} />}
-              {cafe.altura && <Chip det={det} label={`${cafe.altura} msnm`} icon="trending-up-outline" premiumAccent={premiumAccent} />}
+              {cafe.variedad && (
+                <Chip
+                  det={det}
+                  label={cafe.variedad}
+                  icon="leaf-outline"
+                  premiumAccent={premiumAccent}
+                />
+              )}
+              {cafe.proceso && (
+                <Chip
+                  det={det}
+                  label={cafe.proceso}
+                  icon="water-outline"
+                  premiumAccent={premiumAccent}
+                />
+              )}
+              {cafe.tueste && (
+                <Chip
+                  det={det}
+                  label={`Tueste ${cafe.tueste}`}
+                  icon="flame-outline"
+                  premiumAccent={premiumAccent}
+                />
+              )}
+              {cafe.altura && (
+                <Chip
+                  det={det}
+                  label={`${cafe.altura} msnm`}
+                  icon="trending-up-outline"
+                  premiumAccent={premiumAccent}
+                />
+              )}
             </ScrollView>
 
             <View style={det.votarBox}>
@@ -151,11 +193,19 @@ export default function CafeDetailScreen({
               )}
               <View style={styles.starsRow}>
                 {[1, 2, 3, 4, 5].map((n) => (
-                  <TouchableOpacity key={n} onPress={() => votar(n)} disabled={yaVotado || miVoto > 0 || votando}>
+                  <TouchableOpacity
+                    key={n}
+                    onPress={() => votar(n)}
+                    disabled={yaVotado || miVoto > 0 || votando}
+                  >
                     <Ionicons
-                      name={n <= (miVoto || (yaVotado ? puntuacionActual : 0)) ? 'star' : 'star-outline'}
+                      name={
+                        n <= (miVoto || (yaVotado ? puntuacionActual : 0)) ? 'star' : 'star-outline'
+                      }
                       size={36}
-                      color={n <= (miVoto || (yaVotado ? puntuacionActual : 0)) ? premiumAccent : '#ddd'}
+                      color={
+                        n <= (miVoto || (yaVotado ? puntuacionActual : 0)) ? premiumAccent : '#ddd'
+                      }
                     />
                   </TouchableOpacity>
                 ))}
@@ -171,9 +221,20 @@ export default function CafeDetailScreen({
                   <Text style={det.scaLabel}>Puntuacion SCA</Text>
                 </View>
                 <View style={det.scaBar}>
-                  <View style={[det.scaFill, { width: `${Math.min(((cafe.sca - 80) / 20) * 100, 100)}%` }]} />
+                  <View
+                    style={[
+                      det.scaFill,
+                      { width: `${Math.min(((cafe.sca - 80) / 20) * 100, 100)}%` },
+                    ]}
+                  />
                 </View>
-                <Text style={det.scaCat}>{cafe.sca >= 90 ? '☕ Excepcional' : cafe.sca >= 85 ? '⭐ Excelente' : '✓ Especialidad'}</Text>
+                <Text style={det.scaCat}>
+                  {cafe.sca >= 90
+                    ? '☕ Excepcional'
+                    : cafe.sca >= 85
+                      ? '⭐ Excelente'
+                      : '✓ Especialidad'}
+                </Text>
               </View>
             )}
 
@@ -186,25 +247,103 @@ export default function CafeDetailScreen({
               </View>
             )}
             <View style={det.sensRow}>
-              {cafe.acidez && <SensItem det={det} label="Acidez" value={cafe.acidez} icon="flash-outline" premiumAccent={premiumAccent} />}
-              {cafe.cuerpo && <SensItem det={det} label="Cuerpo" value={cafe.cuerpo} icon="fitness-outline" premiumAccent={premiumAccent} />}
-              {cafe.regusto && <SensItem det={det} label="Regusto" value={cafe.regusto} icon="time-outline" premiumAccent={premiumAccent} />}
+              {cafe.acidez && (
+                <SensItem
+                  det={det}
+                  label="Acidez"
+                  value={cafe.acidez}
+                  icon="flash-outline"
+                  premiumAccent={premiumAccent}
+                />
+              )}
+              {cafe.cuerpo && (
+                <SensItem
+                  det={det}
+                  label="Cuerpo"
+                  value={cafe.cuerpo}
+                  icon="fitness-outline"
+                  premiumAccent={premiumAccent}
+                />
+              )}
+              {cafe.regusto && (
+                <SensItem
+                  det={det}
+                  label="Regusto"
+                  value={cafe.regusto}
+                  icon="time-outline"
+                  premiumAccent={premiumAccent}
+                />
+              )}
             </View>
 
             <View style={det.divider} />
             <Text style={det.sectionTitle}>Origen y proceso</Text>
-            <InfoRow det={det} icon="location-outline" label="País / Región" value={[cafe.pais, cafe.region].filter(Boolean).join(', ')} premiumAccent={premiumAccent} />
-            <InfoRow det={det} icon="person-outline" label="Productor" value={cafe.productor} premiumAccent={premiumAccent} />
-            <InfoRow det={det} icon="home-outline" label="Finca" value={cafe.finca} premiumAccent={premiumAccent} />
-            <InfoRow det={det} icon="trending-up-outline" label="Altura" value={cafe.altura ? `${cafe.altura} msnm` : null} premiumAccent={premiumAccent} />
-            <InfoRow det={det} icon="leaf-outline" label="Variedad" value={cafe.variedad} premiumAccent={premiumAccent} />
-            <InfoRow det={det} icon="water-outline" label="Proceso" value={cafe.proceso} premiumAccent={premiumAccent} />
-            <InfoRow det={det} icon="sunny-outline" label="Secado" value={cafe.secado} premiumAccent={premiumAccent} />
+            <InfoRow
+              det={det}
+              icon="location-outline"
+              label="País / Región"
+              value={[cafe.pais, cafe.region].filter(Boolean).join(', ')}
+              premiumAccent={premiumAccent}
+            />
+            <InfoRow
+              det={det}
+              icon="person-outline"
+              label="Productor"
+              value={cafe.productor}
+              premiumAccent={premiumAccent}
+            />
+            <InfoRow
+              det={det}
+              icon="home-outline"
+              label="Finca"
+              value={cafe.finca}
+              premiumAccent={premiumAccent}
+            />
+            <InfoRow
+              det={det}
+              icon="trending-up-outline"
+              label="Altura"
+              value={cafe.altura ? `${cafe.altura} msnm` : null}
+              premiumAccent={premiumAccent}
+            />
+            <InfoRow
+              det={det}
+              icon="leaf-outline"
+              label="Variedad"
+              value={cafe.variedad}
+              premiumAccent={premiumAccent}
+            />
+            <InfoRow
+              det={det}
+              icon="water-outline"
+              label="Proceso"
+              value={cafe.proceso}
+              premiumAccent={premiumAccent}
+            />
+            <InfoRow
+              det={det}
+              icon="sunny-outline"
+              label="Secado"
+              value={cafe.secado}
+              premiumAccent={premiumAccent}
+            />
 
             <View style={det.divider} />
             <Text style={det.sectionTitle}>Tueste</Text>
-            <InfoRow det={det} icon="flame-outline" label="Nivel" value={cafe.tueste} premiumAccent={premiumAccent} />
-            <InfoRow det={det} icon="calendar-outline" label="Fecha tueste" value={cafe.fechaTueste} premiumAccent={premiumAccent} />
+            <InfoRow
+              det={det}
+              icon="flame-outline"
+              label="Nivel"
+              value={cafe.tueste}
+              premiumAccent={premiumAccent}
+            />
+            <InfoRow
+              det={det}
+              icon="calendar-outline"
+              label="Fecha tueste"
+              value={cafe.fechaTueste}
+              premiumAccent={premiumAccent}
+            />
 
             {cafe.preparacion && (
               <>
@@ -270,10 +409,47 @@ function InfoRow({ det, icon, label, value, premiumAccent }) {
 
 const det = StyleSheet.create({
   hero: { width: '100%', height: '42%', minHeight: 320, backgroundColor: '#f5f0eb' },
-  heroGrad: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 120, backgroundColor: 'rgba(0,0,0,0.45)' },
-  backBtn: { position: 'absolute', top: 52, left: 16, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.4)', alignItems: 'center', justifyContent: 'center' },
-  favBtn: { position: 'absolute', top: 52, right: 64, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.4)', alignItems: 'center', justifyContent: 'center' },
-  deleteBtn: { position: 'absolute', top: 52, right: 16, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(220,50,50,0.7)', alignItems: 'center', justifyContent: 'center' },
+  heroGrad: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 120,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+  },
+  backBtn: {
+    position: 'absolute',
+    top: 52,
+    left: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  favBtn: {
+    position: 'absolute',
+    top: 52,
+    right: 64,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  deleteBtn: {
+    position: 'absolute',
+    top: 52,
+    right: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(220,50,50,0.7)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   scoreBox: { position: 'absolute', bottom: 20, left: 20, gap: 4 },
   scoreNum: { fontSize: 42, fontWeight: '800', color: '#fff' },
   scoreVotos: { fontSize: 13, color: 'rgba(255,255,255,0.8)' },
@@ -283,9 +459,27 @@ const det = StyleSheet.create({
   originRow: { marginBottom: 14 },
   originText: { fontSize: 14, color: '#888' },
   chipsWrap: { marginBottom: 20 },
-  chip: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: '#f6ede3', borderWidth: 1, borderColor: '#e4d3c2', borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, marginRight: 8 },
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: '#f6ede3',
+    borderWidth: 1,
+    borderColor: '#e4d3c2',
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    marginRight: 8,
+  },
   chipText: { fontSize: 12, color: '#5d4030', fontWeight: '600' },
-  votarBox: { backgroundColor: '#fbf5ee', borderRadius: 16, padding: 18, alignItems: 'center', gap: 4, marginBottom: 4 },
+  votarBox: {
+    backgroundColor: '#fbf5ee',
+    borderRadius: 16,
+    padding: 18,
+    alignItems: 'center',
+    gap: 4,
+    marginBottom: 4,
+  },
   votarTitle: { fontSize: 17, fontWeight: '700', color: '#111' },
   votarSub: { fontSize: 13, color: '#888' },
   scaBox: { backgroundColor: '#f9f9f9', borderRadius: 16, padding: 16, marginBottom: 4, gap: 8 },
@@ -298,19 +492,55 @@ const det = StyleSheet.create({
   divider: { height: 0.5, backgroundColor: '#eee', marginVertical: 20 },
   sectionTitle: { fontSize: 18, fontWeight: '700', color: '#111', marginBottom: 14 },
   notasBox: { backgroundColor: '#fbf5ee', borderRadius: 12, padding: 14, marginBottom: 14 },
-  notasLabel: { fontSize: 11, fontWeight: '700', color: '#5d4030', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 6 },
+  notasLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#5d4030',
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    marginBottom: 6,
+  },
   notasText: { fontSize: 15, color: '#333', lineHeight: 22 },
   sensRow: { flexDirection: 'row', gap: 10 },
-  sensItem: { flex: 1, backgroundColor: '#f9f9f9', borderRadius: 12, padding: 12, alignItems: 'center', gap: 4 },
+  sensItem: {
+    flex: 1,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 12,
+    padding: 12,
+    alignItems: 'center',
+    gap: 4,
+  },
   sensLabel: { fontSize: 11, color: '#888', fontWeight: '600' },
   sensVal: { fontSize: 12, color: '#333', textAlign: 'center' },
-  infoRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8, borderBottomWidth: 0.5, borderBottomColor: '#f0f0f0' },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 8,
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#f0f0f0',
+  },
   infoLabel: { fontSize: 14, color: '#888', flex: 1 },
   infoVal: { fontSize: 14, color: '#111', fontWeight: '500', flex: 2, textAlign: 'right' },
-  prepBox: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: '#fbf5ee', borderRadius: 12, padding: 14 },
+  prepBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: '#fbf5ee',
+    borderRadius: 12,
+    padding: 14,
+  },
   prepText: { fontSize: 14, color: '#333', flex: 1 },
   certText: { fontSize: 14, color: '#555', lineHeight: 22 },
-  precioBox: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#f9f9f9', borderRadius: 12, padding: 16, marginTop: 20 },
+  precioBox: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#f9f9f9',
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 20,
+  },
   precioLabel: { fontSize: 14, color: '#888' },
   precioVal: { fontSize: 20, fontWeight: '800', color: '#8f5e3b' },
 });

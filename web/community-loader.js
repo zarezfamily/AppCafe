@@ -18,16 +18,19 @@ if (forumSection) {
   if (shouldLoadImmediately) {
     loadCommunityScript();
   } else if ('IntersectionObserver' in window) {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        observer.disconnect();
-        loadCommunityScript();
-      });
-    }, {
-      rootMargin: '600px 0px',
-      threshold: 0.01,
-    });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          observer.disconnect();
+          loadCommunityScript();
+        });
+      },
+      {
+        rootMargin: '600px 0px',
+        threshold: 0.01,
+      }
+    );
 
     observer.observe(forumSection);
   } else {

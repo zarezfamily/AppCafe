@@ -65,7 +65,10 @@ export function createMainScreenNotebookHandlers({
 
       await cargarCatas();
       if (fotoOmitidaPorPermisos) {
-        showDialog('Cata guardada', 'La cata se guardó sin foto porque Firebase Storage rechazó la subida.');
+        showDialog(
+          'Cata guardada',
+          'La cata se guardó sin foto porque Firebase Storage rechazó la subida.'
+        );
       }
       notebook.irCerrarModal();
     } catch (error) {

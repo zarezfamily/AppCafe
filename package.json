@@ -21,7 +21,12 @@
     "screenshots:ios": "./scripts/capture_screenshots_ios.sh",
     "screenshots:ios:auto": "AUTO_CAPTURE=1 ./scripts/capture_screenshots_ios.sh",
     "import:es:coffee:dry": "npm run env:check:import-dry && DRY_RUN=true node --env-file=.env scripts/import_top_es_real.js",
-    "import:es:coffee": "npm run env:check:import-write && node --env-file=.env scripts/import_top_es_real.js"
+    "import:es:coffee": "npm run env:check:import-write && node --env-file=.env scripts/import_top_es_real.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check .",
+    "validate": "npm run format:check && npm run lint"
   },
   "dependencies": {
     "@expo-google-fonts/playfair-display": "^0.4.2",
@@ -51,7 +56,12 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
-    "@types/react": "~19.1.10"
+    "@eslint/js": "^9.25.1",
+    "@types/react": "~19.1.10",
+    "eslint": "^9.25.1",
+    "eslint-plugin-react": "^7.37.5",
+    "globals": "^16.0.0",
+    "prettier": "^3.5.3"
   },
   "private": true
 }

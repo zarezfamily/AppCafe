@@ -1,6 +1,4 @@
-import {
-  Text,
-} from 'react-native';
+import { Text } from 'react-native';
 import { CommunityBodyField, CommunityCountText, CommunityTitleField } from './CommunityFormFields';
 import CommunityModalActions from './CommunityModalActions';
 import CommunityModalSheet from './CommunityModalSheet';
@@ -31,11 +29,7 @@ export default function CommunityEditItemModal({
         {forumEditCollection === 'foro_hilos' ? 'Editar hilo' : 'Editar respuesta'}
       </Text>
       {forumEditCollection === 'foro_hilos' && (
-        <CommunityTitleField
-          s={s}
-          value={forumEditTitle}
-          onChangeText={setForumEditTitle}
-        />
+        <CommunityTitleField s={s} value={forumEditTitle} onChangeText={setForumEditTitle} />
       )}
       <CommunityBodyField
         s={s}

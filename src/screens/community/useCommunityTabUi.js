@@ -50,7 +50,8 @@ export default function useCommunityTabUi({
   const animatePressIn = runCommunityPressIn;
   const animatePressOut = runCommunityPressOut;
 
-  const closeCreateModal = () => runCommunityModalClose(createModalAnim, () => setForumCreateOpen(false));
+  const closeCreateModal = () =>
+    runCommunityModalClose(createModalAnim, () => setForumCreateOpen(false));
   const closeEditModal = () => runCommunityModalClose(editModalAnim, () => setForumEditOpen(false));
   const {
     hapticTap,
@@ -80,7 +81,12 @@ export default function useCommunityTabUi({
   useEffect(() => {
     if (forumCategory) return;
     communityHeroAnim.setValue(0);
-    prepareStaggeredAnimatedValues(categoryRowAnimsRef, categoryPressAnimsRef, forumCategories.length, 0);
+    prepareStaggeredAnimatedValues(
+      categoryRowAnimsRef,
+      categoryPressAnimsRef,
+      forumCategories.length,
+      0
+    );
     runFadeIn(communityHeroAnim, 320);
     runStaggeredFadeIn(categoryRowAnimsRef.current, 65, 260);
   }, [communityHeroAnim, forumCategories, forumCategory]);
@@ -88,7 +94,12 @@ export default function useCommunityTabUi({
   useEffect(() => {
     if (!forumCategory || forumThread || forumLoading) return;
     threadListEnterAnim.setValue(0);
-    prepareStaggeredAnimatedValues(threadRowAnimsRef, threadPressAnimsRef, forumThreadsByCategory.length, 0);
+    prepareStaggeredAnimatedValues(
+      threadRowAnimsRef,
+      threadPressAnimsRef,
+      forumThreadsByCategory.length,
+      0
+    );
     runFadeIn(threadListEnterAnim, 260);
     runStaggeredFadeIn(threadRowAnimsRef.current, 55, 230);
   }, [forumCategory, forumLoading, forumThread, forumThreadsByCategory, threadListEnterAnim]);

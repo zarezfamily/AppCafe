@@ -9,11 +9,7 @@ import {
   restorePremiumPurchases,
 } from '../core/purchases';
 
-export default function useMainScreenPremium({
-  user,
-  premium,
-  showDialog,
-}) {
+export default function useMainScreenPremium({ user, premium, showDialog }) {
   const [purchasesReady, setPurchasesReady] = useState(false);
   const [purchasingPlan, setPurchasingPlan] = useState('');
   const [restoringPurchases, setRestoringPurchases] = useState(false);
@@ -57,7 +53,10 @@ export default function useMainScreenPremium({
 
   const handlePremiumPurchase = async (plan) => {
     if (!purchasesReady) {
-      showDialog('Compras no disponibles', 'Configura las claves públicas de RevenueCat para esta plataforma y vuelve a intentarlo.');
+      showDialog(
+        'Compras no disponibles',
+        'Configura las claves públicas de RevenueCat para esta plataforma y vuelve a intentarlo.'
+      );
       return;
     }
 
@@ -83,7 +82,10 @@ export default function useMainScreenPremium({
       );
     } catch (error) {
       if (!isRevenueCatCancellation(error)) {
-        showDialog('No se pudo completar la compra', 'La compra no se completó o no se pudo sincronizar con tu cuenta.');
+        showDialog(
+          'No se pudo completar la compra',
+          'La compra no se completó o no se pudo sincronizar con tu cuenta.'
+        );
       }
     } finally {
       setPurchasingPlan('');
@@ -92,7 +94,10 @@ export default function useMainScreenPremium({
 
   const handleRestorePurchases = async () => {
     if (!purchasesReady) {
-      showDialog('Compras no disponibles', 'Configura las claves públicas de RevenueCat para esta plataforma y vuelve a intentarlo.');
+      showDialog(
+        'Compras no disponibles',
+        'Configura las claves públicas de RevenueCat para esta plataforma y vuelve a intentarlo.'
+      );
       return;
     }
 
@@ -100,15 +105,22 @@ export default function useMainScreenPremium({
     try {
       const restoredPurchase = await restorePremiumPurchases();
       if (!restoredPurchase?.plan) {
-        showDialog('Sin compras para restaurar', 'No encontramos compras Premium asociadas a tu cuenta de App Store o Google Play.');
+        showDialog(
+          'Sin compras para restaurar',
+          'No encontramos compras Premium asociadas a tu cuenta de App Store o Google Play.'
+        );
         return;
       }
 
-      const activated = await premium.activatePremium(restoredPurchase.plan, restoredPurchase.transactionId, {
-        expiresAt: restoredPurchase.expiresAt,
-        provider: restoredPurchase.source,
-        productId: restoredPurchase.productId,
-      });
+      const activated = await premium.activatePremium(
+        restoredPurchase.plan,
+        restoredPurchase.transactionId,
+        {
+          expiresAt: restoredPurchase.expiresAt,
+          provider: restoredPurchase.source,
+          productId: restoredPurchase.productId,
+        }
+      );
 
       if (!activated) throw new Error('premium_restore_sync_failed');
 

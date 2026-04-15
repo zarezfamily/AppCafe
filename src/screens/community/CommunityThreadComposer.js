@@ -48,8 +48,16 @@ export default function CommunityThreadComposer({
           onChangeText={setForumReplyText}
           multiline
         />
-        <TouchableOpacity style={s.forumSendBtn} onPress={handleSendReply} disabled={!!forumSendingReply}>
-          {forumSendingReply ? <ActivityIndicator color="#fff" /> : <Ionicons name="send" size={16} color="#fff" />}
+        <TouchableOpacity
+          style={s.forumSendBtn}
+          onPress={handleSendReply}
+          disabled={!!forumSendingReply}
+        >
+          {forumSendingReply ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Ionicons name="send" size={16} color="#fff" />
+          )}
         </TouchableOpacity>
       </View>
     </Animated.View>

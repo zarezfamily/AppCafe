@@ -1,9 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import {
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { CommunityBodyField, CommunityCountText, CommunityTitleField } from './CommunityFormFields';
 import CommunityModalActions from './CommunityModalActions';
 import CommunityModalSheet from './CommunityModalSheet';
@@ -37,11 +33,7 @@ export default function CommunityCreateThreadModal({
     >
       <Text style={s.sectionTitle}>Nuevo hilo</Text>
       <Text style={s.sectionSub}>{forumCategory?.label || 'Comunidad'}</Text>
-      <CommunityTitleField
-        s={s}
-        value={forumTitle}
-        onChangeText={setForumTitle}
-      />
+      <CommunityTitleField s={s} value={forumTitle} onChangeText={setForumTitle} />
       <CommunityBodyField
         s={s}
         value={forumBody}
@@ -63,7 +55,9 @@ export default function CommunityCreateThreadModal({
           onPress={() => setForumAccessLevel('public')}
         >
           <Text style={{ fontSize: 13, fontWeight: '700', color: '#5d4030' }}>Público</Text>
-          <Text style={{ fontSize: 11, color: '#8b7355', marginTop: 2 }}>Cualquiera puede leerlo</Text>
+          <Text style={{ fontSize: 11, color: '#8b7355', marginTop: 2 }}>
+            Cualquiera puede leerlo
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={{
@@ -77,8 +71,12 @@ export default function CommunityCreateThreadModal({
           }}
           onPress={() => setForumAccessLevel('registered_only')}
         >
-          <Text style={{ fontSize: 13, fontWeight: '700', color: '#5d4030' }}>Solo registrados</Text>
-          <Text style={{ fontSize: 11, color: '#8b7355', marginTop: 2 }}>Solo usuarios con sesión</Text>
+          <Text style={{ fontSize: 13, fontWeight: '700', color: '#5d4030' }}>
+            Solo registrados
+          </Text>
+          <Text style={{ fontSize: 11, color: '#8b7355', marginTop: 2 }}>
+            Solo usuarios con sesión
+          </Text>
         </TouchableOpacity>
       </View>
       <CommunityCountText s={s} titleLength={forumTitle.length} bodyLength={forumBody.length} />

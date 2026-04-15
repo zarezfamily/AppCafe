@@ -74,7 +74,9 @@ export default function MainScreenBody({
         </ScrollView>
       )}
 
-      {!(activeTab === MAIN_TABS.COMMUNITY && !!forumThread) && <BottomBarNav {...bottomBarProps} />}
+      {!(activeTab === MAIN_TABS.COMMUNITY && !!forumThread) && (
+        <BottomBarNav {...bottomBarProps} />
+      )}
 
       <CataFormModal
         visible={!!notebook.modalFormOpen}

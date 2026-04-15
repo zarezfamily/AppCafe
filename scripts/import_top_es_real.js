@@ -16,7 +16,8 @@
     DRY_RUN=true
 */
 
-const FIREBASE_PROJECT_ID = process.env.FIREBASE_PROJECT_ID || process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID;
+const FIREBASE_PROJECT_ID =
+  process.env.FIREBASE_PROJECT_ID || process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID;
 const FIREBASE_API_KEY = process.env.FIREBASE_API_KEY || process.env.EXPO_PUBLIC_FIREBASE_API_KEY;
 const FIREBASE_AUTH_TOKEN = process.env.FIREBASE_AUTH_TOKEN || process.env.TOKEN || '';
 
@@ -29,7 +30,9 @@ if (!FIREBASE_PROJECT_ID || !FIREBASE_API_KEY) {
 }
 
 if (!DRY_RUN && !FIREBASE_AUTH_TOKEN) {
-  console.error('Falta FIREBASE_AUTH_TOKEN para escribir en Firestore (usa DRY_RUN=true para solo previsualizar).');
+  console.error(
+    'Falta FIREBASE_AUTH_TOKEN para escribir en Firestore (usa DRY_RUN=true para solo previsualizar).'
+  );
   process.exit(1);
 }
 
@@ -115,7 +118,8 @@ const toCafeDoc = (product, idx) => {
 };
 
 const fetchTopProductsSpain = async (limit) => {
-  const url = 'https://world.openfoodfacts.org/api/v2/search' +
+  const url =
+    'https://world.openfoodfacts.org/api/v2/search' +
     '?categories_tags=coffee' +
     '&countries_tags=spain' +
     '&fields=code,product_name,product_name_es,brands,categories,categories_tags,image_front_url,image_url,unique_scans_n,popularity_key' +
@@ -124,7 +128,7 @@ const fetchTopProductsSpain = async (limit) => {
   const res = await fetch(url, {
     headers: {
       'User-Agent': 'Etiove/1.0 (github.com/zarezfamily/etiove)',
-      'Accept': 'application/json',
+      Accept: 'application/json',
     },
   });
 
@@ -137,7 +141,7 @@ const fetchTopProductsSpain = async (limit) => {
 
   const filtered = products
     .filter((p) => p && looksLikeCoffee(p))
-    .filter((p) => (p.image_front_url || p.image_url))
+    .filter((p) => p.image_front_url || p.image_url)
     .filter((p) => (p.product_name || p.product_name_es || '').trim().length > 2)
     .sort((a, b) => scoreProduct(b) - scoreProduct(a))
     .slice(0, limit);
@@ -150,7 +154,7 @@ const writeCafe = async (cafeDoc) => {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${FIREBASE_AUTH_TOKEN}`,
+      Authorization: `Bearer ${FIREBASE_AUTH_TOKEN}`,
     },
     body: JSON.stringify(toFields(cafeDoc)),
   });

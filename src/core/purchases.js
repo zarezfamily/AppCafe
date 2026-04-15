@@ -7,8 +7,16 @@ let purchasesModule = undefined;
 const REVENUECAT_TEST_API_KEY = 'test_cSzLKDiWVBSZqtHxscEKhRLkqRA';
 
 const PLAN_PRODUCT_IDS = {
-  monthly: [PREMIUM_PLANS.monthly.appleId, PREMIUM_PLANS.monthly.googleId, PREMIUM_PLANS.monthly.id],
-  lifetime: [PREMIUM_PLANS.lifetime.appleId, PREMIUM_PLANS.lifetime.googleId, PREMIUM_PLANS.lifetime.id],
+  monthly: [
+    PREMIUM_PLANS.monthly.appleId,
+    PREMIUM_PLANS.monthly.googleId,
+    PREMIUM_PLANS.monthly.id,
+  ],
+  lifetime: [
+    PREMIUM_PLANS.lifetime.appleId,
+    PREMIUM_PLANS.lifetime.googleId,
+    PREMIUM_PLANS.lifetime.id,
+  ],
 };
 
 function getRevenueCatApiKey() {
@@ -44,7 +52,9 @@ function getAllPackageCandidates(offerings) {
     current.threeMonth,
   ].filter(Boolean);
 
-  const availablePackages = Array.isArray(current.availablePackages) ? current.availablePackages : [];
+  const availablePackages = Array.isArray(current.availablePackages)
+    ? current.availablePackages
+    : [];
   return [...directPackages, ...availablePackages].filter(Boolean);
 }
 
@@ -118,7 +128,9 @@ export function getPremiumStatusFromCustomerInfo(customerInfo) {
       plan: 'lifetime',
       expiresAt: null,
       transactionId: customerInfo.originalAppUserId || 'revenuecat',
-      productId: PLAN_PRODUCT_IDS.lifetime.find((id) => purchasedProductIds.has(id)) || PREMIUM_PLANS.lifetime.id,
+      productId:
+        PLAN_PRODUCT_IDS.lifetime.find((id) => purchasedProductIds.has(id)) ||
+        PREMIUM_PLANS.lifetime.id,
       source: 'revenuecat',
     };
   }
@@ -129,7 +141,9 @@ export function getPremiumStatusFromCustomerInfo(customerInfo) {
       plan: 'monthly',
       expiresAt: getExpirationDate(customerInfo, 'monthly'),
       transactionId: customerInfo.originalAppUserId || 'revenuecat',
-      productId: PLAN_PRODUCT_IDS.monthly.find((id) => purchasedProductIds.has(id)) || PREMIUM_PLANS.monthly.id,
+      productId:
+        PLAN_PRODUCT_IDS.monthly.find((id) => purchasedProductIds.has(id)) ||
+        PREMIUM_PLANS.monthly.id,
       source: 'revenuecat',
     };
   }
@@ -163,7 +177,10 @@ export async function purchasePremiumPlan(plan) {
   const summary = getPremiumStatusFromCustomerInfo(purchaseResult?.customerInfo);
   return {
     ...(summary || { plan }),
-    productId: purchaseResult?.productIdentifier || selectedPackage?.product?.identifier || selectedPackage?.product?.productIdentifier,
+    productId:
+      purchaseResult?.productIdentifier ||
+      selectedPackage?.product?.identifier ||
+      selectedPackage?.product?.productIdentifier,
   };
 }
 

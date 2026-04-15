@@ -421,7 +421,14 @@ export default function useMainScreenTabProps({
   community,
 }) {
   const { s, theme, premiumAccent, premiumAccentDeep, onLogout, appVersion, iconFaint } = core;
-  const { SearchInput, CardVertical, CardHorizontal, PackshotImage, PremiumBadge, DiarioCatasSection } = components;
+  const {
+    SearchInput,
+    CardVertical,
+    CardHorizontal,
+    PackshotImage,
+    PremiumBadge,
+    DiarioCatasSection,
+  } = components;
   const { keyFavs, keyPrefs, keyVotes } = keys;
   const { activeTab, setActiveTab, setScanning, setCafeDetalle } = navigation;
   const {
@@ -447,7 +454,14 @@ export default function useMainScreenTabProps({
     newsletterEmail,
   } = profile;
   const { busqueda, setBusqueda, busquedaMis, setBusquedaMis } = search;
-  const { favs, toggleFav, interactionFeedbackSettings, guardarFeedbackInteracciones, guardarModoFeedbackInteracciones, onGamifyEvent } = interaction;
+  const {
+    favs,
+    toggleFav,
+    interactionFeedbackSettings,
+    guardarFeedbackInteracciones,
+    guardarModoFeedbackInteracciones,
+    onGamifyEvent,
+  } = interaction;
   const { newsletterState, guardarNewsletter, newsletterLoading, newsletterSaving } = newsletter;
   const {
     cargando,

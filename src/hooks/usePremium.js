@@ -39,40 +39,48 @@ export default function usePremium({ user, getDocument, setDocument }) {
     }
   }, [loadPremium, user?.uid]);
 
-  const activatePremium = useCallback(async (plan, transactionId, options = {}) => {
-    if (!user?.uid) return false;
-    try {
-      const now = new Date();
-      const expiresAt = options.expiresAt || (plan === 'monthly'
-        ? new Date(now.getFullYear(), now.getMonth() + 1, now.getDate()).toISOString()
-        : null);
+  const activatePremium = useCallback(
+    async (plan, transactionId, options = {}) => {
+      if (!user?.uid) return false;
+      try {
+        const now = new Date();
+        const expiresAt =
+          options.expiresAt ||
+          (plan === 'monthly'
+            ? new Date(now.getFullYear(), now.getMonth() + 1, now.getDate()).toISOString()
+            : null);
 
-      const data = {
-        uid: user.uid,
-        plan,
-        activatedAt: now.toISOString(),
-        expiresAt: expiresAt || null,
-        transactionId: transactionId || 'manual',
-        provider: options.provider || 'manual',
-        productId: options.productId || '',
-        updatedAt: now.toISOString(),
-      };
+        const data = {
+          uid: user.uid,
+          plan,
+          activatedAt: now.toISOString(),
+          expiresAt: expiresAt || null,
+          transactionId: transactionId || 'manual',
+          provider: options.provider || 'manual',
+          productId: options.productId || '',
+          updatedAt: now.toISOString(),
+        };
 
-      await setDocument('premium_users', user.uid, data);
-      setPremiumData(data);
-      setIsPremium(true);
-      return true;
-    } catch {
+        await setDocument('premium_users', user.uid, data);
+        setPremiumData(data);
+        setIsPremium(true);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    [setDocument, user?.uid]
+  );
+
+  const requirePremium = useCallback(
+    (trigger) => {
+      if (isPremium) return true;
+      setPaywallTrigger(trigger || null);
+      setShowPaywall(true);
       return false;
-    }
-  }, [setDocument, user?.uid]);
-
-  const requirePremium = useCallback((trigger) => {
-    if (isPremium) return true;
-    setPaywallTrigger(trigger || null);
-    setShowPaywall(true);
-    return false;
-  }, [isPremium]);
+    },
+    [isPremium]
+  );
 
   const closePaywall = useCallback(() => {
     setShowPaywall(false);

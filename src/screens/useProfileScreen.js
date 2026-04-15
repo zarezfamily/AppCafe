@@ -3,10 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { persistProfile } from '../domain/profile/profilePersistence';
 import { loadStoredProfile, saveStoredProfile } from '../domain/profile/profileStorage';
-import {
-  hasRequiredProfileFields,
-  isValidProfileEmail,
-} from '../domain/profile/profileValidation';
+import { hasRequiredProfileFields, isValidProfileEmail } from '../domain/profile/profileValidation';
 
 export default function useProfileScreen({ user, onClose, onProfileSaved }) {
   const [nombre, setNombre] = useState('');

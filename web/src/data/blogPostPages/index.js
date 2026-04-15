@@ -1,6 +1,10 @@
-const { cafeDeEspecialidadCreceEnEspana_2026 } = require('./cafe-de-especialidad-crece-en-espana-2026');
+const {
+  cafeDeEspecialidadCreceEnEspana_2026,
+} = require('./cafe-de-especialidad-crece-en-espana-2026');
 const { comoElegirElMejorCafeDeEtiopia } = require('./como-elegir-el-mejor-cafe-de-etiopia');
-const { valeLaPenaPagarMasPorCafeDeEspecialidad } = require('./vale-la-pena-pagar-mas-por-cafe-de-especialidad');
+const {
+  valeLaPenaPagarMasPorCafeDeEspecialidad,
+} = require('./vale-la-pena-pagar-mas-por-cafe-de-especialidad');
 const { guiaDeMoliendaPorMetodo } = require('./guia-de-molienda-por-metodo');
 const { cafeDeEspecialidadVsCafeNormal } = require('./cafe-de-especialidad-vs-cafe-normal');
 const { arabicaVsRobusta } = require('./arabica-vs-robusta');

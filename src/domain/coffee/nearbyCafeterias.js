@@ -23,7 +23,9 @@ export const mapPlacesToNearbyCafeterias = ({ places, lat, lon, apiKey }) =>
         : null;
       const abierto = place.currentOpeningHours?.openNow ?? null;
       const descripcion = place.editorialSummary?.text || null;
-      const fotoUrl = place.photos?.[0]?.name ? buildPlacesPhotoUrl(place.photos[0].name, apiKey) : null;
+      const fotoUrl = place.photos?.[0]?.name
+        ? buildPlacesPhotoUrl(place.photos[0].name, apiKey)
+        : null;
       const fotosUrls = (place.photos || [])
         .slice(0, 4)
         .map((photo) => buildPlacesPhotoUrl(photo.name, apiKey))
@@ -71,8 +73,6 @@ export const mapPlacesToHomeNearbyCafeterias = ({ places, lat, lon, apiKey }) =>
       numResenas: place.userRatingCount || 0,
       distancia,
       abierto: place.currentOpeningHours?.openNow ?? null,
-      foto: place.photos?.[0]?.name
-        ? buildPlacesPhotoUrl(place.photos[0].name, apiKey)
-        : null,
+      foto: place.photos?.[0]?.name ? buildPlacesPhotoUrl(place.photos[0].name, apiKey) : null,
     };
   });

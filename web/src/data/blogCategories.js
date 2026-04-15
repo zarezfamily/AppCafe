@@ -1,24 +1,24 @@
 const blogCategories = [
   {
     slug: 'todos',
-    label: 'Todos'
+    label: 'Todos',
   },
   {
     slug: 'tutorial',
-    label: 'Tutorial'
+    label: 'Tutorial',
   },
   {
     slug: 'guia',
-    label: 'Guía'
+    label: 'Guía',
   },
   {
     slug: 'analisis',
-    label: 'Análisis'
+    label: 'Análisis',
   },
   {
     slug: 'noticia',
-    label: 'Noticia'
-  }
+    label: 'Noticia',
+  },
 ];
 
 module.exports = {

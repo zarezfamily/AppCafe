@@ -1,12 +1,22 @@
 import { Ionicons } from '@expo/vector-icons';
-import { ActivityIndicator, Image, Linking, Switch, Text, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Image,
+  Linking,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { MAIN_TABS } from './mainScreenTabs';
 import PremiumBadge from './PremiumBadge';
 
 export function MasItem({ icon, label, sub, onPress, mas, premiumAccent, iconFaint }) {
   return (
     <TouchableOpacity style={mas.item} onPress={onPress} activeOpacity={0.7}>
-      <View style={mas.iconWrap}><Ionicons name={icon} size={22} color={premiumAccent} /></View>
+      <View style={mas.iconWrap}>
+        <Ionicons name={icon} size={22} color={premiumAccent} />
+      </View>
       <View style={{ flex: 1 }}>
         <Text style={mas.label}>{label}</Text>
         {sub && <Text style={mas.sub}>{sub}</Text>}
@@ -51,23 +61,35 @@ export function MemberStatusCard({
   onLongPress,
 }) {
   return (
-    <TouchableOpacity style={mas.premiumCard} activeOpacity={0.95} onLongPress={onLongPress} delayLongPress={280}>
+    <TouchableOpacity
+      style={mas.premiumCard}
+      activeOpacity={0.95}
+      onLongPress={onLongPress}
+      delayLongPress={280}
+    >
       <View style={mas.premiumGlow} />
       <View style={mas.premiumGlowTwo} />
       <Text style={mas.clubTag}>ETIOVE MEMBER STATUS</Text>
       <View style={mas.premiumTopRow}>
         <View style={mas.premiumIdentity}>
-          {perfil.foto
-            ? <Image source={{ uri: perfil.foto }} style={mas.premiumAvatar} />
-            : <View style={mas.premiumAvatarFallback}><Text style={mas.premiumAvatarText}>{profileInitial}</Text></View>
-          }
+          {perfil.foto ? (
+            <Image source={{ uri: perfil.foto }} style={mas.premiumAvatar} />
+          ) : (
+            <View style={mas.premiumAvatarFallback}>
+              <Text style={mas.premiumAvatarText}>{profileInitial}</Text>
+            </View>
+          )}
           <View style={{ flex: 1 }}>
             <Text style={mas.premiumAlias}>@{profileAlias.replace(/^@+/, '')}</Text>
-            <Text style={mas.premiumName} numberOfLines={1}>{profileName}</Text>
+            <Text style={mas.premiumName} numberOfLines={1}>
+              {profileName}
+            </Text>
           </View>
         </View>
         <View style={mas.premiumLevelBadge}>
-          <Text style={mas.premiumLevelText}>{memberStatus.icon} {memberStatus.label}</Text>
+          <Text style={mas.premiumLevelText}>
+            {memberStatus.icon} {memberStatus.label}
+          </Text>
         </View>
       </View>
 
@@ -87,36 +109,58 @@ export function MemberStatusCard({
       </View>
 
       <View style={mas.memberProgressRow}>
-        <Text style={mas.memberProgressText}>{unlockedCount}/{achievementTotal} LOGROS</Text>
-        <Text style={mas.memberProgressText}>{pendingAchievements[0] ? `SIGUIENTE: ${pendingAchievements[0].title.toUpperCase()}` : 'STATUS COMPLETO'}</Text>
+        <Text style={mas.memberProgressText}>
+          {unlockedCount}/{achievementTotal} LOGROS
+        </Text>
+        <Text style={mas.memberProgressText}>
+          {pendingAchievements[0]
+            ? `SIGUIENTE: ${pendingAchievements[0].title.toUpperCase()}`
+            : 'STATUS COMPLETO'}
+        </Text>
       </View>
-      <View style={mas.memberProgressBar}><View style={[mas.memberProgressFill, { width: `${achievementProgress * 100}%` }]} /></View>
+      <View style={mas.memberProgressBar}>
+        <View style={[mas.memberProgressFill, { width: `${achievementProgress * 100}%` }]} />
+      </View>
     </TouchableOpacity>
   );
 }
 
-export function PremiumSection({
-  mas,
-  isPremium,
-  premiumDaysLeft,
-  onOpenPaywall,
-}) {
+export function PremiumSection({ mas, isPremium, premiumDaysLeft, onOpenPaywall }) {
   return (
     <>
       <Text style={mas.blockTitle}>ETIOVE PREMIUM</Text>
       <View style={mas.achievementsCard}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 12,
+          }}
+        >
           <View style={{ flex: 1 }}>
-            {isPremium ? <PremiumBadge size="lg" /> : <Text style={mas.achievementTitle}>Desbloquea Etiove Premium</Text>}
-            <Text style={[mas.achievementDesc, { marginTop: 8 }]}>Diario ilimitado, estadísticas avanzadas, PDF y ventajas exclusivas en la comunidad.</Text>
+            {isPremium ? (
+              <PremiumBadge size="lg" />
+            ) : (
+              <Text style={mas.achievementTitle}>Desbloquea Etiove Premium</Text>
+            )}
+            <Text style={[mas.achievementDesc, { marginTop: 8 }]}>
+              Diario ilimitado, estadísticas avanzadas, PDF y ventajas exclusivas en la comunidad.
+            </Text>
             {isPremium ? (
               <Text style={[mas.quickSub, { marginTop: 8 }]}>
-                {premiumDaysLeft == null ? 'Plan de por vida activo' : `${premiumDaysLeft} días restantes en tu plan`}
+                {premiumDaysLeft == null
+                  ? 'Plan de por vida activo'
+                  : `${premiumDaysLeft} días restantes en tu plan`}
               </Text>
             ) : null}
           </View>
           <TouchableOpacity
-            style={[mas.newsletterBtn, { paddingHorizontal: 18, paddingVertical: 12, minWidth: 126 }, isPremium && mas.newsletterBtnDisabled]}
+            style={[
+              mas.newsletterBtn,
+              { paddingHorizontal: 18, paddingVertical: 12, minWidth: 126 },
+              isPremium && mas.newsletterBtnDisabled,
+            ]}
             onPress={onOpenPaywall}
             activeOpacity={0.85}
           >
@@ -141,7 +185,8 @@ export function BlogSection({ mas }) {
         <Text style={mas.blogKicker}>ETIOVE JOURNAL</Text>
         <Text style={mas.blogTitle}>Lee el blog de Etiove desde la app</Text>
         <Text style={mas.blogDesc}>
-          Guías de molienda, métodos, cafés recomendados y contenido editorial para seguir descubriendo café de especialidad.
+          Guías de molienda, métodos, cafés recomendados y contenido editorial para seguir
+          descubriendo café de especialidad.
         </Text>
         <View style={mas.blogActionRow}>
           <View style={mas.blogActionPill}>
@@ -155,22 +200,23 @@ export function BlogSection({ mas }) {
   );
 }
 
-export function QuickAccessSection({
-  mas,
-  premiumAccentDeep,
-  setShowProfile,
-  setActiveTab,
-}) {
+export function QuickAccessSection({ mas, premiumAccentDeep, setShowProfile, setActiveTab }) {
   return (
     <>
       <Text style={mas.blockTitle}>Accesos</Text>
       <View style={mas.quickGrid}>
-        <TouchableOpacity style={[mas.quickCard, mas.quickCardDark]} onPress={() => setShowProfile(true)}>
+        <TouchableOpacity
+          style={[mas.quickCard, mas.quickCardDark]}
+          onPress={() => setShowProfile(true)}
+        >
           <Ionicons name="person-circle-outline" size={20} color="#f8e7d5" />
           <Text style={mas.quickTitleDark}>Mi Perfil</Text>
           <Text style={mas.quickSubDark}>Editar datos y foto</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[mas.quickCard, mas.quickCardSoft]} onPress={() => setActiveTab(MAIN_TABS.NOTEBOOK)}>
+        <TouchableOpacity
+          style={[mas.quickCard, mas.quickCardSoft]}
+          onPress={() => setActiveTab(MAIN_TABS.NOTEBOOK)}
+        >
           <Ionicons name="heart-outline" size={20} color={premiumAccentDeep} />
           <Text style={mas.quickTitle}>Mis Cafés</Text>
           <Text style={mas.quickSub}>Tu colección personal</Text>
@@ -180,24 +226,26 @@ export function QuickAccessSection({
   );
 }
 
-export function AchievementsSection({
-  mas,
-  unlockedAchievements,
-  pendingAchievements,
-}) {
+export function AchievementsSection({ mas, unlockedAchievements, pendingAchievements }) {
   return (
     <>
       <Text style={mas.blockTitle}>Logros conseguidos</Text>
       <View style={mas.achievementsCard}>
-        {unlockedAchievements.length > 0 ? unlockedAchievements.slice(0, 4).map((a) => (
-          <View key={a.id} style={mas.achievementOn}>
-            <Text style={mas.achievementIcon}>{a.icon}</Text>
-            <View style={{ flex: 1 }}>
-              <Text style={mas.achievementTitle}>{a.title}</Text>
-              <Text style={mas.achievementDesc}>{a.desc}</Text>
+        {unlockedAchievements.length > 0 ? (
+          unlockedAchievements.slice(0, 4).map((a) => (
+            <View key={a.id} style={mas.achievementOn}>
+              <Text style={mas.achievementIcon}>{a.icon}</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={mas.achievementTitle}>{a.title}</Text>
+                <Text style={mas.achievementDesc}>{a.desc}</Text>
+              </View>
             </View>
-          </View>
-        )) : <Text style={mas.emptyAchText}>Aún no has desbloqueado logros. Empieza a catar y guardar cafés.</Text>}
+          ))
+        ) : (
+          <Text style={mas.emptyAchText}>
+            Aún no has desbloqueado logros. Empieza a catar y guardar cafés.
+          </Text>
+        )}
       </View>
 
       <Text style={mas.blockTitle}>Siguiente por conseguir</Text>
@@ -244,39 +292,60 @@ export function NewsletterSection({
         </View>
 
         <View style={mas.newsletterMetaRow}>
-          <View style={[mas.newsletterStatusPill, newsletterState.subscribed ? mas.newsletterStatusOn : mas.newsletterStatusOff]}>
-            <Text style={[mas.newsletterStatusText, newsletterState.subscribed ? mas.newsletterStatusTextOn : mas.newsletterStatusTextOff]}>
-              {newsletterLoading ? 'CARGANDO' : newsletterState.subscribed ? 'SUSCRIPCIÓN ACTIVA' : 'NO SUSCRITO'}
+          <View
+            style={[
+              mas.newsletterStatusPill,
+              newsletterState.subscribed ? mas.newsletterStatusOn : mas.newsletterStatusOff,
+            ]}
+          >
+            <Text
+              style={[
+                mas.newsletterStatusText,
+                newsletterState.subscribed
+                  ? mas.newsletterStatusTextOn
+                  : mas.newsletterStatusTextOff,
+              ]}
+            >
+              {newsletterLoading
+                ? 'CARGANDO'
+                : newsletterState.subscribed
+                  ? 'SUSCRIPCIÓN ACTIVA'
+                  : 'NO SUSCRITO'}
             </Text>
           </View>
-          <Text style={mas.newsletterEmail}>{newsletterHasEmail ? newsletterEmail.toUpperCase() : 'AÑADE UN EMAIL EN TU PERFIL PARA ACTIVAR LA NEWSLETTER.'}</Text>
+          <Text style={mas.newsletterEmail}>
+            {newsletterHasEmail
+              ? newsletterEmail.toUpperCase()
+              : 'AÑADE UN EMAIL EN TU PERFIL PARA ACTIVAR LA NEWSLETTER.'}
+          </Text>
         </View>
 
-        <Text style={mas.newsletterNote}>Guardamos tus consentimientos para que seas un ETIOVER</Text>
+        <Text style={mas.newsletterNote}>
+          Guardamos tus consentimientos para que seas un ETIOVER
+        </Text>
 
         <TouchableOpacity
-          style={[mas.newsletterBtn, (!newsletterHasEmail || newsletterSaving) && mas.newsletterBtnDisabled]}
+          style={[
+            mas.newsletterBtn,
+            (!newsletterHasEmail || newsletterSaving) && mas.newsletterBtnDisabled,
+          ]}
           onPress={() => guardarNewsletter(!newsletterState.subscribed)}
           disabled={!newsletterHasEmail || !!newsletterSaving}
         >
-          {newsletterSaving
-            ? <ActivityIndicator color="#fff" />
-            : <Text style={mas.newsletterBtnText}>{newsletterState.subscribed ? 'DARME DE BAJA' : 'SUSCRIBIRME AHORA'}</Text>
-          }
+          {newsletterSaving ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={mas.newsletterBtnText}>
+              {newsletterState.subscribed ? 'DARME DE BAJA' : 'SUSCRIBIRME AHORA'}
+            </Text>
+          )}
         </TouchableOpacity>
       </View>
     </>
   );
 }
 
-export function ModerationSection({
-  mas,
-  isAdmin,
-  isStaff,
-  openDialog,
-  premiumAccent,
-  iconFaint,
-}) {
+export function ModerationSection({ mas, isAdmin, isStaff, openDialog, premiumAccent, iconFaint }) {
   if (!isAdmin && !isStaff) return null;
 
   return (
@@ -287,13 +356,15 @@ export function ModerationSection({
           icon="shield-checkmark-outline"
           label={isAdmin ? 'Panel de administración' : 'Panel de staff'}
           sub={isAdmin ? 'Gestión total del sistema' : 'Herramientas de moderación'}
-          onPress={() => openDialog(
-            isAdmin ? 'Panel de administración' : 'Panel de staff',
-            isAdmin
-              ? 'La moderación avanzada ya está integrada en Comunidad. Si quieres, el siguiente paso es crear una pantalla admin real con métricas, reportes y acciones globales.'
-              : 'Las herramientas de moderación ya están integradas en Comunidad para editar, eliminar y revisar contenido.',
-            [{ label: 'Cerrar' }]
-          )}
+          onPress={() =>
+            openDialog(
+              isAdmin ? 'Panel de administración' : 'Panel de staff',
+              isAdmin
+                ? 'La moderación avanzada ya está integrada en Comunidad. Si quieres, el siguiente paso es crear una pantalla admin real con métricas, reportes y acciones globales.'
+                : 'Las herramientas de moderación ya están integradas en Comunidad para editar, eliminar y revisar contenido.',
+              [{ label: 'Cerrar' }]
+            )
+          }
           mas={mas}
           premiumAccent={premiumAccent}
           iconFaint={iconFaint}
@@ -330,7 +401,13 @@ export function SettingsSection({
           icon="information-circle-outline"
           label="Versión"
           sub={`Etiove v${appVersion}`}
-          onPress={() => openDialog('Etiove', `Versión ${appVersion}\n\nReact Native + Expo\nFirebase Firestore`, [{ label: 'Cerrar' }])}
+          onPress={() =>
+            openDialog(
+              'Etiove',
+              `Versión ${appVersion}\n\nReact Native + Expo\nFirebase Firestore`,
+              [{ label: 'Cerrar' }]
+            )
+          }
           mas={mas}
           premiumAccent={premiumAccent}
           iconFaint={iconFaint}
@@ -344,7 +421,15 @@ export function SocialSection({ mas, premiumAccent }) {
   return (
     <>
       <Text style={mas.blockTitle}>Dónde estamos</Text>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 20, gap: 12 }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          paddingHorizontal: 16,
+          paddingVertical: 20,
+          gap: 12,
+        }}
+      >
         <SocialIconButton
           icon="logo-instagram"
           premiumAccent={premiumAccent}
@@ -374,10 +459,12 @@ export function LogoutSection({ mas, onLogout, openDialog }) {
   return (
     <TouchableOpacity
       style={mas.logoutBtn}
-      onPress={() => openDialog('Cerrar sesión', '¿Seguro que quieres salir de tu cuenta?', [
-        { label: 'Cancelar' },
-        { label: 'Salir', variant: 'danger', onPress: onLogout },
-      ])}
+      onPress={() =>
+        openDialog('Cerrar sesión', '¿Seguro que quieres salir de tu cuenta?', [
+          { label: 'Cancelar' },
+          { label: 'Salir', variant: 'danger', onPress: onLogout },
+        ])
+      }
     >
       <Ionicons name="log-out-outline" size={20} color="#fff" />
       <Text style={mas.logoutText}>Cerrar sesión</Text>

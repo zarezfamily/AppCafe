@@ -70,7 +70,9 @@ export default function useCafeteriasScreen() {
       if (message.includes('GOOGLE_PLACES_KEY_NOT_CONFIGURED')) {
         setError('Configura una Google Places API key válida para habilitar cafeterías cercanas.');
       } else if (message.includes('GOOGLE_PLACES_API_ERROR')) {
-        setError('Google Places no está disponible: revisa permisos de API key y facturación en Google Cloud.');
+        setError(
+          'Google Places no está disponible: revisa permisos de API key y facturación en Google Cloud.'
+        );
       } else {
         setError(`Error al buscar cafeterías: ${message}`);
       }
@@ -89,7 +91,8 @@ export default function useCafeteriasScreen() {
   };
 
   const cafeteriasVisibles = useMemo(
-    () => (soloAbiertas ? cafeterias.filter((cafeteria) => cafeteria.abierto === true) : cafeterias),
+    () =>
+      soloAbiertas ? cafeterias.filter((cafeteria) => cafeteria.abierto === true) : cafeterias,
     [cafeterias, soloAbiertas]
   );
 

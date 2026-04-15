@@ -8,11 +8,7 @@ import {
   View,
 } from 'react-native';
 
-import {
-  H,
-  PREMIUM_ACCENT,
-  THEME,
-} from '../constants/theme';
+import { H, PREMIUM_ACCENT, THEME } from '../constants/theme';
 import CafeteriaCard from './cafeterias/CafeteriaCard';
 import CafeteriaDetailModal from './cafeterias/CafeteriaDetailModal';
 import useCafeteriasScreen, { RADIOS_DISPONIBLES } from './cafeterias/useCafeteriasScreen';
@@ -89,7 +85,9 @@ export default function CafeteriasScreen() {
               activeOpacity={0.85}
               style={[styles.radiusChip, activo && styles.radiusChipActive]}
             >
-              <Text style={[styles.radiusChipText, activo && styles.radiusChipTextActive]}>Hasta {km} km</Text>
+              <Text style={[styles.radiusChipText, activo && styles.radiusChipTextActive]}>
+                Hasta {km} km
+              </Text>
             </TouchableOpacity>
           );
         })}
@@ -99,7 +97,9 @@ export default function CafeteriasScreen() {
           activeOpacity={0.85}
           style={[styles.radiusChip, soloAbiertas && styles.radiusChipActive]}
         >
-          <Text style={[styles.radiusChipText, soloAbiertas && styles.radiusChipTextActive]}>Solo abiertas</Text>
+          <Text style={[styles.radiusChipText, soloAbiertas && styles.radiusChipTextActive]}>
+            Solo abiertas
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -157,7 +157,10 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     backgroundColor: '#fff',
   },
-  radiusChipActive: { backgroundColor: THEME.brand.accentDeep, borderColor: THEME.brand.accentDeep },
+  radiusChipActive: {
+    backgroundColor: THEME.brand.accentDeep,
+    borderColor: THEME.brand.accentDeep,
+  },
   radiusChipText: { fontSize: 12, fontWeight: '700', color: THEME.text.secondary },
   radiusChipTextActive: { color: '#fff' },
   emptyBox: {
@@ -197,7 +200,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   cardNumText: { color: '#fff', fontWeight: '700', fontSize: 13 },
-  cardEstado: { position: 'absolute', top: 10, right: 10, borderRadius: 10, paddingHorizontal: 8, paddingVertical: 4 },
+  cardEstado: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
   cardEstadoText: { color: '#fff', fontSize: 11, fontWeight: '700' },
   cardInfo: { padding: 12, gap: 4 },
   cardNombre: { fontSize: 17, fontWeight: '800', color: '#111' },
@@ -219,7 +229,14 @@ const styles = StyleSheet.create({
   cardEspec: { fontSize: 12, color: THEME.text.secondary, marginTop: 4, fontStyle: 'italic' },
   detailScreen: { flex: 1, backgroundColor: '#fff' },
   detHero: { height: H * 0.38, position: 'relative' },
-  detHeroGrad: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 160, backgroundColor: 'rgba(0,0,0,0.55)' },
+  detHeroGrad: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 160,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+  },
   detPlaceholder: {
     position: 'absolute',
     top: 0,
@@ -231,9 +248,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   detPlaceholderEmoji: { fontSize: 72, opacity: 0.4 },
-  cardPlaceholder: { width: '100%', height: '100%', backgroundColor: '#1a0a00', alignItems: 'center', justifyContent: 'center', padding: 12 },
+  cardPlaceholder: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#1a0a00',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 12,
+  },
   cardPlaceholderEmoji: { fontSize: 32, opacity: 0.5, marginBottom: 6 },
-  cardPlaceholderNombre: { fontSize: 13, fontWeight: '700', color: 'rgba(255,255,255,0.7)', textAlign: 'center', lineHeight: 18 },
+  cardPlaceholderNombre: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: 'rgba(255,255,255,0.7)',
+    textAlign: 'center',
+    lineHeight: 18,
+  },
   detBack: {
     position: 'absolute',
     top: 52,
@@ -256,7 +286,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  badgeEstado: { position: 'absolute', top: 52, left: 70, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 5 },
+  badgeEstado: {
+    position: 'absolute',
+    top: 52,
+    left: 70,
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
   badgeEstadoText: { color: '#fff', fontSize: 12, fontWeight: '700' },
   detOverlay: { position: 'absolute', bottom: 16, left: 16, right: 16 },
   detNombre: { fontSize: 24, fontWeight: '800', color: '#fff', marginBottom: 2 },
@@ -265,7 +302,15 @@ const styles = StyleSheet.create({
   detRatingNum: { fontSize: 15, fontWeight: '700', color: THEME.status.favorite, marginLeft: 4 },
   detReseñas: { fontSize: 12, color: 'rgba(255,255,255,0.7)' },
   detBody: { padding: 20 },
-  detInfoRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 20, backgroundColor: '#f9f9f9', borderRadius: 14, padding: 14 },
+  detInfoRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginBottom: 20,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 14,
+    padding: 14,
+  },
   detInfoItem: { alignItems: 'center', gap: 4, minWidth: 56 },
   detInfoLabel: { fontSize: 11, color: '#555', fontWeight: '600' },
   seccion: { marginBottom: 20 },

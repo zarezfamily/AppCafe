@@ -27,12 +27,7 @@ import SearchInput from '../components/SearchInput';
 import DiarioCatasSection from './DiarioCatasSection';
 import MainScreenBody from './MainScreenBody';
 import PremiumBadge from './PremiumBadge';
-import {
-  KEY_VOTES,
-  PREMIUM_ACCENT,
-  PREMIUM_ACCENT_DEEP,
-  THEME,
-} from './mainScreenConfig';
+import { KEY_VOTES, PREMIUM_ACCENT, PREMIUM_ACCENT_DEEP, THEME } from './mainScreenConfig';
 import useMainScreenComposition from './useMainScreenComposition';
 import createMainScreenStyles from './mainScreenStyles';
 import { MainScreenOverlayLayer, renderMainScreenTransientView } from './mainScreenTransientViews';
@@ -74,10 +69,11 @@ export default function MainScreen({ onLogout }) {
     showForm: ui.showForm,
     onFormBack: () => ui.setShowForm(false),
     onFormSave: () => ui.closeFormAndRefreshData(domain.cargarDatos),
-    onCafeAdded: (cafe) => gamification.registrarEventoGamificacion('add_cafe', {
-      hasPhoto: !!cafe?.foto,
-      hasReview: !!String(cafe?.notas || '').trim(),
-    }),
+    onCafeAdded: (cafe) =>
+      gamification.registrarEventoGamificacion('add_cafe', {
+        hasPhoto: !!cafe?.foto,
+        hasReview: !!String(cafe?.notas || '').trim(),
+      }),
     s,
     premiumAccent: PREMIUM_ACCENT,
   });

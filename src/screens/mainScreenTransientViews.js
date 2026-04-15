@@ -110,7 +110,11 @@ export function MainScreenOverlayLayer({
       />
 
       {!!achievementToast && (
-        <TouchableOpacity activeOpacity={0.95} onPress={closeAchievementToast} style={s.achievementToastWrap}>
+        <TouchableOpacity
+          activeOpacity={0.95}
+          onPress={closeAchievementToast}
+          style={s.achievementToastWrap}
+        >
           <Animated.View
             style={[
               s.achievementToastCard,

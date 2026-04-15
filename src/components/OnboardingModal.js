@@ -8,7 +8,9 @@ export default function OnboardingModal({ visible, onClose, onStartQuiz }) {
         <View style={styles.card}>
           <Text style={styles.kicker}>WELCOME TO ETIOVE</Text>
           <Text style={styles.title}>Tu primera ruta cafetera</Text>
-          <Text style={styles.sub}>Antes de explorar, te guiamos en 3 pasos para que la app te recomiende mejor.</Text>
+          <Text style={styles.sub}>
+            Antes de explorar, te guiamos en 3 pasos para que la app te recomiende mejor.
+          </Text>
 
           <View style={styles.stepRow}>
             <Ionicons name="sparkles-outline" size={18} color="#8f5e3b" />

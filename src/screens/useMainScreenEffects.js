@@ -38,7 +38,7 @@ export default function useMainScreenEffects({
       .then(() => {
         setTimeout(() => cargarCatas(), 120);
       })
-      .catch(e => console.warn('[Auth Token] Error:', e));
+      .catch((e) => console.warn('[Auth Token] Error:', e));
   }, [cargarCatas, restoreAuthTokenFromSecureStore, userId]);
 
   useEffect(() => {

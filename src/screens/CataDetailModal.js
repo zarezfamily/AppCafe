@@ -1,7 +1,14 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from 'react';
 import {
-  Animated, Image, Modal, Platform, ScrollView, Text, TouchableOpacity, View,
+  Animated,
+  Image,
+  Modal,
+  Platform,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 export default function CataDetailModal({
@@ -26,7 +33,12 @@ export default function CataDetailModal({
       setShouldRender(true);
       Animated.parallel([
         Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
-        Animated.spring(slideAnim, { toValue: 0, friction: 8, tension: 110, useNativeDriver: true }),
+        Animated.spring(slideAnim, {
+          toValue: 0,
+          friction: 8,
+          tension: 110,
+          useNativeDriver: true,
+        }),
       ]).start();
     } else {
       Animated.parallel([
@@ -108,7 +120,14 @@ export default function CataDetailModal({
           <View style={{ paddingHorizontal: 16, paddingTop: 16 }}>
             {/* Café + Puntuación */}
             <View style={{ marginBottom: 20 }}>
-              <Text style={{ fontSize: 24, fontWeight: '900', color: theme.text.primary, marginBottom: 6 }}>
+              <Text
+                style={{
+                  fontSize: 24,
+                  fontWeight: '900',
+                  color: theme.text.primary,
+                  marginBottom: 6,
+                }}
+              >
                 {cataData.cafeNombre}
               </Text>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
@@ -122,18 +141,48 @@ export default function CataDetailModal({
             </View>
 
             {/* Fecha */}
-            <View style={{ marginBottom: 16, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: '#e8dfd5' }}>
-              <Text style={{ fontSize: 11, fontWeight: '600', color: theme.text.secondary, textTransform: 'uppercase', marginBottom: 4 }}>
+            <View
+              style={{
+                marginBottom: 16,
+                paddingBottom: 16,
+                borderBottomWidth: 1,
+                borderBottomColor: '#e8dfd5',
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 11,
+                  fontWeight: '600',
+                  color: theme.text.secondary,
+                  textTransform: 'uppercase',
+                  marginBottom: 4,
+                }}
+              >
                 Fecha y hora
               </Text>
-              <Text style={{ fontSize: 14, fontWeight: '600', color: theme.text.primary, textTransform: 'capitalize' }}>
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontWeight: '600',
+                  color: theme.text.primary,
+                  textTransform: 'capitalize',
+                }}
+              >
                 {fechaCompleta}
               </Text>
             </View>
 
             {/* Parámetros */}
             <View style={{ marginBottom: 20 }}>
-              <Text style={{ fontSize: 11, fontWeight: '600', color: theme.text.secondary, textTransform: 'uppercase', marginBottom: 10 }}>
+              <Text
+                style={{
+                  fontSize: 11,
+                  fontWeight: '600',
+                  color: theme.text.secondary,
+                  textTransform: 'uppercase',
+                  marginBottom: 10,
+                }}
+              >
                 Parámetros de preparación
               </Text>
               <View style={{ gap: 8 }}>
@@ -141,16 +190,42 @@ export default function CataDetailModal({
                 <ParameterRow label="Dosis" value={`${cataData.dosis}g`} icon="⚖️" />
                 <ParameterRow label="Agua" value={`${cataData.agua}ml`} icon="💧" />
                 <ParameterRow label="Temperatura" value={`${cataData.temperatura}°C`} icon="🌡️" />
-                <ParameterRow label="Extracción" value={`${cataData.tiempoExtraccion}s`} icon="⏱️" />
+                <ParameterRow
+                  label="Extracción"
+                  value={`${cataData.tiempoExtraccion}s`}
+                  icon="⏱️"
+                />
               </View>
             </View>
 
             {/* Contexto */}
-            <View style={{ marginBottom: 16, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: '#e8dfd5' }}>
-              <Text style={{ fontSize: 11, fontWeight: '600', color: theme.text.secondary, textTransform: 'uppercase', marginBottom: 4 }}>
+            <View
+              style={{
+                marginBottom: 16,
+                paddingBottom: 16,
+                borderBottomWidth: 1,
+                borderBottomColor: '#e8dfd5',
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 11,
+                  fontWeight: '600',
+                  color: theme.text.secondary,
+                  textTransform: 'uppercase',
+                  marginBottom: 4,
+                }}
+              >
                 Contexto
               </Text>
-              <View style={{ backgroundColor: '#f9f7f4', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8 }}>
+              <View
+                style={{
+                  backgroundColor: '#f9f7f4',
+                  borderRadius: 8,
+                  paddingHorizontal: 10,
+                  paddingVertical: 8,
+                }}
+              >
                 <Text style={{ fontSize: 12, fontWeight: '600', color: theme.text.primary }}>
                   {cataData.contexto}
                 </Text>
@@ -160,7 +235,15 @@ export default function CataDetailModal({
             {/* Notas */}
             {cataData.notas && (
               <View style={{ marginBottom: 20 }}>
-                <Text style={{ fontSize: 11, fontWeight: '600', color: theme.text.secondary, textTransform: 'uppercase', marginBottom: 8 }}>
+                <Text
+                  style={{
+                    fontSize: 11,
+                    fontWeight: '600',
+                    color: theme.text.secondary,
+                    textTransform: 'uppercase',
+                    marginBottom: 8,
+                  }}
+                >
                   Notas personales
                 </Text>
                 <View style={{ backgroundColor: '#f9f7f4', borderRadius: 8, padding: 12 }}>
@@ -187,7 +270,9 @@ export default function CataDetailModal({
                   alignItems: 'center',
                 }}
               >
-                <Text style={{ color: premiumAccent, fontWeight: '700', fontSize: 12 }}>✏️ Editar</Text>
+                <Text style={{ color: premiumAccent, fontWeight: '700', fontSize: 12 }}>
+                  ✏️ Editar
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
@@ -202,7 +287,9 @@ export default function CataDetailModal({
                   alignItems: 'center',
                 }}
               >
-                <Text style={{ color: '#a44f45', fontWeight: '700', fontSize: 12 }}>🗑️ Eliminar</Text>
+                <Text style={{ color: '#a44f45', fontWeight: '700', fontSize: 12 }}>
+                  🗑️ Eliminar
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -214,7 +301,14 @@ export default function CataDetailModal({
 
 function ParameterRow({ label, value, icon }) {
   return (
-    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 8 }}>
+    <View
+      style={{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 8,
+      }}
+    >
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
         <Text style={{ fontSize: 18 }}>{icon}</Text>
         <Text style={{ fontSize: 12, fontWeight: '600', color: '#888' }}>{label}</Text>

@@ -1,7 +1,4 @@
-export function initScrollTop({
-  buttonId = 'scrollTopBtn',
-  threshold = 200,
-} = {}) {
+export function initScrollTop({ buttonId = 'scrollTopBtn', threshold = 200 } = {}) {
   const scrollTopBtn = document.getElementById(buttonId);
 
   if (!scrollTopBtn) {

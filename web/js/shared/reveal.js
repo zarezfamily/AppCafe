@@ -14,16 +14,19 @@ export function initRevealOnScroll({
     return;
   }
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry, index) => {
-      if (entry.isIntersecting) {
-        setTimeout(() => {
-          entry.target.classList.add('visible');
-          observer.unobserve(entry.target);
-        }, index * staggerMs);
-      }
-    });
-  }, { threshold, rootMargin: '0px 0px -40px 0px' });
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }, index * staggerMs);
+        }
+      });
+    },
+    { threshold, rootMargin: '0px 0px -40px 0px' }
+  );
 
   reveals.forEach((el) => observer.observe(el));
 }

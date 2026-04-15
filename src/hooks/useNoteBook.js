@@ -1,7 +1,27 @@
 import { useMemo, useState } from 'react';
 
-const METODOS_PREPARACION = ['V60', 'Espresso', 'Chemex', 'Aeropress', 'Prensa francesa', 'Moka', 'Cold brew', 'Otro'];
-const CONTEXTOS = ['Mañana solo', 'Mañana con amigos', 'Tarde solo', 'Tarde con amigos', 'Noche', 'Viaje', 'Presentación', 'Estudio', 'Trabajo', 'En casa'];
+const METODOS_PREPARACION = [
+  'V60',
+  'Espresso',
+  'Chemex',
+  'Aeropress',
+  'Prensa francesa',
+  'Moka',
+  'Cold brew',
+  'Otro',
+];
+const CONTEXTOS = [
+  'Mañana solo',
+  'Mañana con amigos',
+  'Tarde solo',
+  'Tarde con amigos',
+  'Noche',
+  'Viaje',
+  'Presentación',
+  'Estudio',
+  'Trabajo',
+  'En casa',
+];
 
 export default function useNoteBook() {
   const [catas, setCatas] = useState([]);
@@ -73,7 +93,9 @@ export default function useNoteBook() {
 
     let filtradas = [...catas];
     if (filtroPeriodo === 'hoy') {
-      filtradas = filtradas.filter((c) => new Date(c.fechaHora).toDateString() === ahora.toDateString());
+      filtradas = filtradas.filter(
+        (c) => new Date(c.fechaHora).toDateString() === ahora.toDateString()
+      );
     } else if (filtroPeriodo === 'semana') {
       filtradas = filtradas.filter((c) => new Date(c.fechaHora) >= hace7);
     } else if (filtroPeriodo === 'mes') {
@@ -84,8 +106,10 @@ export default function useNoteBook() {
   }, [catas, filtroPeriodo]);
 
   const stats = useMemo(() => {
-    if (catasFiltradas.length === 0) return { totalCatas: 0, promedioPuntuacion: 0, cafesProbados: 0 };
-    const promedio = catasFiltradas.reduce((sum, c) => sum + (c.puntuacion || 0), 0) / catasFiltradas.length;
+    if (catasFiltradas.length === 0)
+      return { totalCatas: 0, promedioPuntuacion: 0, cafesProbados: 0 };
+    const promedio =
+      catasFiltradas.reduce((sum, c) => sum + (c.puntuacion || 0), 0) / catasFiltradas.length;
     const cafeUnicos = new Set(catasFiltradas.map((c) => c.cafeNombre)).size;
     return {
       totalCatas: catasFiltradas.length,
@@ -111,18 +135,30 @@ export default function useNoteBook() {
     setGuardando,
 
     // Formulario
-    cafeNombre, setCafeNombre,
-    cafeId, setCafeId,
-    fechaHora, setFechaHora,
-    metodoPreparacion, setMetodoPreparacion,
-    dosis, setDosis,
-    agua, setAgua,
-    tiempoExtraccion, setTiempoExtraccion,
-    temperatura, setTemperatura,
-    puntuacion, setPuntuacion,
-    notas, setNotas,
-    foto, setFoto,
-    contexto, setContexto,
+    cafeNombre,
+    setCafeNombre,
+    cafeId,
+    setCafeId,
+    fechaHora,
+    setFechaHora,
+    metodoPreparacion,
+    setMetodoPreparacion,
+    dosis,
+    setDosis,
+    agua,
+    setAgua,
+    tiempoExtraccion,
+    setTiempoExtraccion,
+    temperatura,
+    setTemperatura,
+    puntuacion,
+    setPuntuacion,
+    notas,
+    setNotas,
+    foto,
+    setFoto,
+    contexto,
+    setContexto,
 
     // Edición
     isEditing,

@@ -1,9 +1,19 @@
-export const CLEAN_COFFEE_IMAGE = 'https://images.openfoodfacts.org/images/products/761/303/656/9927/front_en.44.400.jpg';
+export const CLEAN_COFFEE_IMAGE =
+  'https://images.openfoodfacts.org/images/products/761/303/656/9927/front_en.44.400.jpg';
 
 export const normalize = (str) =>
-  (str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  (str || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
 
-export const csvToSet = (value) => new Set(String(value || '').split('|').map(v => v.trim()).filter(Boolean));
+export const csvToSet = (value) =>
+  new Set(
+    String(value || '')
+      .split('|')
+      .map((v) => v.trim())
+      .filter(Boolean)
+  );
 
 export const setToCsv = (set) => Array.from(set).join('|');
 

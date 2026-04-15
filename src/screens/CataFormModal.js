@@ -4,8 +4,17 @@ import NetInfo from '@react-native-community/netinfo';
 import * as ImagePicker from 'expo-image-picker';
 import { useEffect, useRef, useState } from 'react';
 import {
-    ActivityIndicator, Animated, Image, KeyboardAvoidingView, Modal, Platform,
-    ScrollView, Text, TextInput, TouchableOpacity, View,
+  ActivityIndicator,
+  Animated,
+  Image,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { saveCataOffline, syncPendingCatas } from '../core/offlineCatas';
 
@@ -18,18 +27,30 @@ export default function CataFormModal({
   onSave,
   allCafes,
   // Campos desde el hook
-  cafeNombre, setCafeNombre,
-  cafeId, setCafeId,
-  fechaHora, setFechaHora,
-  metodoPreparacion, setMetodoPreparacion,
-  dosis, setDosis,
-  agua, setAgua,
-  temperatura, setTemperatura,
-  tiempoExtraccion, setTiempoExtraccion,
-  puntuacion, setPuntuacion,
-  notas, setNotas,
-  foto, setFoto,
-  contexto, setContexto,
+  cafeNombre,
+  setCafeNombre,
+  cafeId,
+  setCafeId,
+  fechaHora,
+  setFechaHora,
+  metodoPreparacion,
+  setMetodoPreparacion,
+  dosis,
+  setDosis,
+  agua,
+  setAgua,
+  temperatura,
+  setTemperatura,
+  tiempoExtraccion,
+  setTiempoExtraccion,
+  puntuacion,
+  setPuntuacion,
+  notas,
+  setNotas,
+  foto,
+  setFoto,
+  contexto,
+  setContexto,
   METODOS_PREPARACION,
   CONTEXTOS,
   guardando,
@@ -46,7 +67,12 @@ export default function CataFormModal({
     if (!!visible) {
       Animated.parallel([
         Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
-        Animated.spring(slideAnim, { toValue: 0, friction: 8, tension: 110, useNativeDriver: true }),
+        Animated.spring(slideAnim, {
+          toValue: 0,
+          friction: 8,
+          tension: 110,
+          useNativeDriver: true,
+        }),
       ]).start();
     } else {
       Animated.parallel([
@@ -110,7 +136,9 @@ export default function CataFormModal({
         contexto,
         isEditing,
       });
-      alert('Sin conexión: tu cata se guardó en el dispositivo y se subirá automáticamente cuando vuelvas a tener internet.');
+      alert(
+        'Sin conexión: tu cata se guardó en el dispositivo y se subirá automáticamente cuando vuelvas a tener internet.'
+      );
       onClose();
       return;
     }
@@ -122,7 +150,10 @@ export default function CataFormModal({
   };
 
   const fechaDisplay = new Date(fechaHora).toLocaleDateString('es-ES');
-  const horaDisplay = new Date(fechaHora).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  const horaDisplay = new Date(fechaHora).toLocaleTimeString('es-ES', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 
   if (!visible || visible === 'false') return null;
 
@@ -151,7 +182,10 @@ export default function CataFormModal({
           transform: [{ translateY: slideAnim }],
         }}
       >
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{ flex: 1 }}
+        >
           <ScrollView
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
@@ -159,7 +193,14 @@ export default function CataFormModal({
             contentContainerStyle={{ paddingBottom: 110, paddingHorizontal: 16, paddingTop: 12 }}
           >
             {/* Header */}
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: 16,
+              }}
+            >
               <Text style={s.sectionTitle}>{isEditing ? 'Editar Cata' : 'Nueva Cata'}</Text>
               <TouchableOpacity onPress={onClose} disabled={!!guardando} style={{ padding: 6 }}>
                 <Ionicons name="close" size={24} color={theme.text.primary} />
@@ -171,24 +212,42 @@ export default function CataFormModal({
             <TouchableOpacity
               onPress={() => setMostrarListaCafes(!mostrarListaCafes)}
               style={{
-                padding: 12, backgroundColor: '#f5f5f5', borderRadius: 8, marginBottom: mostrarListaCafes ? 0 : 16,
-                flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+                padding: 12,
+                backgroundColor: '#f5f5f5',
+                borderRadius: 8,
+                marginBottom: mostrarListaCafes ? 0 : 16,
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
               }}
             >
               <Text
                 style={{
-                  fontSize: 14, color: cafeNombre ? theme.text.primary : theme.text.secondary,
+                  fontSize: 14,
+                  color: cafeNombre ? theme.text.primary : theme.text.secondary,
                   fontWeight: cafeNombre ? '600' : '400',
                   flex: 1,
                 }}
               >
                 {cafeNombre || 'Selecciona o escribe un café'}
               </Text>
-              <Ionicons name={mostrarListaCafes ? 'chevron-up' : 'chevron-down'} size={20} color={theme.text.secondary} />
+              <Ionicons
+                name={mostrarListaCafes ? 'chevron-up' : 'chevron-down'}
+                size={20}
+                color={theme.text.secondary}
+              />
             </TouchableOpacity>
 
             {mostrarListaCafes && (
-              <View style={{ borderWidth: 1, borderColor: '#e8dfd5', borderRadius: 8, marginBottom: 16, maxHeight: 200 }}>
+              <View
+                style={{
+                  borderWidth: 1,
+                  borderColor: '#e8dfd5',
+                  borderRadius: 8,
+                  marginBottom: 16,
+                  maxHeight: 200,
+                }}
+              >
                 <ScrollView>
                   {allCafes.map((cafe) => (
                     <TouchableOpacity
@@ -216,7 +275,9 @@ export default function CataFormModal({
                     }}
                     style={{ padding: 12 }}
                   >
-                    <Text style={{ fontSize: 12, fontWeight: '600', color: premiumAccent }}>Escribir café a mano</Text>
+                    <Text style={{ fontSize: 12, fontWeight: '600', color: premiumAccent }}>
+                      Escribir café a mano
+                    </Text>
                   </TouchableOpacity>
                 </ScrollView>
               </View>
@@ -286,13 +347,16 @@ export default function CataFormModal({
                   key={metodo}
                   onPress={() => setMetodoPreparacion(metodo)}
                   style={{
-                    paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8,
+                    paddingHorizontal: 12,
+                    paddingVertical: 8,
+                    borderRadius: 8,
                     backgroundColor: metodoPreparacion === metodo ? premiumAccent : '#f0f0f0',
                   }}
                 >
                   <Text
                     style={{
-                      fontSize: 12, fontWeight: '600',
+                      fontSize: 12,
+                      fontWeight: '600',
                       color: metodoPreparacion === metodo ? '#fff' : theme.text.primary,
                     }}
                   >
@@ -365,14 +429,17 @@ export default function CataFormModal({
                   key={num}
                   onPress={() => setPuntuacion(num)}
                   style={{
-                    flex: 1, paddingVertical: 10, borderRadius: 8,
+                    flex: 1,
+                    paddingVertical: 10,
+                    borderRadius: 8,
                     backgroundColor: puntuacion >= num ? premiumAccent : '#f0f0f0',
                     alignItems: 'center',
                   }}
                 >
                   <Text
                     style={{
-                      fontSize: 16, fontWeight: '800',
+                      fontSize: 16,
+                      fontWeight: '800',
                       color: puntuacion >= num ? '#fff' : theme.text.secondary,
                     }}
                   >
@@ -390,13 +457,16 @@ export default function CataFormModal({
                   key={ctx}
                   onPress={() => setContexto(ctx)}
                   style={{
-                    paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8,
+                    paddingHorizontal: 10,
+                    paddingVertical: 6,
+                    borderRadius: 8,
                     backgroundColor: contexto === ctx ? premiumAccent : '#f0f0f0',
                   }}
                 >
                   <Text
                     style={{
-                      fontSize: 11, fontWeight: '600',
+                      fontSize: 11,
+                      fontWeight: '600',
                       color: contexto === ctx ? '#fff' : theme.text.primary,
                     }}
                   >
@@ -412,19 +482,36 @@ export default function CataFormModal({
               onPress={handleSelectFoto}
               disabled={!!guardando}
               style={{
-                borderWidth: 2, borderColor: '#e8dfd5', borderStyle: 'dashed', borderRadius: 8,
-                paddingVertical: 20, alignItems: 'center', marginBottom: 16,
+                borderWidth: 2,
+                borderColor: '#e8dfd5',
+                borderStyle: 'dashed',
+                borderRadius: 8,
+                paddingVertical: 20,
+                alignItems: 'center',
+                marginBottom: 16,
               }}
             >
               {foto ? (
                 <>
-                  <Image source={{ uri: foto }} style={{ width: 80, height: 80, borderRadius: 8, marginBottom: 8 }} />
-                  <Text style={{ fontSize: 12, fontWeight: '600', color: premiumAccent }}>Cambiar foto</Text>
+                  <Image
+                    source={{ uri: foto }}
+                    style={{ width: 80, height: 80, borderRadius: 8, marginBottom: 8 }}
+                  />
+                  <Text style={{ fontSize: 12, fontWeight: '600', color: premiumAccent }}>
+                    Cambiar foto
+                  </Text>
                 </>
               ) : (
                 <>
-                  <Ionicons name="image-outline" size={32} color={theme.text.secondary} style={{ marginBottom: 6 }} />
-                  <Text style={{ fontSize: 12, fontWeight: '600', color: theme.text.secondary }}>Agregar foto</Text>
+                  <Ionicons
+                    name="image-outline"
+                    size={32}
+                    color={theme.text.secondary}
+                    style={{ marginBottom: 6 }}
+                  />
+                  <Text style={{ fontSize: 12, fontWeight: '600', color: theme.text.secondary }}>
+                    Agregar foto
+                  </Text>
                 </>
               )}
             </TouchableOpacity>
@@ -443,18 +530,39 @@ export default function CataFormModal({
             <Text style={{ fontSize: 10, color: theme.text.secondary, marginBottom: 16 }}>
               {notas.length}/500
             </Text>
-
           </ScrollView>
 
           {/* Botones fijos */}
-          <View style={{ paddingHorizontal: 16, paddingTop: 10, paddingBottom: 18, borderTopWidth: 1, borderTopColor: '#eee', backgroundColor: '#fff' }}>
+          <View
+            style={{
+              paddingHorizontal: 16,
+              paddingTop: 10,
+              paddingBottom: 18,
+              borderTopWidth: 1,
+              borderTopColor: '#eee',
+              backgroundColor: '#fff',
+            }}
+          >
             <View style={{ flexDirection: 'row', gap: 10 }}>
               <TouchableOpacity
                 onPress={onClose}
                 disabled={!!guardando}
-                style={{ flex: 1, paddingVertical: 12, borderRadius: 8, borderWidth: 1.5, borderColor: premiumAccent }}
+                style={{
+                  flex: 1,
+                  paddingVertical: 12,
+                  borderRadius: 8,
+                  borderWidth: 1.5,
+                  borderColor: premiumAccent,
+                }}
               >
-                <Text style={{ textAlign: 'center', color: premiumAccent, fontWeight: '700', fontSize: 12 }}>
+                <Text
+                  style={{
+                    textAlign: 'center',
+                    color: premiumAccent,
+                    fontWeight: '700',
+                    fontSize: 12,
+                  }}
+                >
                   Cancelar
                 </Text>
               </TouchableOpacity>
@@ -462,7 +570,9 @@ export default function CataFormModal({
                 onPress={handleSave}
                 disabled={!!guardando || !cafeNombre.trim()}
                 style={{
-                  flex: 1, paddingVertical: 12, borderRadius: 8,
+                  flex: 1,
+                  paddingVertical: 12,
+                  borderRadius: 8,
                   backgroundColor: !cafeNombre.trim() ? '#ccc' : premiumAccent,
                   alignItems: 'center',
                 }}
@@ -470,7 +580,9 @@ export default function CataFormModal({
                 {guardando ? (
                   <ActivityIndicator color="#fff" />
                 ) : (
-                  <Text style={{ color: '#fff', fontWeight: '700', fontSize: 12 }}>Guardar Cata</Text>
+                  <Text style={{ color: '#fff', fontWeight: '700', fontSize: 12 }}>
+                    Guardar Cata
+                  </Text>
                 )}
               </TouchableOpacity>
             </View>

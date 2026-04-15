@@ -150,7 +150,11 @@ export default function FormScreen({ onSave, onBack, onCafeAdded, s, premiumAcce
         />
 
         <TouchableOpacity style={s.redBtn} onPress={guardarCafe} disabled={subiendo}>
-          {subiendo ? <ActivityIndicator color="#fff" /> : <Text style={s.redBtnText}>Guardar café</Text>}
+          {subiendo ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={s.redBtnText}>Guardar café</Text>
+          )}
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>

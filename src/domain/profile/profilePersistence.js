@@ -25,12 +25,17 @@ export const persistProfile = async ({
   });
 
   let fotoPersistida = profileDraft.foto;
-  let avatarUrlParaWeb = String(profileDraft.foto || '').startsWith('http') ? String(profileDraft.foto).trim() : '';
+  let avatarUrlParaWeb = String(profileDraft.foto || '').startsWith('http')
+    ? String(profileDraft.foto).trim()
+    : '';
   let uploadPendiente = false;
 
   if (profileDraft.foto && !String(profileDraft.foto).startsWith('http')) {
     try {
-      fotoPersistida = await uploadImageToStorage(profileDraft.foto, `profile_avatars/${user?.uid || 'anon'}`);
+      fotoPersistida = await uploadImageToStorage(
+        profileDraft.foto,
+        `profile_avatars/${user?.uid || 'anon'}`
+      );
       avatarUrlParaWeb = String(fotoPersistida || '').trim();
     } catch {
       uploadPendiente = true;
@@ -45,7 +50,11 @@ export const persistProfile = async ({
   if (user?.uid) {
     try {
       const existing = await getDocument('user_profiles', user.uid);
-      const displayName = storedProfile.alias || storedProfile.nombre || storedProfile.email.split('@')[0] || 'Catador';
+      const displayName =
+        storedProfile.alias ||
+        storedProfile.nombre ||
+        storedProfile.email.split('@')[0] ||
+        'Catador';
       const avatarCloud = avatarUrlParaWeb || String(existing?.avatarUrl || '').trim();
 
       await setDocument('user_profiles', user.uid, {

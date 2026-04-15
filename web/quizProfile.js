@@ -36,10 +36,12 @@ export function clearQuizProfile() {
 }
 
 export function renderQuizSummary(prefs) {
-  return Object.entries(prefs).map(([key, value]) => {
-    const label = (QUIZ_VALUE_LABELS[key] && QUIZ_VALUE_LABELS[key][value]) || value;
-    const name = QUIZ_FIELD_NAMES[key] || key;
+  return Object.entries(prefs)
+    .map(([key, value]) => {
+      const label = (QUIZ_VALUE_LABELS[key] && QUIZ_VALUE_LABELS[key][value]) || value;
+      const name = QUIZ_FIELD_NAMES[key] || key;
 
-    return `<div class="eq-summary-pill"><span class="eq-summary-key">${name}</span><span class="eq-summary-val">${label}</span></div>`;
-  }).join('');
+      return `<div class="eq-summary-pill"><span class="eq-summary-key">${name}</span><span class="eq-summary-val">${label}</span></div>`;
+    })
+    .join('');
 }

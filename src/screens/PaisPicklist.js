@@ -1,12 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import {
-  Modal,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Modal, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 import { PREMIUM_ACCENT } from '../constants/theme';
 import { PAISES } from '../core/paises';
@@ -44,7 +38,9 @@ export default function PaisPicklist({ value, onChange }) {
                   }}
                 >
                   <Text style={pick.itemText}>{item.label}</Text>
-                  {item.value === value && <Ionicons name="checkmark" size={20} color={PREMIUM_ACCENT} />}
+                  {item.value === value && (
+                    <Ionicons name="checkmark" size={20} color={PREMIUM_ACCENT} />
+                  )}
                 </TouchableOpacity>
               ))}
             </ScrollView>

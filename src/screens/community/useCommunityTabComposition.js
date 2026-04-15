@@ -1,4 +1,3 @@
-import useCommunityTabUi from './useCommunityTabUi';
 import {
   buildCommunityCategoriesViewProps,
   buildCommunityCreateModalProps,
@@ -6,10 +5,8 @@ import {
   buildCommunityThreadDetailViewProps,
   buildCommunityThreadListViewProps,
 } from '../../domain/community/viewProps';
-import {
-  getCommunityRoleFlags,
-  getCommunityVisibleViews,
-} from '../../domain/community/viewState';
+import { getCommunityRoleFlags, getCommunityVisibleViews } from '../../domain/community/viewState';
+import useCommunityTabUi from './useCommunityTabUi';
 
 export default function useCommunityTabComposition(props) {
   const {
@@ -26,6 +23,8 @@ export default function useCommunityTabComposition(props) {
     setForumThread,
     forumCreateOpen,
     setForumCreateOpen,
+    forumSort,
+    setForumSort,
     forumLoading,
     forumThreadsByCategory,
     forumError,

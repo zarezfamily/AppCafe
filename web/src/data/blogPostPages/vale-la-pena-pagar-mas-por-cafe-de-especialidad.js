@@ -1,19 +1,24 @@
 const valeLaPenaPagarMasPorCafeDeEspecialidad = {
   slug: 'vale-la-pena-pagar-mas-por-cafe-de-especialidad',
   title: '¿Vale la Pena Pagar Más por Café de Especialidad?',
-  description: 'Un análisis honesto de qué hay detrás del precio del café de especialidad: calidad real, impacto social y cuándo merece la pena el desembolso.',
-  ogDescription: 'Un análisis honesto: qué hay detrás del precio, la diferencia real en taza y cuándo merece la pena el desembolso.',
-  twitterDescription: 'Un análisis honesto: qué hay detrás del precio y cuándo merece la pena el desembolso.',
+  description:
+    'Un análisis honesto de qué hay detrás del precio del café de especialidad: calidad real, impacto social y cuándo merece la pena el desembolso.',
+  ogDescription:
+    'Un análisis honesto: qué hay detrás del precio, la diferencia real en taza y cuándo merece la pena el desembolso.',
+  twitterDescription:
+    'Un análisis honesto: qué hay detrás del precio y cuándo merece la pena el desembolso.',
   canonicalUrl: 'https://etiove.com/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html',
   prevUrl: 'https://etiove.com/blog/cafe-de-especialidad-crece-en-espana-2026.html',
   nextUrl: 'https://etiove.com/blog/por-que-mi-cafe-sabe-amargo.html',
   hero: {
-    image: 'https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=1400&q=80&auto=format&fit=crop',
-    imageSocial: 'https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=1200&q=85&auto=format&fit=crop',
+    image:
+      'https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=1400&q=80&auto=format&fit=crop',
+    imageSocial:
+      'https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=1200&q=85&auto=format&fit=crop',
     imageAlt: 'Granos de café seleccionados a mano en una finca de altura',
     tag: 'Análisis · 04 abril 2026 · 7 min de lectura',
     title: '¿Vale la Pena Pagar Más por Café de Especialidad?',
-    meta: 'Por el equipo de Etiove · Foto: Unsplash'
+    meta: 'Por el equipo de Etiove · Foto: Unsplash',
   },
   inlineCss: String.raw`    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -199,12 +204,13 @@ const valeLaPenaPagarMasPorCafeDeEspecialidad = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: '¿Vale la Pena Pagar Más por Café de Especialidad?',
-    description: 'Un análisis honesto de qué hay detrás del precio del café de especialidad: calidad real, impacto social y cuándo merece la pena el desembolso.',
+    description:
+      'Un análisis honesto de qué hay detrás del precio del café de especialidad: calidad real, impacto social y cuándo merece la pena el desembolso.',
     datePublished: '2026-04-04',
     dateModified: '2026-04-04',
     author: {
       '@type': 'Organization',
-      name: 'Etiove'
+      name: 'Etiove',
     },
     publisher: {
       '@type': 'Organization',
@@ -214,22 +220,22 @@ const valeLaPenaPagarMasPorCafeDeEspecialidad = {
         '@type': 'ImageObject',
         url: 'https://etiove.com/favicon.svg',
         width: 512,
-        height: 512
-      }
+        height: 512,
+      },
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': 'https://etiove.com/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html'
+      '@id': 'https://etiove.com/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html',
     },
     image: {
       '@type': 'ImageObject',
       url: 'https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=1400&q=80&auto=format&fit=crop',
       width: 1400,
       height: 700,
-      caption: 'Granos de café seleccionados a mano en una finca de altura'
+      caption: 'Granos de café seleccionados a mano en una finca de altura',
     },
     wordCount: 1091,
-    timeRequired: 'PT8M'
+    timeRequired: 'PT8M',
   },
   extraJsonLd: [
     {
@@ -241,35 +247,35 @@ const valeLaPenaPagarMasPorCafeDeEspecialidad = {
           name: '¿Vale la pena pagar más por café de especialidad?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Sí, si valoras mejor sabor, más frescura, trazabilidad y una cadena de valor más justa. No siempre significa lujo: muchas veces significa comprar menos cantidad, pero mucho mejor café.'
-          }
+            text: 'Sí, si valoras mejor sabor, más frescura, trazabilidad y una cadena de valor más justa. No siempre significa lujo: muchas veces significa comprar menos cantidad, pero mucho mejor café.',
+          },
         },
         {
           '@type': 'Question',
           name: '¿En qué se nota pagar más por el café?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Se nota en el origen identificable, el tueste reciente, la ausencia de sabores quemados o rancios y una taza con más dulzor, limpieza y matices. También suele haber más información útil para prepararlo bien.'
-          }
+            text: 'Se nota en el origen identificable, el tueste reciente, la ausencia de sabores quemados o rancios y una taza con más dulzor, limpieza y matices. También suele haber más información útil para prepararlo bien.',
+          },
         },
         {
           '@type': 'Question',
           name: '¿Es mejor comprar café caro o mejorar la preparación?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Lo ideal es combinar ambas cosas, pero mejorar un poco el café y ajustar molienda, agua y receta suele tener más impacto que gastar mucho sin cuidar la preparación.'
-          }
+            text: 'Lo ideal es combinar ambas cosas, pero mejorar un poco el café y ajustar molienda, agua y receta suele tener más impacto que gastar mucho sin cuidar la preparación.',
+          },
         },
         {
           '@type': 'Question',
           name: '¿Qué precio razonable tiene un buen café de especialidad?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Depende del origen y el proceso, pero en España es habitual encontrar bolsas de 250 g con buena relación calidad-precio en un rango medio, sin necesidad de irse a microlotes muy caros.'
-          }
-        }
-      ]
-    }
+            text: 'Depende del origen y el proceso, pero en España es habitual encontrar bolsas de 250 g con buena relación calidad-precio en un rango medio, sin necesidad de irse a microlotes muy caros.',
+          },
+        },
+      ],
+    },
   ],
   breadcrumbJsonLd: {
     '@context': 'https://schema.org',
@@ -279,21 +285,21 @@ const valeLaPenaPagarMasPorCafeDeEspecialidad = {
         '@type': 'ListItem',
         position: 1,
         name: 'Inicio',
-        item: 'https://etiove.com/'
+        item: 'https://etiove.com/',
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'Blog',
-        item: 'https://etiove.com/blog/'
+        item: 'https://etiove.com/blog/',
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: '¿Vale la Pena Pagar Más por Café de Especialidad?',
-        item: 'https://etiove.com/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html'
-      }
-    ]
+        item: 'https://etiove.com/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html',
+      },
+    ],
   },
   bodyHtml: String.raw`
     
@@ -551,7 +557,7 @@ const valeLaPenaPagarMasPorCafeDeEspecialidad = {
         <p class="post-nav-label">Siguiente →</p>
         <p class="post-nav-title">¿Por qué mi café sabe amargo? 7 causas y sus soluciones</p>
       </a>
-    </nav>`
+    </nav>`,
 };
 
 module.exports = {

@@ -22,7 +22,10 @@ export default function CommunityCategoriesView({
   return (
     <View style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={{ paddingBottom: 110, gap: 0 }}>
-        <CommunityAchievementsSection gamification={gamification} achievementDefs={achievementDefs} />
+        <CommunityAchievementsSection
+          gamification={gamification}
+          achievementDefs={achievementDefs}
+        />
         <CommunityMotivationSection />
         <CommunityCategoryList
           s={s}

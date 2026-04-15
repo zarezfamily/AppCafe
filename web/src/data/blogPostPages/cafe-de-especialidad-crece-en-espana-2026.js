@@ -1,19 +1,24 @@
 const cafeDeEspecialidadCreceEnEspana_2026 = {
   slug: 'cafe-de-especialidad-crece-en-espana-2026',
   title: 'El Café de Especialidad Crece un 34% en España',
-  description: 'El mercado del café de especialidad en España supera los 220 millones de euros en 2025. Analizamos los datos, las causas y lo que significa para el consumidor.',
-  ogDescription: 'El mercado del café de especialidad en España supera los 220 millones de euros en 2025. Datos, causas y lo que significa para el consumidor.',
-  twitterDescription: 'El mercado del café de especialidad en España supera los 220 millones de euros en 2025.',
+  description:
+    'El mercado del café de especialidad en España supera los 220 millones de euros en 2025. Analizamos los datos, las causas y lo que significa para el consumidor.',
+  ogDescription:
+    'El mercado del café de especialidad en España supera los 220 millones de euros en 2025. Datos, causas y lo que significa para el consumidor.',
+  twitterDescription:
+    'El mercado del café de especialidad en España supera los 220 millones de euros en 2025.',
   canonicalUrl: 'https://etiove.com/blog/cafe-de-especialidad-crece-en-espana-2026.html',
   prevUrl: 'https://etiove.com/blog/guia-de-molienda-por-metodo.html',
   nextUrl: 'https://etiove.com/blog/vale-la-pena-pagar-mas-por-cafe-de-especialidad.html',
   hero: {
-    image: 'https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=1400&q=80&auto=format&fit=crop',
-    imageSocial: 'https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=1200&q=85&auto=format&fit=crop',
+    image:
+      'https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=1400&q=80&auto=format&fit=crop',
+    imageSocial:
+      'https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=1200&q=85&auto=format&fit=crop',
     imageAlt: 'El café de especialidad crece en España 2026',
     tag: 'Noticia · 04 abril 2026 · 4 min de lectura',
     title: 'El Café de Especialidad Crece un 34% en España',
-    meta: 'Por el equipo de Etiove · Foto: Unsplash'
+    meta: 'Por el equipo de Etiove · Foto: Unsplash',
   },
   inlineCss: String.raw`    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -178,12 +183,13 @@ const cafeDeEspecialidadCreceEnEspana_2026 = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: 'El Café de Especialidad Crece un 34% en España',
-    description: 'El mercado del café de especialidad en España supera los 220 millones de euros en 2025. Analizamos los datos, las causas y lo que significa para el consumidor.',
+    description:
+      'El mercado del café de especialidad en España supera los 220 millones de euros en 2025. Analizamos los datos, las causas y lo que significa para el consumidor.',
     datePublished: '2026-04-03',
     dateModified: '2026-04-03',
     author: {
       '@type': 'Organization',
-      name: 'Etiove'
+      name: 'Etiove',
     },
     publisher: {
       '@type': 'Organization',
@@ -193,22 +199,22 @@ const cafeDeEspecialidadCreceEnEspana_2026 = {
         '@type': 'ImageObject',
         url: 'https://etiove.com/favicon.svg',
         width: 512,
-        height: 512
-      }
+        height: 512,
+      },
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': 'https://etiove.com/blog/cafe-de-especialidad-crece-en-espana-2026.html'
+      '@id': 'https://etiove.com/blog/cafe-de-especialidad-crece-en-espana-2026.html',
     },
     image: {
       '@type': 'ImageObject',
       url: 'https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=1400&q=80&auto=format&fit=crop',
       width: 1400,
       height: 700,
-      caption: 'Barista preparando café de especialidad en una cafetería moderna'
+      caption: 'Barista preparando café de especialidad en una cafetería moderna',
     },
     wordCount: 881,
-    timeRequired: 'PT6M'
+    timeRequired: 'PT6M',
   },
   breadcrumbJsonLd: {
     '@context': 'https://schema.org',
@@ -218,21 +224,21 @@ const cafeDeEspecialidadCreceEnEspana_2026 = {
         '@type': 'ListItem',
         position: 1,
         name: 'Inicio',
-        item: 'https://etiove.com/'
+        item: 'https://etiove.com/',
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'Blog',
-        item: 'https://etiove.com/blog/'
+        item: 'https://etiove.com/blog/',
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: 'El Café de Especialidad Crece un 34% en España',
-        item: 'https://etiove.com/blog/cafe-de-especialidad-crece-en-espana-2026.html'
-      }
-    ]
+        item: 'https://etiove.com/blog/cafe-de-especialidad-crece-en-espana-2026.html',
+      },
+    ],
   },
   bodyHtml: String.raw`
     <article class="article">
@@ -432,7 +438,7 @@ const cafeDeEspecialidadCreceEnEspana_2026 = {
         <p class="post-nav-label">Siguiente →</p>
         <p class="post-nav-title">¿Vale la Pena Pagar Más por Café de Especialidad?</p>
       </a>
-    </nav>`
+    </nav>`,
 };
 
 module.exports = {

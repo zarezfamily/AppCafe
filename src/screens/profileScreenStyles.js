@@ -95,7 +95,12 @@ export const profilePickStyles = StyleSheet.create({
   },
   triggerText: { fontSize: 15, color: '#111' },
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
-  sheet: { backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '70%' },
+  sheet: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '70%',
+  },
   sheetHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',

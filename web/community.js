@@ -49,12 +49,18 @@ const withSubmitGuard = async (key, btn, loadingText, fn) => {
   _submitting[key] = true;
   const originalText = btn ? btn.textContent : '';
   const originalDisabled = btn ? btn.disabled : false;
-  if (btn) { btn.disabled = true; if (loadingText) btn.textContent = loadingText; }
+  if (btn) {
+    btn.disabled = true;
+    if (loadingText) btn.textContent = loadingText;
+  }
   try {
     await fn();
   } finally {
     _submitting[key] = false;
-    if (btn) { btn.disabled = originalDisabled; btn.textContent = originalText; }
+    if (btn) {
+      btn.disabled = originalDisabled;
+      btn.textContent = originalText;
+    }
   }
 };
 
@@ -87,7 +93,10 @@ const hideOfflineBanner = () => {
 
 // Guard that checks connectivity before any write operation
 const requireOnline = () => {
-  if (isOffline()) { showOfflineBanner(); return false; }
+  if (isOffline()) {
+    showOfflineBanner();
+    return false;
+  }
   return true;
 };
 
@@ -105,7 +114,8 @@ const setCanonicalAlias = (alias) => {
 };
 
 // Nunca usar email/prefijo como nombre visible.
-const getAuthorName = () => canonicalAlias || String(localStorage.getItem('etiove_web_alias') || '').trim() || 'Catador';
+const getAuthorName = () =>
+  canonicalAlias || String(localStorage.getItem('etiove_web_alias') || '').trim() || 'Catador';
 
 // Busca en foro_hilos un hilo del usuario para obtener su alias real
 const resolveAuthorAlias = async () => {
@@ -118,11 +128,15 @@ const resolveAuthorAlias = async () => {
   if (!auth.uid) return 'Catador';
 
   const profile = await getDocument('user_profiles', auth.uid).catch(() => null);
-  const fromProfile = String((profile && (profile.displayName || profile.alias || profile.nickname)) || '').trim();
+  const fromProfile = String(
+    (profile && (profile.displayName || profile.alias || profile.nickname)) || ''
+  ).trim();
   if (fromProfile) return setCanonicalAlias(fromProfile);
 
   const allThreads = await getCollection('foro_hilos', 200).catch(() => []);
-  const mine = allThreads.find((t) => t.authorUid === auth.uid && String(t.authorName || '').trim());
+  const mine = allThreads.find(
+    (t) => t.authorUid === auth.uid && String(t.authorName || '').trim()
+  );
   if (mine) return setCanonicalAlias(mine.authorName);
 
   return getAuthorName();
@@ -139,7 +153,8 @@ const openProfileModal = async (authorUid, authorName) => {
   document.getElementById('profileModalSub').textContent = 'Miembro de la comunidad';
   const initial = (authorName || '?')[0].toUpperCase();
   document.getElementById('profileModalAvatar').innerHTML = initial;
-  document.getElementById('profileModalStats').innerHTML = '<span style="color:#ccc;font-size:13px;">Cargando...</span>';
+  document.getElementById('profileModalStats').innerHTML =
+    '<span style="color:#ccc;font-size:13px;">Cargando...</span>';
   document.getElementById('profileModalBody').innerHTML = '';
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
@@ -161,13 +176,17 @@ const openProfileModal = async (authorUid, authorName) => {
     `;
 
     if (userThreads.length > 0) {
-      const recent = userThreads.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3);
+      const recent = userThreads
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 3);
       document.getElementById('profileModalBody').innerHTML = `
         <p style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8b7355;margin-bottom:8px;">Últimos hilos</p>
         ${recent.map((t) => `<div style="padding:8px 0;border-bottom:1px solid #f0e8df;font-size:13px;color:#1c120d;">${escapeHtml(t.title)}</div>`).join('')}
       `;
     }
-  } catch (_) { /* no bloquear */ }
+  } catch (_) {
+    /* no bloquear */
+  }
 };
 
 const closeProfileModal = () => {
@@ -240,35 +259,69 @@ const el = {
   memberEvolutionEmpty: document.getElementById('memberEvolutionEmpty'),
 };
 
-const escapeHtml = (text) => String(text || '')
-  .replace(/&/g, '&amp;')
-  .replace(/</g, '&lt;')
-  .replace(/>/g, '&gt;')
-  .replace(/"/g, '&quot;')
-  .replace(/'/g, '&#39;');
+const escapeHtml = (text) =>
+  String(text || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 
 // Permite espacios entre palabras, solo limpia extremos y múltiples espacios
-const normalizeThreadTitle = (text) => String(text || '')
-  .replace(/\s{2,}/g, ' ')
-  .trim()
-  .toLocaleUpperCase('es-ES');
+const normalizeThreadTitle = (text) =>
+  String(text || '')
+    .replace(/\s{2,}/g, ' ')
+    .trim()
+    .toLocaleUpperCase('es-ES');
 
-const splitCsv = (value) => String(value || '')
-  .split(',')
-  .map((entry) => entry.trim())
-  .filter(Boolean);
+const splitCsv = (value) =>
+  String(value || '')
+    .split(',')
+    .map((entry) => entry.trim())
+    .filter(Boolean);
 
 const BADGE_LIBRARY = {
-  first_thread: { icon: '🌱', label: 'Primer hilo', desc: 'Iniciaste tu primera conversación en la comunidad.' },
-  first_reply: { icon: '💬', label: 'Primera respuesta', desc: 'Participaste ayudando en un hilo de otro miembro.' },
-  curator: { icon: '🧠', label: 'Curador', desc: 'Tus aportes reciben interés y aportan criterio al foro.' },
-  active_voice: { icon: '⚡', label: 'Voz activa', desc: 'Mantienes presencia frecuente en la conversación.' },
-  top_contributor: { icon: '🏆', label: 'Top contribuidor', desc: 'Acumulaste una participación destacada en hilos y respuestas.' },
-  community_pillar: { icon: '🛡️', label: 'Pilar', desc: 'Eres uno de los perfiles más constantes de la comunidad.' },
-  espresso_scholar: { icon: '📚', label: 'Scholar', desc: 'Tu evolución refleja dominio y aprendizaje continuo.' },
+  first_thread: {
+    icon: '🌱',
+    label: 'Primer hilo',
+    desc: 'Iniciaste tu primera conversación en la comunidad.',
+  },
+  first_reply: {
+    icon: '💬',
+    label: 'Primera respuesta',
+    desc: 'Participaste ayudando en un hilo de otro miembro.',
+  },
+  curator: {
+    icon: '🧠',
+    label: 'Curador',
+    desc: 'Tus aportes reciben interés y aportan criterio al foro.',
+  },
+  active_voice: {
+    icon: '⚡',
+    label: 'Voz activa',
+    desc: 'Mantienes presencia frecuente en la conversación.',
+  },
+  top_contributor: {
+    icon: '🏆',
+    label: 'Top contribuidor',
+    desc: 'Acumulaste una participación destacada en hilos y respuestas.',
+  },
+  community_pillar: {
+    icon: '🛡️',
+    label: 'Pilar',
+    desc: 'Eres uno de los perfiles más constantes de la comunidad.',
+  },
+  espresso_scholar: {
+    icon: '📚',
+    label: 'Scholar',
+    desc: 'Tu evolución refleja dominio y aprendizaje continuo.',
+  },
 };
 
-const normalizeBadgeId = (rawBadge) => normalizeText(rawBadge).replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+const normalizeBadgeId = (rawBadge) =>
+  normalizeText(rawBadge)
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
 
 const deriveTierLabel = (xp) => {
   if (xp >= 2500) return 'Reserve V';
@@ -285,7 +338,7 @@ const fallbackBadgeIds = (stats) => {
   if (stats.voteReceived >= 12) badges.push('curator');
   if (stats.replyCount >= 8) badges.push('active_voice');
   if (stats.threadCount >= 6 || stats.replyCount >= 20) badges.push('top_contributor');
-  if ((stats.threadCount + stats.replyCount) >= 30) badges.push('community_pillar');
+  if (stats.threadCount + stats.replyCount >= 30) badges.push('community_pillar');
   if (stats.xp >= 900) badges.push('espresso_scholar');
   return badges;
 };
@@ -302,7 +355,9 @@ const extractBadgeUnlockMap = (profile) => {
   const out = {};
   if (!profile) return out;
 
-  const rawJson = String(profile.badgeUnlockedAtJson || profile.achievementUnlockedAtJson || '').trim();
+  const rawJson = String(
+    profile.badgeUnlockedAtJson || profile.achievementUnlockedAtJson || ''
+  ).trim();
   if (rawJson) {
     try {
       const parsed = JSON.parse(rawJson);
@@ -320,7 +375,7 @@ const extractBadgeUnlockMap = (profile) => {
 
   const rawCsv = String(profile.badgeUnlockedAtCsv || profile.achievementDatesCsv || '').trim();
   splitCsv(rawCsv).forEach((entry) => {
-    const sep = entry.includes('|') ? '|' : (entry.includes(':') ? ':' : '');
+    const sep = entry.includes('|') ? '|' : entry.includes(':') ? ':' : '';
     if (!sep) return;
     const idx = entry.indexOf(sep);
     if (idx < 1) return;
@@ -344,8 +399,14 @@ const renderMemberEvolutionCard = ({ profile = null, allThreads = [], allReplies
   if (el.authSection) el.authSection.style.display = 'none';
 
   // Avatar premium
-  let avatarUrl = (profile && (profile.photoURL || profile.avatarUrl || profile.avatar || profile.photo || '')) || '';
-  let displayName = String((profile && (profile.displayName || profile.alias || profile.nickname)) || getAuthorName() || 'Catador').trim();
+  let avatarUrl =
+    (profile && (profile.photoURL || profile.avatarUrl || profile.avatar || profile.photo || '')) ||
+    '';
+  let displayName = String(
+    (profile && (profile.displayName || profile.alias || profile.nickname)) ||
+      getAuthorName() ||
+      'Catador'
+  ).trim();
   // Avatar premium: buscar nuevos elementos DOM
   el.memberAvatarImg = document.getElementById('memberAvatarImg');
   el.memberAvatarFallback = document.getElementById('memberAvatarFallback');
@@ -354,7 +415,7 @@ const renderMemberEvolutionCard = ({ profile = null, allThreads = [], allReplies
       el.memberAvatarImg.src = avatarUrl;
       el.memberAvatarImg.style.display = 'block';
       el.memberAvatarFallback.style.display = 'none';
-      el.memberAvatarImg.onerror = function() {
+      el.memberAvatarImg.onerror = function () {
         el.memberAvatarImg.style.display = 'none';
         el.memberAvatarFallback.textContent = displayName.charAt(0).toUpperCase();
         el.memberAvatarFallback.style.display = 'block';
@@ -373,23 +434,39 @@ const renderMemberEvolutionCard = ({ profile = null, allThreads = [], allReplies
   const votesFromReplies = myReplies.reduce((sum, item) => sum + Number(item.upvotes || 0), 0);
   const voteReceived = votesFromThreads + votesFromReplies;
 
-  const profileXp = Number((profile && (profile.xp || profile.totalXp || profile.communityXp || 0)) || 0);
-  const calculatedXp = (myThreads.length * 40) + (myReplies.length * 18) + (voteReceived * 4);
+  const profileXp = Number(
+    (profile && (profile.xp || profile.totalXp || profile.communityXp || 0)) || 0
+  );
+  const calculatedXp = myThreads.length * 40 + myReplies.length * 18 + voteReceived * 4;
   const xp = Math.max(profileXp, calculatedXp);
-  const tier = String((profile && (profile.memberLevel || profile.tierLabel || profile.communityTier)) || '').trim() || deriveTierLabel(xp);
+  const tier =
+    String(
+      (profile && (profile.memberLevel || profile.tierLabel || profile.communityTier)) || ''
+    ).trim() || deriveTierLabel(xp);
 
-  const rawAchievementCsv = String((profile && (profile.achievementCsv || profile.achievementsCsv || profile.badgeCsv)) || '').trim();
+  const rawAchievementCsv = String(
+    (profile && (profile.achievementCsv || profile.achievementsCsv || profile.badgeCsv)) || ''
+  ).trim();
   const parsedBadges = splitCsv(rawAchievementCsv).map(normalizeBadgeId).filter(Boolean);
   const badgeUnlockMap = extractBadgeUnlockMap(profile);
-  const computedBadges = parsedBadges.length > 0 ? parsedBadges : fallbackBadgeIds({
-    threadCount: myThreads.length,
-    replyCount: myReplies.length,
-    voteReceived,
-    xp,
-  });
+  const computedBadges =
+    parsedBadges.length > 0
+      ? parsedBadges
+      : fallbackBadgeIds({
+          threadCount: myThreads.length,
+          replyCount: myReplies.length,
+          voteReceived,
+          xp,
+        });
   const uniqueBadges = Array.from(new Set(computedBadges)).slice(0, 8);
 
-  const aliasDisplay = '@' + String(displayName || 'catador').replace(/^@+/, '').trim().toLowerCase().replace(/\s+/g, '_');
+  const aliasDisplay =
+    '@' +
+    String(displayName || 'catador')
+      .replace(/^@+/, '')
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, '_');
   const verifyBadgeOrBtn = auth.emailVerified
     ? VERIFIED_BADGE
     : ` <button id="communityVerifyBtn" style="margin-left:5px;font-size:10px;letter-spacing:1px;text-transform:uppercase;background:rgba(201,149,87,0.15);border:1px solid rgba(201,149,87,0.4);color:#9e6a42;border-radius:6px;padding:2px 7px;cursor:pointer;font-family:inherit;vertical-align:middle;">Verificar email</button>`;
@@ -405,29 +482,48 @@ const renderMemberEvolutionCard = ({ profile = null, allThreads = [], allReplies
     const aliasBtn = document.getElementById('memberAliasBtn');
     if (aliasBtn && !aliasBtn.dataset.bound) {
       aliasBtn.addEventListener('click', () => goToProfilePage(auth.uid, getAuthorName()));
-      aliasBtn.addEventListener('mouseenter', () => { aliasBtn.style.opacity = '0.65'; });
-      aliasBtn.addEventListener('mouseleave', () => { aliasBtn.style.opacity = '1'; });
+      aliasBtn.addEventListener('mouseenter', () => {
+        aliasBtn.style.opacity = '0.65';
+      });
+      aliasBtn.addEventListener('mouseleave', () => {
+        aliasBtn.style.opacity = '1';
+      });
       aliasBtn.dataset.bound = '1';
     }
   }, 0);
   // Wire verify button
   setTimeout(() => {
     const vBtn = document.getElementById('communityVerifyBtn');
-    if (vBtn) vBtn.addEventListener('click', () => {
-      vBtn.disabled = true; vBtn.textContent = 'Enviando...';
-      fetch('https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=' + FIREBASE_API_KEY, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Ios-Bundle-Identifier': FIREBASE_IOS_BUNDLE_ID },
-        body: JSON.stringify({ requestType: 'VERIFY_EMAIL', idToken: auth.token }),
-      }).then(() => { vBtn.textContent = '✔ Email enviado'; }).catch(() => { vBtn.textContent = 'Error, reintenta'; vBtn.disabled = false; });
-    });
+    if (vBtn)
+      vBtn.addEventListener('click', () => {
+        vBtn.disabled = true;
+        vBtn.textContent = 'Enviando...';
+        fetch(
+          'https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=' + FIREBASE_API_KEY,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Ios-Bundle-Identifier': FIREBASE_IOS_BUNDLE_ID,
+            },
+            body: JSON.stringify({ requestType: 'VERIFY_EMAIL', idToken: auth.token }),
+          }
+        )
+          .then(() => {
+            vBtn.textContent = '✔ Email enviado';
+          })
+          .catch(() => {
+            vBtn.textContent = 'Error, reintenta';
+            vBtn.disabled = false;
+          });
+      });
   }, 0);
   const TIER_DESC = {
-    'Reserve I':   'Nivel 1 de 5 · 0–349 XP\nEstás comenzando tu viaje en la comunidad Etiove.',
-    'Reserve II':  'Nivel 2 de 5 · 350–899 XP\nMiembro activo con criterio en crecimiento.',
+    'Reserve I': 'Nivel 1 de 5 · 0–349 XP\nEstás comenzando tu viaje en la comunidad Etiove.',
+    'Reserve II': 'Nivel 2 de 5 · 350–899 XP\nMiembro activo con criterio en crecimiento.',
     'Reserve III': 'Nivel 3 de 5 · 900–1599 XP\nVoz reconocida en el Salón Etiove.',
-    'Reserve IV':  'Nivel 4 de 5 · 1600–2499 XP\nReferente de la comunidad.',
-    'Reserve V':   'Nivel 5 de 5 · 2500+ XP\nÉlite del café de especialidad.',
+    'Reserve IV': 'Nivel 4 de 5 · 1600–2499 XP\nReferente de la comunidad.',
+    'Reserve V': 'Nivel 5 de 5 · 2500+ XP\nÉlite del café de especialidad.',
   };
   el.memberEvolutionTier.textContent = tier;
   el.memberEvolutionTier.setAttribute('data-tooltip', TIER_DESC[tier] || tier);
@@ -437,41 +533,45 @@ const renderMemberEvolutionCard = ({ profile = null, allThreads = [], allReplies
     { label: 'Hilos', value: myThreads.length },
     { label: 'Respuestas', value: myReplies.length },
     { label: 'Votos', value: voteReceived },
-  ].map((item) => `
+  ]
+    .map(
+      (item) => `
     <div class="member-evo-stat">
       <p class="member-evo-stat-label">${escapeHtml(item.label)}</p>
       <p class="member-evo-stat-value">${escapeHtml(String(item.value))}</p>
     </div>
-  `).join('');
+  `
+    )
+    .join('');
 
   if (uniqueBadges.length === 0) {
     el.memberEvolutionBadges.innerHTML = '';
     el.memberEvolutionEmpty.style.display = 'block';
   } else {
     // Barra de progreso XP
-  const XP_TIERS = [
-    { label: 'Reserve I',   min: 0    },
-    { label: 'Reserve II',  min: 350  },
-    { label: 'Reserve III', min: 900  },
-    { label: 'Reserve IV',  min: 1600 },
-    { label: 'Reserve V',   min: 2500 },
-  ];
-  const currentTierIdx = XP_TIERS.reduce((acc, t, i) => xp >= t.min ? i : acc, 0);
-  const nextTier = XP_TIERS[currentTierIdx + 1] || null;
-  const currentMin = XP_TIERS[currentTierIdx].min;
-  const progressPct = nextTier
-    ? Math.min(100, Math.round(((xp - currentMin) / (nextTier.min - currentMin)) * 100))
-    : 100;
-  const xpLeft = nextTier ? (nextTier.min - Math.round(xp)) : 0;
+    const XP_TIERS = [
+      { label: 'Reserve I', min: 0 },
+      { label: 'Reserve II', min: 350 },
+      { label: 'Reserve III', min: 900 },
+      { label: 'Reserve IV', min: 1600 },
+      { label: 'Reserve V', min: 2500 },
+    ];
+    const currentTierIdx = XP_TIERS.reduce((acc, t, i) => (xp >= t.min ? i : acc), 0);
+    const nextTier = XP_TIERS[currentTierIdx + 1] || null;
+    const currentMin = XP_TIERS[currentTierIdx].min;
+    const progressPct = nextTier
+      ? Math.min(100, Math.round(((xp - currentMin) / (nextTier.min - currentMin)) * 100))
+      : 100;
+    const xpLeft = nextTier ? nextTier.min - Math.round(xp) : 0;
 
-  let progressEl = document.getElementById('memberEvoProgressWrap');
-  if (!progressEl) {
-    progressEl = document.createElement('div');
-    progressEl.id = 'memberEvoProgressWrap';
-    progressEl.className = 'member-evo-progress-wrap';
-    el.memberEvolutionCard.insertBefore(progressEl, el.memberEvolutionBadges);
-  }
-  progressEl.innerHTML = `
+    let progressEl = document.getElementById('memberEvoProgressWrap');
+    if (!progressEl) {
+      progressEl = document.createElement('div');
+      progressEl.id = 'memberEvoProgressWrap';
+      progressEl.className = 'member-evo-progress-wrap';
+      el.memberEvolutionCard.insertBefore(progressEl, el.memberEvolutionBadges);
+    }
+    progressEl.innerHTML = `
     <div class="member-evo-progress-labels">
       <span class="member-evo-progress-xp">${Math.round(xp)} XP</span>
       <span class="member-evo-progress-next">${nextTier ? xpLeft + ' XP para ' + nextTier.label : 'Nivel máximo'}</span>
@@ -480,18 +580,20 @@ const renderMemberEvolutionCard = ({ profile = null, allThreads = [], allReplies
       <div class="member-evo-progress-fill" style="width:${progressPct}%"></div>
     </div>`;
 
-  el.memberEvolutionBadges.innerHTML = uniqueBadges.map((badgeId) => {
-      const badge = BADGE_LIBRARY[badgeId] || {
-        icon: '✦',
-        label: badgeId.replace(/_/g, ' '),
-        desc: 'Insignia desbloqueada por tu evolución en la comunidad.',
-      };
-      const unlockedAt = formatBadgeUnlockDate(badgeUnlockMap[badgeId]);
-      const tooltip = unlockedAt
-        ? `${badge.label} · ${badge.desc} · Desbloqueada ${unlockedAt}`
-        : `${badge.label} · ${badge.desc}`;
-      return `<span class="member-evo-badge" data-tip="${escapeHtml(tooltip)}" tabindex="0"><span>${escapeHtml(badge.icon)} ${escapeHtml(badge.label)}</span></span>`;
-    }).join('');
+    el.memberEvolutionBadges.innerHTML = uniqueBadges
+      .map((badgeId) => {
+        const badge = BADGE_LIBRARY[badgeId] || {
+          icon: '✦',
+          label: badgeId.replace(/_/g, ' '),
+          desc: 'Insignia desbloqueada por tu evolución en la comunidad.',
+        };
+        const unlockedAt = formatBadgeUnlockDate(badgeUnlockMap[badgeId]);
+        const tooltip = unlockedAt
+          ? `${badge.label} · ${badge.desc} · Desbloqueada ${unlockedAt}`
+          : `${badge.label} · ${badge.desc}`;
+        return `<span class="member-evo-badge" data-tip="${escapeHtml(tooltip)}" tabindex="0"><span>${escapeHtml(badge.icon)} ${escapeHtml(badge.label)}</span></span>`;
+      })
+      .join('');
     // Tooltips: handled via CSS ::after data-tip attribute
     el.memberEvolutionEmpty.style.display = 'none';
   }
@@ -532,7 +634,9 @@ const resetThreadComposer = (options = {}) => {
   if (el.threadComposerTitle) el.threadComposerTitle.textContent = 'Nuevo hilo';
   if (composerSection) composerSection.classList.remove('thread-composer-is-editing');
   if (el.threadEditBanner) el.threadEditBanner.classList.remove('is-visible');
-  if (el.threadEditBannerText) el.threadEditBannerText.textContent = 'Aquí editarás el título y el mensaje del hilo seleccionado.';
+  if (el.threadEditBannerText)
+    el.threadEditBannerText.textContent =
+      'Aquí editarás el título y el mensaje del hilo seleccionado.';
   if (el.createThreadBtn) el.createThreadBtn.textContent = 'Publicar hilo';
   if (el.cancelThreadEditBtn) el.cancelThreadEditBtn.style.display = 'none';
   if (el.threadTitle) el.threadTitle.value = '';
@@ -549,9 +653,10 @@ const resetThreadComposer = (options = {}) => {
 
 const focusInlineThreadEditor = () => {
   if (!editingThreadId) return;
-  const selector = editingThreadFocusField === 'body'
-    ? `[data-inline-edit-body="${editingThreadId}"]`
-    : `[data-inline-edit-title="${editingThreadId}"]`;
+  const selector =
+    editingThreadFocusField === 'body'
+      ? `[data-inline-edit-body="${editingThreadId}"]`
+      : `[data-inline-edit-title="${editingThreadId}"]`;
   const target = el.threadsWrap ? el.threadsWrap.querySelector(selector) : null;
   if (!target) return;
   target.focus({ preventScroll: true });
@@ -580,9 +685,13 @@ const renderInlineThreadEditor = (item, options = {}) => {
   const draft = editingThreadDraft || item;
   const categoryValue = String(draft.categoryId || item.categoryId || 'general');
   const accessValue = draft.accessLevel === 'registered_only' ? 'registered_only' : 'public';
-  const activeImageUrl = draft.imageRemoved ? '' : normalizeStorageImageUrl(draft.image || item.image || '');
+  const activeImageUrl = draft.imageRemoved
+    ? ''
+    : normalizeStorageImageUrl(draft.image || item.image || '');
   const imageStatusKind = String(draft.imageStatusKind || '');
-  const imageStatusText = String(draft.imageStatus || (activeImageUrl ? 'Imagen actual del hilo.' : 'Este hilo no tiene imagen.'));
+  const imageStatusText = String(
+    draft.imageStatus || (activeImageUrl ? 'Imagen actual del hilo.' : 'Este hilo no tiene imagen.')
+  );
   return `
     <div class="thread-inline-editor${compact ? ' compact' : ''}">
       <div class="field"><select data-inline-edit-category="${item.id}">${FORUM_CATEGORIES.map((c) => `<option value="${c.id}" ${c.id === categoryValue ? 'selected' : ''}>${c.emoji} ${c.label}</option>`).join('')}</select></div>
@@ -628,9 +737,8 @@ const hasUserVote = (item) => splitCsv(item && item.voterUids).includes(auth.uid
 const toFirestoreValue = (val) => {
   if (val === null || val === undefined) return { nullValue: null };
   if (typeof val === 'string') return { stringValue: val };
-  if (typeof val === 'number') return Number.isInteger(val)
-    ? { integerValue: String(val) }
-    : { doubleValue: val };
+  if (typeof val === 'number')
+    return Number.isInteger(val) ? { integerValue: String(val) } : { doubleValue: val };
   if (typeof val === 'boolean') return { booleanValue: val };
   return { stringValue: String(val) };
 };
@@ -685,26 +793,27 @@ const fmt = (iso) => {
     if (isNaN(d.getTime())) return iso || '';
     const now = Date.now();
     const diff = now - d.getTime();
-    const mins  = Math.floor(diff / 60000);
+    const mins = Math.floor(diff / 60000);
     const hours = Math.floor(diff / 3600000);
-    const days  = Math.floor(diff / 86400000);
-    if (diff < 60000)   return 'ahora mismo';
-    if (mins  < 60)     return `hace ${mins} min`;
-    if (hours < 24)     return `hace ${hours}h`;
-    if (days  === 1)    return 'ayer';
-    if (days  < 7)      return `hace ${days} días`;
-    if (days  < 30)     return `hace ${Math.floor(days / 7)} semanas`;
+    const days = Math.floor(diff / 86400000);
+    if (diff < 60000) return 'ahora mismo';
+    if (mins < 60) return `hace ${mins} min`;
+    if (hours < 24) return `hace ${hours}h`;
+    if (days === 1) return 'ayer';
+    if (days < 7) return `hace ${days} días`;
+    if (days < 30) return `hace ${Math.floor(days / 7)} semanas`;
     return d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
   } catch {
     return iso || '';
   }
 };
 
-const normalizeText = (value) => String(value || '')
-  .normalize('NFD')
-  .replace(/[\u0300-\u036f]/g, '')
-  .toLowerCase()
-  .trim();
+const normalizeText = (value) =>
+  String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
 
 const getActiveThreadId = () => {
   try {
@@ -750,13 +859,15 @@ const initializeMetaDefaults = () => {
   const twitterDescription = getMetaTag('meta[name="twitter:description"]');
   const canonical = getMetaTag('link[rel="canonical"]');
 
-  metaDefaults.description = desc ? (desc.getAttribute('content') || '') : '';
-  metaDefaults.ogTitle = ogTitle ? (ogTitle.getAttribute('content') || '') : '';
-  metaDefaults.ogDescription = ogDescription ? (ogDescription.getAttribute('content') || '') : '';
-  metaDefaults.ogUrl = ogUrl ? (ogUrl.getAttribute('content') || '') : '';
-  metaDefaults.twitterTitle = twitterTitle ? (twitterTitle.getAttribute('content') || '') : '';
-  metaDefaults.twitterDescription = twitterDescription ? (twitterDescription.getAttribute('content') || '') : '';
-  metaDefaults.canonical = canonical ? (canonical.getAttribute('href') || '') : '';
+  metaDefaults.description = desc ? desc.getAttribute('content') || '' : '';
+  metaDefaults.ogTitle = ogTitle ? ogTitle.getAttribute('content') || '' : '';
+  metaDefaults.ogDescription = ogDescription ? ogDescription.getAttribute('content') || '' : '';
+  metaDefaults.ogUrl = ogUrl ? ogUrl.getAttribute('content') || '' : '';
+  metaDefaults.twitterTitle = twitterTitle ? twitterTitle.getAttribute('content') || '' : '';
+  metaDefaults.twitterDescription = twitterDescription
+    ? twitterDescription.getAttribute('content') || ''
+    : '';
+  metaDefaults.canonical = canonical ? canonical.getAttribute('href') || '' : '';
 };
 
 const setMetaContent = (selector, value) => {
@@ -783,8 +894,12 @@ const updateCommunityMetaForThread = (thread) => {
   }
 
   const safeTitle = String(thread.title || 'Hilo de comunidad').trim() || 'Hilo de comunidad';
-  const bodyText = String(thread.body || '').replace(/\s+/g, ' ').trim();
-  const summary = bodyText ? bodyText.slice(0, 150) : 'Participa en el hilo de la comunidad Etiove.';
+  const bodyText = String(thread.body || '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const summary = bodyText
+    ? bodyText.slice(0, 150)
+    : 'Participa en el hilo de la comunidad Etiove.';
   const fullTitle = `${safeTitle} | Comunidad Etiove`;
   const detailUrl = `https://etiove.com${threadDetailUrl(thread.id)}`;
 
@@ -802,8 +917,21 @@ const updateCommunityMetaForThread = (thread) => {
 const goToThreadDetail = (threadId) => {
   const safeId = String(threadId || '').trim();
   if (!safeId) return;
-  window.history.replaceState({ ...(window.history.state || {}), communityScrollY: window.scrollY }, '', window.location.href);
-  window.history.pushState({ communityView: 'thread', threadId: safeId, communityScrollY: window.scrollY, communityAnchorY: pendingThreadAnchorY }, '', threadDetailUrl(safeId));
+  window.history.replaceState(
+    { ...(window.history.state || {}), communityScrollY: window.scrollY },
+    '',
+    window.location.href
+  );
+  window.history.pushState(
+    {
+      communityView: 'thread',
+      threadId: safeId,
+      communityScrollY: window.scrollY,
+      communityAnchorY: pendingThreadAnchorY,
+    },
+    '',
+    threadDetailUrl(safeId)
+  );
   transitionThreadsView(
     () => renderThreads(),
     () => {
@@ -817,16 +945,28 @@ const goToThreadDetail = (threadId) => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
       pendingThreadAnchorY = null;
-    },
+    }
   );
 };
 
-const goToThreadList = ({ replace = false, restoreScroll = true, scrollToThreadId = null } = {}) => {
+const goToThreadList = ({
+  replace = false,
+  restoreScroll = true,
+  scrollToThreadId = null,
+} = {}) => {
   const scrollY = Number((window.history.state && window.history.state.communityScrollY) || 0);
   // Always replaceState first to clear the thread URL, so getActiveThreadId() returns ''
-  window.history.replaceState({ communityView: 'list', communityScrollY: scrollY }, '', '/comunidad.html');
+  window.history.replaceState(
+    { communityView: 'list', communityScrollY: scrollY },
+    '',
+    '/comunidad.html'
+  );
   if (!replace) {
-    window.history.pushState({ communityView: 'list', communityScrollY: scrollY }, '', '/comunidad.html');
+    window.history.pushState(
+      { communityView: 'list', communityScrollY: scrollY },
+      '',
+      '/comunidad.html'
+    );
   }
   transitionThreadsView(
     () => renderThreads(),
@@ -852,9 +992,13 @@ const goBackFromThreadDetail = () => {
 };
 
 const goToProfilePage = (uid, name) => {
-  const safeUid  = String(uid  || '').trim();
+  const safeUid = String(uid || '').trim();
   if (!safeUid) return;
-  const safeAlias = String(name || '').trim().replace(/^@+/, '').replace(/\s+/g, '_').toLowerCase();
+  const safeAlias = String(name || '')
+    .trim()
+    .replace(/^@+/, '')
+    .replace(/\s+/g, '_')
+    .toLowerCase();
   // URL limpia: /perfil/@alias (Cloudflare _redirects hace el rewrite)
   const slug = safeAlias || safeUid;
   window.location.href = `/perfil/@${encodeURIComponent(slug)}`;
@@ -869,7 +1013,9 @@ const resolveUidByAlias = async (uid, name) => {
 
   const profiles = await getCollection('user_profiles', 2000).catch(() => []);
   const hit = profiles.find((profile) => {
-    const candidates = [profile.displayName, profile.alias, profile.nickname].map((value) => normalizeText(value));
+    const candidates = [profile.displayName, profile.alias, profile.nickname].map((value) =>
+      normalizeText(value)
+    );
     return candidates.includes(aliasKey) && String(profile.uid || '').trim();
   });
   return String((hit && hit.uid) || '').trim();
@@ -883,7 +1029,8 @@ const inferCategoryId = (thread) => {
   if (rawLabel.includes('metodo') || rawLabel.includes('preparacion')) return 'metodos';
   if (rawLabel.includes('compra') || rawLabel.includes('tostador')) return 'compras';
   if (rawLabel.includes('novedad') || rawLabel.includes('evento')) return 'novedades';
-  if (rawLabel.includes('aprende') || rawLabel.includes('novato') || rawLabel.includes('tecnica')) return 'aprende';
+  if (rawLabel.includes('aprende') || rawLabel.includes('novato') || rawLabel.includes('tecnica'))
+    return 'aprende';
   return 'general';
 };
 
@@ -992,18 +1139,19 @@ const runStructuredQuery = async (structuredQuery) => {
   return (json || []).filter((row) => row.document).map((row) => docToObject(row.document));
 };
 
-const getPublicThreads = async (limit = 500) => runStructuredQuery({
-  from: [{ collectionId: 'foro_hilos' }],
-  where: {
-    fieldFilter: {
-      field: { fieldPath: 'accessLevel' },
-      op: 'EQUAL',
-      value: { stringValue: 'public' },
+const getPublicThreads = async (limit = 500) =>
+  runStructuredQuery({
+    from: [{ collectionId: 'foro_hilos' }],
+    where: {
+      fieldFilter: {
+        field: { fieldPath: 'accessLevel' },
+        op: 'EQUAL',
+        value: { stringValue: 'public' },
+      },
     },
-  },
-  orderBy: [{ field: { fieldPath: 'createdAt' }, direction: 'DESCENDING' }],
-  limit,
-});
+    orderBy: [{ field: { fieldPath: 'createdAt' }, direction: 'DESCENDING' }],
+    limit,
+  });
 
 const addDocument = async (name, data) => {
   const res = await fetch(`${BASE_URL}/${name}?key=${FIREBASE_API_KEY}`, {
@@ -1097,7 +1245,9 @@ const uploadImageToStorage = async (file, folder) => {
     }
 
     const safeName = String(inputFile.name || 'upload').replace(/\.[^/.]+$/, '');
-    return new File([blob], `${safeName}.${outputType === 'image/png' ? 'png' : 'jpg'}`, { type: outputType });
+    return new File([blob], `${safeName}.${outputType === 'image/png' ? 'png' : 'jpg'}`, {
+      type: outputType,
+    });
   };
 
   const fileToUpload = await compressImageIfNeeded(file);
@@ -1126,9 +1276,13 @@ const uploadImageToStorage = async (file, folder) => {
 
   const raw = await res.text();
   let json = {};
-  try { json = raw ? JSON.parse(raw) : {}; } catch { json = {}; }
+  try {
+    json = raw ? JSON.parse(raw) : {};
+  } catch {
+    json = {};
+  }
   if (!res.ok) {
-    throw new Error((json.error) || `storage_upload_failed_${res.status}`);
+    throw new Error(json.error || `storage_upload_failed_${res.status}`);
   }
 
   return String(json.downloadUrl || '');
@@ -1142,10 +1296,11 @@ const uploadImageWithRetry = async (file, folder, maxAttempts = 3) => {
     } catch (err) {
       lastError = err;
       const message = String((err && err.message) || '').toUpperCase();
-      const nonRetryable = message.includes('UNSUPPORTED_IMAGE_TYPE')
-        || message.includes('IMAGE_TOO_LARGE')
-        || message.includes('IMAGE_TOO_LARGE_UNCOMPRESSIBLE')
-        || message.includes('UNAUTHENTICATED');
+      const nonRetryable =
+        message.includes('UNSUPPORTED_IMAGE_TYPE') ||
+        message.includes('IMAGE_TOO_LARGE') ||
+        message.includes('IMAGE_TOO_LARGE_UNCOMPRESSIBLE') ||
+        message.includes('UNAUTHENTICATED');
       if (nonRetryable || attempt >= maxAttempts) break;
       await new Promise((resolve) => setTimeout(resolve, 450 * attempt));
     }
@@ -1167,7 +1322,9 @@ const renderAuthState = () => {
   el.createThreadBtn.disabled = !logged;
   el.authStatus.innerHTML = '';
   if (logged) {
-    const badge = auth.emailVerified ? VERIFIED_BADGE : ' <span style="font-size:11px;color:#b07a52;margin-left:3px;">(sin verificar)</span>';
+    const badge = auth.emailVerified
+      ? VERIFIED_BADGE
+      : ' <span style="font-size:11px;color:#b07a52;margin-left:3px;">(sin verificar)</span>';
     el.authStatus.innerHTML = `<span style="color:var(--success);font-size:12px;">Sesión activa: <strong>${escapeHtml(getAuthorName())}</strong>${badge}</span>`;
     if (!auth.emailVerified) {
       const resendBtn = document.createElement('button');
@@ -1180,7 +1337,10 @@ const renderAuthState = () => {
         try {
           const res = await fetch(`${AUTH_URL}:sendOobCode?key=${FIREBASE_API_KEY}`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-Ios-Bundle-Identifier': FIREBASE_IOS_BUNDLE_ID },
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Ios-Bundle-Identifier': FIREBASE_IOS_BUNDLE_ID,
+            },
             body: JSON.stringify({ requestType: 'VERIFY_EMAIL', idToken: auth.token }),
           });
           const json = await res.json().catch(() => ({}));
@@ -1189,7 +1349,8 @@ const renderAuthState = () => {
           } else {
             const code = (json.error && json.error.message) || '';
             if (code.includes('TOO_MANY_ATTEMPTS') || code.includes('too_many_attempts')) {
-              resendBtn.textContent = 'Demasiados intentos. Espera unos minutos e inténtalo de nuevo.';
+              resendBtn.textContent =
+                'Demasiados intentos. Espera unos minutos e inténtalo de nuevo.';
             } else {
               resendBtn.textContent = 'No se pudo enviar el email. Inténtalo más tarde.';
             }
@@ -1203,7 +1364,8 @@ const renderAuthState = () => {
       el.authStatus.appendChild(resendBtn);
     }
   } else {
-    el.authStatus.innerHTML = '<span style="color:var(--ink-muted);font-size:12px;">Sesión no iniciada</span>';
+    el.authStatus.innerHTML =
+      '<span style="color:var(--ink-muted);font-size:12px;">Sesión no iniciada</span>';
   }
 
   // Mostrar/ocultar bloque "Nuevo hilo"
@@ -1217,24 +1379,23 @@ const renderAuthState = () => {
 };
 
 const renderCategories = () => {
-  el.categorySelect.innerHTML = FORUM_CATEGORIES
-    .map((c) => `<option value="${c.id}">${c.emoji} ${c.label}</option>`)
-    .join('');
+  el.categorySelect.innerHTML = FORUM_CATEGORIES.map(
+    (c) => `<option value="${c.id}">${c.emoji} ${c.label}</option>`
+  ).join('');
   el.categorySelect.value = selectedCategory;
 
   // Buscador junto a Aprende
-  el.categoryChips.innerHTML = FORUM_CATEGORIES
-    .map((c) => {
-      if (c.id === 'aprende') {
-        return `<button class="chip ${selectedCategory === c.id ? 'active' : ''}" data-cat="${c.id}">${c.emoji} ${c.label}</button>`;
-        // search input is injected separately below
-      }
+  el.categoryChips.innerHTML = FORUM_CATEGORIES.map((c) => {
+    if (c.id === 'aprende') {
       return `<button class="chip ${selectedCategory === c.id ? 'active' : ''}" data-cat="${c.id}">${c.emoji} ${c.label}</button>`;
-    })
-    .join('');
+      // search input is injected separately below
+    }
+    return `<button class="chip ${selectedCategory === c.id ? 'active' : ''}" data-cat="${c.id}">${c.emoji} ${c.label}</button>`;
+  }).join('');
 
   // Inject search input below chips in its wrapper
-  const chipsWrap = el.categoryChips.closest('.chips-search-wrap') || el.categoryChips.parentElement;
+  const chipsWrap =
+    el.categoryChips.closest('.chips-search-wrap') || el.categoryChips.parentElement;
   let searchInput = document.getElementById('threadSearchInput');
   if (!searchInput) {
     searchInput = document.createElement('input');
@@ -1260,7 +1421,8 @@ const renderCategories = () => {
   if (searchInputEl) searchInputEl.value = activeSearchTerm;
 
   // Clear-search button — shown when there's an active term
-  const chipsWrapEl = searchInputEl && (searchInputEl.closest('.chips-search-wrap') || searchInputEl.parentElement);
+  const chipsWrapEl =
+    searchInputEl && (searchInputEl.closest('.chips-search-wrap') || searchInputEl.parentElement);
   let clearBtn = document.getElementById('threadSearchClear');
   if (!clearBtn && chipsWrapEl) {
     clearBtn = document.createElement('button');
@@ -1301,17 +1463,25 @@ const renderCategories = () => {
   }
 
   // ─── SELECTOR DE ORDENACIÓN ──────────────────────────────────────────────
-  const chipsWrapRef = searchInputEl && (searchInputEl.closest('.chips-search-wrap') || searchInputEl.parentElement);
+  const chipsWrapRef =
+    searchInputEl && (searchInputEl.closest('.chips-search-wrap') || searchInputEl.parentElement);
   let sortSelect = document.getElementById('threadSortSelect');
   if (!sortSelect && chipsWrapRef) {
     sortSelect = document.createElement('select');
     sortSelect.id = 'threadSortSelect';
     sortSelect.style.cssText = [
-      'font-size:11px', 'font-weight:500', 'letter-spacing:1px',
-      'color:var(--ink-muted)', 'background:transparent',
-      'border:1px solid var(--border-soft)', 'border-radius:6px',
-      'padding:5px 10px', 'cursor:pointer', 'font-family:inherit',
-      'margin-top:6px', 'appearance:none',
+      'font-size:11px',
+      'font-weight:500',
+      'letter-spacing:1px',
+      'color:var(--ink-muted)',
+      'background:transparent',
+      'border:1px solid var(--border-soft)',
+      'border-radius:6px',
+      'padding:5px 10px',
+      'cursor:pointer',
+      'font-family:inherit',
+      'margin-top:6px',
+      'appearance:none',
     ].join(';');
     sortSelect.innerHTML = [
       '<option value="recent">Más recientes</option>',
@@ -1358,16 +1528,17 @@ const renderThreads = () => {
     : threads.filter((t) => t.categoryId === selectedCategory);
   if (searchTerm) {
     const term = searchTerm.toLowerCase();
-    list = list.filter((t) =>
-      (t.title && t.title.toLowerCase().includes(term)) ||
-      (t.body && t.body.toLowerCase().includes(term))
+    list = list.filter(
+      (t) =>
+        (t.title && t.title.toLowerCase().includes(term)) ||
+        (t.body && t.body.toLowerCase().includes(term))
     );
   }
   list = list.sort((a, b) => {
     if (activeSortOrder === 'votes') return Number(b.upvotes || 0) - Number(a.upvotes || 0);
     if (activeSortOrder === 'replies') {
-      const ra = replies.filter(r => r.threadId === a.id).length;
-      const rb = replies.filter(r => r.threadId === b.id).length;
+      const ra = replies.filter((r) => r.threadId === a.id).length;
+      const rb = replies.filter((r) => r.threadId === b.id).length;
       return rb - ra;
     }
     return new Date(b.createdAt) - new Date(a.createdAt);
@@ -1384,7 +1555,8 @@ const renderThreads = () => {
 
     if (!activeThread) {
       resetCommunityMeta();
-      el.threadsWrap.innerHTML = '<p class="empty">Este hilo no está disponible.</p><div style="margin-top:10px"><button class="btn ghost" data-back-detail="1">Volver atrás</button></div>';
+      el.threadsWrap.innerHTML =
+        '<p class="empty">Este hilo no está disponible.</p><div style="margin-top:10px"><button class="btn ghost" data-back-detail="1">Volver atrás</button></div>';
       const backBtn = el.threadsWrap.querySelector('[data-back-detail]');
       if (backBtn) backBtn.addEventListener('click', goBackFromThreadDetail);
       return;
@@ -1406,10 +1578,11 @@ const renderThreads = () => {
     const accessTagColor = activeThread.accessLevel === 'registered_only' ? '#8f5e3b' : '#4f7a53';
     const accessTagBg = activeThread.accessLevel === 'registered_only' ? '#f3e9de' : '#edf7ee';
 
-    const repliesHtml = threadReplies.map((r) => {
-      const isEditingThis = editingReplyId === r.id;
-      if (isEditingThis) {
-        return `<div class="reply reply-is-editing">
+    const repliesHtml = threadReplies
+      .map((r) => {
+        const isEditingThis = editingReplyId === r.id;
+        if (isEditingThis) {
+          return `<div class="reply reply-is-editing">
           <div class="meta"><span style="font-weight:600;">${escapeHtml(r.authorName || 'Catador')}</span> · ${fmt(r.createdAt)}</div>
           <textarea data-reply-edit-body="${r.id}" maxlength="1000" style="width:100%;min-height:90px;resize:vertical;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;font-family:inherit;background:rgba(255,255,255,.9);color:var(--ink);margin:8px 0;">${escapeHtml(editingReplyDraft)}</textarea>
           <div class="actions-row" style="margin-top:6px;gap:10px;">
@@ -1417,8 +1590,8 @@ const renderThreads = () => {
             <button class="btn ghost" data-reply-cancel-edit="${r.id}" style="font-size:12px;padding:8px 18px;">Cancelar</button>
           </div>
         </div>`;
-      }
-      return `<div class="reply">
+        }
+        return `<div class="reply">
         <div class="meta"><button class="link-btn author-btn" data-author-uid="${escapeHtml(r.authorUid || '')}" data-author-name="${escapeHtml(r.authorName || 'Catador')}" style="font-weight:600;">${escapeHtml(r.authorName || 'Catador')}</button> · ${fmt(r.createdAt)}</div>
         <p>${escapeHtml(r.body || '')}</p>
         <div class="thread-foot">
@@ -1427,19 +1600,23 @@ const renderThreads = () => {
             <span class="muted">${Number(r.upvotes || 0)} votos</span>
           </div>
           <div class="actions-row">
-            ${canManageItem(r)
-              ? `<button class="link-btn" data-reply-edit="${r.id}">Editar</button><button class="link-btn" data-reply-delete="${r.id}">Eliminar</button>`
-              : (auth.token && r.authorUid !== auth.uid
+            ${
+              canManageItem(r)
+                ? `<button class="link-btn" data-reply-edit="${r.id}">Editar</button><button class="link-btn" data-reply-delete="${r.id}">Eliminar</button>`
+                : auth.token && r.authorUid !== auth.uid
                   ? `<button class="link-btn" data-report-reply="${r.id}" style="color:var(--ink-muted);font-size:11px;opacity:0.6;">Reportar</button>`
-                  : '')}
+                  : ''
+            }
           </div>
         </div>
       </div>`;
-    }).join('');
+      })
+      .join('');
 
-    const detailBodyHtml = editingThreadId === activeThread.id
-      ? renderInlineThreadEditor(activeThread)
-      : `<h3 class="thread-detail-title">${escapeHtml(normalizeThreadTitle(activeThread.title || ''))}</h3>
+    const detailBodyHtml =
+      editingThreadId === activeThread.id
+        ? renderInlineThreadEditor(activeThread)
+        : `<h3 class="thread-detail-title">${escapeHtml(normalizeThreadTitle(activeThread.title || ''))}</h3>
         <div class="meta"><button class="link-btn author-btn" data-author-uid="${escapeHtml(activeThread.authorUid || '')}" data-author-name="${escapeHtml(activeThread.authorName || 'Catador')}" style="font-weight:600;">${escapeHtml(activeThread.authorName || 'Catador')}</button> · ${fmt(activeThread.createdAt)} <span class="meta-cat">${escapeHtml(activeThread.categoryLabel || 'General')}</span> <span class="meta-access" style="margin-left:4px;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;background:${accessTagBg};color:${accessTagColor};border:1px solid ${activeThread.accessLevel === 'registered_only' ? '#e2c7a7' : '#b7e2c7'};">${escapeHtml(ACCESS_LABELS[activeThread.accessLevel] || 'Público')}</span> · ${Number(activeThread.upvotes || 0)} votos</div>
         <p>${escapeHtml(activeThread.body || '')}</p>`;
 
@@ -1453,15 +1630,19 @@ const renderThreads = () => {
             <span class="muted">${threadReplies.length} respuestas</span>
             <button class="link-btn" data-copy-thread-link="${activeThread.id}" title="Copiar enlace al hilo">🔗 Copiar enlace</button>
           </div>
-          ${threadCanManage
-            ? `<div class=\"actions-row\"><button class=\"link-btn\" data-thread-edit=\"${activeThread.id}\">Editar</button><button class=\"link-btn\" data-thread-delete=\"${activeThread.id}\">Eliminar</button></div>`
-            : (auth.token && activeThread.authorUid !== auth.uid
+          ${
+            threadCanManage
+              ? `<div class=\"actions-row\"><button class=\"link-btn\" data-thread-edit=\"${activeThread.id}\">Editar</button><button class=\"link-btn\" data-thread-delete=\"${activeThread.id}\">Eliminar</button></div>`
+              : auth.token && activeThread.authorUid !== auth.uid
                 ? `<div class=\"actions-row\"><button class=\"link-btn\" data-report-thread=\"${activeThread.id}\" style=\"color:var(--ink-muted);font-size:11px;opacity:0.6;\">Reportar</button></div>`
-                : '')}
+                : ''
+          }
         </div>
         <div class="reply-box">
           ${repliesHtml || '<p class="muted">Sin respuestas aún.</p>'}
-          ${auth.token ? `
+          ${
+            auth.token
+              ? `
             <div class="reply-composer">
               <textarea data-reply-input="${activeThread.id}" maxlength="1000" placeholder="Escribe tu respuesta..." class="reply-textarea"></textarea>
               <div class="reply-actions">
@@ -1469,11 +1650,13 @@ const renderThreads = () => {
                 <button class="btn primary" data-reply-send="${activeThread.id}">Enviar respuesta</button>
               </div>
             </div>
-          ` : `
+          `
+              : `
             <div class="reply-actions" style="margin-top:16px;">
               <button class="btn ghost" data-back-detail="1">← Volver</button>
             </div>
-          `}
+          `
+          }
         </div>
       </article>
     `;
@@ -1483,9 +1666,9 @@ const renderThreads = () => {
       const categoryLabel = (category && category.label) || 'esta categoría';
       const cta = searchTerm
         ? `No se encontraron hilos para «${searchTerm}» en ninguna categoría.`
-        : (auth.token
+        : auth.token
           ? `Todavía no hay hilos en ${categoryLabel}. Sé la primera voz y escribe el primer post de esta categoría.`
-          : `Todavía no hay hilos en ${categoryLabel}. Inicia sesión y abre el primer post de esta categoría.`);
+          : `Todavía no hay hilos en ${categoryLabel}. Inicia sesión y abre el primer post de esta categoría.`;
       el.threadsWrap.innerHTML = `<p class="empty">${escapeHtml(cta)}</p>`;
       return;
     }
@@ -1513,7 +1696,10 @@ const renderThreads = () => {
 
     const prevDisabled = currentListPage === 1 ? 'disabled' : '';
     const nextDisabled = currentListPage === totalPages ? 'disabled' : '';
-    const pagerHtml = totalPages <= 1 ? '' : `
+    const pagerHtml =
+      totalPages <= 1
+        ? ''
+        : `
       <div class="threads-pager">
         <div class="pager-nav">
           <button class="pager-btn pager-arrow" data-page="1" ${prevDisabled} aria-label="Primera página">«</button>
@@ -1522,27 +1708,30 @@ const renderThreads = () => {
           <button class="pager-btn pager-arrow" data-page="${currentListPage + 1}" ${nextDisabled} aria-label="Página siguiente">›</button>
           <button class="pager-btn pager-arrow" data-page="${totalPages}" ${nextDisabled} aria-label="Última página">»</button>
         </div>
-        <p class="pager-info">${searchTerm ? `${displayList.length} resultado${displayList.length !== 1 ? "s" : ""} en todas las categorías` : `Mostrando temas del ${start + 1} al ${end} de ${displayList.length}`}</p>
+        <p class="pager-info">${searchTerm ? `${displayList.length} resultado${displayList.length !== 1 ? 's' : ''} en todas las categorías` : `Mostrando temas del ${start + 1} al ${end} de ${displayList.length}`}</p>
       </div>
     `;
 
-    el.threadsWrap.innerHTML = `${pagedList.map((t, idx) => {
-    const delay = Math.min(idx * 0.03, 0.21);
-    const threadReplies = replies
-      .filter((r) => r.threadId === t.id)
-      .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    el.threadsWrap.innerHTML = `${pagedList
+      .map((t, idx) => {
+        const delay = Math.min(idx * 0.03, 0.21);
+        const threadReplies = replies
+          .filter((r) => r.threadId === t.id)
+          .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 
-    const threadCanManage = canManageItem(t);
-    const threadVoted = hasUserVote(t);
+        const threadCanManage = canManageItem(t);
+        const threadVoted = hasUserVote(t);
 
-    const accessTagColor = t.accessLevel === 'registered_only' ? '#8f5e3b' : '#4f7a53';
-    const accessTagBg = t.accessLevel === 'registered_only' ? '#f3e9de' : '#edf7ee';
+        const accessTagColor = t.accessLevel === 'registered_only' ? '#8f5e3b' : '#4f7a53';
+        const accessTagBg = t.accessLevel === 'registered_only' ? '#f3e9de' : '#edf7ee';
 
-    const rawBody = String(t.body || '').replace(/\s+/g, ' ').trim();
-    const isLongBody = rawBody.length > 110;
+        const rawBody = String(t.body || '')
+          .replace(/\s+/g, ' ')
+          .trim();
+        const isLongBody = rawBody.length > 110;
 
-    if (editingThreadId === t.id) {
-      return `
+        if (editingThreadId === t.id) {
+          return `
         <article class="thread thread-is-editing" data-thread-id="${t.id}" style="animation-delay:${delay}s">
           <div class="thread-compact-head">
             <span class="thread-edit-chip">Editando</span>
@@ -1551,9 +1740,9 @@ const renderThreads = () => {
           ${renderInlineThreadEditor(t, { compact: true })}
         </article>
       `;
-    }
+        }
 
-    return `
+        return `
       <article class="thread${editingThreadId === t.id ? ' thread-is-editing' : ''}" data-thread-id="${t.id}" style="animation-delay:${delay}s">
         <div class="thread-compact-head">
           ${editingThreadId === t.id ? '<span class="thread-edit-chip">Editando</span>' : ''}
@@ -1574,7 +1763,8 @@ const renderThreads = () => {
         </div>
       </article>
     `;
-  }).join('')}${pagerHtml}`;
+      })
+      .join('')}${pagerHtml}`;
   }
 
   el.threadsWrap.querySelectorAll('[data-vote]').forEach((btn) => {
@@ -1741,9 +1931,10 @@ const renderThreads = () => {
         const sizeMb = (selected.size / (1024 * 1024)).toFixed(2);
         editingThreadDraft.imageFile = selected;
         editingThreadDraft.imageRemoved = false;
-        editingThreadDraft.imageStatus = selected.size > IMAGE_MAX_BYTES
-          ? `Imagen seleccionada (${sizeMb} MB). Se intentará comprimir al guardar.`
-          : `Imagen lista para reemplazar (${sizeMb} MB).`;
+        editingThreadDraft.imageStatus =
+          selected.size > IMAGE_MAX_BYTES
+            ? `Imagen seleccionada (${sizeMb} MB). Se intentará comprimir al guardar.`
+            : `Imagen lista para reemplazar (${sizeMb} MB).`;
         editingThreadDraft.imageStatusKind = selected.size > IMAGE_MAX_BYTES ? '' : 'ok';
         renderThreads();
         window.requestAnimationFrame(() => focusInlineThreadEditor());
@@ -1763,23 +1954,34 @@ const renderThreads = () => {
           await navigator.clipboard.writeText(url);
         } else {
           const ta = document.createElement('textarea');
-          ta.value = url; ta.style.cssText = 'position:fixed;opacity:0;';
-          document.body.appendChild(ta); ta.select();
-          document.execCommand('copy'); ta.remove();
+          ta.value = url;
+          ta.style.cssText = 'position:fixed;opacity:0;';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          ta.remove();
         }
         const orig = btn.textContent;
         btn.textContent = '✓ Enlace copiado';
-        setTimeout(() => { btn.textContent = orig; }, 2000);
-      } catch { btn.textContent = 'No se pudo copiar'; }
+        setTimeout(() => {
+          btn.textContent = orig;
+        }, 2000);
+      } catch {
+        btn.textContent = 'No se pudo copiar';
+      }
     });
   });
 
   // Report buttons
   el.threadsWrap.querySelectorAll('[data-report-thread]').forEach((btn) => {
-    btn.addEventListener('click', () => reportItem('foro_hilos', btn.getAttribute('data-report-thread'), 'hilo'));
+    btn.addEventListener('click', () =>
+      reportItem('foro_hilos', btn.getAttribute('data-report-thread'), 'hilo')
+    );
   });
   el.threadsWrap.querySelectorAll('[data-report-reply]').forEach((btn) => {
-    btn.addEventListener('click', () => reportItem('foro_respuestas', btn.getAttribute('data-report-reply'), 'respuesta'));
+    btn.addEventListener('click', () =>
+      reportItem('foro_respuestas', btn.getAttribute('data-report-reply'), 'respuesta')
+    );
   });
 
   el.threadsWrap.querySelectorAll('[data-reply-save]').forEach((btn) => {
@@ -1791,7 +1993,9 @@ const renderThreads = () => {
   });
 
   el.threadsWrap.querySelectorAll('[data-reply-edit-body]').forEach((ta) => {
-    ta.addEventListener('input', () => { editingReplyDraft = ta.value; });
+    ta.addEventListener('input', () => {
+      editingReplyDraft = ta.value;
+    });
   });
 
   el.threadsWrap.querySelectorAll('[data-reply-edit]').forEach((btn) => {
@@ -1849,14 +2053,18 @@ const renderThreads = () => {
 };
 
 const renderThreadSkeletons = (count = 3) => {
-  el.threadsWrap.innerHTML = Array.from({ length: count }).map(() => `
+  el.threadsWrap.innerHTML = Array.from({ length: count })
+    .map(
+      () => `
     <article class="thread-skeleton" aria-hidden="true">
       <div class="skeleton-line w70"></div>
       <div class="skeleton-line"></div>
       <div class="skeleton-line"></div>
       <div class="skeleton-line w40"></div>
     </article>
-  `).join('');
+  `
+    )
+    .join('');
 };
 
 const loadForum = async () => {
@@ -1875,15 +2083,16 @@ const loadForum = async () => {
     replies = [];
     renderMemberEvolutionCard();
     setStatus(el.threadStatus, 'No se pudo cargar la comunidad.', 'error');
-    el.threadsWrap.innerHTML = '<p class="empty">No se pudieron cargar los hilos en este momento.</p>';
+    el.threadsWrap.innerHTML =
+      '<p class="empty">No se pudieron cargar los hilos en este momento.</p>';
     return;
   }
 
   const h = hRes.value || [];
   const activeThreadId = getActiveThreadId();
 
-  const profiles = pRes.status === 'fulfilled' ? (pRes.value || []) : [];
-  const allReplies = rRes.status === 'fulfilled' ? (rRes.value || []) : [];
+  const profiles = pRes.status === 'fulfilled' ? pRes.value || [] : [];
+  const allReplies = rRes.status === 'fulfilled' ? rRes.value || [] : [];
   const aliasByUid = new Map();
   profiles.forEach((profile) => {
     const safeUid = String(profile.uid || '').trim();
@@ -1904,34 +2113,49 @@ const loadForum = async () => {
     return { ...item, authorName: alias };
   };
 
-
   // Guardamos TODOS los hilos — el acceso al detalle se controla en renderThreads
   threads = h.map((item) => normalizeThread(applyCanonicalAlias(item)));
   const allThreadIds = new Set(threads.map((t) => t.id));
 
-  replies = rRes.status === 'fulfilled'
-    ? (rRes.value || []).filter((reply) => allThreadIds.has(reply.threadId)).map((item) => applyCanonicalAlias(item))
-    : [];
+  replies =
+    rRes.status === 'fulfilled'
+      ? (rRes.value || [])
+          .filter((reply) => allThreadIds.has(reply.threadId))
+          .map((item) => applyCanonicalAlias(item))
+      : [];
 
   // Normalizar y filtrar los hilos visibles para el usuario
   const normalizedVisibleThreads = threads.filter(isThreadVisible);
 
-  const myProfile = profiles.find((profile) => String(profile.uid || '').trim() === auth.uid) || null;
+  const myProfile =
+    profiles.find((profile) => String(profile.uid || '').trim() === auth.uid) || null;
   renderMemberEvolutionCard({
     profile: myProfile,
     allThreads: h.map((item) => applyCanonicalAlias(item)),
     allReplies: allReplies.map((item) => applyCanonicalAlias(item)),
   });
 
-  if (!aliasSyncDone && auth.uid && auth.token && getAuthorName() && getAuthorName() !== 'Catador') {
+  if (
+    !aliasSyncDone &&
+    auth.uid &&
+    auth.token &&
+    getAuthorName() &&
+    getAuthorName() !== 'Catador'
+  ) {
     aliasSyncDone = true;
     const targetAlias = getAuthorName();
     const updateMyName = async (collectionName, items) => {
-      const mine = items.filter((row) => row.authorUid === auth.uid && String(row.authorName || '').trim() !== targetAlias);
-      await Promise.allSettled(mine.map((row) => updateDocument(collectionName, row.id, {
-        authorName: targetAlias,
-        updatedAt: new Date().toISOString(),
-      })));
+      const mine = items.filter(
+        (row) => row.authorUid === auth.uid && String(row.authorName || '').trim() !== targetAlias
+      );
+      await Promise.allSettled(
+        mine.map((row) =>
+          updateDocument(collectionName, row.id, {
+            authorName: targetAlias,
+            updatedAt: new Date().toISOString(),
+          })
+        )
+      );
     };
     await Promise.allSettled([
       updateMyName('foro_hilos', normalizedVisibleThreads),
@@ -1960,34 +2184,58 @@ const getAuthErrorCode = (errorLike) => {
 const mapAuthError = (errorLike) => {
   const code = getAuthErrorCode(errorLike);
   if (code.includes('INVALID_EMAIL')) return 'El email no tiene un formato válido.';
-  if (code.includes('INVALID_LOGIN_CREDENTIALS') || code.includes('EMAIL_NOT_FOUND') || code.includes('INVALID_PASSWORD')) return 'Email o contraseña incorrectos.';
+  if (
+    code.includes('INVALID_LOGIN_CREDENTIALS') ||
+    code.includes('EMAIL_NOT_FOUND') ||
+    code.includes('INVALID_PASSWORD')
+  )
+    return 'Email o contraseña incorrectos.';
   if (code.includes('MISSING_PASSWORD')) return 'Falta la contraseña.';
   if (code.includes('WEAK_PASSWORD')) return 'La contraseña debe tener al menos 6 caracteres.';
   if (code.includes('EMAIL_EXISTS')) return 'Ese email ya está registrado.';
-  if (code.includes('OPERATION_NOT_ALLOWED')) return 'El acceso por email/contraseña no está habilitado en Firebase Auth.';
+  if (code.includes('OPERATION_NOT_ALLOWED'))
+    return 'El acceso por email/contraseña no está habilitado en Firebase Auth.';
   if (code.includes('USER_DISABLED')) return 'Esta cuenta está deshabilitada.';
-  if (code.includes('TOO_MANY_ATTEMPTS_TRY_LATER') || code.includes('HTTP_429')) return 'Demasiados intentos. Prueba otra vez en unos minutos.';
-  if (code.includes('NETWORK') || code.includes('FETCH') || code.includes('FAILED_TO_FETCH')) return 'No hay conexión con Firebase. Revisa tu red o desactiva bloqueadores de privacidad para este sitio.';
-  if (code.includes('REQUEST_BLOCKED') || code.includes('CLIENT') || code.includes('API_KEY') || code.includes('INVALID_KEY_TYPE') || code.includes('HTTP_403')) {
+  if (code.includes('TOO_MANY_ATTEMPTS_TRY_LATER') || code.includes('HTTP_429'))
+    return 'Demasiados intentos. Prueba otra vez en unos minutos.';
+  if (code.includes('NETWORK') || code.includes('FETCH') || code.includes('FAILED_TO_FETCH'))
+    return 'No hay conexión con Firebase. Revisa tu red o desactiva bloqueadores de privacidad para este sitio.';
+  if (
+    code.includes('REQUEST_BLOCKED') ||
+    code.includes('CLIENT') ||
+    code.includes('API_KEY') ||
+    code.includes('INVALID_KEY_TYPE') ||
+    code.includes('HTTP_403')
+  ) {
     return 'Firebase está rechazando la petición de login (API key/restricciones).';
   }
-  if (code.includes('CONFIGURATION_NOT_FOUND') || code.includes('PROJECT_NOT_FOUND')) return 'No se encontró la configuración de autenticación en Firebase para este proyecto.';
+  if (code.includes('CONFIGURATION_NOT_FOUND') || code.includes('PROJECT_NOT_FOUND'))
+    return 'No se encontró la configuración de autenticación en Firebase para este proyecto.';
   return `No se pudo completar la autenticación (${code}).`;
 };
 
 const mapThreadPublishError = (errorLike) => {
   const raw = String((errorLike && errorLike.message) || errorLike || '').toUpperCase();
-  if (raw.includes('UNSUPPORTED_IMAGE_TYPE')) return 'Formato de imagen no compatible. Usa JPG, PNG, WEBP o HEIC.';
-  if (raw.includes('IMAGE_TOO_LARGE_UNCOMPRESSIBLE')) return 'La imagen supera 5MB y no se pudo comprimir automáticamente. Usa una imagen más ligera.';
+  if (raw.includes('UNSUPPORTED_IMAGE_TYPE'))
+    return 'Formato de imagen no compatible. Usa JPG, PNG, WEBP o HEIC.';
+  if (raw.includes('IMAGE_TOO_LARGE_UNCOMPRESSIBLE'))
+    return 'La imagen supera 5MB y no se pudo comprimir automáticamente. Usa una imagen más ligera.';
   if (raw.includes('IMAGE_TOO_LARGE')) return 'La imagen supera el límite de 5MB.';
   if (raw.includes('UNAUTHENTICATED')) return 'La sesión caducó. Vuelve a iniciar sesión.';
-  if (raw.includes('STORAGE_UPLOAD_FAILED_401') || raw.includes('STORAGE_UPLOAD_FAILED_403')) return 'Firebase rechazó la subida (permisos/CORS). Cierra sesión y vuelve a entrar.';
-  if (raw.includes('STORAGE_UPLOAD_FAILED_429')) return 'Demasiados intentos de subida. Prueba otra vez en unos minutos.';
-  if (raw.includes('STORAGE_UPLOAD_FAILED_500') || raw.includes('STORAGE_UPLOAD_FAILED_503')) return 'Firebase Storage no está disponible temporalmente. Inténtalo de nuevo.';
-  if (raw.includes('PERMISSION_DENIED') || raw.includes('UNAUTHORIZED')) return 'No hay permisos para subir imágenes con esta sesión.';
-  if (raw.includes('STORAGE_UPLOAD_FAILED_413')) return 'La imagen es demasiado grande para subirla.';
-  if (raw.includes('NETWORK') || raw.includes('FETCH')) return 'Error de red al subir la imagen. Inténtalo de nuevo.';
-  if (raw.includes('STORAGE_UPLOAD_FAILED_')) return `Falló la subida de imagen (${raw.replace('STORAGE_UPLOAD_FAILED_', 'HTTP ')}).`;
+  if (raw.includes('STORAGE_UPLOAD_FAILED_401') || raw.includes('STORAGE_UPLOAD_FAILED_403'))
+    return 'Firebase rechazó la subida (permisos/CORS). Cierra sesión y vuelve a entrar.';
+  if (raw.includes('STORAGE_UPLOAD_FAILED_429'))
+    return 'Demasiados intentos de subida. Prueba otra vez en unos minutos.';
+  if (raw.includes('STORAGE_UPLOAD_FAILED_500') || raw.includes('STORAGE_UPLOAD_FAILED_503'))
+    return 'Firebase Storage no está disponible temporalmente. Inténtalo de nuevo.';
+  if (raw.includes('PERMISSION_DENIED') || raw.includes('UNAUTHORIZED'))
+    return 'No hay permisos para subir imágenes con esta sesión.';
+  if (raw.includes('STORAGE_UPLOAD_FAILED_413'))
+    return 'La imagen es demasiado grande para subirla.';
+  if (raw.includes('NETWORK') || raw.includes('FETCH'))
+    return 'Error de red al subir la imagen. Inténtalo de nuevo.';
+  if (raw.includes('STORAGE_UPLOAD_FAILED_'))
+    return `Falló la subida de imagen (${raw.replace('STORAGE_UPLOAD_FAILED_', 'HTTP ')}).`;
   return 'No se pudo publicar el hilo. Revisa la imagen e inténtalo otra vez.';
 };
 
@@ -2057,7 +2305,10 @@ const signIn = async (registerMode) => {
     try {
       const lookupRes = await fetch(`${AUTH_URL}:lookup?key=${FIREBASE_API_KEY}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Ios-Bundle-Identifier': FIREBASE_IOS_BUNDLE_ID },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Ios-Bundle-Identifier': FIREBASE_IOS_BUNDLE_ID,
+        },
         body: JSON.stringify({ idToken: json.idToken }),
       });
       const lookupJson = await lookupRes.json();
@@ -2065,23 +2316,32 @@ const signIn = async (registerMode) => {
         auth.emailVerified = lookupJson.users[0].emailVerified === true;
         localStorage.setItem('etiove_web_email_verified', auth.emailVerified ? 'true' : 'false');
       }
-    } catch (_) { /* no bloquear */ }
+    } catch (_) {
+      /* no bloquear */
+    }
 
     // Si es registro nuevo, enviar email de verificación
     if (registerMode) {
       try {
         await fetch(`${AUTH_URL}:sendOobCode?key=${FIREBASE_API_KEY}`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-Ios-Bundle-Identifier': FIREBASE_IOS_BUNDLE_ID },
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Ios-Bundle-Identifier': FIREBASE_IOS_BUNDLE_ID,
+          },
           body: JSON.stringify({ requestType: 'VERIFY_EMAIL', idToken: json.idToken }),
         });
-      } catch (_) { /* no bloquear */ }
+      } catch (_) {
+        /* no bloquear */
+      }
     }
 
     // Resolver alias canónico del perfil para no exponer prefijos de email.
     try {
       await resolveAuthorAlias();
-    } catch (_) { /* no bloquear el login */ }
+    } catch (_) {
+      /* no bloquear el login */
+    }
 
     renderAuthState();
     if (registerMode) {
@@ -2117,7 +2377,8 @@ const createThread = async () => {
   const body = (el.threadBody.value || '').trim();
   const categoryId = el.categorySelect.value;
   const category = FORUM_CATEGORIES.find((c) => c.id === categoryId);
-  const accessLevel = el.threadAccessLevel.value === 'registered_only' ? 'registered_only' : 'public';
+  const accessLevel =
+    el.threadAccessLevel.value === 'registered_only' ? 'registered_only' : 'public';
 
   if (title.length < 3 || body.length < 3) {
     setStatus(el.threadStatus, 'Título y contenido deben tener mínimo 3 caracteres.', 'error');
@@ -2127,7 +2388,8 @@ const createThread = async () => {
   if (!requireOnline()) return;
   await withSubmitGuard('thread', el.createThreadBtn, 'Publicando...', async () => {
     try {
-      const imageFile = el.threadImage.files && el.threadImage.files[0] ? el.threadImage.files[0] : null;
+      const imageFile =
+        el.threadImage.files && el.threadImage.files[0] ? el.threadImage.files[0] : null;
       let imageUrl = '';
       let imageUploadWarning = '';
       if (imageFile) {
@@ -2135,9 +2397,15 @@ const createThread = async () => {
           imageUrl = await uploadImageWithRetry(imageFile, 'foro_hilos', 3);
         } catch (uploadErr) {
           imageUploadWarning = mapThreadPublishError(uploadErr);
-          const shouldContinue = window.confirm(`No se pudo subir la imagen.\n\n${imageUploadWarning}\n\n¿Quieres publicar el hilo sin imagen?`);
+          const shouldContinue = window.confirm(
+            `No se pudo subir la imagen.\n\n${imageUploadWarning}\n\n¿Quieres publicar el hilo sin imagen?`
+          );
           if (!shouldContinue) {
-            setStatus(el.threadStatus, 'Publicación cancelada. Inténtalo de nuevo con otra imagen.', 'error');
+            setStatus(
+              el.threadStatus,
+              'Publicación cancelada. Inténtalo de nuevo con otra imagen.',
+              'error'
+            );
             return;
           }
         }
@@ -2293,7 +2561,8 @@ const saveInlineThreadEdit = async (threadId) => {
   const body = String(editingThreadDraft.body || '').trim();
   const categoryId = String(editingThreadDraft.categoryId || 'general').trim() || 'general';
   const category = FORUM_CATEGORIES.find((c) => c.id === categoryId);
-  const accessLevel = editingThreadDraft.accessLevel === 'registered_only' ? 'registered_only' : 'public';
+  const accessLevel =
+    editingThreadDraft.accessLevel === 'registered_only' ? 'registered_only' : 'public';
 
   if (title.length < 3 || body.length < 3) {
     setStatus(el.threadStatus, 'Título y contenido deben tener mínimo 3 caracteres.', 'error');
@@ -2342,8 +2611,17 @@ const saveInlineThreadEdit = async (threadId) => {
 
     setStatus(el.threadStatus, `Cambios guardados en "${title}".`, 'ok');
     resetInlineThreadEdit({ preserveStatus: true, rerender: false });
-    applyLocalUpdate({ updateThread: { id: threadId, title, body, categoryId,
-      categoryLabel: category ? category.label : 'General', image, accessLevel } });
+    applyLocalUpdate({
+      updateThread: {
+        id: threadId,
+        title,
+        body,
+        categoryId,
+        categoryLabel: category ? category.label : 'General',
+        image,
+        accessLevel,
+      },
+    });
   });
 };
 
@@ -2357,19 +2635,22 @@ const deleteThread = async (threadId) => {
     danger: true,
     onConfirm: async () => {
       const relatedReplies = replies.filter((reply) => reply.threadId === threadId);
-  const replyResults = await Promise.allSettled(relatedReplies.map((reply) => deleteDocument('foro_respuestas', reply.id)));
-  if (replyResults.some((result) => result.status === 'rejected' || !result.value)) {
-    setStatus(el.threadStatus, 'No se pudieron borrar todas las respuestas del hilo.', 'error');
-    return;
-  }
+      const replyResults = await Promise.allSettled(
+        relatedReplies.map((reply) => deleteDocument('foro_respuestas', reply.id))
+      );
+      if (replyResults.some((result) => result.status === 'rejected' || !result.value)) {
+        setStatus(el.threadStatus, 'No se pudieron borrar todas las respuestas del hilo.', 'error');
+        return;
+      }
 
-  const ok = await deleteDocument('foro_hilos', threadId);
-  if (!ok) {
-    setStatus(el.threadStatus, 'No se pudo borrar el hilo.', 'error');
-    return;
-  }
+      const ok = await deleteDocument('foro_hilos', threadId);
+      if (!ok) {
+        setStatus(el.threadStatus, 'No se pudo borrar el hilo.', 'error');
+        return;
+      }
 
-  if (editingThreadId === threadId) resetInlineThreadEdit({ preserveStatus: true, rerender: false });
+      if (editingThreadId === threadId)
+        resetInlineThreadEdit({ preserveStatus: true, rerender: false });
       setStatus(el.threadStatus, 'Hilo eliminado.', 'ok');
       if (getActiveThreadId() === threadId) {
         applyLocalUpdate({ removeThreadId: threadId });
@@ -2389,8 +2670,13 @@ const editReply = (replyId) => {
   renderThreads();
   // Focus the textarea after render
   window.requestAnimationFrame(() => {
-    const ta = el.threadsWrap && el.threadsWrap.querySelector(`[data-reply-edit-body="${replyId}"]`);
-    if (ta) { ta.focus(); const end = ta.value.length; ta.setSelectionRange(end, end); }
+    const ta =
+      el.threadsWrap && el.threadsWrap.querySelector(`[data-reply-edit-body="${replyId}"]`);
+    if (ta) {
+      ta.focus();
+      const end = ta.value.length;
+      ta.setSelectionRange(end, end);
+    }
   });
 };
 
@@ -2441,10 +2727,10 @@ const deleteReply = async (replyId) => {
     danger: true,
     onConfirm: async () => {
       const ok = await deleteDocument('foro_respuestas', replyId);
-  if (!ok) {
-    setStatus(el.threadStatus, 'No se pudo borrar la respuesta.', 'error');
-    return;
-  }
+      if (!ok) {
+        setStatus(el.threadStatus, 'No se pudo borrar la respuesta.', 'error');
+        return;
+      }
 
       setStatus(el.threadStatus, 'Respuesta eliminada.', 'ok');
       applyLocalUpdate({ removeReplyId: replyId });
@@ -2520,18 +2806,26 @@ const showProfileGate = () => {
       <button class="thread-gate-back" id="profileGateBack">← Volver a los hilos</button>
     </div>`;
   const actionBtn = el.threadsWrap.querySelector('#profileGateAction');
-  const backBtn   = el.threadsWrap.querySelector('#profileGateBack');
-  if (backBtn) backBtn.addEventListener('click', () => {
-    goToThreadList({ replace: false, restoreScroll: false, scrollToThreadId: activeThreadId || null });
-  });
-  if (actionBtn) actionBtn.addEventListener('click', () => {
-    const loginSection = document.querySelector('.login-section');
-    if (loginSection) { loginSection.style.display = ''; loginSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-    const emailInput = document.getElementById('email');
-    if (emailInput) setTimeout(() => emailInput.focus(), 400);
-  });
+  const backBtn = el.threadsWrap.querySelector('#profileGateBack');
+  if (backBtn)
+    backBtn.addEventListener('click', () => {
+      goToThreadList({
+        replace: false,
+        restoreScroll: false,
+        scrollToThreadId: activeThreadId || null,
+      });
+    });
+  if (actionBtn)
+    actionBtn.addEventListener('click', () => {
+      const loginSection = document.querySelector('.login-section');
+      if (loginSection) {
+        loginSection.style.display = '';
+        loginSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      const emailInput = document.getElementById('email');
+      if (emailInput) setTimeout(() => emailInput.focus(), 400);
+    });
 };
-
 
 const showPrivateThreadGate = (thread) => {
   const isPrivate = thread && thread.accessLevel === 'registered_only';
@@ -2540,23 +2834,29 @@ const showPrivateThreadGate = (thread) => {
   el.threadsWrap.innerHTML = `
     <div class="thread-gate ${isPrivate ? 'private' : 'public'}">
       <div class="thread-gate-icon">${isPrivate ? '🔒' : '📖'}</div>
-      <h3 class="thread-gate-title">${isPrivate ? 'Hilo privado' : escapeHtml(thread && thread.title || '')}</h3>
-      <p class="thread-gate-text">${isPrivate
-        ? 'Este hilo es exclusivo para miembros registrados. Crea tu cuenta gratis o inicia sesión para leerlo.'
-        : 'Este es un hilo público. Puedes leerlo sin registro.'}</p>
+      <h3 class="thread-gate-title">${isPrivate ? 'Hilo privado' : escapeHtml((thread && thread.title) || '')}</h3>
+      <p class="thread-gate-text">${
+        isPrivate
+          ? 'Este hilo es exclusivo para miembros registrados. Crea tu cuenta gratis o inicia sesión para leerlo.'
+          : 'Este es un hilo público. Puedes leerlo sin registro.'
+      }</p>
       <button class="thread-gate-btn" id="threadGateAction">${isPrivate ? 'Crear cuenta · Es gratis' : 'Leer hilo'}</button>
       <button class="thread-gate-back" id="threadGateBack">← Volver a los hilos</button>
     </div>`;
   const actionBtn = el.threadsWrap.querySelector('#threadGateAction');
   const backBtn = el.threadsWrap.querySelector('#threadGateBack');
-  if (backBtn) backBtn.addEventListener('click', () => {
-    goToThreadList({ replace: false, restoreScroll: false, scrollToThreadId: threadId || null });
-  });
+  if (backBtn)
+    backBtn.addEventListener('click', () => {
+      goToThreadList({ replace: false, restoreScroll: false, scrollToThreadId: threadId || null });
+    });
   if (actionBtn) {
     if (isPrivate) {
       actionBtn.addEventListener('click', () => {
         const loginSection = document.querySelector('.login-section');
-        if (loginSection) { loginSection.style.display = ''; loginSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        if (loginSection) {
+          loginSection.style.display = '';
+          loginSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
         const emailInput = document.getElementById('email');
         if (emailInput) emailInput.focus();
       });
@@ -2568,20 +2868,16 @@ const showPrivateThreadGate = (thread) => {
   }
 };
 
-
 // ─── TOKEN REFRESH ────────────────────────────────────────────────────────────
 const refreshFirebaseToken = async () => {
   const refreshToken = localStorage.getItem('etiove_web_refresh_token');
   if (!refreshToken) return;
   try {
-    const res = await fetch(
-      `https://securetoken.googleapis.com/v1/token?key=${FIREBASE_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: `grant_type=refresh_token&refresh_token=${encodeURIComponent(refreshToken)}`,
-      }
-    );
+    const res = await fetch(`https://securetoken.googleapis.com/v1/token?key=${FIREBASE_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `grant_type=refresh_token&refresh_token=${encodeURIComponent(refreshToken)}`,
+    });
     if (!res.ok) {
       // Token inválido o revocado → mostrar banner y limpiar sesión
       showSessionExpiredBanner();
@@ -2592,12 +2888,14 @@ const refreshFirebaseToken = async () => {
     const json = await res.json();
     if (json.id_token && json.user_id) {
       auth.token = json.id_token;
-      auth.uid   = json.user_id;
+      auth.uid = json.user_id;
       localStorage.setItem('etiove_web_token', json.id_token);
-      localStorage.setItem('etiove_web_uid',   json.user_id);
+      localStorage.setItem('etiove_web_uid', json.user_id);
       if (json.refresh_token) localStorage.setItem('etiove_web_refresh_token', json.refresh_token);
     }
-  } catch (_) { /* red caída — no limpiar sesión */ }
+  } catch (_) {
+    /* red caída — no limpiar sesión */
+  }
 };
 
 // ─── BANNER SESIÓN CADUCADA ───────────────────────────────────────────────────
@@ -2633,7 +2931,10 @@ const showSessionExpiredBanner = () => {
   document.getElementById('sessionExpiredLogin').onclick = () => {
     banner.remove();
     const loginSection = document.querySelector('.login-section');
-    if (loginSection) { loginSection.style.display = ''; loginSection.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    if (loginSection) {
+      loginSection.style.display = '';
+      loginSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
     const emailInput = document.getElementById('email');
     if (emailInput) setTimeout(() => emailInput.focus(), 400);
   };
@@ -2652,29 +2953,33 @@ const checkNotifications = async () => {
       getCollection('direct_messages', 200),
     ]);
 
-    const myAlias   = String(localStorage.getItem('etiove_web_alias') || '').toLowerCase().replace(/^@/, '');
+    const myAlias = String(localStorage.getItem('etiove_web_alias') || '')
+      .toLowerCase()
+      .replace(/^@/, '');
 
     // 1. Respuestas nuevas en mis hilos
     const myThreadIds = new Set(threads.filter((t) => t.authorUid === auth.uid).map((t) => t.id));
-    const newRepliesInMyThreads = allReplies.filter((r) =>
-      r.authorUid !== auth.uid &&
-      myThreadIds.has(r.threadId) &&
-      new Date(r.createdAt).getTime() > lastCheck
+    const newRepliesInMyThreads = allReplies.filter(
+      (r) =>
+        r.authorUid !== auth.uid &&
+        myThreadIds.has(r.threadId) &&
+        new Date(r.createdAt).getTime() > lastCheck
     ).length;
 
     // 2. Menciones @alias en respuestas y títulos
     const mentionPattern = myAlias ? new RegExp(`@${myAlias}\b`, 'i') : null;
-    const newMentions = mentionPattern ? allReplies.filter((r) =>
-      r.authorUid !== auth.uid &&
-      new Date(r.createdAt).getTime() > lastCheck &&
-      (mentionPattern.test(r.body || '') || mentionPattern.test(r.title || ''))
-    ).length : 0;
+    const newMentions = mentionPattern
+      ? allReplies.filter(
+          (r) =>
+            r.authorUid !== auth.uid &&
+            new Date(r.createdAt).getTime() > lastCheck &&
+            (mentionPattern.test(r.body || '') || mentionPattern.test(r.title || ''))
+        ).length
+      : 0;
 
     // 3. Mensajes directos no leídos
-    const newDMs = allMessages.filter((m) =>
-      m.recipientUid === auth.uid &&
-      !m.read &&
-      new Date(m.createdAt).getTime() > lastCheck
+    const newDMs = allMessages.filter(
+      (m) => m.recipientUid === auth.uid && !m.read && new Date(m.createdAt).getTime() > lastCheck
     ).length;
 
     const total = newRepliesInMyThreads + newMentions + newDMs;
@@ -2684,9 +2989,13 @@ const checkNotifications = async () => {
       badge.textContent = total > 9 ? '9+' : String(total);
       badge.style.display = 'inline-flex';
       const parts = [];
-      if (newRepliesInMyThreads) parts.push(`${newRepliesInMyThreads} respuesta${newRepliesInMyThreads > 1 ? 's' : ''} en tus hilos`);
+      if (newRepliesInMyThreads)
+        parts.push(
+          `${newRepliesInMyThreads} respuesta${newRepliesInMyThreads > 1 ? 's' : ''} en tus hilos`
+        );
       if (newMentions) parts.push(`${newMentions} mención${newMentions > 1 ? 'es' : ''}`);
-      if (newDMs) parts.push(`${newDMs} mensaje${newDMs > 1 ? 's' : ''} directo${newDMs > 1 ? 's' : ''}`);
+      if (newDMs)
+        parts.push(`${newDMs} mensaje${newDMs > 1 ? 's' : ''} directo${newDMs > 1 ? 's' : ''}`);
       badge.title = parts.join(' · ');
     } else {
       badge.style.display = 'none';
@@ -2694,7 +3003,9 @@ const checkNotifications = async () => {
     }
 
     localStorage.setItem('etiove_notif_last_check', String(Date.now()));
-  } catch (_) { /* silencioso */ }
+  } catch (_) {
+    /* silencioso */
+  }
 };
 
 // ─── DRAFT DEL COMPOSER ──────────────────────────────────────────────────────
@@ -2705,8 +3016,8 @@ const saveDraft = () => {
   try {
     const draft = {
       title: el.threadTitle ? el.threadTitle.value : '',
-      body:  el.threadBody  ? el.threadBody.value  : '',
-      categoryId:  el.categorySelect    ? el.categorySelect.value    : 'general',
+      body: el.threadBody ? el.threadBody.value : '',
+      categoryId: el.categorySelect ? el.categorySelect.value : 'general',
       accessLevel: el.threadAccessLevel ? el.threadAccessLevel.value : 'public',
     };
     if (draft.title.trim() || draft.body.trim()) {
@@ -2725,29 +3036,48 @@ const restoreDraft = () => {
     const draft = JSON.parse(raw);
     if (!draft) return;
     if (draft.title && el.threadTitle && !el.threadTitle.value) el.threadTitle.value = draft.title;
-    if (draft.body  && el.threadBody  && !el.threadBody.value)  el.threadBody.value  = draft.body;
-    if (draft.categoryId  && el.categorySelect)    el.categorySelect.value    = draft.categoryId;
+    if (draft.body && el.threadBody && !el.threadBody.value) el.threadBody.value = draft.body;
+    if (draft.categoryId && el.categorySelect) el.categorySelect.value = draft.categoryId;
     if (draft.accessLevel && el.threadAccessLevel) el.threadAccessLevel.value = draft.accessLevel;
     const notice = document.getElementById('draftRestoredNotice');
-    if (notice) { notice.style.display = 'block'; setTimeout(() => { notice.style.display = 'none'; }, 4000); }
+    if (notice) {
+      notice.style.display = 'block';
+      setTimeout(() => {
+        notice.style.display = 'none';
+      }, 4000);
+    }
   } catch (_) {}
 };
 
 const clearDraft = () => {
-  try { localStorage.removeItem(DRAFT_KEY); } catch (_) {}
+  try {
+    localStorage.removeItem(DRAFT_KEY);
+  } catch (_) {}
 };
 
 // ─── MODAL DE CONFIRMACIÓN (reemplaza window.confirm) ────────────────────────
-const showConfirmModal = ({ title, message, confirmLabel = 'Confirmar', danger = false, onConfirm }) => {
+const showConfirmModal = ({
+  title,
+  message,
+  confirmLabel = 'Confirmar',
+  danger = false,
+  onConfirm,
+}) => {
   const existing = document.getElementById('etioveConfirmModal');
   if (existing) existing.remove();
 
   const overlay = document.createElement('div');
   overlay.id = 'etioveConfirmModal';
   overlay.style.cssText = [
-    'position:fixed', 'inset:0', 'z-index:10001',
-    'background:rgba(28,18,13,0.52)', 'backdrop-filter:blur(4px)',
-    'display:flex', 'align-items:center', 'justify-content:center', 'padding:24px',
+    'position:fixed',
+    'inset:0',
+    'z-index:10001',
+    'background:rgba(28,18,13,0.52)',
+    'backdrop-filter:blur(4px)',
+    'display:flex',
+    'align-items:center',
+    'justify-content:center',
+    'padding:24px',
   ].join(';');
 
   const confirmColor = danger ? '#a44f45' : 'var(--accent-deep, #5f3a25)';
@@ -2773,32 +3103,55 @@ const showConfirmModal = ({ title, message, confirmLabel = 'Confirmar', danger =
 
   const close = () => overlay.remove();
   overlay.querySelector('#etioveConfirmCancel').onclick = close;
-  overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) close();
+  });
 
   // Focus trap — keep focus inside modal
   const focusables = overlay.querySelectorAll('button');
   const firstF = focusables[0];
-  const lastF  = focusables[focusables.length - 1];
-  setTimeout(() => { if (lastF) lastF.focus(); }, 0);
+  const lastF = focusables[focusables.length - 1];
+  setTimeout(() => {
+    if (lastF) lastF.focus();
+  }, 0);
   overlay.addEventListener('keydown', (e) => {
     if (e.key !== 'Tab') return;
     if (e.shiftKey) {
-      if (document.activeElement === firstF) { e.preventDefault(); lastF.focus(); }
+      if (document.activeElement === firstF) {
+        e.preventDefault();
+        lastF.focus();
+      }
     } else {
-      if (document.activeElement === lastF) { e.preventDefault(); firstF.focus(); }
+      if (document.activeElement === lastF) {
+        e.preventDefault();
+        firstF.focus();
+      }
     }
   });
 
   document.addEventListener('keydown', function esc(e) {
-    if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); }
+    if (e.key === 'Escape') {
+      close();
+      document.removeEventListener('keydown', esc);
+    }
   });
-  overlay.querySelector('#etioveConfirmOk').onclick = () => { close(); onConfirm(); };
+  overlay.querySelector('#etioveConfirmOk').onclick = () => {
+    close();
+    onConfirm();
+  };
 };
 
 // ─── ACTUALIZACIÓN LOCAL DE ESTADO (evita recargar todo el foro) ─────────────
 // Después de operaciones que ya conocemos el resultado, actualizamos el estado
 // local y re-renderizamos sin ir a Firestore.
-const applyLocalUpdate = ({ addThread, removeThreadId, addReply, removeReplyId, updateThread, updateReply } = {}) => {
+const applyLocalUpdate = ({
+  addThread,
+  removeThreadId,
+  addReply,
+  removeReplyId,
+  updateThread,
+  updateReply,
+} = {}) => {
   if (addThread) {
     threads = [normalizeThread(addThread), ...threads];
   }
@@ -2816,10 +3169,10 @@ const applyLocalUpdate = ({ addThread, removeThreadId, addReply, removeReplyId, 
     replies = replies.filter((r) => r.id !== removeReplyId);
   }
   if (updateThread) {
-    threads = threads.map((t) => t.id === updateThread.id ? { ...t, ...updateThread } : t);
+    threads = threads.map((t) => (t.id === updateThread.id ? { ...t, ...updateThread } : t));
   }
   if (updateReply) {
-    replies = replies.map((r) => r.id === updateReply.id ? { ...r, ...updateReply } : r);
+    replies = replies.map((r) => (r.id === updateReply.id ? { ...r, ...updateReply } : r));
   }
   renderThreads();
 };
@@ -2832,9 +3185,10 @@ const reportItem = async (collection, itemId, itemType) => {
   }
 
   // Find the item in local state
-  const item = collection === 'foro_hilos'
-    ? threads.find((t) => t.id === itemId)
-    : replies.find((r) => r.id === itemId);
+  const item =
+    collection === 'foro_hilos'
+      ? threads.find((t) => t.id === itemId)
+      : replies.find((r) => r.id === itemId);
   if (!item) return;
 
   // Prevent self-report
@@ -2844,7 +3198,12 @@ const reportItem = async (collection, itemId, itemType) => {
   }
 
   // Check if already reported
-  const reporters = new Set(String(item.reporterUids || '').split(',').map(s => s.trim()).filter(Boolean));
+  const reporters = new Set(
+    String(item.reporterUids || '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+  );
   if (reporters.has(auth.uid)) {
     setStatus(el.threadStatus, 'Ya has reportado este contenido.', 'error');
     return;
@@ -2862,15 +3221,21 @@ const reportItem = async (collection, itemId, itemType) => {
         reportedCount: newCount,
         reporterUids: Array.from(reporters).join(','),
       });
-      if (!ok) { setStatus(el.threadStatus, 'No se pudo enviar el reporte.', 'error'); return; }
+      if (!ok) {
+        setStatus(el.threadStatus, 'No se pudo enviar el reporte.', 'error');
+        return;
+      }
       item.reportedCount = newCount;
-      item.reporterUids  = Array.from(reporters).join(',');
-      setStatus(el.threadStatus, 'Reporte enviado. Gracias por ayudar a mantener la comunidad.', 'ok');
+      item.reporterUids = Array.from(reporters).join(',');
+      setStatus(
+        el.threadStatus,
+        'Reporte enviado. Gracias por ayudar a mantener la comunidad.',
+        'ok'
+      );
       renderThreads();
     },
   });
 };
-
 
 // ─── MENCIONES @USUARIO (autocomplete) ────────────────────────────────────────
 const initMentionAutocomplete = (textarea) => {
@@ -2881,7 +3246,10 @@ const initMentionAutocomplete = (textarea) => {
   let mentionStart = -1;
 
   const closeDropdown = () => {
-    if (dropdown) { dropdown.remove(); dropdown = null; }
+    if (dropdown) {
+      dropdown.remove();
+      dropdown = null;
+    }
     mentionStart = -1;
   };
 
@@ -2891,35 +3259,45 @@ const initMentionAutocomplete = (textarea) => {
 
     dropdown = document.createElement('div');
     dropdown.style.cssText = [
-      'position:fixed', 'z-index:9999',
-      'background:#fffaf5', 'border:1px solid #e4d3c2',
-      'border-radius:8px', 'box-shadow:0 8px 24px rgba(28,18,13,0.12)',
-      'max-height:200px', 'overflow-y:auto',
-      'min-width:200px', 'font-family:-apple-system,sans-serif',
+      'position:fixed',
+      'z-index:9999',
+      'background:#fffaf5',
+      'border:1px solid #e4d3c2',
+      'border-radius:8px',
+      'box-shadow:0 8px 24px rgba(28,18,13,0.12)',
+      'max-height:200px',
+      'overflow-y:auto',
+      'min-width:200px',
+      'font-family:-apple-system,sans-serif',
     ].join(';');
 
     // Position below the textarea cursor
     const rect = textarea.getBoundingClientRect();
-    dropdown.style.top  = (rect.bottom + 4) + 'px';
-    dropdown.style.left = (rect.left) + 'px';
+    dropdown.style.top = rect.bottom + 4 + 'px';
+    dropdown.style.left = rect.left + 'px';
 
     matches.slice(0, 6).forEach((user) => {
       const item = document.createElement('div');
-      item.style.cssText = 'padding:10px 14px;cursor:pointer;font-size:13px;color:#1c120d;display:flex;align-items:center;gap:8px;';
+      item.style.cssText =
+        'padding:10px 14px;cursor:pointer;font-size:13px;color:#1c120d;display:flex;align-items:center;gap:8px;';
       item.innerHTML = `<span style="color:#9a7963;font-size:11px;">@</span><strong>${escapeHtml(user.alias || user.name)}</strong><span style="color:#9a7963;font-size:11px;margin-left:4px;">${escapeHtml(user.name)}</span>`;
       item.addEventListener('mousedown', (e) => {
         e.preventDefault();
         const val = textarea.value;
         const before = val.slice(0, mentionStart);
-        const after  = val.slice(textarea.selectionStart);
+        const after = val.slice(textarea.selectionStart);
         const insert = `@${user.alias || user.name} `;
         textarea.value = before + insert + after;
         textarea.selectionStart = textarea.selectionEnd = before.length + insert.length;
         textarea.dispatchEvent(new Event('input'));
         closeDropdown();
       });
-      item.addEventListener('mouseover', () => { item.style.background = '#f6efe7'; });
-      item.addEventListener('mouseout',  () => { item.style.background = ''; });
+      item.addEventListener('mouseover', () => {
+        item.style.background = '#f6efe7';
+      });
+      item.addEventListener('mouseout', () => {
+        item.style.background = '';
+      });
       dropdown.appendChild(item);
     });
 
@@ -2932,22 +3310,30 @@ const initMentionAutocomplete = (textarea) => {
     // Find the @ before the cursor
     let i = cur - 1;
     while (i >= 0 && val[i] !== ' ' && val[i] !== '\n' && val[i] !== '@') i--;
-    if (i < 0 || val[i] !== '@') { closeDropdown(); return; }
+    if (i < 0 || val[i] !== '@') {
+      closeDropdown();
+      return;
+    }
     mentionStart = i;
     const query = val.slice(i + 1, cur).toLowerCase();
-    if (!query) { closeDropdown(); return; }
+    if (!query) {
+      closeDropdown();
+      return;
+    }
 
     // Search in loaded profiles
     const matches = profiles
       .map((p) => ({
-        uid:   p.uid || '',
-        name:  String(p.displayName || p.alias || '').trim(),
-        alias: String(p.alias || '').replace(/^@/, '').trim(),
+        uid: p.uid || '',
+        name: String(p.displayName || p.alias || '').trim(),
+        alias: String(p.alias || '')
+          .replace(/^@/, '')
+          .trim(),
       }))
-      .filter((u) => u.name && (
-        u.name.toLowerCase().includes(query) ||
-        u.alias.toLowerCase().includes(query)
-      ));
+      .filter(
+        (u) =>
+          u.name && (u.name.toLowerCase().includes(query) || u.alias.toLowerCase().includes(query))
+      );
 
     buildDropdown(matches);
   });
@@ -2959,13 +3345,13 @@ const initMentionAutocomplete = (textarea) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
       const next = active ? active.nextElementSibling : items[0];
-      if (active) active.classList.remove('mention-active'), active.style.background = '';
-      if (next) next.classList.add('mention-active'), next.style.background = '#f6efe7';
+      if (active) (active.classList.remove('mention-active'), (active.style.background = ''));
+      if (next) (next.classList.add('mention-active'), (next.style.background = '#f6efe7'));
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       const prev = active ? active.previousElementSibling : items[items.length - 1];
-      if (active) active.classList.remove('mention-active'), active.style.background = '';
-      if (prev) prev.classList.add('mention-active'), prev.style.background = '#f6efe7';
+      if (active) (active.classList.remove('mention-active'), (active.style.background = ''));
+      if (prev) (prev.classList.add('mention-active'), (prev.style.background = '#f6efe7'));
     } else if (e.key === 'Enter' || e.key === 'Tab') {
       if (active) {
         e.preventDefault();
@@ -3029,8 +3415,8 @@ const init = async () => {
 
   // ─── DRAFT AUTO-SAVE ──────────────────────────────────────────────────────
   if (el.threadTitle) el.threadTitle.addEventListener('input', saveDraft);
-  if (el.threadBody)  el.threadBody.addEventListener('input',  saveDraft);
-  if (el.categorySelect)    el.categorySelect.addEventListener('change',    saveDraft);
+  if (el.threadBody) el.threadBody.addEventListener('input', saveDraft);
+  if (el.categorySelect) el.categorySelect.addEventListener('change', saveDraft);
   if (el.threadAccessLevel) el.threadAccessLevel.addEventListener('change', saveDraft);
 
   el.loginBtn.addEventListener('click', () => signIn(false));
@@ -3044,7 +3430,8 @@ const init = async () => {
   }
   // No normalizar el título mientras escribe — se normaliza al guardar
   el.threadImage.addEventListener('change', () => {
-    const selected = el.threadImage.files && el.threadImage.files[0] ? el.threadImage.files[0] : null;
+    const selected =
+      el.threadImage.files && el.threadImage.files[0] ? el.threadImage.files[0] : null;
     // Remove previous preview if exists
     let preview = document.getElementById('threadImagePreview');
     if (preview) preview.remove();
@@ -3062,7 +3449,10 @@ const init = async () => {
 
     const sizeMb = (selected.size / (1024 * 1024)).toFixed(2);
     if (selected.size > IMAGE_MAX_BYTES) {
-      setThreadImageStatus(`Imagen seleccionada (${sizeMb} MB). Se intentará comprimir al publicar.`, '');
+      setThreadImageStatus(
+        `Imagen seleccionada (${sizeMb} MB). Se intentará comprimir al publicar.`,
+        ''
+      );
       return;
     }
 
@@ -3070,7 +3460,7 @@ const init = async () => {
 
     // Show image preview
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = function (e) {
       const img = document.createElement('img');
       img.id = 'threadImagePreview';
       img.src = e.target.result;
@@ -3095,13 +3485,15 @@ const init = async () => {
     if (!counter) {
       counter = document.createElement('span');
       counter.id = counterId;
-      counter.style.cssText = 'font-size:11px;color:var(--ink-muted);float:right;margin-top:3px;font-family:-apple-system,sans-serif;transition:color 0.2s;';
+      counter.style.cssText =
+        'font-size:11px;color:var(--ink-muted);float:right;margin-top:3px;font-family:-apple-system,sans-serif;transition:color 0.2s;';
       inputEl.parentNode.appendChild(counter);
     }
     const update = () => {
       const remaining = maxLen - inputEl.value.length;
       counter.textContent = `${inputEl.value.length} / ${maxLen}`;
-      counter.style.color = remaining <= 20 ? 'var(--danger)' : remaining <= 50 ? '#b07a52' : 'var(--ink-muted)';
+      counter.style.color =
+        remaining <= 20 ? 'var(--danger)' : remaining <= 50 ? '#b07a52' : 'var(--ink-muted)';
     };
     inputEl.addEventListener('input', update);
     update();
@@ -3121,16 +3513,26 @@ const init = async () => {
   const closeBtn = document.getElementById('profileModalClose');
   if (closeBtn) closeBtn.addEventListener('click', closeProfileModal);
   const modal = document.getElementById('profileModal');
-  if (modal) modal.addEventListener('click', (e) => { if (e.target === modal) closeProfileModal(); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeProfileModal(); });
+  if (modal)
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeProfileModal();
+    });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeProfileModal();
+  });
 
   window.addEventListener('popstate', () => {
-    transitionThreadsView(() => renderThreads(), () => {
-      if (!getActiveThreadId()) {
-        const scrollY = Number((window.history.state && window.history.state.communityScrollY) || 0);
-        window.scrollTo({ top: scrollY, behavior: 'auto' });
+    transitionThreadsView(
+      () => renderThreads(),
+      () => {
+        if (!getActiveThreadId()) {
+          const scrollY = Number(
+            (window.history.state && window.history.state.communityScrollY) || 0
+          );
+          window.scrollTo({ top: scrollY, behavior: 'auto' });
+        }
       }
-    });
+    );
   });
 
   await loadForum();
@@ -3141,7 +3543,10 @@ const init = async () => {
       resolveAuthorAlias().catch(() => {});
       fetch(`${AUTH_URL}:lookup?key=${FIREBASE_API_KEY}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Ios-Bundle-Identifier': FIREBASE_IOS_BUNDLE_ID },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Ios-Bundle-Identifier': FIREBASE_IOS_BUNDLE_ID,
+        },
         body: JSON.stringify({ idToken: auth.token }),
       })
         .then((r) => r.json())
@@ -3182,8 +3587,11 @@ const init = async () => {
 init();
 
 // Refresca el token cada 55 minutos mientras la página está abierta
-setInterval(async () => {
-  if (auth.token && localStorage.getItem('etiove_web_refresh_token')) {
-    await refreshFirebaseToken();
-  }
-}, 55 * 60 * 1000);
+setInterval(
+  async () => {
+    if (auth.token && localStorage.getItem('etiove_web_refresh_token')) {
+      await refreshFirebaseToken();
+    }
+  },
+  55 * 60 * 1000
+);

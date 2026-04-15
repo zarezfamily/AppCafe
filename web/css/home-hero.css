@@ -19,27 +19,37 @@
   z-index: 1;
 }
 .aura-1 {
-  width: 600px; height: 600px;
-  top: -100px; right: -150px;
+  width: 600px;
+  height: 600px;
+  top: -100px;
+  right: -150px;
   background: radial-gradient(circle, rgba(143, 94, 59, 0.08) 0%, transparent 70%);
   animation: drift 12s ease-in-out infinite alternate;
 }
 .aura-2 {
-  width: 500px; height: 500px;
-  bottom: -100px; left: -100px;
+  width: 500px;
+  height: 500px;
+  bottom: -100px;
+  left: -100px;
   background: radial-gradient(circle, rgba(93, 64, 48, 0.06) 0%, transparent 70%);
   animation: drift 15s ease-in-out infinite alternate-reverse;
 }
 .aura-3 {
-  width: 300px; height: 300px;
-  top: 40%; left: 50%;
+  width: 300px;
+  height: 300px;
+  top: 40%;
+  left: 50%;
   transform: translate(-50%, -50%);
   background: radial-gradient(circle, rgba(255, 248, 241, 0.4) 0%, transparent 70%);
 }
 
 @keyframes drift {
-  from { transform: translate(0, 0) scale(1); }
-  to   { transform: translate(20px, -20px) scale(1.05); }
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(20px, -20px) scale(1.05);
+  }
 }
 
 .hero-seal {
@@ -53,23 +63,32 @@
 }
 
 .seal-ring {
-  width: 56px; height: 56px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   border: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: var(--cream-alt);
 }
 .seal-ring-inner {
-  width: 42px; height: 42px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   border: 1px solid rgba(154, 121, 99, 0.4);
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .seal-ring-core {
-  width: 30px; height: 30px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   border: 1px solid var(--accent);
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: #f2e7dc;
 }
 .seal-text {
@@ -114,7 +133,7 @@
   position: relative;
   z-index: 2;
   text-transform: uppercase;
-  color: rgba(246,239,231,0.80);
+  color: rgba(246, 239, 231, 0.8);
   letter-spacing: 4px;
   margin-bottom: 48px;
   animation: fadeUp 1s 0.3s ease both;
@@ -142,14 +161,16 @@
   max-width: 300px;
   animation: fadeUp 1s 0.4s ease both;
 }
-.divider-line::before, .divider-line::after {
+.divider-line::before,
+.divider-line::after {
   content: '';
   flex: 1;
   height: 1px;
   background: var(--border);
 }
 .divider-dot {
-  width: 5px; height: 5px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background: var(--accent);
 }
@@ -176,32 +197,33 @@
 }
 
 .btn-download.dark {
-  background: rgba(255,249,241,0.10);
-  border-color: rgba(246,239,231,0.45);
+  background: rgba(255, 249, 241, 0.1);
+  border-color: rgba(246, 239, 231, 0.45);
   color: #fdf8f1;
 }
 .btn-download.dark:hover {
-  background: rgba(201,149,87,0.18);
+  background: rgba(201, 149, 87, 0.18);
   border-color: #c99557;
   transform: translateY(-2px);
-  box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
 }
 
 .btn-download.light {
-  background: rgba(255,255,255,0.10);
+  background: rgba(255, 255, 255, 0.1);
   border-color: rgba(246, 239, 231, 0.5);
   color: #fdf8f1;
 }
 .btn-download.light:hover {
-  background: rgba(255,255,255,0.18);
+  background: rgba(255, 255, 255, 0.18);
   border-color: #c99557;
   color: #efd5ad;
   transform: translateY(-2px);
-  box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
 }
 
 .btn-icon {
-  width: 20px; height: 20px;
+  width: 20px;
+  height: 20px;
   flex-shrink: 0;
 }
 
@@ -224,15 +246,28 @@
 }
 
 @media (max-width: 768px) {
-  .hero { padding: 100px 24px 60px; }
-  .hero-bg-image { opacity: 0.3; }
+  .hero {
+    padding: 100px 24px 60px;
+  }
+  .hero-bg-image {
+    opacity: 0.3;
+  }
   .aura-1,
-  .aura-2 { opacity: 0.45; }
+  .aura-2 {
+    opacity: 0.45;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
-  .btn-download.dark { background: #f0e8de; color: #1a110a; }
-  .btn-download.light { background: rgba(255,255,255,0.08); color: #f0e8de; border-color: rgba(240,232,222,0.45); }
+  .btn-download.dark {
+    background: #f0e8de;
+    color: #1a110a;
+  }
+  .btn-download.light {
+    background: rgba(255, 255, 255, 0.08);
+    color: #f0e8de;
+    border-color: rgba(240, 232, 222, 0.45);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

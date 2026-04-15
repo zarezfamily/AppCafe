@@ -1,21 +1,26 @@
 const cafeDeEspecialidadVsCafeNormal = {
   slug: 'cafe-de-especialidad-vs-cafe-normal',
   title: 'Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real?',
-  description: '¿Qué diferencia hay entre un café de especialidad y uno del supermercado? Puntuación SCA, trazabilidad, sabor y precio explicados sin tecnicismos.',
-  ogDescription: '¿Qué diferencia hay entre un café de especialidad y uno del supermercado? Puntuación SCA, trazabilidad, sabor y precio explicados sin tecnicismos.',
+  description:
+    '¿Qué diferencia hay entre un café de especialidad y uno del supermercado? Puntuación SCA, trazabilidad, sabor y precio explicados sin tecnicismos.',
+  ogDescription:
+    '¿Qué diferencia hay entre un café de especialidad y uno del supermercado? Puntuación SCA, trazabilidad, sabor y precio explicados sin tecnicismos.',
   twitterTitle: 'Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real?',
-  twitterDescription: '¿Qué diferencia hay entre un café de especialidad y uno del supermercado? Puntuación SCA, trazabilidad, sabor y precio explicados sin tecnicismos.',
+  twitterDescription:
+    '¿Qué diferencia hay entre un café de especialidad y uno del supermercado? Puntuación SCA, trazabilidad, sabor y precio explicados sin tecnicismos.',
   canonicalUrl: 'https://etiove.com/blog/cafe-de-especialidad-vs-cafe-normal.html',
   prevUrl: 'https://etiove.com/blog/por-que-mi-cafe-sabe-amargo.html',
   bodyWrapperClass: 'container',
   ogImageAlt: 'Café de especialidad vs café normal',
   hero: {
-    image: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=1400&q=80&auto=format&fit=crop',
-    imageSocial: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=1200&q=85&auto=format&fit=crop',
+    image:
+      'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=1400&q=80&auto=format&fit=crop',
+    imageSocial:
+      'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=1200&q=85&auto=format&fit=crop',
     imageAlt: 'Granos de café de especialidad de distintos orígenes',
     tag: 'Análisis · 09 abril 2026 · 9 min de lectura',
     title: 'Café de especialidad vs café normal',
-    meta: 'Por el equipo de Etiove · Foto: Unsplash'
+    meta: 'Por el equipo de Etiove · Foto: Unsplash',
   },
   inlineCss: String.raw`*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --ink: #1c120d; --ink-soft: #5d4030; --ink-muted: #9a7963; --cream: #f6efe7; --cream-alt: #fffaf5; --accent: #8f5e3b; --accent-deep: #5d4030; --border: #e4d3c2; --border-soft: rgba(228,211,194,0.5); }
@@ -90,12 +95,13 @@ const cafeDeEspecialidadVsCafeNormal = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: 'Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real?',
-    description: 'Puntuación SCA, trazabilidad, sabor y precio. Todo lo que diferencia un café de especialidad de uno del supermercado, explicado sin tecnicismos.',
+    description:
+      'Puntuación SCA, trazabilidad, sabor y precio. Todo lo que diferencia un café de especialidad de uno del supermercado, explicado sin tecnicismos.',
     datePublished: '2026-04-09',
     dateModified: '2026-04-09',
     author: {
       '@type': 'Organization',
-      name: 'Etiove'
+      name: 'Etiove',
     },
     publisher: {
       '@type': 'Organization',
@@ -105,22 +111,22 @@ const cafeDeEspecialidadVsCafeNormal = {
         '@type': 'ImageObject',
         url: 'https://etiove.com/favicon.svg',
         width: 512,
-        height: 512
-      }
+        height: 512,
+      },
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': 'https://etiove.com/blog/cafe-de-especialidad-vs-cafe-normal.html'
+      '@id': 'https://etiove.com/blog/cafe-de-especialidad-vs-cafe-normal.html',
     },
     image: {
       '@type': 'ImageObject',
       url: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=1400&q=80&auto=format&fit=crop',
       width: 1400,
       height: 700,
-      caption: 'Granos de café de especialidad de distintos orígenes'
+      caption: 'Granos de café de especialidad de distintos orígenes',
     },
     wordCount: 1119,
-    timeRequired: 'PT8M'
+    timeRequired: 'PT8M',
   },
   extraJsonLd: [
     {
@@ -132,35 +138,35 @@ const cafeDeEspecialidadVsCafeNormal = {
           name: '¿Qué diferencia hay entre café de especialidad y café normal?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'El café de especialidad supera los 80 puntos SCA, ofrece trazabilidad del origen, menos defectos, tueste más fresco y perfiles de sabor definidos. El café comercial no tiene ese umbral de calidad ni el mismo nivel de información sobre finca, variedad o proceso.'
-          }
+            text: 'El café de especialidad supera los 80 puntos SCA, ofrece trazabilidad del origen, menos defectos, tueste más fresco y perfiles de sabor definidos. El café comercial no tiene ese umbral de calidad ni el mismo nivel de información sobre finca, variedad o proceso.',
+          },
         },
         {
           '@type': 'Question',
           name: '¿El café de especialidad siempre es más caro?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Sí, suele costar más por kilo, pero también paga mejor al productor, se selecciona mejor, se tuesta en lotes más pequeños y suele rendir más en taza porque aporta más sabor sin necesidad de sobrecargar la dosis.'
-          }
+            text: 'Sí, suele costar más por kilo, pero también paga mejor al productor, se selecciona mejor, se tuesta en lotes más pequeños y suele rendir más en taza porque aporta más sabor sin necesidad de sobrecargar la dosis.',
+          },
         },
         {
           '@type': 'Question',
           name: '¿Cómo sé si un café realmente es de especialidad?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Busca fecha de tueste, origen concreto, altitud, variedad, proceso y tostador identificable. Si el paquete solo dice mezcla, intensidad o sabor fuerte, pero no aporta trazabilidad, normalmente no está orientado a especialidad.'
-          }
+            text: 'Busca fecha de tueste, origen concreto, altitud, variedad, proceso y tostador identificable. Si el paquete solo dice mezcla, intensidad o sabor fuerte, pero no aporta trazabilidad, normalmente no está orientado a especialidad.',
+          },
         },
         {
           '@type': 'Question',
           name: '¿El café de especialidad tiene más cafeína?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'No necesariamente. La cafeína depende más de la especie, el tueste, la receta y la dosis. Un arábica de especialidad puede tener menos cafeína que un blend comercial con robusta.'
-          }
-        }
-      ]
-    }
+            text: 'No necesariamente. La cafeína depende más de la especie, el tueste, la receta y la dosis. Un arábica de especialidad puede tener menos cafeína que un blend comercial con robusta.',
+          },
+        },
+      ],
+    },
   ],
   breadcrumbJsonLd: {
     '@context': 'https://schema.org',
@@ -170,21 +176,21 @@ const cafeDeEspecialidadVsCafeNormal = {
         '@type': 'ListItem',
         position: 1,
         name: 'Inicio',
-        item: 'https://etiove.com/'
+        item: 'https://etiove.com/',
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'Blog',
-        item: 'https://etiove.com/blog/'
+        item: 'https://etiove.com/blog/',
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: 'Café de Especialidad vs Café Normal: ¿Cuál es la diferencia real?',
-        item: 'https://etiove.com/blog/cafe-de-especialidad-vs-cafe-normal.html'
-      }
-    ]
+        item: 'https://etiove.com/blog/cafe-de-especialidad-vs-cafe-normal.html',
+      },
+    ],
   },
   bodyHtml: String.raw`<div class="post-body">
 
@@ -421,7 +427,7 @@ const cafeDeEspecialidadVsCafeNormal = {
         <p class="post-nav-label">← Anterior</p>
         <p class="post-nav-title">¿Por qué mi café sabe amargo? 7 causas y sus soluciones</p>
       </a>
-    </nav>`
+    </nav>`,
 };
 
 module.exports = {

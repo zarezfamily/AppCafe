@@ -1,420 +1,536 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Etiove | App y Comunidad de Café de Especialidad en España</title>
-  <meta name="description" content="Etiove: app y comunidad de café de especialidad. Etio (Etiopía, cuna del café) + Ove (donde, en italiano) = donde nació el café. Descubre, cata y conecta." />
-  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-  <link rel="canonical" href="https://etiove.com/" />
-  <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="Etiove" />
-  <meta property="og:locale" content="es_ES" />
-  <meta property="og:title" content="Etiove | App y Comunidad de Café de Especialidad en España" />
-  <meta property="og:description" content="Descubre, cata, colecciona y conecta con amantes del café de especialidad en Etiove." />
-  <meta property="og:url" content="https://etiove.com/" />
-  <meta property="og:image" content="https://etiove.com/og-image.jpg" />
-  <meta property="og:image:secure_url" content="https://etiove.com/og-image.jpg" />
-  <meta property="og:image:type" content="image/jpeg" />
-  <meta property="og:image:width" content="1500" />
-  <meta property="og:image:height" content="500" />
-  <meta property="og:image:alt" content="Etiove, donde nació el café" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Etiove | App y Comunidad de Café de Especialidad en España" />
-  <meta name="twitter:description" content="Descubre, cata, colecciona y conecta con amantes del café de especialidad en Etiove." />
-  <meta name="twitter:image" content="https://etiove.com/og-image.jpg" />
-  <link rel="icon" href="/favicon.ico" sizes="any" />
-  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-  <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48" />
-  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
-  <link rel="icon" type="image/png" href="/icon.png" sizes="48x48" />
-  <link rel="shortcut icon" href="/favicon.ico" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-  <meta name="apple-mobile-web-app-title" content="Etiove" />
-  <meta name="theme-color" content="#21150f" />
-  <link rel="manifest" href="/site.webmanifest" />
-  <meta itemprop="image" content="https://etiove.com/icon.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css" />
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "WebSite",
-        "@id": "https://etiove.com/#website",
-        "url": "https://etiove.com/",
-        "name": "Etiove",
-        "description": "La mayor comunidad de café de especialidad. Descubre, cata, colecciona y conecta.",
-        "inLanguage": "es-ES",
-        "publisher": { "@id": "https://etiove.com/#organization" },
-        "potentialAction": {
-          "@type": "SearchAction",
-          "target": {
-            "@type": "EntryPoint",
-            "urlTemplate": "https://etiove.com/blog/?q={search_term_string}"
-          },
-          "query-input": "required name=search_term_string"
-        }
-      },
-      {
-        "@type": "Organization",
-        "@id": "https://etiove.com/#organization",
-        "name": "Etiove",
-        "url": "https://etiove.com/",
-        "logo": {
-          "@type": "ImageObject",
-          "url": "https://etiove.com/favicon.svg",
-          "width": 512,
-          "height": 512
-        },
-        "sameAs": [
-          "https://instagram.com/etiove_cafe",
-          "https://x.com/etiove_cafe",
-          "https://tiktok.com/@etiove"
-        ],
-        "foundingLocation": {
-          "@type": "Place",
-          "addressCountry": "ES"
-        }
-      },
-      {
-        "@type": "SoftwareApplication",
-        "@id": "https://etiove.com/#app",
-        "name": "Etiove",
-        "operatingSystem": ["iOS", "Android"],
-        "applicationCategory": "FoodAndDrinkApplication",
-        "description": "App de café de especialidad: descubre, cata, colecciona y conecta con amantes del café.",
-        "inLanguage": "es-ES",
-        "offers": {
-          "@type": "Offer",
-          "price": "0",
-          "priceCurrency": "EUR"
-        },
-        "publisher": { "@id": "https://etiove.com/#organization" }
-      }
-    ]
-  }
-  </script>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    "name": "Navegación principal Etiove",
-    "itemListElement": [
-      {
-        "@type": "SiteLinksSearchBox",
-        "target": "https://etiove.com/blog/?q={search_term_string}"
-      },
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "Blog · Café de Especialidad",
-        "description": "Guías, tutoriales y análisis para amantes del café de especialidad.",
-        "url": "https://etiove.com/blog/"
-      },
-      {
-        "@type": "ListItem",
-        "position": 2,
-        "name": "Comunidad",
-        "description": "Foro y comunidad de catadores de café de especialidad.",
-        "url": "https://etiove.com/comunidad.html"
-      },
-      {
-        "@type": "ListItem",
-        "position": 3,
-        "name": "Quiz de Sabor",
-        "description": "Descubre qué café de especialidad encaja con tu paladar.",
-        "url": "https://etiove.com/#quizweb"
-      },
-      {
-        "@type": "ListItem",
-        "position": 4,
-        "name": "Sobre Etiove",
-        "description": "La historia y los valores detrás de la comunidad Etiove.",
-        "url": "https://etiove.com/about.html"
-      }
-    ]
-  }
-  </script>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "HowTo",
-    "name": "Quiz de Sabor Etiove: Descubre tu café ideal",
-    "description": "Responde 4 preguntas sobre tus preferencias de tueste, origen, acidez y perfil de sabor para descubrir qué café de especialidad encaja con tu paladar.",
-    "totalTime": "PT2M",
-    "tool": { "@type": "HowToTool", "name": "App Etiove" },
-    "step": [
-      {
-        "@type": "HowToStep",
-        "position": 1,
-        "name": "Elige tu tueste preferido",
-        "text": "Selecciona entre tueste claro, medio u oscuro según el carácter que buscas en tu taza."
-      },
-      {
-        "@type": "HowToStep",
-        "position": 2,
-        "name": "Elige tu origen favorito",
-        "text": "África (Etiopía, Kenia), América (Colombia, Costa Rica) o Asia (Indonesia, Yemen)."
-      },
-      {
-        "@type": "HowToStep",
-        "position": 3,
-        "name": "Define cómo te gusta la acidez",
-        "text": "Alta (brillante y expresiva), media (equilibrada) o baja (suave y redonda)."
-      },
-      {
-        "@type": "HowToStep",
-        "position": 4,
-        "name": "Elige tu perfil de sabor",
-        "text": "Floral, frutal, chocolate o especias. Obtendrás tu perfil sensorial exacto."
-      }
-    ]
-  }
-  </script>
-  <link rel="search" type="application/opensearchdescription+xml" title="Blog Etiove" href="/opensearch.xml" />
-</head>
-<body>
-  <a class="skip-to-content" href="#main-content">Saltar al contenido</a>
-
-
-  <!-- NAV -->
-  <nav>
-    <a class="nav-wordmark" href="/">Etiove</a>
-    <div class="nav-links" id="navLinks">
-      <a class="nav-link" href="#app">La app</a>
-      <a class="nav-link" href="/blog/">Blog</a>
-      <a class="nav-link" href="/comunidad.html">Comunidad</a>
-    </div>
-    <button class="nav-hamburger" id="navHamburger" aria-label="Menú" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
-  </nav>
-
-  <!-- HERO -->
-  <section class="hero" id="main-content">
-    <div class="aura aura-1"></div>
-    <div class="aura aura-2"></div>
-    <div class="aura aura-3"></div>
-    <!-- Imagen indexable para Google Imágenes -->
-    <img
-      src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=1800&q=80&auto=format&fit=crop"
-      alt="Cata de café de especialidad en la comunidad Etiove — taza de espresso con vapor"
-      width="1800" height="900"
-      fetchpriority="high"
-      class="hero-bg-image"
-      aria-hidden="false"
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Etiove | App y Comunidad de Café de Especialidad en España</title>
+    <meta
+      name="description"
+      content="Etiove: app y comunidad de café de especialidad. Etio (Etiopía, cuna del café) + Ove (donde, en italiano) = donde nació el café. Descubre, cata y conecta."
     />
+    <meta
+      name="robots"
+      content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    />
+    <link rel="canonical" href="https://etiove.com/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Etiove" />
+    <meta property="og:locale" content="es_ES" />
+    <meta
+      property="og:title"
+      content="Etiove | App y Comunidad de Café de Especialidad en España"
+    />
+    <meta
+      property="og:description"
+      content="Descubre, cata, colecciona y conecta con amantes del café de especialidad en Etiove."
+    />
+    <meta property="og:url" content="https://etiove.com/" />
+    <meta property="og:image" content="https://etiove.com/og-image.jpg" />
+    <meta property="og:image:secure_url" content="https://etiove.com/og-image.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1500" />
+    <meta property="og:image:height" content="500" />
+    <meta property="og:image:alt" content="Etiove, donde nació el café" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Etiove | App y Comunidad de Café de Especialidad en España"
+    />
+    <meta
+      name="twitter:description"
+      content="Descubre, cata, colecciona y conecta con amantes del café de especialidad en Etiove."
+    />
+    <meta name="twitter:image" content="https://etiove.com/og-image.jpg" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48" />
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/icon.png" sizes="48x48" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Etiove" />
+    <meta name="theme-color" content="#21150f" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta itemprop="image" content="https://etiove.com/icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://etiove.com/#website",
+            "url": "https://etiove.com/",
+            "name": "Etiove",
+            "description": "La mayor comunidad de café de especialidad. Descubre, cata, colecciona y conecta.",
+            "inLanguage": "es-ES",
+            "publisher": { "@id": "https://etiove.com/#organization" },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://etiove.com/blog/?q={search_term_string}"
+              },
+              "query-input": "required name=search_term_string"
+            }
+          },
+          {
+            "@type": "Organization",
+            "@id": "https://etiove.com/#organization",
+            "name": "Etiove",
+            "url": "https://etiove.com/",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://etiove.com/favicon.svg",
+              "width": 512,
+              "height": 512
+            },
+            "sameAs": [
+              "https://instagram.com/etiove_cafe",
+              "https://x.com/etiove_cafe",
+              "https://tiktok.com/@etiove"
+            ],
+            "foundingLocation": {
+              "@type": "Place",
+              "addressCountry": "ES"
+            }
+          },
+          {
+            "@type": "SoftwareApplication",
+            "@id": "https://etiove.com/#app",
+            "name": "Etiove",
+            "operatingSystem": ["iOS", "Android"],
+            "applicationCategory": "FoodAndDrinkApplication",
+            "description": "App de café de especialidad: descubre, cata, colecciona y conecta con amantes del café.",
+            "inLanguage": "es-ES",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "EUR"
+            },
+            "publisher": { "@id": "https://etiove.com/#organization" }
+          }
+        ]
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        "name": "Navegación principal Etiove",
+        "itemListElement": [
+          {
+            "@type": "SiteLinksSearchBox",
+            "target": "https://etiove.com/blog/?q={search_term_string}"
+          },
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Blog · Café de Especialidad",
+            "description": "Guías, tutoriales y análisis para amantes del café de especialidad.",
+            "url": "https://etiove.com/blog/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Comunidad",
+            "description": "Foro y comunidad de catadores de café de especialidad.",
+            "url": "https://etiove.com/comunidad.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Quiz de Sabor",
+            "description": "Descubre qué café de especialidad encaja con tu paladar.",
+            "url": "https://etiove.com/#quizweb"
+          },
+          {
+            "@type": "ListItem",
+            "position": 4,
+            "name": "Sobre Etiove",
+            "description": "La historia y los valores detrás de la comunidad Etiove.",
+            "url": "https://etiove.com/about.html"
+          }
+        ]
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "Quiz de Sabor Etiove: Descubre tu café ideal",
+        "description": "Responde 4 preguntas sobre tus preferencias de tueste, origen, acidez y perfil de sabor para descubrir qué café de especialidad encaja con tu paladar.",
+        "totalTime": "PT2M",
+        "tool": { "@type": "HowToTool", "name": "App Etiove" },
+        "step": [
+          {
+            "@type": "HowToStep",
+            "position": 1,
+            "name": "Elige tu tueste preferido",
+            "text": "Selecciona entre tueste claro, medio u oscuro según el carácter que buscas en tu taza."
+          },
+          {
+            "@type": "HowToStep",
+            "position": 2,
+            "name": "Elige tu origen favorito",
+            "text": "África (Etiopía, Kenia), América (Colombia, Costa Rica) o Asia (Indonesia, Yemen)."
+          },
+          {
+            "@type": "HowToStep",
+            "position": 3,
+            "name": "Define cómo te gusta la acidez",
+            "text": "Alta (brillante y expresiva), media (equilibrada) o baja (suave y redonda)."
+          },
+          {
+            "@type": "HowToStep",
+            "position": 4,
+            "name": "Elige tu perfil de sabor",
+            "text": "Floral, frutal, chocolate o especias. Obtendrás tu perfil sensorial exacto."
+          }
+        ]
+      }
+    </script>
+    <link
+      rel="search"
+      type="application/opensearchdescription+xml"
+      title="Blog Etiove"
+      href="/opensearch.xml"
+    />
+  </head>
+  <body>
+    <a class="skip-to-content" href="#main-content">Saltar al contenido</a>
 
-    <div class="hero-seal">
-      <div class="seal-ring">
-        <div class="seal-ring-inner">
-          <div class="seal-ring-core">
-            <span class="seal-text">☕</span>
+    <!-- NAV -->
+    <nav>
+      <a class="nav-wordmark" href="/">Etiove</a>
+      <div class="nav-links" id="navLinks">
+        <a class="nav-link" href="#app">La app</a>
+        <a class="nav-link" href="/blog/">Blog</a>
+        <a class="nav-link" href="/comunidad.html">Comunidad</a>
+      </div>
+      <button class="nav-hamburger" id="navHamburger" aria-label="Menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero" id="main-content">
+      <div class="aura aura-1"></div>
+      <div class="aura aura-2"></div>
+      <div class="aura aura-3"></div>
+      <!-- Imagen indexable para Google Imágenes -->
+      <img
+        src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=1800&q=80&auto=format&fit=crop"
+        alt="Cata de café de especialidad en la comunidad Etiove — taza de espresso con vapor"
+        width="1800"
+        height="900"
+        fetchpriority="high"
+        class="hero-bg-image"
+        aria-hidden="false"
+      />
+
+      <div class="hero-seal">
+        <div class="seal-ring">
+          <div class="seal-ring-inner">
+            <div class="seal-ring-core">
+              <span class="seal-text">☕</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <p class="hero-eyebrow">Café de especialidad</p>
-    <h1 class="hero-title">Etiove</h1>
-    <p class="hero-tagline">La mayor comunidad de café de especialidad.<br>Descubre, cata, colecciona y conecta.</p>
-
-    <div class="divider-line">
-      <span class="divider-dot"></span>
-    </div>
-
-    <div class="download-group">
-      <a href="https://apps.apple.com/app/etiove" target="_blank" rel="noopener noreferrer" class="btn-download dark">
-        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-        </svg>
-        <div class="btn-copy">
-          <span class="btn-copy-sub">Descarga en</span>
-          <span class="btn-copy-main">App Store</span>
-        </div>
-      </a>
-      <a href="https://play.google.com/store/apps/details?id=com.zarezfamily.etiove" target="_blank" rel="noopener noreferrer" class="btn-download light">
-        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M3.18 23.76c.3.17.64.24.99.19l12.6-7.27-2.72-2.72-10.87 9.8zm16.11-9.37L5.83 6.93l2.72 2.72 10.74-9.65zm1.61.93c.32-.18.5-.5.5-.87s-.18-.69-.5-.87L18.1 12l-2.59 2.59 2.6 2.6 2.79-1.87zM3.18.24C2.86.07 2.5 0 2.17.19c-.33.18-.5.5-.5.87v21.88c0 .37.17.69.5.87.16.09.34.13.5.13.17 0 .33-.04.49-.13l.02-.01 10.85-9.73-2.7-2.7L3.18.24z"/>
-        </svg>
-        <div class="btn-copy">
-          <span class="btn-copy-sub">Disponible en</span>
-          <span class="btn-copy-main">Google Play</span>
-        </div>
-      </a>
-    </div>
-  </section>
-
-  <!-- SOBRE NOSOTROS -->
-  <div class="section-about-wrap">
-  <section class="section-about" id="sobre">
-    <div class="about-content reveal">
-      <p class="about-label">Quiénes somos</p>
-      <h2 class="about-title">Nacimos del amor por el <em>buen café</em></h2>
-
-      <!-- Cápsula de significado: optimizada para AI Overviews y Featured Snippets -->
-      <section id="significado-etiove" class="brand-meaning">
-        <h3 class="brand-meaning-title">¿Qué significa Etiove?</h3>
-        <p class="brand-meaning-text">
-          <strong>Etiove</strong> es una app y comunidad de <strong>café de especialidad</strong> cuyo nombre fusiona dos conceptos: <strong>Etio</strong>, que evoca <strong>Etiopía</strong> — la cuna histórica del café —, y <strong>Ove</strong>, que en italiano significa <em>donde</em>. Juntos forman el lema que define la marca: <em>"donde nació el café"</em>.
-        </p>
-      </section>
-
-      <p class="about-text">
-        Etiove es una comunidad creada para quienes viven el café de especialidad de
-        verdad: personas que quieren descubrir mejores orígenes, catar con criterio,
-        aprender en comunidad y conectar con otros apasionados que comparten la misma
-        obsesión por una taza extraordinaria.
+      <p class="hero-eyebrow">Café de especialidad</p>
+      <h1 class="hero-title">Etiove</h1>
+      <p class="hero-tagline">
+        La mayor comunidad de café de especialidad.<br />Descubre, cata, colecciona y conecta.
       </p>
+
+      <div class="divider-line">
+        <span class="divider-dot"></span>
+      </div>
+
+      <div class="download-group">
+        <a
+          href="https://apps.apple.com/app/etiove"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn-download dark"
+        >
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"
+            />
+          </svg>
+          <div class="btn-copy">
+            <span class="btn-copy-sub">Descarga en</span>
+            <span class="btn-copy-main">App Store</span>
+          </div>
+        </a>
+        <a
+          href="https://play.google.com/store/apps/details?id=com.zarezfamily.etiove"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn-download light"
+        >
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M3.18 23.76c.3.17.64.24.99.19l12.6-7.27-2.72-2.72-10.87 9.8zm16.11-9.37L5.83 6.93l2.72 2.72 10.74-9.65zm1.61.93c.32-.18.5-.5.5-.87s-.18-.69-.5-.87L18.1 12l-2.59 2.59 2.6 2.6 2.79-1.87zM3.18.24C2.86.07 2.5 0 2.17.19c-.33.18-.5.5-.5.87v21.88c0 .37.17.69.5.87.16.09.34.13.5.13.17 0 .33-.04.49-.13l.02-.01 10.85-9.73-2.7-2.7L3.18.24z"
+            />
+          </svg>
+          <div class="btn-copy">
+            <span class="btn-copy-sub">Disponible en</span>
+            <span class="btn-copy-main">Google Play</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- SOBRE NOSOTROS -->
+    <div class="section-about-wrap">
+      <section class="section-about" id="sobre">
+        <div class="about-content reveal">
+          <p class="about-label">Quiénes somos</p>
+          <h2 class="about-title">Nacimos del amor por el <em>buen café</em></h2>
+
+          <!-- Cápsula de significado: optimizada para AI Overviews y Featured Snippets -->
+          <section id="significado-etiove" class="brand-meaning">
+            <h3 class="brand-meaning-title">¿Qué significa Etiove?</h3>
+            <p class="brand-meaning-text">
+              <strong>Etiove</strong> es una app y comunidad de
+              <strong>café de especialidad</strong> cuyo nombre fusiona dos conceptos:
+              <strong>Etio</strong>, que evoca <strong>Etiopía</strong> — la cuna histórica del café
+              —, y <strong>Ove</strong>, que en italiano significa <em>donde</em>. Juntos forman el
+              lema que define la marca: <em>"donde nació el café"</em>.
+            </p>
+          </section>
+
+          <p class="about-text">
+            Etiove es una comunidad creada para quienes viven el café de especialidad de verdad:
+            personas que quieren descubrir mejores orígenes, catar con criterio, aprender en
+            comunidad y conectar con otros apasionados que comparten la misma obsesión por una taza
+            extraordinaria.
+          </p>
+        </div>
+        <div class="about-visual reveal">
+          <div class="feature-row">
+            <span class="feature-num">01</span>
+            <div class="feature-copy">
+              <h3>Explora el origen de cada grano</h3>
+              <p>
+                Viaja desde Etiopía hasta Colombia sin salir de tu taza. En Etiove te ayudamos a
+                entender las notas de cata, la altitud y el proceso de beneficio de los mejores
+                cafés de especialidad del mundo. La trazabilidad es nuestra prioridad.
+              </p>
+            </div>
+          </div>
+          <div class="feature-row">
+            <span class="feature-num">02</span>
+            <div class="feature-copy">
+              <h3>Desarrolla tu paladar sensorial</h3>
+              <p>
+                Aprende a distinguir fragancias, aromas y sabores complejos. Nuestra metodología de
+                cata te guía paso a paso para que identifiques desde la acidez cítrica hasta el
+                cuerpo sedoso de un varietal Geisha o un proceso natural.
+              </p>
+            </div>
+          </div>
+          <div class="feature-row">
+            <span class="feature-num">03</span>
+            <div class="feature-copy">
+              <h3>Tu opinión construye la comunidad</h3>
+              <p>
+                Registra cada experiencia y puntúa tus cafés favoritos según el protocolo SCA. Tus
+                valoraciones ayudan a otros amantes del café a descubrir joyas ocultas y permiten a
+                los tostadores seguir elevando el listón de la calidad.
+              </p>
+            </div>
+          </div>
+          <div class="feature-row">
+            <span class="feature-num">04</span>
+            <div class="feature-copy">
+              <h3>Etiove: El experto en tu bolsillo</h3>
+              <p>
+                Nuestra App inteligente analiza tus preferencias para recomendarte granos que te
+                emocionen. Gestiona tu bodega personal, sigue tus recetas de filtrado favoritas y
+                conecta con la mayor red de apasionados por el café.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
-    <div class="about-visual reveal">
-      <div class="feature-row">
-        <span class="feature-num">01</span>
-        <div class="feature-copy">
-          <h3>Explora el origen de cada grano</h3>
-          <p>Viaja desde Etiopía hasta Colombia sin salir de tu taza. En Etiove te ayudamos a entender las notas de cata, la altitud y el proceso de beneficio de los mejores cafés de especialidad del mundo. La trazabilidad es nuestra prioridad.</p>
-        </div>
+
+    <div class="section-divider"></div>
+    <!-- QUIZ DE SABOR WEB -->
+    <section id="quizweb" class="section-quiz">
+      <div id="webQuizRoot"></div>
+    </section>
+
+    <!-- CTA APP -->
+    <section class="section-app" id="app">
+      <p class="app-eyebrow">Disponible ahora</p>
+      <h2 class="app-title app-title-compact">Descarga Etiove</h2>
+      <p class="app-sub">iOS y Android · Descarga gratuita</p>
+      <div class="app-btns">
+        <a
+          href="https://apps.apple.com/app/etiove"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn-app"
+        >
+          <svg class="btn-app-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"
+            />
+          </svg>
+          <div>
+            <span class="btn-app-sub">Descarga en</span>
+            <span class="btn-app-main">App Store</span>
+          </div>
+        </a>
+        <a
+          href="https://play.google.com/store/apps/details?id=com.zarezfamily.etiove"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn-app"
+        >
+          <svg class="btn-app-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M3.18 23.76c.3.17.64.24.99.19l12.6-7.27-2.72-2.72-10.87 9.8zm16.11-9.37L5.83 6.93l2.72 2.72 10.74-9.65zm1.61.93c.32-.18.5-.5.5-.87s-.18-.69-.5-.87L18.1 12l-2.59 2.59 2.6 2.6 2.79-1.87zM3.18.24C2.86.07 2.5 0 2.17.19c-.33.18-.5.5-.5.87v21.88c0 .37.17.69.5.87.16.09.34.13.5.13.17 0 .33-.04.49-.13l.02-.01 10.85-9.73-2.7-2.7L3.18.24z"
+            />
+          </svg>
+          <div>
+            <span class="btn-app-sub">Disponible en</span>
+            <span class="btn-app-main">Google Play</span>
+          </div>
+        </a>
       </div>
-      <div class="feature-row">
-        <span class="feature-num">02</span>
-        <div class="feature-copy">
-          <h3>Desarrolla tu paladar sensorial</h3>
-          <p>Aprende a distinguir fragancias, aromas y sabores complejos. Nuestra metodología de cata te guía paso a paso para que identifiques desde la acidez cítrica hasta el cuerpo sedoso de un varietal Geisha o un proceso natural.</p>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      <nav class="footer-nav" aria-label="Navegación del sitio">
+        <div class="footer-nav-group">
+          <span class="footer-nav-label">Explorar</span>
+          <a class="footer-nav-link" href="/">Inicio</a>
+          <a class="footer-nav-link" href="/blog/">Blog</a>
+          <a class="footer-nav-link" href="/comunidad.html">Comunidad</a>
+          <a class="footer-nav-link" href="/#quizweb">Quiz de sabor</a>
         </div>
-      </div>
-      <div class="feature-row">
-        <span class="feature-num">03</span>
-        <div class="feature-copy">
-          <h3>Tu opinión construye la comunidad</h3>
-          <p>Registra cada experiencia y puntúa tus cafés favoritos según el protocolo SCA. Tus valoraciones ayudan a otros amantes del café a descubrir joyas ocultas y permiten a los tostadores seguir elevando el listón de la calidad.</p>
-        </div>
-      </div>
-      <div class="feature-row">
-        <span class="feature-num">04</span>
-        <div class="feature-copy">
-          <h3>Etiove: El experto en tu bolsillo</h3>
-          <p>Nuestra App inteligente analiza tus preferencias para recomendarte granos que te emocionen. Gestiona tu bodega personal, sigue tus recetas de filtrado favoritas y conecta con la mayor red de apasionados por el café.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-  </div>
+      </nav>
 
-  <div class="section-divider"></div>
-  <!-- QUIZ DE SABOR WEB -->
-  <section id="quizweb" class="section-quiz">
-    <div id="webQuizRoot"></div>
-  </section>
+      <p class="footer-copy">
+        <span>© 2026 Etiove. Hecho con ☕ en España.</span>
 
-
-  <!-- CTA APP -->
-  <section class="section-app" id="app">
-    <p class="app-eyebrow">Disponible ahora</p>
-    <h2 class="app-title app-title-compact">Descarga Etiove</h2>
-    <p class="app-sub">iOS y Android · Descarga gratuita</p>
-    <div class="app-btns">
-      <a href="https://apps.apple.com/app/etiove" target="_blank" rel="noopener noreferrer" class="btn-app">
-        <svg class="btn-app-icon" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-        </svg>
-        <div>
-          <span class="btn-app-sub">Descarga en</span>
-          <span class="btn-app-main">App Store</span>
-        </div>
-      </a>
-      <a href="https://play.google.com/store/apps/details?id=com.zarezfamily.etiove" target="_blank" rel="noopener noreferrer" class="btn-app">
-        <svg class="btn-app-icon" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M3.18 23.76c.3.17.64.24.99.19l12.6-7.27-2.72-2.72-10.87 9.8zm16.11-9.37L5.83 6.93l2.72 2.72 10.74-9.65zm1.61.93c.32-.18.5-.5.5-.87s-.18-.69-.5-.87L18.1 12l-2.59 2.59 2.6 2.6 2.79-1.87zM3.18.24C2.86.07 2.5 0 2.17.19c-.33.18-.5.5-.5.87v21.88c0 .37.17.69.5.87.16.09.34.13.5.13.17 0 .33-.04.49-.13l.02-.01 10.85-9.73-2.7-2.7L3.18.24z"/>
-        </svg>
-        <div>
-          <span class="btn-app-sub">Disponible en</span>
-          <span class="btn-app-main">Google Play</span>
-        </div>
-      </a>
-    </div>
-  </section>
-
-
-  <!-- FOOTER -->
-  <footer>
-    <nav class="footer-nav" aria-label="Navegación del sitio">
-      <div class="footer-nav-group">
-        <span class="footer-nav-label">Explorar</span>
-        <a class="footer-nav-link" href="/">Inicio</a>
-        <a class="footer-nav-link" href="/blog/">Blog</a>
-        <a class="footer-nav-link" href="/comunidad.html">Comunidad</a>
-        <a class="footer-nav-link" href="/#quizweb">Quiz de sabor</a>
-      </div>
-    </nav>
-
-    <p class="footer-copy">
-      <span>© 2026 Etiove. Hecho con ☕ en España.</span>
-
-      <span class="footer-copy-center">
-        <span class="footer-wordmark-sm">Etiove</span>
-        <span class="social-row-inline">
-          <a class="social-link" href="https://instagram.com/etiove_cafe" target="_blank" rel="noopener noreferrer" aria-label="Instagram @etiove_cafe">
-            <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-          </a>
-          <a class="social-link" href="https://x.com/etiove_cafe" target="_blank" rel="noopener noreferrer" aria-label="X @etiove_cafe">
-            <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-          </a>
-          <a class="social-link" href="https://tiktok.com/@etiove" target="_blank" rel="noopener noreferrer" aria-label="TikTok @etiove">
-            <svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.16 8.16 0 004.77 1.52V6.75a4.85 4.85 0 01-1-.06z"/></svg>
-          </a>
+        <span class="footer-copy-center">
+          <span class="footer-wordmark-sm">Etiove</span>
+          <span class="social-row-inline">
+            <a
+              class="social-link"
+              href="https://instagram.com/etiove_cafe"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram @etiove_cafe"
+            >
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
+                />
+              </svg>
+            </a>
+            <a
+              class="social-link"
+              href="https://x.com/etiove_cafe"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="X @etiove_cafe"
+            >
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+                />
+              </svg>
+            </a>
+            <a
+              class="social-link"
+              href="https://tiktok.com/@etiove"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="TikTok @etiove"
+            >
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.16 8.16 0 004.77 1.52V6.75a4.85 4.85 0 01-1-.06z"
+                />
+              </svg>
+            </a>
+          </span>
         </span>
-      </span>
 
-      <span class="footer-legal-links">
-        <a class="footer-legal-link" href="/privacidad.html">Privacidad</a>
-        <a class="footer-legal-link" href="/cookies.html">Cookies</a>
-        <a class="footer-legal-link" href="/terminos.html">Términos</a>
-      </span>
-    </p>
-  </footer>
+        <span class="footer-legal-links">
+          <a class="footer-legal-link" href="/privacidad.html">Privacidad</a>
+          <a class="footer-legal-link" href="/cookies.html">Cookies</a>
+          <a class="footer-legal-link" href="/terminos.html">Términos</a>
+        </span>
+      </p>
+    </footer>
 
-  <!-- COOKIE BANNER -->
-  <div id="cookieBanner" role="dialog" aria-label="Aviso de cookies" aria-live="polite">
-    <p class="cookie-text">
-      Usamos cookies técnicas para que la web funcione y Firebase para la autenticación y la comunidad.
-      No usamos cookies publicitarias. <a href="/cookies.html">Más información</a>
-    </p>
-    <div class="cookie-actions">
-      <button class="cookie-btn cookie-btn-reject" id="cookieReject">Solo esenciales</button>
-      <button class="cookie-btn cookie-btn-accept" id="cookieAccept">Aceptar</button>
+    <!-- COOKIE BANNER -->
+    <div id="cookieBanner" role="dialog" aria-label="Aviso de cookies" aria-live="polite">
+      <p class="cookie-text">
+        Usamos cookies técnicas para que la web funcione y Firebase para la autenticación y la
+        comunidad. No usamos cookies publicitarias. <a href="/cookies.html">Más información</a>
+      </p>
+      <div class="cookie-actions">
+        <button class="cookie-btn cookie-btn-reject" id="cookieReject">Solo esenciales</button>
+        <button class="cookie-btn cookie-btn-accept" id="cookieAccept">Aceptar</button>
+      </div>
     </div>
-  </div>
 
+    <!-- SCROLL TO TOP -->
+    <button class="scroll-top" id="scrollTopBtn" aria-label="Volver arriba">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="18 15 12 9 6 15"></polyline>
+      </svg>
+    </button>
 
-  <!-- SCROLL TO TOP -->
-  <button class="scroll-top" id="scrollTopBtn" aria-label="Volver arriba">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="18 15 12 9 6 15"></polyline>
-    </svg>
-  </button>
-
-  <script type="module" src="/site.js"></script>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "DefinedTerm",
-    "name": "Etiove",
-    "description": "Etiove es una app y comunidad de café de especialidad. Su nombre fusiona Etio (de Etiopía, cuna del café) y Ove (donde, en italiano), formando el lema donde nació el café.",
-    "inDefinedTermSet": {
-      "@type": "DefinedTermSet",
-      "name": "Etiove — Glosario",
-      "url": "https://etiove.com"
-    },
-    "url": "https://etiove.com/#significado-etiove",
-    "sameAs": "https://etiove.com"
-  }
-  </script>
-</body>
+    <script type="module" src="/site.js"></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "DefinedTerm",
+        "name": "Etiove",
+        "description": "Etiove es una app y comunidad de café de especialidad. Su nombre fusiona Etio (de Etiopía, cuna del café) y Ove (donde, en italiano), formando el lema donde nació el café.",
+        "inDefinedTermSet": {
+          "@type": "DefinedTermSet",
+          "name": "Etiove — Glosario",
+          "url": "https://etiove.com"
+        },
+        "url": "https://etiove.com/#significado-etiove",
+        "sameAs": "https://etiove.com"
+      }
+    </script>
+  </body>
 </html>

@@ -36,7 +36,10 @@ export default function CommunityModalSheet({
             }}
           />
         </TouchableOpacity>
-        <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end' }}>
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end' }}
+        >
           <Animated.View
             style={[
               s.forumModalCard,

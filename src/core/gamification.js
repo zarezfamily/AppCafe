@@ -35,13 +35,12 @@ export const getLevelFromXp = (xp) => {
   return current;
 };
 
-export const computeXp = (state) => (
+export const computeXp = (state) =>
   state.votesCount * XP_RULES.vote +
   state.photosCount * XP_RULES.photo +
   state.reviewsCount * XP_RULES.review +
   state.cafesAddedCount * XP_RULES.addCafe +
-  state.favoritesMarkedCount * XP_RULES.favorite
-);
+  state.favoritesMarkedCount * XP_RULES.favorite;
 
 export const computeAchievements = (state) => {
   const lvl = getLevelFromXp(state.xp);
@@ -70,13 +69,23 @@ export const normalizeGamification = (state) => {
   return next;
 };
 
-export const getAchievementDefs = () => ([
+export const getAchievementDefs = () => [
   { id: 'primera_cata', icon: '🥇', title: 'Ritual de inicio', desc: 'Valora 3 cafes' },
   { id: 'fotografo', icon: '📸', title: 'Ojo barista', desc: 'Sube 12 fotos de tus cafes' },
-  { id: 'viajero', icon: '🌍', title: 'Ruta de origen', desc: 'Prueba cafes de 8 paises distintos' },
+  {
+    id: 'viajero',
+    icon: '🌍',
+    title: 'Ruta de origen',
+    desc: 'Prueba cafes de 8 paises distintos',
+  },
   { id: 'adicto', icon: '🔥', title: 'Tueste constante', desc: 'Valora 30 cafes' },
   { id: 'maestro_catador', icon: '👑', title: 'Paladar Etiove', desc: 'Alcanza nivel Maestro' },
   { id: 'coleccionista', icon: '❤️', title: 'Bodega signature', desc: 'Marca 25 favoritos' },
   { id: 'critico', icon: '✍️', title: 'Cuaderno de cata', desc: 'Escribe 12 resenas' },
-  { id: 'origen_unico', icon: '🌱', title: 'Lote de autor', desc: 'Prueba Geisha, Bourbon Pointu o Yemen' },
-]);
+  {
+    id: 'origen_unico',
+    icon: '🌱',
+    title: 'Lote de autor',
+    desc: 'Prueba Geisha, Bourbon Pointu o Yemen',
+  },
+];

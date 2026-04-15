@@ -25,14 +25,31 @@
   margin-bottom: 24px;
 }
 
-.section-about-wrap .about-title { color: #1c120d; font-weight: 700; }
-.section-about-wrap .about-title em { color: var(--accent); }
-.section-about-wrap .about-text { color: var(--ink-soft); }
-.section-about-wrap .feature-num { color: var(--border); }
-.section-about-wrap .feature-copy h3 { color: var(--accent); }
-.section-about-wrap .feature-copy p { color: var(--ink-muted); }
-.section-about-wrap .feature-row { border-bottom-color: var(--border-soft); }
-.section-about-wrap .feature-row:first-child { border-top-color: var(--border-soft); }
+.section-about-wrap .about-title {
+  color: #1c120d;
+  font-weight: 700;
+}
+.section-about-wrap .about-title em {
+  color: var(--accent);
+}
+.section-about-wrap .about-text {
+  color: var(--ink-soft);
+}
+.section-about-wrap .feature-num {
+  color: var(--border);
+}
+.section-about-wrap .feature-copy h3 {
+  color: var(--accent);
+}
+.section-about-wrap .feature-copy p {
+  color: var(--ink-muted);
+}
+.section-about-wrap .feature-row {
+  border-bottom-color: var(--border-soft);
+}
+.section-about-wrap .feature-row:first-child {
+  border-top-color: var(--border-soft);
+}
 
 .about-title {
   font-family: 'Playfair Display', serif;
@@ -89,7 +106,9 @@
   padding: 24px 0;
   border-bottom: 1px solid var(--border-soft);
 }
-.feature-row:first-child { border-top: 1px solid var(--border-soft); }
+.feature-row:first-child {
+  border-top: 1px solid var(--border-soft);
+}
 
 .feature-num {
   font-family: 'Playfair Display', serif;
@@ -136,8 +155,11 @@
 .section-app::before {
   content: '';
   position: absolute;
-  top: -80px; left: 50%; transform: translateX(-50%);
-  width: 500px; height: 500px;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 500px;
+  height: 500px;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(143, 94, 59, 0.15) 0%, transparent 70%);
   pointer-events: none;
@@ -148,7 +170,7 @@
   font-weight: 500;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: rgba(201,149,87,0.8);
+  color: rgba(201, 149, 87, 0.8);
   margin-bottom: 24px;
 }
 
@@ -168,7 +190,7 @@
 
 .app-sub {
   font-size: 14px;
-  color: rgba(246,239,231,0.50);
+  color: rgba(246, 239, 231, 0.5);
   font-weight: 300;
   margin-bottom: 48px;
   letter-spacing: 0.5px;
@@ -191,15 +213,18 @@
   text-decoration: none;
   color: #fdf8f1;
   transition: all 0.3s;
-  background: rgba(255,249,241,0.07);
+  background: rgba(255, 249, 241, 0.07);
 }
 .btn-app:hover {
-  background: rgba(201,149,87,0.15);
+  background: rgba(201, 149, 87, 0.15);
   border-color: #c99557;
   transform: translateY(-2px);
-  box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
 }
-.btn-app-icon { width: 20px; height: 20px; }
+.btn-app-icon {
+  width: 20px;
+  height: 20px;
+}
 .btn-app-sub {
   font-size: 9px;
   letter-spacing: 1.5px;
@@ -225,19 +250,23 @@
 .section-quiz::before {
   content: '';
   position: absolute;
-  top: -120px; right: -120px;
-  width: 500px; height: 500px;
+  top: -120px;
+  right: -120px;
+  width: 500px;
+  height: 500px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(143,94,59,0.12) 0%, transparent 65%);
+  background: radial-gradient(circle, rgba(143, 94, 59, 0.12) 0%, transparent 65%);
   pointer-events: none;
 }
 .section-quiz::after {
   content: '';
   position: absolute;
-  bottom: -80px; left: -80px;
-  width: 360px; height: 360px;
+  bottom: -80px;
+  left: -80px;
+  width: 360px;
+  height: 360px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(93,64,48,0.1) 0%, transparent 65%);
+  background: radial-gradient(circle, rgba(93, 64, 48, 0.1) 0%, transparent 65%);
   pointer-events: none;
 }
 
@@ -288,8 +317,8 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: rgba(143,94,59,0.10);
-  border: 1px solid rgba(143,94,59,0.20);
+  background: rgba(143, 94, 59, 0.1);
+  border: 1px solid rgba(143, 94, 59, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -314,7 +343,13 @@
     gap: 48px;
     padding: 80px 24px;
   }
-  .section-app { padding: 80px 24px; }
-  .testimonials-grid { grid-template-columns: 1fr; }
-  .section-testimonials { padding: 60px 24px; }
+  .section-app {
+    padding: 80px 24px;
+  }
+  .testimonials-grid {
+    grid-template-columns: 1fr;
+  }
+  .section-testimonials {
+    padding: 60px 24px;
+  }
 }

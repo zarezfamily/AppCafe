@@ -77,11 +77,7 @@ export default function CommunityTab({
     threadDetailViewProps,
     createModalProps,
     editModalProps,
-    ui: {
-      showMemberInfo,
-      setShowMemberInfo,
-      communityHeroAnim,
-    },
+    ui: { showMemberInfo, setShowMemberInfo, communityHeroAnim },
   } = useCommunityTabComposition({
     s,
     theme,
@@ -151,13 +147,9 @@ export default function CommunityTab({
         </View>
       )}
 
-      {showThreadList && (
-        <CommunityThreadListView {...threadListViewProps} />
-      )}
+      {showThreadList && <CommunityThreadListView {...threadListViewProps} />}
 
-      {showThreadDetail && (
-        <CommunityThreadDetailView {...threadDetailViewProps} />
-      )}
+      {showThreadDetail && <CommunityThreadDetailView {...threadDetailViewProps} />}
 
       <CommunityCreateThreadModal {...createModalProps} />
 

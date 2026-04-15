@@ -1,10 +1,4 @@
-export function renderPager({
-  container,
-  total,
-  page,
-  pageSize,
-  onPageChange,
-}) {
+export function renderPager({ container, total, page, pageSize, onPageChange }) {
   if (!container) return;
 
   if (total <= pageSize) {
@@ -18,12 +12,12 @@ export function renderPager({
   html += `<button class="pager-btn pager-arrow" data-page="${page - 1}" ${page === 1 ? 'disabled' : ''} aria-label="Página anterior">‹</button>`;
 
   for (let nextPage = 1; nextPage <= totalPages; nextPage += 1) {
-    if (totalPages > 11 && (nextPage > 2 && nextPage < page - 3)) {
+    if (totalPages > 11 && nextPage > 2 && nextPage < page - 3) {
       if (nextPage === 3) html += '<span class="pager-ellipsis">…</span>';
       continue;
     }
 
-    if (totalPages > 11 && (nextPage < totalPages - 1 && nextPage > page + 3)) {
+    if (totalPages > 11 && nextPage < totalPages - 1 && nextPage > page + 3) {
       if (nextPage === totalPages - 2) html += '<span class="pager-ellipsis">…</span>';
       continue;
     }

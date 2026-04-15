@@ -65,10 +65,10 @@ Necesitas en RevenueCat:
 
 1. Crear un proyecto con el bundle/package `com.zarezfamily.etiove`
 2. Configurar los productos:
-	- iOS mensual: `com.zarezfamily.etiove.premium.monthly`
-	- iOS lifetime: `com.zarezfamily.etiove.premium.lifetime`
-	- Android mensual: `etiove_premium_monthly`
-	- Android lifetime: `etiove_premium_lifetime`
+   - iOS mensual: `com.zarezfamily.etiove.premium.monthly`
+   - iOS lifetime: `com.zarezfamily.etiove.premium.lifetime`
+   - Android mensual: `etiove_premium_monthly`
+   - Android lifetime: `etiove_premium_lifetime`
 3. Añadir esos productos a una offering actual en RevenueCat
 4. Copiar las public SDK keys a `.env`
 

@@ -75,7 +75,9 @@ export default function ProfileScreen({ isPremium, premiumDaysLeft, onClose, onP
               <Image source={{ uri: foto }} style={styles.avatarImg} />
             ) : (
               <View style={styles.avatar}>
-                <Text style={styles.avatarText}>{(nombre || alias || email || '?')[0].toUpperCase()}</Text>
+                <Text style={styles.avatarText}>
+                  {(nombre || alias || email || '?')[0].toUpperCase()}
+                </Text>
               </View>
             )}
             <View style={styles.avatarBadge}>
@@ -85,17 +87,31 @@ export default function ProfileScreen({ isPremium, premiumDaysLeft, onClose, onP
             {isPremium && <PremiumBadge size="lg" style={{ marginTop: 8 }} />}
             {isPremium && (
               <Text style={styles.premiumText}>
-                {premiumDaysLeft == null ? 'Premium de por vida activo' : `Premium activo · ${premiumDaysLeft} días restantes`}
+                {premiumDaysLeft == null
+                  ? 'Premium de por vida activo'
+                  : `Premium activo · ${premiumDaysLeft} días restantes`}
               </Text>
             )}
             <Text style={styles.avatarHint}>Toca para cambiar foto</Text>
           </TouchableOpacity>
 
           <Text style={styles.label}>Nombre *</Text>
-          <TextInput style={styles.input} placeholder="Tu nombre" placeholderTextColor="#bbb" value={nombre} onChangeText={setNombre} />
+          <TextInput
+            style={styles.input}
+            placeholder="Tu nombre"
+            placeholderTextColor="#bbb"
+            value={nombre}
+            onChangeText={setNombre}
+          />
 
           <Text style={styles.label}>Apellidos *</Text>
-          <TextInput style={styles.input} placeholder="Tus apellidos" placeholderTextColor="#bbb" value={apellidos} onChangeText={setApellidos} />
+          <TextInput
+            style={styles.input}
+            placeholder="Tus apellidos"
+            placeholderTextColor="#bbb"
+            value={apellidos}
+            onChangeText={setApellidos}
+          />
 
           <Text style={styles.label}>Alias *</Text>
           <TextInput
@@ -132,11 +148,18 @@ export default function ProfileScreen({ isPremium, premiumDaysLeft, onClose, onP
           <PaisPicklist value={pais} onChange={setPais} />
 
           <TouchableOpacity
-            style={[styles.primaryButton, { marginTop: 24, opacity: guardando || !camposObligatoriosCompletos ? 0.8 : 1 }]}
+            style={[
+              styles.primaryButton,
+              { marginTop: 24, opacity: guardando || !camposObligatoriosCompletos ? 0.8 : 1 },
+            ]}
             onPress={guardar}
             disabled={!!guardando}
           >
-            {guardando ? <ActivityIndicator color="#fff" /> : <Text style={styles.primaryButtonText}>Guardar cambios</Text>}
+            {guardando ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.primaryButtonText}>Guardar cambios</Text>
+            )}
           </TouchableOpacity>
         </ScrollView>
       </SafeAreaView>

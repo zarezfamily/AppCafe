@@ -21,13 +21,7 @@ export function CommunityTitleField({
   );
 }
 
-export function CommunityBodyField({
-  s,
-  value,
-  onChangeText,
-  marginTop = -6,
-  placeholder,
-}) {
+export function CommunityBodyField({ s, value, onChangeText, marginTop = -6, placeholder }) {
   return (
     <>
       <Text style={[s.label, { marginTop }]}>Contenido</Text>
@@ -43,12 +37,7 @@ export function CommunityBodyField({
   );
 }
 
-export function CommunityCountText({
-  s,
-  titleLength,
-  bodyLength,
-  showTitleLength = true,
-}) {
+export function CommunityCountText({ s, titleLength, bodyLength, showTitleLength = true }) {
   return (
     <Text style={s.forumCountText}>
       {showTitleLength ? `${titleLength}/120 · ` : ''}

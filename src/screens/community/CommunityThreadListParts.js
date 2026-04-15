@@ -1,4 +1,11 @@
-import { ActivityIndicator, Animated, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Animated,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 function ThreadAccessBadge({ accessLevel }) {
@@ -57,13 +64,17 @@ export function CommunityThreadListHeader({
             style={[s.forumSortChip, forumSort === 'top' && s.forumSortChipActive]}
             onPress={() => setForumSort('top')}
           >
-            <Text style={[s.forumSortText, forumSort === 'top' && s.forumSortTextActive]}>Más votados</Text>
+            <Text style={[s.forumSortText, forumSort === 'top' && s.forumSortTextActive]}>
+              Más votados
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[s.forumSortChip, forumSort === 'recent' && s.forumSortChipActive]}
             onPress={() => setForumSort('recent')}
           >
-            <Text style={[s.forumSortText, forumSort === 'recent' && s.forumSortTextActive]}>Más recientes</Text>
+            <Text style={[s.forumSortText, forumSort === 'recent' && s.forumSortTextActive]}>
+              Más recientes
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -149,11 +160,15 @@ function CommunityThreadListCard({
         <View style={s.forumMetaRow}>
           <View style={s.forumAuthorRow}>
             <View style={s.forumAvatar}>
-              <Text style={s.forumAvatarText}>{(thread.authorName || '?')[0]?.toUpperCase() || '?'}</Text>
+              <Text style={s.forumAvatarText}>
+                {(thread.authorName || '?')[0]?.toUpperCase() || '?'}
+              </Text>
             </View>
             <View>
               <Text style={s.forumAuthorName}>{thread.authorName || 'Usuario'}</Text>
-              {thread.authorIsPremium && PremiumBadge ? <PremiumBadge style={{ marginTop: 4 }} /> : null}
+              {thread.authorIsPremium && PremiumBadge ? (
+                <PremiumBadge style={{ marginTop: 4 }} />
+              ) : null}
               <Text style={s.forumAuthorLevel}>{thread.authorLevel || 'Novato'}</Text>
             </View>
           </View>

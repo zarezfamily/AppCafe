@@ -58,10 +58,16 @@ export default function WelcomeScreen() {
       <StatusBar barStyle="dark-content" backgroundColor="#f6efe7" />
       <View style={styles.welcomeAuraOne} />
       <View style={styles.welcomeAuraTwo} />
-      <Animated.View style={[styles.welcomeCard, { transform: [{ translateY: floatTranslateY }] }]}> 
+      <Animated.View style={[styles.welcomeCard, { transform: [{ translateY: floatTranslateY }] }]}>
         <View style={styles.welcomeTypeBox}>
-          <Text style={styles.welcomeLineTop}>{topRaw}{showCursorTop ? '|' : ' '}</Text>
-          <Text style={styles.welcomeLineBottom}>{bottomRaw}{showCursorBottom ? '|' : ' '}</Text>
+          <Text style={styles.welcomeLineTop}>
+            {topRaw}
+            {showCursorTop ? '|' : ' '}
+          </Text>
+          <Text style={styles.welcomeLineBottom}>
+            {bottomRaw}
+            {showCursorBottom ? '|' : ' '}
+          </Text>
         </View>
         <Text style={styles.welcomeSub}>SPECIALTY COFFEE ATELIER</Text>
         <Text style={styles.welcomeCaption}>Dónde nació el café</Text>

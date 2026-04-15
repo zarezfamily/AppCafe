@@ -22,7 +22,7 @@ if (quizRoot) {
   const loadQuizModule = async () => {
     if (quizLoaded) return;
     quizLoaded = true;
-    const { initQuiz } = await import('/web/quiz.js');
+    const { initQuiz } = await import('/quiz.js');
     initQuiz();
   };
   // Cargar SIEMPRE el quiz, sin esperar al scroll/intersection

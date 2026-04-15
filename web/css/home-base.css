@@ -89,6 +89,8 @@ nav {
   transition: color 0.3s;
 }
 .nav-link:hover { color: var(--accent); }
+/* Solo visible en menú mobile, oculto en desktop */
+.nav-link--mobile-only { display: none; }
 
 .social-row {
   display: flex;
@@ -222,6 +224,8 @@ nav {
     font-size: 12px;
   }
   .nav-link:last-child { border-bottom: none; }
+  /* "Sobre" visible dentro del menú mobile */
+  .nav-link--mobile-only { display: block; }
 
   .mobile-nav { display: none !important; }
   .scroll-top { bottom: 80px; right: 16px; }

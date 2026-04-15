@@ -2,13 +2,12 @@
 //  App.js — Etiove ☕  v2.1
 // ─────────────────────────────────────────────────────────────────────────────
 
-import {
-  PlayfairDisplay_700Bold,
-  PlayfairDisplay_800ExtraBold,
-} from '@expo-google-fonts/playfair-display';
-import React from 'react';
 import { SafeAreaView } from 'react-native';
 
+import { CardHorizontal, CardVertical } from '../components/Cards';
+import PackshotImage from '../components/PackshotImage';
+import SearchInput from '../components/SearchInput';
+import { restoreAuthTokenFromSecureStore } from '../services/authService';
 import {
   addDocument,
   deleteDocument,
@@ -19,18 +18,14 @@ import {
   setDocument,
   updateDocument,
 } from '../services/firestoreService';
-import { restoreAuthTokenFromSecureStore } from '../services/authService';
 import { uploadImageToStorage } from '../services/storageService';
-import { CardHorizontal, CardVertical } from '../components/Cards';
-import PackshotImage from '../components/PackshotImage';
-import SearchInput from '../components/SearchInput';
 import DiarioCatasSection from './DiarioCatasSection';
 import MainScreenBody from './MainScreenBody';
 import PremiumBadge from './PremiumBadge';
 import { KEY_VOTES, PREMIUM_ACCENT, PREMIUM_ACCENT_DEEP, THEME } from './mainScreenConfig';
-import useMainScreenComposition from './useMainScreenComposition';
 import createMainScreenStyles from './mainScreenStyles';
 import { MainScreenOverlayLayer, renderMainScreenTransientView } from './mainScreenTransientViews';
+import useMainScreenComposition from './useMainScreenComposition';
 
 const s = createMainScreenStyles(THEME, PREMIUM_ACCENT, PREMIUM_ACCENT_DEEP);
 

@@ -49,16 +49,19 @@ export async function clearPendingCatas() {
 export async function syncPendingCatas(uploadFn) {
   const pendientes = await getPendingCatas();
   if (!pendientes.length) return 0;
+
   let subidas = 0;
+
   for (const cata of pendientes) {
     try {
       await uploadFn(cata);
       subidas++;
-    } catch (_e) {
+    } catch {
       // Si falla, dejamos la cata pendiente
       break;
     }
   }
+
   if (subidas > 0) {
     const restantes = pendientes.slice(subidas);
     if (restantes.length) {
@@ -66,11 +69,12 @@ export async function syncPendingCatas(uploadFn) {
     } else {
       await clearPendingCatas();
     }
-    // Notificación push local
+
     await scheduleEtioveNotification({
       title: 'Catas sincronizadas',
       body: `${subidas} cata(s) pendientes se subieron correctamente.`,
     });
   }
+
   return subidas;
 }

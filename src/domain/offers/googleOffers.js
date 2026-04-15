@@ -1,11 +1,13 @@
 function parsePrecio(value) {
   if (typeof value === 'number') return value;
   if (!value) return Number.POSITIVE_INFINITY;
+
   const n = Number(
     String(value)
       .replace(',', '.')
       .replace(/[^\d.]/g, '')
   );
+
   return Number.isFinite(n) && n > 0 ? n : Number.POSITIVE_INFINITY;
 }
 
@@ -17,7 +19,7 @@ function decodeHtmlText(value) {
     .replace(/\\u003e/g, '>')
     .replace(/\\u00a0/g, ' ')
     .replace(/\\u20ac/g, '€')
-    .replace(/\\\//g, '/') // ESTE es correcto (no tocar más)
+    .replace(/\\\//g, '/')
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/&amp;/g, '&')
@@ -35,7 +37,11 @@ function stripHtmlTags(value) {
 function normalizarGoogleLink(rawLink) {
   const clean = decodeHtmlText(rawLink);
   if (!clean) return null;
-  if (clean.startsWith('http://') || clean.startsWith('https://')) return clean;
+
+  if (clean.startsWith('http://') || clean.startsWith('https://')) {
+    return clean;
+  }
+
   if (clean.startsWith('/url?')) {
     try {
       const params = new URLSearchParams(clean.split('?')[1] || '');
@@ -44,7 +50,11 @@ function normalizarGoogleLink(rawLink) {
       return null;
     }
   }
-  if (clean.startsWith('/')) return `https://www.google.com${clean}`;
+
+  if (clean.startsWith('/')) {
+    return `https://www.google.com${clean}`;
+  }
+
   return null;
 }
 
@@ -60,9 +70,13 @@ function inferTiendaFromLink(link) {
 function normalizarOfertaGoogle(raw) {
   const precio = parsePrecio(raw.price);
   const link = normalizarGoogleLink(raw.link);
+
   const tienda = decodeHtmlText(
-    raw.store || raw.merchant || (link ? inferTiendaFromLink(link) : 'Google Shopping')
+    raw.store ||
+      raw.merchant ||
+      (link ? inferTiendaFromLink(link) : 'Google Shopping')
   );
+
   const titulo = stripHtmlTags(raw.title || 'Oferta de café');
   const priceText = decodeHtmlText(raw.price || 'Precio no visible');
 
@@ -73,7 +87,9 @@ function normalizarOfertaGoogle(raw) {
     titulo,
     tienda,
     precio,
-    precioTexto: Number.isFinite(precio) ? `${precio.toFixed(2)}€` : priceText,
+    precioTexto: Number.isFinite(precio)
+      ? `${precio.toFixed(2)}€`
+      : priceText,
     link,
     fuente: 'Google',
   };
@@ -85,10 +101,14 @@ function extraerOfertasGoogleBusqueda(html) {
 
   cards.forEach((fragment) => {
     const block = `/url?q=${fragment.slice(0, 1800)}`;
+
     const linkMatch = block.match(/^\/url\?q=([^&"]+)/i);
     const titleMatch =
-      block.match(/<h3[^>]*>(.*?)<\/h3>/i) || block.match(/aria-label="([^"]{8,160})"/i);
-    const priceMatch = block.match(/(\d{1,4}(?:[\.,]\d{2})\s?€)/i);
+      block.match(/<h3[^>]*>(.*?)<\/h3>/i) ||
+      block.match(/aria-label="([^"]{8,160})"/i);
+
+    const priceMatch = block.match(/(\d{1,4}(?:[.,]\d{2})\s?€)/i);
+
     if (!linkMatch || !titleMatch || !priceMatch) return;
 
     const link = decodeURIComponent(linkMatch[1]);
@@ -108,12 +128,17 @@ function extraerOfertasGoogleBusqueda(html) {
 
 export function extraerOfertasGoogle(html) {
   if (
-    /trouble accessing Google Search|unusual traffic|SG_SS|detected unusual traffic/i.test(html)
+    /trouble accessing Google Search|unusual traffic|SG_SS|detected unusual traffic/i.test(
+      html
+    )
   ) {
-    throw new Error('Google ha bloqueado temporalmente la consulta de ofertas');
+    throw new Error(
+      'Google ha bloqueado temporalmente la consulta de ofertas'
+    );
   }
 
   const candidates = [];
+
   const patterns = [
     /"title":"([^"]+?)".*?"price":"([^"]+?)".*?"merchantName":"([^"]+?)".*?"url":"([^"]+?)"/g,
     /"fullTitle":"([^"]+?)".*?"price":"([^"]+?)".*?"merchantName":"([^"]+?)".*?"url":"([^"]+?)"/g,
@@ -127,16 +152,29 @@ export function extraerOfertasGoogle(html) {
   patterns.forEach((pattern, index) => {
     for (const match of html.matchAll(pattern)) {
       if (index === 2) {
-        candidates.push({ title: match[1], merchant: match[2], price: match[3], link: match[4] });
+        candidates.push({
+          title: match[1],
+          merchant: match[2],
+          price: match[3],
+          link: match[4],
+        });
       } else {
-        candidates.push({ title: match[1], price: match[2], merchant: match[3], link: match[4] });
+        candidates.push({
+          title: match[1],
+          price: match[2],
+          merchant: match[3],
+          link: match[4],
+        });
       }
     }
   });
 
-  extraerOfertasGoogleBusqueda(html).forEach((offer) => candidates.push(offer));
+  extraerOfertasGoogleBusqueda(html).forEach((offer) =>
+    candidates.push(offer)
+  );
 
   const seen = new Set();
+
   return candidates
     .map(normalizarOfertaGoogle)
     .filter((offer) => {
@@ -150,6 +188,7 @@ export function extraerOfertasGoogle(html) {
 
 export function buildGoogleOfferSearchUrls(cafeNombre) {
   const query = encodeURIComponent(`${cafeNombre} café comprar precio`);
+
   return [
     `https://www.google.com/search?tbm=shop&hl=es&gl=es&q=${query}`,
     `https://www.google.com/search?tbm=shop&gbv=1&hl=es&gl=es&q=${query}`,
@@ -157,8 +196,12 @@ export function buildGoogleOfferSearchUrls(cafeNombre) {
   ];
 }
 
-export async function fetchGoogleOffersForCafe(cafeNombre, fetchImpl = fetch) {
+export async function fetchGoogleOffersForCafe(
+  cafeNombre,
+  fetchImpl = fetch
+) {
   const endpoints = buildGoogleOfferSearchUrls(cafeNombre);
+
   let ofertas = [];
   let lastError = null;
 
@@ -169,6 +212,7 @@ export async function fetchGoogleOffersForCafe(cafeNombre, fetchImpl = fetch) {
           'Accept-Language': 'es-ES,es;q=0.9',
         },
       });
+
       if (!res.ok) {
         lastError = new Error(`Google respondió con ${res.status}`);
         continue;
@@ -176,6 +220,7 @@ export async function fetchGoogleOffersForCafe(cafeNombre, fetchImpl = fetch) {
 
       const html = await res.text();
       ofertas = extraerOfertasGoogle(html);
+
       if (ofertas.length > 0) break;
     } catch (error) {
       lastError = error;
@@ -183,5 +228,6 @@ export async function fetchGoogleOffersForCafe(cafeNombre, fetchImpl = fetch) {
   }
 
   if (ofertas.length === 0 && lastError) throw lastError;
+
   return ofertas;
 }

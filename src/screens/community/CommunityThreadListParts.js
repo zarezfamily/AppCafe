@@ -1,12 +1,5 @@
-import {
-  ActivityIndicator,
-  Animated,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Animated, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 function ThreadAccessBadge({ accessLevel }) {
   const isRegisteredOnly = accessLevel === 'registered_only';
@@ -166,9 +159,7 @@ function CommunityThreadListCard({
             </View>
             <View>
               <Text style={s.forumAuthorName}>{thread.authorName || 'Usuario'}</Text>
-              {thread.authorIsPremium && PremiumBadge ? (
-                <PremiumBadge style={{ marginTop: 4 }} />
-              ) : null}
+              {thread.authorIsPremium && PremiumBadge ? <PremiumBadge style={{ marginTop: 4 }} /> : null}
               <Text style={s.forumAuthorLevel}>{thread.authorLevel || 'Novato'}</Text>
             </View>
           </View>

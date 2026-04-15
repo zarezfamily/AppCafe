@@ -1,4 +1,4 @@
-import { Animated, View } from 'react-native';
+import { Animated } from 'react-native';
 import {
   CommunityThreadListContent,
   CommunityThreadListHeader,

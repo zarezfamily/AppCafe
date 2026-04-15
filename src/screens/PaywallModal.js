@@ -1,5 +1,3 @@
-// SOLO CAMBIOS CLAVE (te dejo el archivo completo limpio de warnings)
-
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef } from 'react';
 import {
@@ -10,7 +8,7 @@ import {
   ScrollView,
   StatusBar,
   Text,
-  TouchableOpacity
+  TouchableOpacity,
 } from 'react-native';
 import { PREMIUM_PLANS } from '../core/premium';
 
@@ -19,8 +17,8 @@ export default function PaywallModal({
   onClose,
   onPurchase,
   onRestore,
-  trigger,
-  isPremium,
+  _trigger,
+  _isPremium,
   purchasingPlan,
   restoring,
   revenueCatReady,
@@ -31,8 +29,16 @@ export default function PaywallModal({
   useEffect(() => {
     if (visible) {
       Animated.parallel([
-        Animated.timing(fadeAnim, { toValue: 1, duration: 320, useNativeDriver: true }),
-        Animated.timing(slideAnim, { toValue: 0, duration: 320, useNativeDriver: true }),
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 320,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 320,
+          useNativeDriver: true,
+        }),
       ]).start();
     } else {
       fadeAnim.setValue(0);
@@ -71,23 +77,17 @@ export default function PaywallModal({
         <ScrollView>
           <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
             <TouchableOpacity onPress={() => handlePurchase('lifetime')}>
-              <Text>
-                {purchasingPlan === 'lifetime' ? 'Procesando...' : 'Comprar de por vida'}
-              </Text>
+              <Text>{purchasingPlan === 'lifetime' ? 'Procesando...' : 'Comprar de por vida'}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => handlePurchase('monthly')}>
               <Text>
-                {purchasingPlan === 'monthly'
-                  ? 'Procesando...'
-                  : 'Suscribirse mensualmente'}
+                {purchasingPlan === 'monthly' ? 'Procesando...' : 'Suscribirse mensualmente'}
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={onRestore}>
-              <Text>
-                {restoring ? 'Restaurando compras...' : 'Restaurar compras'}
-              </Text>
+              <Text>{restoring ? 'Restaurando compras...' : 'Restaurar compras'}</Text>
             </TouchableOpacity>
           </Animated.View>
         </ScrollView>

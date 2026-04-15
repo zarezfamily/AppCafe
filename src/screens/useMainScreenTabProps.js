@@ -420,7 +420,7 @@ export default function useMainScreenTabProps({
   offers,
   community,
 }) {
-  const { s, theme, premiumAccent, premiumAccentDeep, onLogout, appVersion, iconFaint } = core;
+  const { s, theme, premiumAccent, _premiumAccentDeep, onLogout, appVersion, iconFaint } = core;
   const {
     SearchInput,
     CardVertical,

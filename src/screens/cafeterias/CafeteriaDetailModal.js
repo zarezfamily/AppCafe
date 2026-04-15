@@ -12,7 +12,7 @@ import {
   View,
 } from 'react-native';
 
-import { PREMIUM_ACCENT, PREMIUM_ACCENT_DEEP, THEME } from '../../constants/theme';
+import { PREMIUM_ACCENT, THEME } from '../../constants/theme';
 
 export default function CafeteriaDetailModal({ cafeteria, styles, onClose, abrirMaps }) {
   if (!cafeteria) return null;

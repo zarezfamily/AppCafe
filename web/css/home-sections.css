@@ -25,11 +25,11 @@
   margin-bottom: 24px;
 }
 
-.section-about-wrap .about-title { color: var(--ink); }
+.section-about-wrap .about-title { color: var(--ink); font-weight: 700; }
 .section-about-wrap .about-title em { color: var(--accent); }
 .section-about-wrap .about-text { color: var(--ink-soft); }
 .section-about-wrap .feature-num { color: var(--border); }
-.section-about-wrap .feature-copy h3 { color: var(--ink); }
+.section-about-wrap .feature-copy h3 { color: var(--accent); }
 .section-about-wrap .feature-copy p { color: var(--ink-muted); }
 .section-about-wrap .feature-row { border-bottom-color: var(--border-soft); }
 .section-about-wrap .feature-row:first-child { border-top-color: var(--border-soft); }

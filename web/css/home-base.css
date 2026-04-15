@@ -183,7 +183,7 @@ nav {
   z-index: 200;
 }
 .scroll-top.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
-.scroll-top:hover { background: var(--accent); }
+.scroll-top:hover { background: var(--accent-deep); }
 
 @media (max-width: 768px) {
   nav { padding: 16px 20px; }

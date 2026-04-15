@@ -19,31 +19,12 @@ const quizRoot = document.getElementById('webQuizRoot');
 
 if (quizRoot) {
   let quizLoaded = false;
-
   const loadQuizModule = async () => {
     if (quizLoaded) return;
     quizLoaded = true;
     const { initQuiz } = await import('/quiz.js');
     initQuiz();
   };
-
-  if ('IntersectionObserver' in window) {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          observer.disconnect();
-          loadQuizModule();
-        });
-      },
-      {
-        rootMargin: '400px 0px',
-        threshold: 0.01,
-      }
-    );
-
-    observer.observe(quizRoot);
-  } else {
-    loadQuizModule();
-  }
+  // Cargar SIEMPRE el quiz, sin esperar al scroll/intersection
+  loadQuizModule();
 }

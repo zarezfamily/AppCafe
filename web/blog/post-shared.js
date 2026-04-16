@@ -170,9 +170,9 @@
   };
 
   const addComment = async (data) => {
-    const auth = getAuth();
+    const token = await ensureFreshToken();
     const headers = { ...baseHeaders() };
-    if (auth.token) headers['Authorization'] = `Bearer ${auth.token}`;
+    if (token) headers['Authorization'] = `Bearer ${token}`;
     const res = await fetch(`${BASE_URL}/blog_comentarios?key=${FIREBASE_API_KEY}`, {
       method: 'POST',
       headers,
@@ -382,6 +382,12 @@
     const listEl = document.getElementById('commentList');
     if (!sendBtn || !bodyEl || !listEl) return;
 
+    // Refrescar token y cargar comentarios en paralelo.
+    // El refresh actualiza etiove_web_uid en localStorage antes de renderizar,
+    // de modo que isOwner() puede comparar correctamente el UID del autor.
+    const [, comments] = await Promise.all([ensureFreshToken(), getComments()]);
+
+    // Leer auth DESPUÉS del refresh para tener uid/alias actualizados
     const auth = getAuth();
 
     // Help text
@@ -394,9 +400,6 @@
         helpEl.innerHTML = `<a href="/comunidad.html">Inicia sesión</a> para comentar con tu alias. Los comentarios de invitados también son bienvenidos.`;
       }
     }
-
-    // Load existing comments
-    const comments = await getComments();
     renderComments(comments, listEl);
 
     // Send comment
@@ -414,6 +417,8 @@
       sendBtn.textContent = 'Publicando...';
       if (statusEl) statusEl.textContent = '';
 
+      // Refrescar token antes de leer el UID para que authorUid esté actualizado
+      await ensureFreshToken();
       const currentAuth = getAuth();
       const authorName = currentAuth.alias || 'Catador';
 

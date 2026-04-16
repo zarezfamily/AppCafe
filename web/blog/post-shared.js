@@ -3,7 +3,15 @@
 // reading progress bar, and Firebase-backed comments.
 
 (function () {
-  'use strict';
+  // DEBUG VISUAL: Si ves este mensaje, el JS NUEVO está cargado correctamente
+  const debugBanner = document.createElement('div');
+  debugBanner.textContent = 'DEBUG: JS NUEVO CARGADO (post-shared.js 20260416)';
+  debugBanner.style.cssText =
+    'position:fixed;top:0;left:0;right:0;z-index:99999;background:#c0554a;color:#fff;font-size:22px;padding:16px;text-align:center;font-family:sans-serif;';
+  document.body.prepend(debugBanner);
+  setTimeout(() => debugBanner.remove(), 8000);
+
+  ('use strict');
 
   // ─── CONFIG ────────────────────────────────────────────────────────────────
   const {

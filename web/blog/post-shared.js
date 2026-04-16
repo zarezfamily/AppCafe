@@ -3,14 +3,6 @@
 // reading progress bar, and Firebase-backed comments.
 
 (function () {
-  // DEBUG VISUAL: Si ves este mensaje, el JS NUEVO está cargado correctamente
-  const debugBanner = document.createElement('div');
-  debugBanner.textContent = 'DEBUG: JS NUEVO CARGADO (post-shared.js 20260416)';
-  debugBanner.style.cssText =
-    'position:fixed;top:0;left:0;right:0;z-index:99999;background:#c0554a;color:#fff;font-size:22px;padding:16px;text-align:center;font-family:sans-serif;';
-  document.body.prepend(debugBanner);
-  setTimeout(() => debugBanner.remove(), 8000);
-
   ('use strict');
 
   // ─── CONFIG ────────────────────────────────────────────────────────────────
@@ -18,6 +10,7 @@
     apiKey: FIREBASE_API_KEY,
     iosBundleId: FIREBASE_IOS_BUNDLE,
     baseUrl: BASE_URL,
+    authUrl: AUTH_URL,
   } = window.ETIOVE_CONFIG;
 
   const cfg = window.ETIOVE_BLOG_POST_CONFIG || {};
@@ -82,6 +75,43 @@
     alias: localStorage.getItem('etiove_web_alias') || '',
     token: localStorage.getItem('etiove_web_token') || '',
   });
+
+  // Refresca el Firebase ID token usando el refresh token guardado.
+  // Devuelve el nuevo id_token, o '' si no se puede refrescar.
+  const refreshFirebaseToken = async () => {
+    const refreshToken = localStorage.getItem('etiove_web_refresh_token');
+    if (!refreshToken) return '';
+    try {
+      const res = await fetch(
+        `https://securetoken.googleapis.com/v1/token?key=${FIREBASE_API_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: `grant_type=refresh_token&refresh_token=${encodeURIComponent(refreshToken)}`,
+        }
+      );
+      if (!res.ok) return '';
+      const json = await res.json();
+      if (json.id_token && json.user_id) {
+        localStorage.setItem('etiove_web_token', json.id_token);
+        localStorage.setItem('etiove_web_uid', json.user_id);
+        if (json.refresh_token)
+          localStorage.setItem('etiove_web_refresh_token', json.refresh_token);
+        return json.id_token;
+      }
+    } catch (_) {}
+    return '';
+  };
+
+  // Devuelve un token válido: refresca primero si hay refresh token disponible.
+  const ensureFreshToken = async () => {
+    const refreshToken = localStorage.getItem('etiove_web_refresh_token');
+    if (refreshToken) {
+      const fresh = await refreshFirebaseToken();
+      if (fresh) return fresh;
+    }
+    return localStorage.getItem('etiove_web_token') || '';
+  };
 
   // ─── FIRESTORE HELPERS ────────────────────────────────────────────────────
   const toFirestoreValue = (val) => {
@@ -153,9 +183,9 @@
   };
 
   const deleteComment = async (docId) => {
-    const auth = getAuth();
+    const token = await ensureFreshToken();
     const headers = { ...baseHeaders() };
-    if (auth.token) headers['Authorization'] = `Bearer ${auth.token}`;
+    if (token) headers['Authorization'] = `Bearer ${token}`;
     const res = await fetch(`${BASE_URL}/blog_comentarios/${docId}?key=${FIREBASE_API_KEY}`, {
       method: 'DELETE',
       headers,
@@ -299,29 +329,26 @@
       String(v || '')
         .trim()
         .toLowerCase();
-    // Debug: show current user and comment author info
-    const debugAuth = `<span style=\"color:#bfae7c;font-size:11px;opacity:0.7;\">[uid:${escapeHtml(auth.uid)}|alias:${escapeHtml(auth.alias)}]</span>`;
-    listEl.innerHTML =
-      list
-        .map((c) => {
-          // Robust owner check: compare as strings, trim, lowercase
-          const isOwner =
-            auth.token &&
-            ((auth.uid && c.authorUid && norm(c.authorUid) === norm(auth.uid)) ||
-              (auth.alias && norm(c.authorName) === norm(auth.alias)));
-          // Debug visual for each comment
-          const debug = `<span style=\"color:#bfae7c;font-size:11px;opacity:0.7;\">[c.uid:${escapeHtml(c.authorUid)}|c.alias:${escapeHtml(c.authorName)}]</span>`;
-          const deleteBtn = isOwner
-            ? `<button class=\"comment-delete-btn\" data-id=\"${escapeHtml(c.id)}\" title=\"Borrar comentario\" style=\"background:none;border:none;cursor:pointer;font-size:13px;color:#c0554a;margin-left:10px;padding:0;font-family:inherit;opacity:0.7;\" onmouseover=\"this.style.opacity=1\" onmouseout=\"this.style.opacity=0.7\">✕ Borrar</button>`
-            : '';
-          return `
-      <div class=\"comment-item\" data-comment-id=\"${escapeHtml(c.id)}\">\n        <p class=\"comment-meta\">\n          <strong>${escapeHtml(c.authorName || 'Catador')}</strong>\n          · ${fmtDate(c.createdAt)} ${deleteBtn} ${debug}
+    listEl.innerHTML = list
+      .map((c) => {
+        const isOwner =
+          auth.token &&
+          ((auth.uid && c.authorUid && norm(c.authorUid) === norm(auth.uid)) ||
+            (auth.alias && norm(c.authorName) === norm(auth.alias)));
+        const deleteBtn = isOwner
+          ? `<button class="comment-delete-btn" data-id="${escapeHtml(c.id)}" title="Borrar comentario" style="background:none;border:none;cursor:pointer;font-size:13px;color:#c0554a;margin-left:10px;padding:0;font-family:inherit;opacity:0.7;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.7">✕ Borrar</button>`
+          : '';
+        return `
+      <div class="comment-item" data-comment-id="${escapeHtml(c.id)}">
+        <p class="comment-meta">
+          <strong>${escapeHtml(c.authorName || 'Catador')}</strong>
+          · ${fmtDate(c.createdAt)} ${deleteBtn}
         </p>
-        <p class=\"comment-body\">${escapeHtml(c.body || '')}</p>
+        <p class="comment-body">${escapeHtml(c.body || '')}</p>
       </div>
     `;
-        })
-        .join('') + debugAuth;
+      })
+      .join('');
 
     // Attach delete handlers
     listEl.querySelectorAll('.comment-delete-btn').forEach((btn) => {

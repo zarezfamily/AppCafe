@@ -601,7 +601,8 @@ const renderMemberEvolutionCard = ({ profile = null, allThreads = [], allReplies
   el.memberEvolutionCard.style.display = 'block';
 };
 
-const canManageItem = (item) => !!auth.uid && item && item.authorUid === auth.uid;
+const canManageItem = (item) =>
+  !!auth.uid && item && String(item.authorUid).trim() === String(auth.uid).trim();
 
 const setThreadImageStatus = (text, kind = '') => {
   if (!el.threadImageStatus) return;
@@ -1594,6 +1595,9 @@ const renderThreads = () => {
         return `<div class="reply">
         <div class="meta"><button class="link-btn author-btn" data-author-uid="${escapeHtml(r.authorUid || '')}" data-author-name="${escapeHtml(r.authorName || 'Catador')}" style="font-weight:600;">${escapeHtml(r.authorName || 'Catador')}</button> · ${fmt(r.createdAt)}</div>
         <p>${escapeHtml(r.body || '')}</p>
+        <div style="font-size:11px;color:#b00;background:#fff3f3;padding:2px 6px;border-radius:4px;margin-bottom:2px;">
+          <strong>DEBUG:</strong> authorUid=<span style="color:#333">${escapeHtml(String(r.authorUid))}</span> | auth.uid=<span style="color:#333">${escapeHtml(String(auth.uid))}</span>
+        </div>
         <div class="thread-foot">
           <div class="actions-row">
             <button class="link-btn" data-reply-vote="${r.id}">${hasUserVote(r) ? 'Ya te interesa' : 'Me interesa'}</button>

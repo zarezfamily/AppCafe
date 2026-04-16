@@ -3419,9 +3419,27 @@ const init = async () => {
   if (el.categorySelect) el.categorySelect.addEventListener('change', saveDraft);
   if (el.threadAccessLevel) el.threadAccessLevel.addEventListener('change', saveDraft);
 
-  el.loginBtn.addEventListener('click', () => signIn(false));
-  el.registerBtn.addEventListener('click', () => signIn(true));
-  el.logoutBtn.addEventListener('click', logout);
+  el.loginBtn.addEventListener('click', async () => {
+    await signIn(false);
+    renderAuthState();
+    if (typeof renderMemberEvolutionCard === 'function') {
+      renderMemberEvolutionCard({ profile: null, allThreads: [], allReplies: [] });
+    }
+  });
+  el.registerBtn.addEventListener('click', async () => {
+    await signIn(true);
+    renderAuthState();
+    if (typeof renderMemberEvolutionCard === 'function') {
+      renderMemberEvolutionCard({ profile: null, allThreads: [], allReplies: [] });
+    }
+  });
+  el.logoutBtn.addEventListener('click', async () => {
+    await logout();
+    renderAuthState();
+    if (typeof renderMemberEvolutionCard === 'function') {
+      renderMemberEvolutionCard({ profile: null, allThreads: [], allReplies: [] });
+    }
+  });
   el.createThreadBtn.addEventListener('click', createThread);
   if (el.cancelThreadEditBtn) {
     el.cancelThreadEditBtn.addEventListener('click', () => {

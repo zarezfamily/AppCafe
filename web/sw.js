@@ -1,6 +1,6 @@
 // Etiove Service Worker — PWA offline shell
 // Versión: incrementar para forzar actualización del caché
-const CACHE_VERSION = 'etiove-v7';
+const CACHE_VERSION = 'etiove-v8';
 
 // Assets del shell que se cachean en la instalación (siempre disponibles offline)
 const SHELL_ASSETS = [
@@ -10,7 +10,11 @@ const SHELL_ASSETS = [
   '/blog/',
   '/favicon.png',
   '/favicon-48x48.png',
+  '/site.js',
   '/quiz.js',
+  '/quizData.js',
+  '/quizProfile.js',
+  '/quizStyles.js',
   '/favicon.svg',
   '/favicon.ico',
   '/icon.png',

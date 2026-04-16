@@ -287,35 +287,33 @@
       return;
     }
     const auth = getAuth();
-    const normAlias = (s) =>
-      String(s || '')
+    const norm = (v) =>
+      String(v || '')
         .trim()
-        .toLowerCase()
-        .replace(/^@/, '');
-    console.log('[etiove] auth uid:', auth.uid, '| alias:', auth.alias, '| !!token:', !!auth.token);
-    list.forEach((c) =>
-      console.log('[etiove] comment authorUid:', c.authorUid, '| authorName:', c.authorName)
-    );
-    listEl.innerHTML = list
-      .map((c) => {
-        const isOwner =
-          auth.token &&
-          ((auth.uid && c.authorUid && c.authorUid === auth.uid) ||
-            (auth.alias && normAlias(c.authorName) === normAlias(auth.alias)));
-        const deleteBtn = isOwner
-          ? `<button class="comment-delete-btn" data-id="${escapeHtml(c.id)}" title="Borrar comentario" style="background:none;border:none;cursor:pointer;font-size:13px;color:#c0554a;margin-left:10px;padding:0;font-family:inherit;opacity:0.7;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.7">✕ Borrar</button>`
-          : '';
-        return `
-      <div class="comment-item" data-comment-id="${escapeHtml(c.id)}">
-        <p class="comment-meta">
-          <strong>${escapeHtml(c.authorName || 'Catador')}</strong>
-          · ${fmtDate(c.createdAt)}${deleteBtn}
+        .toLowerCase();
+    // Debug: show current user and comment author info
+    const debugAuth = `<span style=\"color:#bfae7c;font-size:11px;opacity:0.7;\">[uid:${escapeHtml(auth.uid)}|alias:${escapeHtml(auth.alias)}]</span>`;
+    listEl.innerHTML =
+      list
+        .map((c) => {
+          // Robust owner check: compare as strings, trim, lowercase
+          const isOwner =
+            auth.token &&
+            ((auth.uid && c.authorUid && norm(c.authorUid) === norm(auth.uid)) ||
+              (auth.alias && norm(c.authorName) === norm(auth.alias)));
+          // Debug visual for each comment
+          const debug = `<span style=\"color:#bfae7c;font-size:11px;opacity:0.7;\">[c.uid:${escapeHtml(c.authorUid)}|c.alias:${escapeHtml(c.authorName)}]</span>`;
+          const deleteBtn = isOwner
+            ? `<button class=\"comment-delete-btn\" data-id=\"${escapeHtml(c.id)}\" title=\"Borrar comentario\" style=\"background:none;border:none;cursor:pointer;font-size:13px;color:#c0554a;margin-left:10px;padding:0;font-family:inherit;opacity:0.7;\" onmouseover=\"this.style.opacity=1\" onmouseout=\"this.style.opacity=0.7\">✕ Borrar</button>`
+            : '';
+          return `
+      <div class=\"comment-item\" data-comment-id=\"${escapeHtml(c.id)}\">\n        <p class=\"comment-meta\">\n          <strong>${escapeHtml(c.authorName || 'Catador')}</strong>\n          · ${fmtDate(c.createdAt)} ${deleteBtn} ${debug}
         </p>
-        <p class="comment-body">${escapeHtml(c.body || '')}</p>
+        <p class=\"comment-body\">${escapeHtml(c.body || '')}</p>
       </div>
     `;
-      })
-      .join('');
+        })
+        .join('') + debugAuth;
 
     // Attach delete handlers
     listEl.querySelectorAll('.comment-delete-btn').forEach((btn) => {

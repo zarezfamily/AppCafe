@@ -975,7 +975,7 @@ ${renderScrollTopButton()}
     };
   </script>
   <script src="/js/config.js"></script>
-  <script src="/blog/post-shared.js" defer></script>
+  <script src="/blog/post-shared.js?v=20260416c" defer></script>
   <script type="module" src="/blog/post-page.js"></script>
 ${renderBlogPostFooter()}
 </body>

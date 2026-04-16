@@ -569,6 +569,14 @@
         margin-right: auto;
       }
 
+      /* about.css fuerza text-align:justify en todos los <p>.
+         Revertimos en secciones que deben ir centradas. */
+      .app-hero p,
+      .app-cta-dark p,
+      .video-section p {
+        text-align: center;
+      }
+
       /* ─── RESPONSIVE ──────────────────────────────────────────────── */
       @media (max-width: 640px) {
         .app-hero { padding: 110px 24px 72px; }

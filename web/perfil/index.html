@@ -296,14 +296,15 @@
       .profile-alias {
         font-family: 'Playfair Display', serif;
         font-size: clamp(24px, 3.5vw, 34px);
-        font-weight: 400;
-        color: #fff8f0;
+        font-weight: 500;
+        color: #ffffff;
         line-height: 1.1;
         margin-bottom: 4px;
         display: flex;
         align-items: center;
         gap: 4px;
         flex-wrap: wrap;
+        text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
       }
       .profile-since {
         font-size: 10px;
@@ -351,21 +352,22 @@
 
       /* Level badge */
       .profile-level-badge {
-        background: linear-gradient(145deg, rgba(201, 149, 87, 0.22), rgba(240, 201, 141, 0.1));
-        border: 1px solid rgba(201, 149, 87, 0.45);
+        background: linear-gradient(145deg, rgba(201, 149, 87, 0.28), rgba(240, 201, 141, 0.14));
+        border: 1px solid rgba(201, 149, 87, 0.6);
         border-radius: 999px;
-        padding: 9px 16px;
+        padding: 10px 18px;
         white-space: nowrap;
         box-shadow:
-          inset 0 1px 0 rgba(255, 244, 220, 0.14),
-          0 4px 16px rgba(201, 149, 87, 0.12);
+          inset 0 1px 0 rgba(255, 244, 220, 0.18),
+          0 4px 20px rgba(201, 149, 87, 0.2),
+          0 0 0 1px rgba(201, 149, 87, 0.1);
         align-self: start;
       }
       .profile-level-text {
         font-size: 12px;
         font-weight: 700;
-        color: rgba(255, 240, 210, 0.95);
-        letter-spacing: 0.3px;
+        color: #f5d9a0;
+        letter-spacing: 0.5px;
         font-family: 'Manrope', sans-serif;
       }
 
@@ -379,45 +381,79 @@
         margin: 0;
       }
       .hero-stat {
-        padding: 22px 12px;
+        padding: 20px 12px;
         text-align: center;
-        border-right: 1px solid rgba(255, 232, 200, 0.08);
+        border-right: 1px solid rgba(255, 232, 200, 0.07);
         transition: background 0.2s;
       }
       .hero-stat:last-child {
         border-right: none;
       }
       .hero-stat:hover {
-        background: rgba(255, 232, 200, 0.05);
+        background: rgba(255, 232, 200, 0.04);
       }
       .hero-stat-value {
         font-family: 'Playfair Display', serif;
-        font-size: 26px;
-        font-weight: 400;
-        color: #fff8f0;
+        font-size: 28px;
+        font-weight: 500;
+        color: #ffffff;
         line-height: 1;
-        margin-bottom: 6px;
+        margin-bottom: 7px;
         display: block;
+        text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
       }
       .hero-stat-label {
         font-size: 9px;
         font-weight: 700;
         letter-spacing: 1.8px;
         text-transform: uppercase;
-        color: rgba(201, 149, 87, 0.65);
+        color: rgba(201, 149, 87, 0.75);
       }
 
       /* ── HERO PROGRESS ── */
       .hero-progress {
         position: relative;
         z-index: 1;
-        padding: 22px 40px 30px;
+        padding: 20px 40px 28px;
         border-top: 1px solid rgba(255, 232, 200, 0.08);
+      }
+      .progress-journey {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        gap: 12px;
+      }
+      .progress-level-current {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        color: rgba(255, 244, 230, 0.6);
+      }
+      .progress-level-arrow {
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          rgba(201, 149, 87, 0.3),
+          rgba(201, 149, 87, 0.6),
+          rgba(201, 149, 87, 0.3)
+        );
+        position: relative;
+      }
+      .progress-level-next {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        color: rgba(201, 149, 87, 0.9);
       }
       .progress-labels {
         display: flex;
         justify-content: space-between;
         margin-bottom: 10px;
+        display: none;
       }
       .progress-label-text {
         font-size: 10px;
@@ -433,18 +469,27 @@
         font-style: italic;
       }
       .profile-progress-track {
-        height: 6px;
+        height: 8px;
         border-radius: 999px;
-        background: rgba(255, 232, 200, 0.1);
+        background: rgba(255, 232, 200, 0.08);
         overflow: hidden;
+        border: 1px solid rgba(255, 232, 200, 0.06);
       }
       .profile-progress-fill {
         height: 100%;
         border-radius: 999px;
-        background: linear-gradient(90deg, #b8843e, #e8b870, #f5d8a0);
+        background: linear-gradient(90deg, #9a6830, #c99557, #f0c875);
         width: 0%;
-        transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-        box-shadow: 0 0 8px rgba(201, 149, 87, 0.35);
+        transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+        box-shadow:
+          0 0 12px rgba(201, 149, 87, 0.5),
+          0 0 4px rgba(240, 200, 117, 0.6);
+      }
+      .progress-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-top: 10px;
       }
 
       /* ── HERO ACTIONS ── */
@@ -1222,26 +1267,20 @@
 
         <!-- Progress -->
         <div class="hero-progress">
-          <div class="progress-labels">
-            <span id="profileNextLevel" class="progress-label-text">Próximo nivel: Aficionado</span>
-            <span id="profileNextXp" class="progress-xp">220 XP</span>
+          <div class="progress-journey">
+            <span id="profileCurrentLevelLabel" class="progress-level-current">🌱 Novato</span>
+            <div class="progress-level-arrow"></div>
+            <span id="profileNextLevel" class="progress-level-next">☕ Aficionado</span>
           </div>
           <div class="profile-progress-track">
             <div id="profileProgressFill" class="profile-progress-fill"></div>
           </div>
-          <div
-            style="
-              margin-top: 10px;
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-            "
-          >
+          <div class="progress-footer">
             <p
               id="profileXp"
               style="
                 font-size: 12px;
-                color: rgba(201, 149, 87, 0.65);
+                color: rgba(255, 220, 160, 0.85);
                 font-weight: 700;
                 letter-spacing: 0.3px;
               "
@@ -1249,10 +1288,26 @@
               0 XP acumulados
             </p>
             <p
-              id="profileCounters"
-              style="font-size: 10px; color: rgba(255, 220, 170, 0.35); letter-spacing: 0.5px"
-            ></p>
+              id="profileNextXp"
+              style="
+                font-size: 11px;
+                color: rgba(201, 149, 87, 0.65);
+                font-style: italic;
+                font-family: 'Playfair Display', serif;
+              "
+            >
+              220 XP
+            </p>
           </div>
+          <p
+            id="profileCounters"
+            style="
+              font-size: 10px;
+              color: rgba(255, 220, 170, 0.3);
+              letter-spacing: 0.5px;
+              margin-top: 4px;
+            "
+          ></p>
         </div>
 
         <!-- Actions -->
@@ -1271,7 +1326,7 @@
             style="
               margin-top: 10px;
               font-size: 10px;
-              color: rgba(201, 149, 87, 0.45);
+              color: rgba(201, 149, 87, 0.7);
               font-weight: 700;
               letter-spacing: 1.5px;
               text-transform: uppercase;
@@ -1315,7 +1370,7 @@
     </button>
 
     <script src="/js/config.js"></script>
-    <script src="/profile.js?v=20260417b"></script>
+    <script src="/profile.js?v=20260417c"></script>
 
     <!-- FOOTER -->
     <footer>

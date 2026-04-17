@@ -61,6 +61,7 @@
     alias: document.getElementById('profileAlias'),
     name: document.getElementById('profileName'),
     level: document.getElementById('profileLevel'),
+    levelJourney: document.getElementById('profileCurrentLevelLabel'),
     xp: document.getElementById('profileXp'),
     nextLevel: document.getElementById('profileNextLevel'),
     nextXp: document.getElementById('profileNextXp'),
@@ -746,12 +747,15 @@
     }
     if (el.since) el.since.textContent = sinceText;
     if (el.level) el.level.textContent = `${currentLevel.icon} ${currentLevel.name}`;
+    if (el.levelJourney)
+      el.levelJourney.textContent = `${currentLevel.icon} ${currentLevel.name.toUpperCase()}`;
     if (el.xp) el.xp.textContent = `${member.xp} XP acumulados`;
     if (el.nextLevel)
       el.nextLevel.textContent = nextLevel
-        ? `Próximo nivel: ${nextLevel.name}`
-        : 'Nivel máximo alcanzado';
-    if (el.nextXp) el.nextXp.textContent = nextLevel ? `${nextLevel.minXp} XP` : '';
+        ? `${nextLevel.icon} ${nextLevel.name.toUpperCase()}`
+        : 'NIVEL MÁXIMO';
+    if (el.nextXp)
+      el.nextXp.textContent = nextLevel ? `${nextLevel.minXp} XP para el siguiente` : '';
     if (el.progressFill) el.progressFill.style.width = `${progress.toFixed(1)}%`;
     if (el.statVotes) el.statVotes.textContent = String(member.votesCount);
     if (el.statPhotos) el.statPhotos.textContent = String(member.photosCount);
@@ -1340,6 +1344,34 @@
     tag.type = 'application/ld+json';
     tag.textContent = JSON.stringify(schema);
     document.head.appendChild(tag);
+  };
+
+  const VALID_TABS = [
+    'activity',
+    'threads',
+    'replies',
+    'blog',
+    'followers',
+    'following',
+    'messages',
+    'stats',
+  ];
+
+  const setHashForTab = (tabName) => {
+    try {
+      const target =
+        tabName && tabName !== 'activity'
+          ? `${window.location.pathname}${window.location.search}#${tabName}`
+          : window.location.pathname + window.location.search;
+      window.history.replaceState(null, '', target);
+    } catch {
+      // navigation not available in this context
+    }
+  };
+
+  const getTabFromHash = () => {
+    const hash = (window.location.hash || '').replace(/^#/, '');
+    return VALID_TABS.includes(hash) ? hash : null;
   };
 
   const renderTab = (tabName) => {

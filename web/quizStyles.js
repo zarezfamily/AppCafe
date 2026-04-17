@@ -1,7 +1,10 @@
 export const QUIZ_STYLE_ELEMENT_ID = 'eq-styles';
 
 export const QUIZ_STYLES = `
-  #webQuizRoot, #webQuizRoot * { box-sizing: border-box; margin: 0; padding: 0; }
+  #webQuizRoot * { box-sizing: border-box; }
+  #webQuizRoot h1, #webQuizRoot h2, #webQuizRoot h3, #webQuizRoot h4,
+  #webQuizRoot h5, #webQuizRoot h6, #webQuizRoot p, #webQuizRoot ul,
+  #webQuizRoot ol, #webQuizRoot figure { margin: 0; padding: 0; }
 
   #webQuizRoot {
     position: relative;

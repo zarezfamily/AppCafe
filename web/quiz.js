@@ -1,11 +1,11 @@
-import { QUIZ, QUIZ_STEP_NUMERALS } from '/quizData.js?v=20260417c';
+import { QUIZ, QUIZ_STEP_NUMERALS } from '/quizData.js?v=20260417d';
 import {
   clearQuizProfile,
   loadQuizProfile,
   renderQuizSummary,
   saveQuizProfile,
-} from '/quizProfile.js?v=20260417c';
-import { ensureQuizStyles } from '/quizStyles.js?v=20260417c';
+} from '/quizProfile.js?v=20260417d';
+import { ensureQuizStyles } from '/quizStyles.js?v=20260417d';
 
 function renderQuiz() {
   const root = document.getElementById('webQuizRoot');

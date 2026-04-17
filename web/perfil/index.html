@@ -15,6 +15,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-title" content="Etiove" />
     <meta name="theme-color" content="#21150f" />
+    <meta name="color-scheme" content="light dark" />
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com" />
     <link rel="dns-prefetch" href="https://europe-west1-firestore.googleapis.com" />
@@ -272,23 +273,42 @@
       .profile-kicker {
         font-size: 9px;
         font-weight: 700;
-        letter-spacing: 3.5px;
+        letter-spacing: 3px;
         text-transform: uppercase;
-        color: rgba(201, 149, 87, 0.7);
-        margin-bottom: 8px;
-        display: block;
+        color: rgba(201, 149, 87, 0.85);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .profile-kicker::before {
+        content: '';
+        display: inline-block;
+        width: 20px;
+        height: 1px;
+        background: linear-gradient(90deg, #c99557, transparent);
+        flex-shrink: 0;
       }
       .profile-alias {
         font-family: 'Playfair Display', serif;
-        font-size: clamp(22px, 3.5vw, 32px);
+        font-size: clamp(24px, 3.5vw, 34px);
         font-weight: 400;
-        color: #fff4ea;
+        color: #fff8f0;
         line-height: 1.1;
-        margin-bottom: 6px;
+        margin-bottom: 4px;
         display: flex;
         align-items: center;
         gap: 4px;
         flex-wrap: wrap;
+      }
+      .profile-since {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        color: rgba(201, 149, 87, 0.6);
+        margin-bottom: 10px;
+        display: block;
       }
       .profile-name {
         font-size: 11px;
@@ -300,10 +320,10 @@
       }
       .profile-quote {
         font-family: 'Cormorant Garamond', serif;
-        font-size: 15px;
+        font-size: 16px;
         font-style: italic;
-        color: rgba(255, 228, 190, 0.6);
-        line-height: 1.5;
+        color: rgba(255, 228, 190, 0.7);
+        line-height: 1.55;
         cursor: pointer;
         position: relative;
         padding-right: 20px;
@@ -319,27 +339,29 @@
         color: rgba(201, 149, 87, 0.5);
       }
       .profile-quote.editable:hover {
-        color: rgba(255, 236, 204, 0.85);
+        color: rgba(255, 236, 204, 0.9);
       }
       .profile-quote.placeholder {
-        color: rgba(201, 149, 87, 0.4);
+        color: rgba(201, 149, 87, 0.38);
       }
 
       /* Level badge */
       .profile-level-badge {
-        background: linear-gradient(145deg, rgba(255, 232, 190, 0.12), rgba(201, 149, 87, 0.08));
-        border: 1px solid rgba(201, 149, 87, 0.28);
+        background: linear-gradient(145deg, rgba(201, 149, 87, 0.22), rgba(240, 201, 141, 0.1));
+        border: 1px solid rgba(201, 149, 87, 0.45);
         border-radius: 999px;
-        padding: 8px 14px;
+        padding: 9px 16px;
         white-space: nowrap;
-        box-shadow: inset 0 1px 0 rgba(255, 244, 220, 0.1);
+        box-shadow:
+          inset 0 1px 0 rgba(255, 244, 220, 0.14),
+          0 4px 16px rgba(201, 149, 87, 0.12);
         align-self: start;
       }
       .profile-level-text {
-        font-size: 11px;
+        font-size: 12px;
         font-weight: 700;
-        color: rgba(255, 236, 204, 0.9);
-        letter-spacing: 0.5px;
+        color: rgba(255, 240, 210, 0.95);
+        letter-spacing: 0.3px;
         font-family: 'Manrope', sans-serif;
       }
 
@@ -353,7 +375,7 @@
         margin: 0;
       }
       .hero-stat {
-        padding: 18px 12px;
+        padding: 22px 12px;
         text-align: center;
         border-right: 1px solid rgba(255, 232, 200, 0.08);
         transition: background 0.2s;
@@ -362,15 +384,15 @@
         border-right: none;
       }
       .hero-stat:hover {
-        background: rgba(255, 232, 200, 0.04);
+        background: rgba(255, 232, 200, 0.05);
       }
       .hero-stat-value {
         font-family: 'Playfair Display', serif;
-        font-size: 22px;
+        font-size: 26px;
         font-weight: 400;
-        color: #fff4ea;
+        color: #fff8f0;
         line-height: 1;
-        margin-bottom: 5px;
+        margin-bottom: 6px;
         display: block;
       }
       .hero-stat-label {
@@ -378,40 +400,36 @@
         font-weight: 700;
         letter-spacing: 1.8px;
         text-transform: uppercase;
-        color: rgba(201, 149, 87, 0.6);
+        color: rgba(201, 149, 87, 0.65);
       }
 
       /* ── HERO PROGRESS ── */
       .hero-progress {
         position: relative;
         z-index: 1;
-        padding: 20px 40px 28px;
+        padding: 22px 40px 30px;
         border-top: 1px solid rgba(255, 232, 200, 0.08);
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 12px;
-        align-items: center;
       }
       .progress-labels {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 8px;
+        margin-bottom: 10px;
       }
       .progress-label-text {
         font-size: 10px;
         font-weight: 700;
         letter-spacing: 1.5px;
         text-transform: uppercase;
-        color: rgba(201, 149, 87, 0.6);
+        color: rgba(201, 149, 87, 0.65);
       }
       .progress-xp {
         font-family: 'Playfair Display', serif;
-        font-size: 12px;
-        color: rgba(255, 228, 190, 0.55);
+        font-size: 13px;
+        color: rgba(255, 228, 190, 0.65);
         font-style: italic;
       }
       .profile-progress-track {
-        height: 5px;
+        height: 6px;
         border-radius: 999px;
         background: rgba(255, 232, 200, 0.1);
         overflow: hidden;
@@ -419,17 +437,10 @@
       .profile-progress-fill {
         height: 100%;
         border-radius: 999px;
-        background: linear-gradient(90deg, #c99557, #f0c98d);
+        background: linear-gradient(90deg, #b8843e, #e8b870, #f5d8a0);
         width: 0%;
-        transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-      }
-      .profile-since {
-        font-size: 10px;
-        font-weight: 700;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-        color: rgba(201, 149, 87, 0.5);
-        white-space: nowrap;
+        transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        box-shadow: 0 0 8px rgba(201, 149, 87, 0.35);
       }
 
       /* ── HERO ACTIONS ── */
@@ -1167,6 +1178,7 @@
           <div class="hero-identity">
             <span class="profile-kicker">Etiove · Miembro de la comunidad</span>
             <p id="profileAlias" class="profile-alias">@catador</p>
+            <span id="profileSince" class="profile-since">Miembro reciente</span>
             <h1 id="profileName" class="profile-name"></h1>
             <p id="profileQuote" class="profile-quote placeholder">Sin frase aún</p>
           </div>
@@ -1206,37 +1218,37 @@
 
         <!-- Progress -->
         <div class="hero-progress">
-          <div style="flex: 1; min-width: 0">
-            <div class="progress-labels">
-              <span id="profileNextLevel" class="progress-label-text"
-                >Próximo nivel: Aficionado</span
-              >
-              <span id="profileNextXp" class="progress-xp">220 XP</span>
-            </div>
-            <div class="profile-progress-track">
-              <div id="profileProgressFill" class="profile-progress-fill"></div>
-            </div>
-            <div
+          <div class="progress-labels">
+            <span id="profileNextLevel" class="progress-label-text">Próximo nivel: Aficionado</span>
+            <span id="profileNextXp" class="progress-xp">220 XP</span>
+          </div>
+          <div class="profile-progress-track">
+            <div id="profileProgressFill" class="profile-progress-fill"></div>
+          </div>
+          <div
+            style="
+              margin-top: 10px;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            "
+          >
+            <p
+              id="profileXp"
               style="
-                margin-top: 8px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
+                font-size: 12px;
+                color: rgba(201, 149, 87, 0.65);
+                font-weight: 700;
+                letter-spacing: 0.3px;
               "
             >
-              <p
-                id="profileXp"
-                style="font-size: 11px; color: rgba(201, 149, 87, 0.55); font-weight: 600"
-              >
-                0 XP acumulados
-              </p>
-              <p
-                id="profileCounters"
-                style="font-size: 10px; color: rgba(255, 220, 170, 0.35); letter-spacing: 0.5px"
-              ></p>
-            </div>
+              0 XP acumulados
+            </p>
+            <p
+              id="profileCounters"
+              style="font-size: 10px; color: rgba(255, 220, 170, 0.35); letter-spacing: 0.5px"
+            ></p>
           </div>
-          <p id="profileSince" class="profile-since">Miembro reciente</p>
         </div>
 
         <!-- Actions -->

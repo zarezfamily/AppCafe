@@ -201,12 +201,16 @@
   };
 
   const getCollection = async (name, pageSize = 1000) => {
-    const res = await fetch(`${BASE_URL}/${name}?key=${FIREBASE_API_KEY}&pageSize=${pageSize}`, {
-      headers: authedHeaders(),
-    });
-    if (res.status === 404 || !res.ok) return [];
-    const json = await res.json();
-    return (json.documents || []).map((doc) => docToObject(doc));
+    try {
+      const res = await fetch(`${BASE_URL}/${name}?key=${FIREBASE_API_KEY}&pageSize=${pageSize}`, {
+        headers: authedHeaders(),
+      });
+      if (res.status === 404 || !res.ok) return [];
+      const json = await res.json();
+      return (json.documents || []).map((doc) => docToObject(doc));
+    } catch {
+      return [];
+    }
   };
 
   const toFirestoreValue = (val) => {
@@ -255,12 +259,16 @@
   };
 
   const getDocument = async (name, id) => {
-    const res = await fetch(`${BASE_URL}/${name}/${id}?key=${FIREBASE_API_KEY}`, {
-      headers: authedHeaders(),
-    });
-    if (res.status === 404 || !res.ok) return null;
-    const json = await res.json();
-    return docToObject(json);
+    try {
+      const res = await fetch(`${BASE_URL}/${name}/${id}?key=${FIREBASE_API_KEY}`, {
+        headers: authedHeaders(),
+      });
+      if (res.status === 404 || !res.ok) return null;
+      const json = await res.json();
+      return docToObject(json);
+    } catch {
+      return null;
+    }
   };
 
   const uploadAvatar = async (file) => {
@@ -1379,7 +1387,7 @@
       '@context': 'https://schema.org',
       '@type': 'Person',
       name: displayName,
-      url: `https://etiove.com/perfil/?uid=${encodeURIComponent(uid)}`,
+      url: `https://etiove.com/perfil/@${encodeURIComponent(queryName || uid)}`,
       description: `Perfil de ${displayName} en la comunidad Etiove de café de especialidad.`,
       memberOf: {
         '@type': 'Organization',
@@ -1796,7 +1804,7 @@
   };
 
   const init = async () => {
-    if (!uid) {
+    if (!uid && !pathAlias) {
       // No uid en la URL y no hay sesión — redirigir a comunidad con mensaje amable
       if (!el.content) {
         window.location.replace('/comunidad.html');

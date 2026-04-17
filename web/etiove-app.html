@@ -48,24 +48,28 @@
     <style>
       /* ── TOKENS ──────────────────────────────────────────────────────── */
       :root {
-        --espresso:   #0f0906;
-        --roast:      #140b07;
-        --roast-mid:  #1e1109;
+        --espresso: #0f0906;
+        --roast: #140b07;
+        --roast-mid: #1e1109;
         --roast-card: #251509;
-        --gold:       #c99557;
+        --gold: #c99557;
         --gold-light: #e8c88a;
-        --gold-dim:   rgba(201,149,87,0.18);
-        --gold-glow:  rgba(201,149,87,0.10);
-        --cream:      #fdf8f1;
-        --cream-muted: rgba(253,248,241,0.55);
-        --cream-soft:  rgba(253,248,241,0.32);
-        --cream-faint: rgba(253,248,241,0.14);
-        --border:      rgba(201,149,87,0.18);
-        --border-soft: rgba(201,149,87,0.10);
+        --gold-dim: rgba(201, 149, 87, 0.18);
+        --gold-glow: rgba(201, 149, 87, 0.1);
+        --cream: #fdf8f1;
+        --cream-muted: rgba(253, 248, 241, 0.55);
+        --cream-soft: rgba(253, 248, 241, 0.32);
+        --cream-faint: rgba(253, 248, 241, 0.14);
+        --border: rgba(201, 149, 87, 0.18);
+        --border-soft: rgba(201, 149, 87, 0.1);
       }
 
       /* ── BASE ────────────────────────────────────────────────────────── */
-      *, *::before, *::after { box-sizing: border-box; }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
 
       body {
         background: var(--roast);
@@ -74,21 +78,33 @@
       }
 
       /* Override about.css light body bg */
-      body { background: var(--roast) !important; }
+      body {
+        background: var(--roast) !important;
+      }
 
       /* Override about.css text-align justify on p */
-      p { text-align: left; }
+      p {
+        text-align: left;
+      }
 
       /* ── NAV override: dark ───────────────────────────────────────────── */
       nav {
-        background: rgba(15,9,6,0.92) !important;
+        background: rgba(15, 9, 6, 0.92) !important;
         border-bottom-color: var(--border) !important;
         backdrop-filter: blur(16px) !important;
       }
-      .nav-wordmark { color: var(--cream) !important; }
-      .nav-link { color: var(--cream-muted) !important; }
-      .nav-link:hover { color: var(--gold) !important; }
-      .nav-hamburger span { background: var(--cream-muted) !important; }
+      .nav-wordmark {
+        color: var(--cream) !important;
+      }
+      .nav-link {
+        color: var(--cream-muted) !important;
+      }
+      .nav-link:hover {
+        color: var(--gold) !important;
+      }
+      .nav-hamburger span {
+        background: var(--cream-muted) !important;
+      }
 
       /* ── SHARED UTILITIES ────────────────────────────────────────────── */
       .eyebrow {
@@ -116,33 +132,45 @@
         border-radius: 4px;
         text-decoration: none;
         transition: all 0.3s ease;
-        border: 1px solid rgba(246,239,231,0.30);
-        background: rgba(255,249,241,0.07);
+        border: 1px solid rgba(246, 239, 231, 0.3);
+        background: rgba(255, 249, 241, 0.07);
         color: var(--cream);
       }
       .btn-dl:hover {
-        background: rgba(201,149,87,0.16);
+        background: rgba(201, 149, 87, 0.16);
         border-color: var(--gold);
         transform: translateY(-2px);
-        box-shadow: 0 14px 40px rgba(0,0,0,0.4);
+        box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4);
         color: var(--cream);
       }
-      .btn-dl-icon { width: 20px; height: 20px; flex-shrink: 0; }
-      .btn-dl-copy { display: flex; flex-direction: column; gap: 2px; }
+      .btn-dl-icon {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+      }
+      .btn-dl-copy {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
       .btn-dl-sub {
         font-size: 9px;
         letter-spacing: 1.5px;
         text-transform: uppercase;
         opacity: 0.6;
       }
-      .btn-dl-main { font-size: 14px; font-weight: 500; }
+      .btn-dl-main {
+        font-size: 14px;
+        font-weight: 500;
+      }
 
       .gold-rule {
         display: flex;
         align-items: center;
         gap: 18px;
       }
-      .gold-rule::before, .gold-rule::after {
+      .gold-rule::before,
+      .gold-rule::after {
         content: '';
         flex: 1;
         height: 1px;
@@ -152,7 +180,8 @@
         background: linear-gradient(90deg, var(--gold-dim), transparent);
       }
       .gold-rule-dot {
-        width: 5px; height: 5px;
+        width: 5px;
+        height: 5px;
         border-radius: 50%;
         background: var(--gold);
         opacity: 0.7;
@@ -169,20 +198,24 @@
       .hero::before {
         content: '';
         position: absolute;
-        top: -180px; left: 50%;
+        top: -180px;
+        left: 50%;
         transform: translateX(-50%);
-        width: 800px; height: 800px;
+        width: 800px;
+        height: 800px;
         border-radius: 50%;
-        background: radial-gradient(circle, rgba(143,94,59,0.26) 0%, transparent 68%);
+        background: radial-gradient(circle, rgba(143, 94, 59, 0.26) 0%, transparent 68%);
         pointer-events: none;
       }
       .hero::after {
         content: '';
         position: absolute;
-        bottom: -60px; right: -80px;
-        width: 380px; height: 380px;
+        bottom: -60px;
+        right: -80px;
+        width: 380px;
+        height: 380px;
         border-radius: 50%;
-        background: radial-gradient(circle, rgba(201,149,87,0.10) 0%, transparent 70%);
+        background: radial-gradient(circle, rgba(201, 149, 87, 0.1) 0%, transparent 70%);
         pointer-events: none;
       }
       .hero-inner {
@@ -233,7 +266,9 @@
         padding: 0 28px;
         border-right: 1px solid var(--border-soft);
       }
-      .hero-stat:last-child { border-right: none; }
+      .hero-stat:last-child {
+        border-right: none;
+      }
       .hero-stat-val {
         font-family: 'Playfair Display', serif;
         font-size: 28px;
@@ -264,7 +299,11 @@
         content: '';
         position: absolute;
         inset: 0;
-        background: radial-gradient(ellipse 70% 80% at 50% 100%, rgba(143,94,59,0.12) 0%, transparent 65%);
+        background: radial-gradient(
+          ellipse 70% 80% at 50% 100%,
+          rgba(143, 94, 59, 0.12) 0%,
+          transparent 65%
+        );
         pointer-events: none;
       }
       .statement-inner {
@@ -328,7 +367,11 @@
         margin: 0;
       }
 
-      .feature-list { list-style: none; margin: 0; padding: 0; }
+      .feature-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
       .feature-item {
         display: grid;
         grid-template-columns: 56px 1fr;
@@ -338,8 +381,12 @@
         border-top: 1px solid var(--border-soft);
         transition: border-color 0.3s;
       }
-      .feature-item:last-child { border-bottom: 1px solid var(--border-soft); }
-      .feature-item:hover { border-top-color: var(--gold-dim); }
+      .feature-item:last-child {
+        border-bottom: 1px solid var(--border-soft);
+      }
+      .feature-item:hover {
+        border-top-color: var(--gold-dim);
+      }
 
       .feature-num {
         font-family: 'Playfair Display', serif;
@@ -351,7 +398,8 @@
         padding-top: 4px;
         text-align: right;
       }
-      .feature-body {}
+      .feature-body {
+      }
       .feature-title {
         font-family: 'Playfair Display', serif;
         font-size: clamp(18px, 2.2vw, 22px);
@@ -397,22 +445,29 @@
       .manifesto::before {
         content: '';
         position: absolute;
-        top: -100px; right: -100px;
-        width: 420px; height: 420px;
+        top: -100px;
+        right: -100px;
+        width: 420px;
+        height: 420px;
         border-radius: 50%;
-        background: radial-gradient(circle, rgba(201,149,87,0.18) 0%, transparent 65%);
+        background: radial-gradient(circle, rgba(201, 149, 87, 0.18) 0%, transparent 65%);
         pointer-events: none;
       }
       .manifesto::after {
         content: '';
         position: absolute;
-        bottom: -80px; left: -80px;
-        width: 320px; height: 320px;
+        bottom: -80px;
+        left: -80px;
+        width: 320px;
+        height: 320px;
         border-radius: 50%;
-        background: radial-gradient(circle, rgba(143,94,59,0.14) 0%, transparent 65%);
+        background: radial-gradient(circle, rgba(143, 94, 59, 0.14) 0%, transparent 65%);
         pointer-events: none;
       }
-      .manifesto-inner { position: relative; z-index: 1; }
+      .manifesto-inner {
+        position: relative;
+        z-index: 1;
+      }
       .manifesto-mark {
         font-family: 'Playfair Display', serif;
         font-size: 80px;
@@ -456,7 +511,9 @@
         position: relative;
         transition: background 0.3s;
       }
-      .step:hover { background: #2a170a; }
+      .step:hover {
+        background: #2a170a;
+      }
       .step-index {
         font-family: 'Playfair Display', serif;
         font-size: 64px;
@@ -465,7 +522,8 @@
         opacity: 0.12;
         line-height: 1;
         position: absolute;
-        top: 24px; right: 28px;
+        top: 24px;
+        right: 28px;
       }
       .step-label {
         font-size: 9px;
@@ -497,15 +555,23 @@
         max-width: 780px;
         margin: 0 auto;
       }
-      .faq { margin-top: 48px; display: flex; flex-direction: column; gap: 3px; }
+      .faq {
+        margin-top: 48px;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
       .faq details {
         border: 1px solid var(--border-soft);
         border-radius: 8px;
         background: var(--roast-card);
         overflow: hidden;
-        transition: border-color 0.2s, background 0.2s;
+        transition:
+          border-color 0.2s,
+          background 0.2s;
       }
-      .faq details[open], .faq details:hover {
+      .faq details[open],
+      .faq details:hover {
         border-color: var(--gold-dim);
         background: #251509;
       }
@@ -523,7 +589,9 @@
         user-select: none;
         letter-spacing: 0.1px;
       }
-      .faq summary::-webkit-details-marker { display: none; }
+      .faq summary::-webkit-details-marker {
+        display: none;
+      }
       .faq summary::after {
         content: '+';
         font-size: 22px;
@@ -534,7 +602,9 @@
         line-height: 1;
         opacity: 0.7;
       }
-      .faq details[open] summary::after { transform: rotate(45deg); }
+      .faq details[open] summary::after {
+        transform: rotate(45deg);
+      }
       .faq details p {
         padding: 0 24px 20px;
         font-size: 14px;
@@ -557,14 +627,21 @@
       .cta::before {
         content: '';
         position: absolute;
-        top: -140px; left: 50%;
+        top: -140px;
+        left: 50%;
         transform: translateX(-50%);
-        width: 700px; height: 700px;
+        width: 700px;
+        height: 700px;
         border-radius: 50%;
-        background: radial-gradient(circle, rgba(143,94,59,0.22) 0%, transparent 65%);
+        background: radial-gradient(circle, rgba(143, 94, 59, 0.22) 0%, transparent 65%);
         pointer-events: none;
       }
-      .cta-inner { position: relative; z-index: 1; max-width: 600px; margin: 0 auto; }
+      .cta-inner {
+        position: relative;
+        z-index: 1;
+        max-width: 600px;
+        margin: 0 auto;
+      }
       .cta-title {
         font-family: 'Playfair Display', serif;
         font-size: clamp(32px, 5.5vw, 58px);
@@ -574,7 +651,10 @@
         line-height: 1.1;
         margin-top: 0;
       }
-      .cta-title em { font-style: italic; color: var(--gold-light); }
+      .cta-title em {
+        font-style: italic;
+        color: var(--gold-light);
+      }
       .cta-sub {
         font-size: 17px;
         color: var(--cream-muted);
@@ -593,7 +673,13 @@
       /* ── DIVIDER ─────────────────────────────────────────────────────── */
       .sep {
         height: 1px;
-        background: linear-gradient(90deg, transparent, var(--border) 30%, var(--border) 70%, transparent);
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--border) 30%,
+          var(--border) 70%,
+          transparent
+        );
         max-width: 860px;
         margin: 0 auto;
       }
@@ -603,42 +689,102 @@
         background: var(--espresso) !important;
         border-top-color: var(--border-soft) !important;
       }
-      footer * { color: var(--cream-muted) !important; }
-      footer .footer-wordmark-sm { color: var(--cream) !important; }
-      footer a:hover { color: var(--gold) !important; }
+      footer * {
+        color: var(--cream-muted) !important;
+      }
+      footer .footer-wordmark-sm {
+        color: var(--cream) !important;
+      }
+      footer a:hover {
+        color: var(--gold) !important;
+      }
 
       /* ── RESPONSIVE ──────────────────────────────────────────────────── */
       @media (max-width: 768px) {
-        .hero { padding: 120px 24px 90px; }
-        .hero-stats { gap: 0; flex-wrap: wrap; }
-        .hero-stat { flex: 0 0 50%; border-right: none; border-bottom: 1px solid var(--border-soft); padding: 20px 0; }
-        .hero-stat:nth-child(odd) { border-right: 1px solid var(--border-soft); }
+        .hero {
+          padding: 120px 24px 90px;
+        }
+        .hero-stats {
+          gap: 0;
+          flex-wrap: wrap;
+        }
+        .hero-stat {
+          flex: 0 0 50%;
+          border-right: none;
+          border-bottom: 1px solid var(--border-soft);
+          padding: 20px 0;
+        }
+        .hero-stat:nth-child(odd) {
+          border-right: 1px solid var(--border-soft);
+        }
 
-        .statement { padding: 72px 24px; }
+        .statement {
+          padding: 72px 24px;
+        }
 
-        .features { padding: 72px 24px 0; }
-        .feature-item { grid-template-columns: 44px 1fr; gap: 20px; padding: 32px 0; }
+        .features {
+          padding: 72px 24px 0;
+        }
+        .feature-item {
+          grid-template-columns: 44px 1fr;
+          gap: 20px;
+          padding: 32px 0;
+        }
 
-        .manifesto { margin: 72px 24px; padding: 48px 32px; }
+        .manifesto {
+          margin: 72px 24px;
+          padding: 48px 32px;
+        }
 
-        .how { padding: 0 24px 80px; }
-        .steps-grid { grid-template-columns: 1fr; gap: 0; }
-        .step-index { font-size: 48px; top: 18px; right: 20px; }
+        .how {
+          padding: 0 24px 80px;
+        }
+        .steps-grid {
+          grid-template-columns: 1fr;
+          gap: 0;
+        }
+        .step-index {
+          font-size: 48px;
+          top: 18px;
+          right: 20px;
+        }
 
-        .faq-section { padding: 0 24px 80px; }
+        .faq-section {
+          padding: 0 24px 80px;
+        }
 
-        .cta { padding: 90px 24px 80px; }
+        .cta {
+          padding: 90px 24px 80px;
+        }
 
-        .sep { margin: 0 24px; }
+        .sep {
+          margin: 0 24px;
+        }
       }
 
       @media (max-width: 480px) {
-        .hero-title { font-size: clamp(38px, 11vw, 56px); }
-        .download-group { flex-direction: column; align-items: center; }
-        .btn-dl { width: 100%; max-width: 280px; justify-content: center; }
-        .hero-stat { flex: 0 0 100%; border-right: none !important; }
-        .manifesto { padding: 40px 24px; }
-        .step { padding: 36px 24px; }
+        .hero-title {
+          font-size: clamp(38px, 11vw, 56px);
+        }
+        .download-group {
+          flex-direction: column;
+          align-items: center;
+        }
+        .btn-dl {
+          width: 100%;
+          max-width: 280px;
+          justify-content: center;
+        }
+        .hero-stat {
+          flex: 0 0 100%;
+          border-right: none !important;
+        }
+        .manifesto {
+          padding: 40px 24px;
+        }
+        .step {
+          padding: 36px 24px;
+        }
       }
     </style>
   </head>
@@ -659,7 +805,9 @@
     <section class="hero" id="main-content">
       <div class="hero-inner">
         <span class="eyebrow">App · iOS &amp; Android · Descarga gratuita</span>
-        <h1 class="hero-title">El café de especialidad<br />merece una app<br /><em>a su altura</em></h1>
+        <h1 class="hero-title">
+          El café de especialidad<br />merece una app<br /><em>a su altura</em>
+        </h1>
         <p class="hero-sub">
           Descubre, cata y colecciona los mejores cafés del mundo.<br />
           Tu guía personal para encontrar el café que es exactamente para ti.
@@ -668,18 +816,32 @@
           <div class="gold-rule"><div class="gold-rule-dot"></div></div>
         </div>
         <div class="download-group">
-          <a href="https://apps.apple.com/app/etiove" target="_blank" rel="noopener noreferrer" class="btn-dl">
+          <a
+            href="https://apps.apple.com/app/etiove"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn-dl"
+          >
             <svg class="btn-dl-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+              <path
+                d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"
+              />
             </svg>
             <div class="btn-dl-copy">
               <span class="btn-dl-sub">Descarga en</span>
               <span class="btn-dl-main">App Store</span>
             </div>
           </a>
-          <a href="https://play.google.com/store/apps/details?id=com.zarezfamily.etiove" target="_blank" rel="noopener noreferrer" class="btn-dl">
+          <a
+            href="https://play.google.com/store/apps/details?id=com.zarezfamily.etiove"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn-dl"
+          >
             <svg class="btn-dl-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3.18 23.76c.3.17.64.24.99.19l12.6-7.27-2.72-2.72-10.87 9.8zm16.11-9.37L5.83 6.93l2.72 2.72 10.74-9.65zm1.61.93c.32-.18.5-.5.5-.87s-.18-.69-.5-.87L18.1 12l-2.59 2.59 2.6 2.6 2.79-1.87zM3.18.24C2.86.07 2.5 0 2.17.19c-.33.18-.5.5-.5.87v21.88c0 .37.17.69.5.87.16.09.34.13.5.13.17 0 .33-.04.49-.13l.02-.01 10.85-9.73-2.7-2.7L3.18.24z"/>
+              <path
+                d="M3.18 23.76c.3.17.64.24.99.19l12.6-7.27-2.72-2.72-10.87 9.8zm16.11-9.37L5.83 6.93l2.72 2.72 10.74-9.65zm1.61.93c.32-.18.5-.5.5-.87s-.18-.69-.5-.87L18.1 12l-2.59 2.59 2.6 2.6 2.79-1.87zM3.18.24C2.86.07 2.5 0 2.17.19c-.33.18-.5.5-.5.87v21.88c0 .37.17.69.5.87.16.09.34.13.5.13.17 0 .33-.04.49-.13l.02-.01 10.85-9.73-2.7-2.7L3.18.24z"
+              />
             </svg>
             <div class="btn-dl-copy">
               <span class="btn-dl-sub">Disponible en</span>
@@ -724,14 +886,19 @@
       <div class="section-header">
         <span class="eyebrow">Funcionalidades</span>
         <h2>Diseñada para los que toman<br />el café <em>en serio</em></h2>
-        <p>Todo lo que necesitas para descubrir mejor, elegir mejor y disfrutar más de cada taza.</p>
+        <p>
+          Todo lo que necesitas para descubrir mejor, elegir mejor y disfrutar más de cada taza.
+        </p>
       </div>
       <ul class="feature-list">
         <li class="feature-item">
           <span class="feature-num">01</span>
           <div class="feature-body">
             <h3 class="feature-title">Descubre cafés de especialidad</h3>
-            <p class="feature-desc">Explora por origen, perfil sensorial, tueste y proceso de beneficio. Filtra hasta encontrar el café que encaja exactamente con tu paladar y tu método de preparación.</p>
+            <p class="feature-desc">
+              Explora por origen, perfil sensorial, tueste y proceso de beneficio. Filtra hasta
+              encontrar el café que encaja exactamente con tu paladar y tu método de preparación.
+            </p>
             <span class="feature-tag">Exploración</span>
           </div>
         </li>
@@ -739,7 +906,10 @@
           <span class="feature-num">02</span>
           <div class="feature-body">
             <h3 class="feature-title">Diario de catas personal</h3>
-            <p class="feature-desc">Registra tus notas de cata, puntuaciones e impresiones en tiempo real. Con el tiempo, tu historial te revela con precisión qué perfiles de sabor te emocionan de verdad.</p>
+            <p class="feature-desc">
+              Registra tus notas de cata, puntuaciones e impresiones en tiempo real. Con el tiempo,
+              tu historial te revela con precisión qué perfiles de sabor te emocionan de verdad.
+            </p>
             <span class="feature-tag">Cata</span>
           </div>
         </li>
@@ -747,7 +917,10 @@
           <span class="feature-num">03</span>
           <div class="feature-body">
             <h3 class="feature-title">Valora y contribuye</h3>
-            <p class="feature-desc">Puntúa cada café que pruebas y contribuye al ranking colectivo. Tus valoraciones ayudan a otros catadores a descubrir joyas ocultas de tostadores independientes.</p>
+            <p class="feature-desc">
+              Puntúa cada café que pruebas y contribuye al ranking colectivo. Tus valoraciones
+              ayudan a otros catadores a descubrir joyas ocultas de tostadores independientes.
+            </p>
             <span class="feature-tag">Comunidad</span>
           </div>
         </li>
@@ -755,7 +928,10 @@
           <span class="feature-num">04</span>
           <div class="feature-body">
             <h3 class="feature-title">Colecciona tus favoritos</h3>
-            <p class="feature-desc">Guarda los cafés que quieres repetir y construye tu colección personal. Nunca más perderás la referencia de ese café que te dejó sin palabras.</p>
+            <p class="feature-desc">
+              Guarda los cafés que quieres repetir y construye tu colección personal. Nunca más
+              perderás la referencia de ese café que te dejó sin palabras.
+            </p>
             <span class="feature-tag">Biblioteca</span>
           </div>
         </li>
@@ -763,7 +939,11 @@
           <span class="feature-num">05</span>
           <div class="feature-body">
             <h3 class="feature-title">Tu perfil sensorial exacto</h3>
-            <p class="feature-desc">Responde el quiz de sabor y descubre qué tipo de café encaja con tu paladar: floral, achocolatado, cítrico, especiado. Recomendaciones personalizadas desde el primer minuto.</p>
+            <p class="feature-desc">
+              Responde el quiz de sabor y descubre qué tipo de café encaja con tu paladar: floral,
+              achocolatado, cítrico, especiado. Recomendaciones personalizadas desde el primer
+              minuto.
+            </p>
             <span class="feature-tag">Quiz · Perfil</span>
           </div>
         </li>
@@ -771,7 +951,10 @@
           <span class="feature-num">06</span>
           <div class="feature-body">
             <h3 class="feature-title">Comunidad de catadores</h3>
-            <p class="feature-desc">Conecta con otros amantes del café de especialidad. Foro activo, conversaciones reales y conocimiento compartido entre personas que saben lo que es una buena taza.</p>
+            <p class="feature-desc">
+              Conecta con otros amantes del café de especialidad. Foro activo, conversaciones reales
+              y conocimiento compartido entre personas que saben lo que es una buena taza.
+            </p>
             <span class="feature-tag">Foro</span>
           </div>
         </li>
@@ -796,26 +979,37 @@
       <div class="section-header">
         <span class="eyebrow">Cómo funciona</span>
         <h2>Empieza en <em>tres pasos</em></h2>
-        <p>Simple, rápido y pensado para que lo uses desde el primer día sin curva de aprendizaje.</p>
+        <p>
+          Simple, rápido y pensado para que lo uses desde el primer día sin curva de aprendizaje.
+        </p>
       </div>
       <div class="steps-grid">
         <div class="step">
           <span class="step-index">01</span>
           <span class="step-label">Paso uno</span>
           <h3 class="step-title">Descarga la app</h3>
-          <p class="step-desc">Disponible gratis en App Store y Google Play. Sin suscripción, sin barreras de entrada, sin anuncios.</p>
+          <p class="step-desc">
+            Disponible gratis en App Store y Google Play. Sin suscripción, sin barreras de entrada,
+            sin anuncios.
+          </p>
         </div>
         <div class="step">
           <span class="step-index">02</span>
           <span class="step-label">Paso dos</span>
           <h3 class="step-title">Descubre tu perfil</h3>
-          <p class="step-desc">Responde el quiz de sabor en dos minutos y recibe recomendaciones personalizadas basadas en tu paladar real.</p>
+          <p class="step-desc">
+            Responde el quiz de sabor en dos minutos y recibe recomendaciones personalizadas basadas
+            en tu paladar real.
+          </p>
         </div>
         <div class="step">
           <span class="step-index">03</span>
           <span class="step-label">Paso tres</span>
           <h3 class="step-title">Explora y cata</h3>
-          <p class="step-desc">Registra tus cafés, guarda favoritos, puntúa tostados y conecta con una comunidad que comparte tu misma pasión.</p>
+          <p class="step-desc">
+            Registra tus cafés, guarda favoritos, puntúa tostados y conecta con una comunidad que
+            comparte tu misma pasión.
+          </p>
         </div>
       </div>
     </section>
@@ -831,23 +1025,41 @@
       <div class="faq">
         <details>
           <summary>¿Etiove es completamente gratuita?</summary>
-          <p>Sí. La descarga y el uso de la app son totalmente gratuitos y sin anuncios. En el futuro puede haber funciones premium opcionales, pero el núcleo de la experiencia siempre será gratis.</p>
+          <p>
+            Sí. La descarga y el uso de la app son totalmente gratuitos y sin anuncios. En el futuro
+            puede haber funciones premium opcionales, pero el núcleo de la experiencia siempre será
+            gratis.
+          </p>
         </details>
         <details>
           <summary>¿Está disponible en iOS y Android?</summary>
-          <p>Sí, Etiove está disponible tanto en la App Store de Apple como en Google Play para Android. Descarga la que corresponda a tu dispositivo.</p>
+          <p>
+            Sí, Etiove está disponible tanto en la App Store de Apple como en Google Play para
+            Android. Descarga la que corresponda a tu dispositivo.
+          </p>
         </details>
         <details>
           <summary>¿Hace falta ser experto en café para usarla?</summary>
-          <p>Para nada. Etiove está pensada tanto para quienes se inician en el café de especialidad como para catadores con experiencia. El quiz de sabor te orienta desde el primer minuto sin necesitar conocimientos previos.</p>
+          <p>
+            Para nada. Etiove está pensada tanto para quienes se inician en el café de especialidad
+            como para catadores con experiencia. El quiz de sabor te orienta desde el primer minuto
+            sin necesitar conocimientos previos.
+          </p>
         </details>
         <details>
           <summary>¿Qué hace Etiove diferente a otras apps de café?</summary>
-          <p>Etiove combina el descubrimiento de cafés, el diario de catas personal y una comunidad activa en una sola app. No es solo contenido ni solo un listado: es una herramienta para construir tu propio criterio de catador.</p>
+          <p>
+            Etiove combina el descubrimiento de cafés, el diario de catas personal y una comunidad
+            activa en una sola app. No es solo contenido ni solo un listado: es una herramienta para
+            construir tu propio criterio de catador.
+          </p>
         </details>
         <details>
           <summary>¿Puedo usar Etiove sin crear una cuenta?</summary>
-          <p>Puedes explorar cafés sin cuenta. Para guardar favoritos, registrar catas y participar en la comunidad necesitarás registrarte, lo cual es gratuito y lleva menos de un minuto.</p>
+          <p>
+            Puedes explorar cafés sin cuenta. Para guardar favoritos, registrar catas y participar
+            en la comunidad necesitarás registrarte, lo cual es gratuito y lleva menos de un minuto.
+          </p>
         </details>
       </div>
     </section>
@@ -859,18 +1071,32 @@
         <h2 class="cta-title">Tu próximo café favorito<br />te está <em>esperando</em></h2>
         <p class="cta-sub">Únete a la comunidad de amantes del café de especialidad.</p>
         <div class="download-group">
-          <a href="https://apps.apple.com/app/etiove" target="_blank" rel="noopener noreferrer" class="btn-dl">
+          <a
+            href="https://apps.apple.com/app/etiove"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn-dl"
+          >
             <svg class="btn-dl-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+              <path
+                d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"
+              />
             </svg>
             <div class="btn-dl-copy">
               <span class="btn-dl-sub">Descarga en</span>
               <span class="btn-dl-main">App Store</span>
             </div>
           </a>
-          <a href="https://play.google.com/store/apps/details?id=com.zarezfamily.etiove" target="_blank" rel="noopener noreferrer" class="btn-dl">
+          <a
+            href="https://play.google.com/store/apps/details?id=com.zarezfamily.etiove"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn-dl"
+          >
             <svg class="btn-dl-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3.18 23.76c.3.17.64.24.99.19l12.6-7.27-2.72-2.72-10.87 9.8zm16.11-9.37L5.83 6.93l2.72 2.72 10.74-9.65zm1.61.93c.32-.18.5-.5.5-.87s-.18-.69-.5-.87L18.1 12l-2.59 2.59 2.6 2.6 2.79-1.87zM3.18.24C2.86.07 2.5 0 2.17.19c-.33.18-.5.5-.5.87v21.88c0 .37.17.69.5.87.16.09.34.13.5.13.17 0 .33-.04.49-.13l.02-.01 10.85-9.73-2.7-2.7L3.18.24z"/>
+              <path
+                d="M3.18 23.76c.3.17.64.24.99.19l12.6-7.27-2.72-2.72-10.87 9.8zm16.11-9.37L5.83 6.93l2.72 2.72 10.74-9.65zm1.61.93c.32-.18.5-.5.5-.87s-.18-.69-.5-.87L18.1 12l-2.59 2.59 2.6 2.6 2.79-1.87zM3.18.24C2.86.07 2.5 0 2.17.19c-.33.18-.5.5-.5.87v21.88c0 .37.17.69.5.87.16.09.34.13.5.13.17 0 .33-.04.49-.13l.02-.01 10.85-9.73-2.7-2.7L3.18.24z"
+              />
             </svg>
             <div class="btn-dl-copy">
               <span class="btn-dl-sub">Disponible en</span>
@@ -898,14 +1124,44 @@
         <span class="footer-copy-center">
           <span class="footer-wordmark-sm">Etiove</span>
           <span class="social-row-inline">
-            <a class="social-link" href="https://instagram.com/etiove_cafe" target="_blank" rel="noopener noreferrer" aria-label="Instagram @etiove_cafe">
-              <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            <a
+              class="social-link"
+              href="https://instagram.com/etiove_cafe"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram @etiove_cafe"
+            >
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"
+                />
+              </svg>
             </a>
-            <a class="social-link" href="https://x.com/etiove_cafe" target="_blank" rel="noopener noreferrer" aria-label="X @etiove_cafe">
-              <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            <a
+              class="social-link"
+              href="https://x.com/etiove_cafe"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="X @etiove_cafe"
+            >
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"
+                />
+              </svg>
             </a>
-            <a class="social-link" href="https://tiktok.com/@etiove" target="_blank" rel="noopener noreferrer" aria-label="TikTok @etiove">
-              <svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.16 8.16 0 004.77 1.52V6.75a4.85 4.85 0 01-1-.06z"/></svg>
+            <a
+              class="social-link"
+              href="https://tiktok.com/@etiove"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="TikTok @etiove"
+            >
+              <svg viewBox="0 0 24 24">
+                <path
+                  d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.16 8.16 0 004.77 1.52V6.75a4.85 4.85 0 01-1-.06z"
+                />
+              </svg>
             </a>
           </span>
         </span>

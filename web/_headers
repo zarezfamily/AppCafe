@@ -10,7 +10,19 @@
   Cache-Control: public, max-age=31536000, immutable
 
 /quiz.js
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: public, max-age=3600, must-revalidate
+
+/quizData.js
+  Cache-Control: public, max-age=3600, must-revalidate
+
+/quizProfile.js
+  Cache-Control: public, max-age=3600, must-revalidate
+
+/quizStyles.js
+  Cache-Control: public, max-age=3600, must-revalidate
+
+/site.js
+  Cache-Control: public, max-age=3600, must-revalidate
 
 /blog/post-shared.js
   Cache-Control: public, max-age=31536000, immutable

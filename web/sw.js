@@ -1,6 +1,6 @@
 // Etiove Service Worker — PWA offline shell
 // Versión: incrementar para forzar actualización del caché
-const CACHE_VERSION = 'etiove-v8';
+const CACHE_VERSION = 'etiove-v9';
 
 // Assets del shell que se cachean en la instalación (siempre disponibles offline)
 const SHELL_ASSETS = [
@@ -25,11 +25,15 @@ const SHELL_ASSETS = [
 ];
 
 // ── Instalación: cachear shell ─────────────────────────────────────────────
+// Usamos cache:'reload' para ignorar el caché HTTP del navegador y obtener
+// siempre la versión más reciente del servidor durante la instalación del SW.
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches
       .open(CACHE_VERSION)
-      .then((cache) => cache.addAll(SHELL_ASSETS))
+      .then((cache) =>
+        Promise.all(SHELL_ASSETS.map((url) => cache.add(new Request(url, { cache: 'reload' }))))
+      )
       .then(() => self.skipWaiting())
   );
 });

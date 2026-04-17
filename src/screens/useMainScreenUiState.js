@@ -9,31 +9,51 @@ export default function useMainScreenUiState({ keyProfile }) {
   const [scanning, setScanning] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+
   const [busqueda, setBusqueda] = useState('');
   const [busquedaTop, setBusquedaTop] = useState('');
   const [busquedaMis, setBusquedaMis] = useState('');
+
   const [cafeDetalle, setCafeDetalle] = useState(null);
   const [favs, setFavs] = useState([]);
   const [votes, setVotes] = useState([]);
+
   const [perfil, setPerfil] = useState({ pais: 'España' });
+
   const [ofertasPorCafe, setOfertasPorCafe] = useState({});
   const [buscandoOfertaId, setBuscandoOfertaId] = useState(null);
   const [openOfferCafeId, setOpenOfferCafeId] = useState(null);
   const [errorOfertas, setErrorOfertas] = useState(null);
+
+  const [trendingFilters, setTrendingFilters] = useState({
+    pais: null,
+    proceso: null,
+    roaster: null,
+  });
+
   const [dialogVisible, setDialogVisible] = useState(false);
-  const [dialogConfig, setDialogConfig] = useState({ title: '', description: '', actions: [] });
+  const [dialogConfig, setDialogConfig] = useState({
+    title: '',
+    description: '',
+    actions: [],
+  });
+
   const forumThreadScrollRef = useRef(null);
   const forumReplyInputRef = useRef(null);
+
   const communityNotificationBootRef = useRef(false);
   const forumNotificationBootRef = useRef(false);
   const favoriteNotificationBootRef = useRef(false);
+
   const [permission, setPermission] = useState(null);
+
   const brandCardAnim = useRef(new Animated.Value(0)).current;
   const brandProgressAnim = useRef(new Animated.Value(0)).current;
 
   const requestPermission = async () => {
     try {
       if (permission?.granted) return permission;
+
       const nextPermission = await Camera.requestCameraPermissionsAsync();
       setPermission(nextPermission);
       return nextPermission;
@@ -90,45 +110,68 @@ export default function useMainScreenUiState({ keyProfile }) {
   return {
     activeTab,
     setActiveTab,
+
     scanning,
     setScanning,
+
     showForm,
     setShowForm,
+
     showProfile,
     setShowProfile,
+
     busqueda,
     setBusqueda,
+
     busquedaTop,
     setBusquedaTop,
+
     busquedaMis,
     setBusquedaMis,
+
     cafeDetalle,
     setCafeDetalle,
+
     favs,
     setFavs,
+
     votes,
     setVotes,
+
     perfil,
     setPerfil,
+
     ofertasPorCafe,
     setOfertasPorCafe,
+
     buscandoOfertaId,
     setBuscandoOfertaId,
+
     openOfferCafeId,
     setOpenOfferCafeId,
+
     errorOfertas,
     setErrorOfertas,
+
+    trendingFilters,
+    setTrendingFilters,
+
     dialogVisible,
     dialogConfig,
+
     forumThreadScrollRef,
     forumReplyInputRef,
+
     communityNotificationBootRef,
     forumNotificationBootRef,
     favoriteNotificationBootRef,
+
     permission,
     requestPermission,
+
     brandCardAnim,
     brandProgressAnim,
+
     refrescarPerfil,
     showDialog,
     closeDialog,

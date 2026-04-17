@@ -17,14 +17,15 @@ export default function UltimosAnadidosTab({
       setActiveTab={setActiveTab}
       premiumAccent={premiumAccent}
       cargando={cargando}
-      title="Últimos añadidos"
-      subtitle="Mostrando los 100 más recientes de la comunidad"
+      title="Últimos cafés descubiertos"
+      subtitle="Las incorporaciones más recientes de la comunidad ETIOVE"
+      helperText="Ideal para seguir nuevos lanzamientos, cafés recién añadidos y descubrimientos recientes."
       items={ultimos100}
       CardVertical={CardVertical}
       setCafeDetalle={setCafeDetalle}
       favs={favs}
       toggleFav={toggleFav}
-      emptyText="Aún no hay cafés."
+      emptyText="Todavía no hay cafés recientes en esta vista."
     />
   );
 }

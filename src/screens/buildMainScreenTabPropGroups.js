@@ -33,6 +33,7 @@ export default function buildMainScreenTabPropGroups({
       setActiveTab: ui.setActiveTab,
       setScanning: ui.setScanning,
       setCafeDetalle: ui.setCafeDetalle,
+      setTrendingFilters: ui.setTrendingFilters,
     },
     profile: {
       perfil: ui.perfil,
@@ -90,6 +91,9 @@ export default function buildMainScreenTabPropGroups({
       filtrar: domain.filtrar,
       ultimosGlobal: domain.ultimosGlobal,
       topCafesVista: domain.topCafesVista,
+      trendingCafes: domain.trendingCafes,
+      ultimos100: domain.ultimos100,
+      top100: domain.top100,
       cafesParaOfertas: domain.cafesParaOfertas,
       favCafes: domain.favCafes,
       misCafes: domain.misCafes,
@@ -97,8 +101,6 @@ export default function buildMainScreenTabPropGroups({
       eliminarCafe: domain.eliminarCafe,
       notebook: domain.notebook,
       abrirNuevaCata: domain.abrirNuevaCata,
-      ultimos100: domain.ultimos100,
-      top100: domain.top100,
       abrirOfertasCafe: domain.abrirOfertasCafe,
       abrirOfertaWeb: domain.abrirOfertaWeb,
     },
@@ -107,6 +109,10 @@ export default function buildMainScreenTabPropGroups({
       buscandoOfertaId: ui.buscandoOfertaId,
       openOfferCafeId: ui.openOfferCafeId,
       errorOfertas: ui.errorOfertas,
+    },
+    trending: {
+      trendingFilters: ui.trendingFilters,
+      setTrendingFilters: ui.setTrendingFilters,
     },
     community: {
       forumCategories,

@@ -12,6 +12,7 @@ import MisCafesTab from './MisCafesTab';
 import OfertasTab from './OfertasTab';
 import PaywallModal from './PaywallModal';
 import TopCafesTab from './TopCafesTab';
+import TrendingTab from './TrendingTab';
 import UltimosAnadidosTab from './UltimosAnadidosTab';
 import { MAIN_TABS } from './mainScreenTabs';
 
@@ -22,6 +23,7 @@ export default function MainScreenBody({
   misCafesTabProps,
   ultimosAnadidosTabProps,
   topCafesTabProps,
+  trendingTabProps,
   ofertasTabProps,
   masTabProps,
   bottomBarProps,
@@ -43,7 +45,10 @@ export default function MainScreenBody({
   const contentScrollRef = useRef(null);
 
   useEffect(() => {
-    if (activeTab === MAIN_TABS.CAFETERIAS || activeTab === MAIN_TABS.COMMUNITY) return;
+    if (activeTab === MAIN_TABS.CAFETERIAS || activeTab === MAIN_TABS.COMMUNITY) {
+      return;
+    }
+
     requestAnimationFrame(() => {
       contentScrollRef.current?.scrollTo?.({ y: 0, animated: false });
     });
@@ -69,6 +74,7 @@ export default function MainScreenBody({
           {activeTab === MAIN_TABS.NOTEBOOK && <MisCafesTab {...misCafesTabProps} />}
           {activeTab === MAIN_TABS.LATEST && <UltimosAnadidosTab {...ultimosAnadidosTabProps} />}
           {activeTab === MAIN_TABS.TOP && <TopCafesTab {...topCafesTabProps} />}
+          {activeTab === MAIN_TABS.TRENDING && <TrendingTab {...trendingTabProps} />}
           {activeTab === MAIN_TABS.OFFERS && <OfertasTab {...ofertasTabProps} />}
           {activeTab === MAIN_TABS.MORE && <MasTab {...masTabProps} />}
         </ScrollView>

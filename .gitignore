@@ -74,6 +74,13 @@ Thumbs.db
 !.env.example
 
 # ---------------------------------------
+# Secrets / credentials
+# ---------------------------------------
+serviceAccountKey*.json
+*serviceAccount*.json
+*.secret.json
+
+# ---------------------------------------
 # TypeScript
 # ---------------------------------------
 *.tsbuildinfo

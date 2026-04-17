@@ -48,6 +48,7 @@
     "expo-notifications": "~0.32.16",
     "expo-secure-store": "~15.0.8",
     "expo-status-bar": "~3.0.9",
+    "firebase-admin": "^13.8.0",
     "node-fetch": "^2.7.0",
     "openfoodfacts-nodejs": "^0.1.0",
     "react": "19.1.0",
@@ -63,9 +64,9 @@
     "eslint": "^9.25.1",
     "eslint-plugin-react": "^7.37.5",
     "globals": "^16.0.0",
-    "prettier": "^3.5.3",
     "husky": "^9.1.7",
-    "lint-staged": "^15.2.2"
+    "lint-staged": "^15.2.2",
+    "prettier": "^3.5.3"
   },
   "lint-staged": {
     "*.{js,jsx,json,md,yml,yaml}": [
@@ -74,5 +75,18 @@
     "*.{js,jsx}": [
       "eslint --fix"
     ]
-  }
+  },
+  "description": "App movil de cafe de especialidad con enfoque premium: catalogo, detalle sensorial, gamificacion, foro, diario de catas, cafeterias cercanas y notificaciones push.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zarezfamily/etiove.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/zarezfamily/etiove/issues"
+  },
+  "homepage": "https://github.com/zarezfamily/etiove#readme"
 }

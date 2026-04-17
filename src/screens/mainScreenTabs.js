@@ -4,6 +4,8 @@ export const MAIN_TABS = {
   NOTEBOOK: 'Mis Cafés',
   LATEST: 'Últimos añadidos',
   TOP: 'Top cafés',
+  TRENDING: 'Trending',
+  DISCOVER: 'Descubrir',
   OFFERS: 'Ofertas',
   MORE: 'Más',
   CAFETERIAS: 'Cafeterías',

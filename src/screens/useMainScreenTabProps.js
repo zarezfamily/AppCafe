@@ -6,6 +6,7 @@ import {
   buildMisCafesTabProps,
   buildOfertasTabProps,
   buildTopCafesTabProps,
+  buildTrendingTabProps,
   buildUltimosAnadidosTabProps,
 } from './mainScreenTabProps';
 
@@ -36,6 +37,7 @@ function buildDiscoveryTabProps({
   setBusqueda,
   setCafeDetalle,
   setActiveTab,
+  setTrendingFilters,
   cargando,
   cargandoCafInicio,
   errorCafInicio,
@@ -47,6 +49,7 @@ function buildDiscoveryTabProps({
   toggleFav,
   ultimosGlobal,
   topCafesVista,
+  trendingCafes,
   cafesParaOfertas,
   abrirOfertasCafe,
   abrirOfertaWeb,
@@ -200,10 +203,12 @@ function buildDiscoveryTabProps({
     toggleFav,
     ultimosGlobal,
     setActiveTab,
+    setTrendingFilters,
     cargando,
     premiumAccent,
     CardHorizontal,
     topCafesVista,
+    trendingCafes,
     flag,
     cargandoCafInicio,
     errorCafInicio,
@@ -267,6 +272,9 @@ function buildCollectionTabProps({
   abrirNuevaCata,
   ultimos100,
   top100,
+  trendingCafes,
+  trendingFilters,
+  setTrendingFilters,
   cafesParaOfertas,
   abrirOfertasCafe,
   abrirOfertaWeb,
@@ -330,6 +338,20 @@ function buildCollectionTabProps({
     perfil,
     cargando,
     top100,
+    CardVertical,
+    setCafeDetalle,
+    favs,
+    toggleFav,
+  });
+
+  const trendingTabProps = buildTrendingTabProps({
+    s,
+    setActiveTab,
+    premiumAccent,
+    cargando,
+    trendingCafes,
+    trendingFilters,
+    setTrendingFilters,
     CardVertical,
     setCafeDetalle,
     favs,
@@ -400,6 +422,7 @@ function buildCollectionTabProps({
     misCafesTabProps,
     ultimosAnadidosTabProps,
     topCafesTabProps,
+    trendingTabProps,
     ofertasTabProps,
     masTabProps,
     bottomBarProps,
@@ -418,6 +441,7 @@ export default function useMainScreenTabProps({
   premium,
   coffee,
   offers,
+  trending,
   community,
 }) {
   const { s, theme, premiumAccent, premiumAccentDeep, onLogout, appVersion, iconFaint } = core;
@@ -430,7 +454,7 @@ export default function useMainScreenTabProps({
     DiarioCatasSection,
   } = components;
   const { keyFavs, keyPrefs, keyVotes } = keys;
-  const { activeTab, setActiveTab, setScanning, setCafeDetalle } = navigation;
+  const { activeTab, setActiveTab, setScanning, setCafeDetalle, setTrendingFilters } = navigation;
   const {
     perfil,
     setShowProfile,
@@ -473,6 +497,7 @@ export default function useMainScreenTabProps({
     filtrar,
     ultimosGlobal,
     topCafesVista,
+    trendingCafes,
     cafesParaOfertas,
     favCafes,
     misCafes,
@@ -486,6 +511,7 @@ export default function useMainScreenTabProps({
     abrirOfertaWeb,
   } = coffee;
   const { ofertasPorCafe, buscandoOfertaId, openOfferCafeId, errorOfertas } = offers;
+  const { trendingFilters } = trending;
   const {
     forumCategories,
     forumCategory,
@@ -583,6 +609,7 @@ export default function useMainScreenTabProps({
     setBusqueda,
     setCafeDetalle,
     setActiveTab,
+    setTrendingFilters,
     cargando,
     cargandoCafInicio,
     errorCafInicio,
@@ -594,6 +621,7 @@ export default function useMainScreenTabProps({
     toggleFav,
     ultimosGlobal,
     topCafesVista,
+    trendingCafes,
     cafesParaOfertas,
     abrirOfertasCafe,
     abrirOfertaWeb,
@@ -662,6 +690,7 @@ export default function useMainScreenTabProps({
     misCafesTabProps,
     ultimosAnadidosTabProps,
     topCafesTabProps,
+    trendingTabProps,
     ofertasTabProps,
     masTabProps,
     bottomBarProps,
@@ -706,6 +735,9 @@ export default function useMainScreenTabProps({
     abrirNuevaCata,
     ultimos100,
     top100,
+    trendingCafes,
+    trendingFilters,
+    setTrendingFilters,
     cafesParaOfertas,
     abrirOfertasCafe,
     abrirOfertaWeb,
@@ -733,6 +765,7 @@ export default function useMainScreenTabProps({
     misCafesTabProps,
     ultimosAnadidosTabProps,
     topCafesTabProps,
+    trendingTabProps,
     ofertasTabProps,
     masTabProps,
     bottomBarProps,

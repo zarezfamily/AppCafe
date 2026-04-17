@@ -1,7 +1,7 @@
 import { normalize } from '../../core/utils';
 
 export const filterCoffeeList = (list, query) => {
-  if (!query.trim()) return list;
+  if (!query?.trim()) return list;
   const normalizedQuery = normalize(query);
 
   return list

@@ -80,6 +80,10 @@
   color: #9a7963 !important;
 }
 
+#webQuizRoot .eq-options {
+  gap: 20px !important;
+}
+
 #webQuizRoot .eq-option {
   background: #fffaf5 !important;
   border-color: #e4d3c2 !important;

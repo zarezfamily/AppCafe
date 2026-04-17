@@ -212,7 +212,7 @@ export const QUIZ_STYLES = `
   .eq-options {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    gap: 20px;
     margin-bottom: 40px;
   }
   .eq-options.cols-3 { grid-template-columns: repeat(3, 1fr); }

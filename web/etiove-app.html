@@ -31,7 +31,7 @@
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-title" content="Etiove" />
-    <meta name="theme-color" content="#0f0906" />
+    <meta name="theme-color" content="#1c120d" />
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -46,327 +46,291 @@
     />
     <link rel="stylesheet" href="/about.css" />
     <style>
-      /* ── TOKENS ──────────────────────────────────────────────────────── */
+      /* ── TOKENS ─────────────────────────────────────────────────────── */
       :root {
-        --espresso: #0f0906;
-        --roast: #140b07;
-        --roast-mid: #1e1109;
-        --roast-card: #251509;
-        --gold: #c99557;
-        --gold-light: #e8c88a;
-        --gold-dim: rgba(201, 149, 87, 0.18);
-        --gold-glow: rgba(201, 149, 87, 0.1);
+        --ink: #1c120d;
+        --ink-soft: #4a3428;
+        --ink-muted: #8a6a58;
         --cream: #fdf8f1;
-        --cream-muted: rgba(253, 248, 241, 0.55);
-        --cream-soft: rgba(253, 248, 241, 0.32);
-        --cream-faint: rgba(253, 248, 241, 0.14);
-        --border: rgba(201, 149, 87, 0.18);
-        --border-soft: rgba(201, 149, 87, 0.1);
+        --cream-warm: #f7efe6;
+        --cream-alt: #f2e8dd;
+        --espresso: #1a0d07;
+        --roast: #241109;
+        --gold: #c99557;
+        --gold-dark: #8f5e3b;
+        --gold-light: #e8c88a;
+        --border: #e4d3c2;
+        --border-dark: rgba(228, 195, 164, 0.2);
       }
 
-      /* ── BASE ────────────────────────────────────────────────────────── */
+      /* ── RESET ──────────────────────────────────────────────────────── */
       *,
       *::before,
       *::after {
         box-sizing: border-box;
       }
-
       body {
-        background: var(--roast);
-        color: var(--cream);
+        background: var(--cream) !important;
+        color: var(--ink);
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
       }
-
-      /* Override about.css light body bg */
-      body {
-        background: var(--roast) !important;
-      }
-
-      /* Override about.css text-align justify on p */
       p {
         text-align: left;
       }
 
-      /* ── NAV override: dark ───────────────────────────────────────────── */
-      nav {
-        background: rgba(15, 9, 6, 0.92) !important;
-        border-bottom-color: var(--border) !important;
-        backdrop-filter: blur(16px) !important;
-      }
-      .nav-wordmark {
-        color: var(--cream) !important;
-      }
-      .nav-link {
-        color: var(--cream-muted) !important;
-      }
-      .nav-link:hover {
-        color: var(--gold) !important;
-      }
-      .nav-hamburger span {
-        background: var(--cream-muted) !important;
-      }
-
-      /* ── SHARED UTILITIES ────────────────────────────────────────────── */
-      .eyebrow {
+      /* ── SHARED ─────────────────────────────────────────────────────── */
+      .eyebrow-light {
         font-size: 10px;
         font-weight: 600;
         letter-spacing: 4px;
         text-transform: uppercase;
         color: var(--gold);
-        opacity: 0.85;
         display: block;
-        margin-bottom: 22px;
+        margin-bottom: 20px;
+      }
+      .eyebrow-dark {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        color: var(--gold-dark);
+        display: block;
+        margin-bottom: 20px;
       }
 
-      .download-group {
+      /* download buttons — dark version (on dark bg) */
+      .btn-group {
         display: flex;
         gap: 14px;
         justify-content: center;
         flex-wrap: wrap;
       }
-      .btn-dl {
+      .btn-store {
         display: flex;
         align-items: center;
-        gap: 13px;
-        padding: 15px 28px;
+        gap: 12px;
+        padding: 14px 26px;
         border-radius: 4px;
         text-decoration: none;
-        transition: all 0.3s ease;
-        border: 1px solid rgba(246, 239, 231, 0.3);
-        background: rgba(255, 249, 241, 0.07);
-        color: var(--cream);
+        transition: all 0.3s;
+        border: 1px solid rgba(246, 239, 231, 0.32);
+        background: rgba(255, 249, 241, 0.08);
+        color: #fdf8f1;
       }
-      .btn-dl:hover {
-        background: rgba(201, 149, 87, 0.16);
+      .btn-store:hover {
+        background: rgba(201, 149, 87, 0.18);
         border-color: var(--gold);
         transform: translateY(-2px);
-        box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4);
-        color: var(--cream);
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+        color: #fdf8f1;
       }
-      .btn-dl-icon {
+      /* download buttons — light version (on cream bg) */
+      .btn-store.light {
+        border-color: #c9b5a0;
+        background: transparent;
+        color: var(--ink);
+      }
+      .btn-store.light:hover {
+        background: var(--ink);
+        border-color: var(--ink);
+        color: var(--cream);
+        box-shadow: 0 12px 36px rgba(28, 18, 13, 0.18);
+      }
+      .btn-store-icon {
         width: 20px;
         height: 20px;
         flex-shrink: 0;
       }
-      .btn-dl-copy {
+      .btn-store-copy {
         display: flex;
         flex-direction: column;
         gap: 2px;
       }
-      .btn-dl-sub {
+      .btn-store-sub {
         font-size: 9px;
         letter-spacing: 1.5px;
         text-transform: uppercase;
         opacity: 0.6;
       }
-      .btn-dl-main {
+      .btn-store-main {
         font-size: 14px;
         font-weight: 500;
       }
 
-      .gold-rule {
-        display: flex;
-        align-items: center;
-        gap: 18px;
-      }
-      .gold-rule::before,
-      .gold-rule::after {
-        content: '';
-        flex: 1;
-        height: 1px;
-        background: linear-gradient(90deg, transparent, var(--gold-dim));
-      }
-      .gold-rule::after {
-        background: linear-gradient(90deg, var(--gold-dim), transparent);
-      }
-      .gold-rule-dot {
-        width: 5px;
-        height: 5px;
-        border-radius: 50%;
-        background: var(--gold);
-        opacity: 0.7;
-      }
-
-      /* ── HERO ────────────────────────────────────────────────────────── */
+      /* ── 1. HERO — DARK ─────────────────────────────────────────────── */
       .hero {
         position: relative;
         background: var(--espresso);
         overflow: hidden;
-        padding: 160px 40px 120px;
+        padding: 160px 40px 130px;
         text-align: center;
       }
       .hero::before {
         content: '';
         position: absolute;
-        top: -180px;
+        top: -200px;
         left: 50%;
         transform: translateX(-50%);
-        width: 800px;
-        height: 800px;
+        width: 900px;
+        height: 900px;
         border-radius: 50%;
-        background: radial-gradient(circle, rgba(143, 94, 59, 0.26) 0%, transparent 68%);
-        pointer-events: none;
-      }
-      .hero::after {
-        content: '';
-        position: absolute;
-        bottom: -60px;
-        right: -80px;
-        width: 380px;
-        height: 380px;
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(201, 149, 87, 0.1) 0%, transparent 70%);
+        background: radial-gradient(circle, rgba(143, 94, 59, 0.28) 0%, transparent 65%);
         pointer-events: none;
       }
       .hero-inner {
         position: relative;
         z-index: 2;
-        max-width: 780px;
+        max-width: 760px;
         margin: 0 auto;
       }
       .hero-title {
         font-family: 'Playfair Display', serif;
-        font-size: clamp(46px, 7.5vw, 88px);
+        font-size: clamp(48px, 8vw, 92px);
         font-weight: 700;
-        color: var(--cream);
-        line-height: 1.06;
+        color: #fdf8f1;
+        line-height: 1.05;
         letter-spacing: -0.5px;
-        margin-bottom: 30px;
+        margin-bottom: 28px;
+        margin-top: 0;
       }
       .hero-title em {
         font-style: italic;
         color: var(--gold-light);
       }
       .hero-sub {
-        font-size: clamp(16px, 2vw, 19px);
-        color: var(--cream-muted);
+        font-size: clamp(16px, 1.8vw, 18px);
+        color: rgba(253, 248, 241, 0.58);
         line-height: 1.8;
-        max-width: 520px;
+        max-width: 500px;
         margin: 0 auto 48px;
         text-align: center;
       }
-      .hero-divider {
-        margin-bottom: 48px;
-        max-width: 340px;
-        margin-left: auto;
-        margin-right: auto;
-      }
-      .hero-stats {
+      .hero-rule {
         display: flex;
-        gap: 0;
-        justify-content: center;
-        margin-top: 60px;
-        padding-top: 48px;
-        border-top: 1px solid var(--border-soft);
+        align-items: center;
+        gap: 18px;
+        max-width: 320px;
+        margin: 0 auto 48px;
       }
-      .hero-stat {
+      .hero-rule::before,
+      .hero-rule::after {
+        content: '';
         flex: 1;
-        max-width: 180px;
-        text-align: center;
-        padding: 0 28px;
-        border-right: 1px solid var(--border-soft);
+        height: 1px;
+        background: rgba(201, 149, 87, 0.3);
       }
-      .hero-stat:last-child {
-        border-right: none;
+      .hero-rule-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--gold);
+        opacity: 0.65;
       }
-      .hero-stat-val {
-        font-family: 'Playfair Display', serif;
-        font-size: 28px;
-        font-weight: 700;
-        color: var(--gold-light);
-        line-height: 1;
-        margin-bottom: 6px;
-        display: block;
+      .hero-badges {
+        display: flex;
+        justify-content: center;
+        gap: 28px;
+        flex-wrap: wrap;
+        margin-top: 52px;
+        padding-top: 44px;
+        border-top: 1px solid rgba(228, 195, 164, 0.12);
       }
-      .hero-stat-label {
-        font-size: 10px;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        color: var(--cream-soft);
+      .hero-badge {
+        font-size: 11px;
+        letter-spacing: 0.5px;
+        color: rgba(253, 248, 241, 0.4);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .hero-badge::before {
+        content: '';
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: var(--gold);
+        opacity: 0.6;
+        flex-shrink: 0;
       }
 
-      /* ── STATEMENT ───────────────────────────────────────────────────── */
-      .statement {
-        background: var(--roast-mid);
+      /* ── 2. INTRO — CREAM ───────────────────────────────────────────── */
+      .intro {
+        background: var(--cream);
         padding: 100px 40px;
-        text-align: center;
-        border-top: 1px solid var(--border-soft);
-        border-bottom: 1px solid var(--border-soft);
-        position: relative;
-        overflow: hidden;
+        border-bottom: 1px solid var(--border);
       }
-      .statement::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(
-          ellipse 70% 80% at 50% 100%,
-          rgba(143, 94, 59, 0.12) 0%,
-          transparent 65%
-        );
-        pointer-events: none;
-      }
-      .statement-inner {
-        position: relative;
-        z-index: 1;
+      .intro-inner {
         max-width: 860px;
         margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 80px;
+        align-items: center;
       }
-      .statement-quote {
+      .intro-heading {
         font-family: 'Playfair Display', serif;
-        font-size: clamp(26px, 4vw, 46px);
-        font-weight: 400;
-        font-style: italic;
-        color: var(--cream);
-        line-height: 1.45;
-        opacity: 0.92;
-        text-align: center;
-      }
-      .statement-quote strong {
+        font-size: clamp(30px, 4vw, 46px);
         font-weight: 700;
-        font-style: normal;
-        color: var(--gold-light);
+        color: var(--ink);
+        line-height: 1.15;
+        margin: 0;
       }
-      .statement-attr {
-        margin-top: 32px;
+      .intro-heading em {
+        font-style: italic;
+        color: var(--gold-dark);
+      }
+      .intro-body {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+      .intro-body p {
+        font-size: 16px;
+        color: var(--ink-soft);
+        line-height: 1.8;
+        margin: 0;
+      }
+      .intro-detail {
         font-size: 11px;
-        letter-spacing: 3px;
+        letter-spacing: 2px;
         text-transform: uppercase;
-        color: var(--cream-soft);
+        color: var(--ink-muted);
+        padding-top: 20px;
+        border-top: 1px solid var(--border);
       }
 
-      /* ── FEATURES ────────────────────────────────────────────────────── */
+      /* ── 3. FEATURES — CREAM ALT ────────────────────────────────────── */
       .features {
-        padding: 100px 0 0;
-        max-width: 1000px;
+        background: var(--cream-warm);
+        padding: 100px 40px;
+        border-bottom: 1px solid var(--border);
+      }
+      .features-inner {
+        max-width: 900px;
         margin: 0 auto;
-        padding-left: 40px;
-        padding-right: 40px;
       }
-      .section-header {
+      .features-header {
         margin-bottom: 64px;
+        max-width: 560px;
       }
-      .section-header h2 {
+      .features-header h2 {
         font-family: 'Playfair Display', serif;
-        font-size: clamp(28px, 4vw, 44px);
+        font-size: clamp(28px, 4vw, 42px);
         font-weight: 700;
-        color: var(--cream);
+        color: var(--ink);
         line-height: 1.15;
-        margin-bottom: 16px;
-        margin-top: 0;
+        margin: 0 0 14px;
       }
-      .section-header h2 em {
+      .features-header h2 em {
         font-style: italic;
-        color: var(--gold-light);
+        color: var(--gold-dark);
       }
-      .section-header p {
-        font-size: 16px;
-        color: var(--cream-muted);
-        max-width: 500px;
+      .features-header p {
+        font-size: 15px;
+        color: var(--ink-muted);
         line-height: 1.75;
         margin: 0;
       }
-
       .feature-list {
         list-style: none;
         margin: 0;
@@ -374,212 +338,246 @@
       }
       .feature-item {
         display: grid;
-        grid-template-columns: 56px 1fr;
-        gap: 32px;
+        grid-template-columns: 52px 1fr;
+        gap: 28px;
         align-items: start;
-        padding: 40px 0;
-        border-top: 1px solid var(--border-soft);
-        transition: border-color 0.3s;
+        padding: 36px 0;
+        border-top: 1px solid var(--border);
+        transition: border-color 0.25s;
       }
       .feature-item:last-child {
-        border-bottom: 1px solid var(--border-soft);
+        border-bottom: 1px solid var(--border);
       }
       .feature-item:hover {
-        border-top-color: var(--gold-dim);
+        border-top-color: var(--gold-dark);
       }
-
       .feature-num {
         font-family: 'Playfair Display', serif;
-        font-size: 13px;
+        font-size: 12px;
         font-weight: 400;
-        color: var(--gold);
-        opacity: 0.55;
+        color: var(--gold-dark);
+        opacity: 0.5;
         letter-spacing: 2px;
         padding-top: 4px;
         text-align: right;
       }
-      .feature-body {
-      }
       .feature-title {
         font-family: 'Playfair Display', serif;
-        font-size: clamp(18px, 2.2vw, 22px);
+        font-size: clamp(17px, 2vw, 21px);
         font-weight: 700;
-        color: var(--cream);
+        color: var(--ink);
         margin-bottom: 10px;
         line-height: 1.2;
       }
       .feature-desc {
-        font-size: 15px;
-        color: var(--cream-muted);
-        line-height: 1.75;
+        font-size: 14px;
+        color: var(--ink-muted);
+        line-height: 1.8;
         margin: 0;
-        max-width: 580px;
+        max-width: 560px;
       }
       .feature-tag {
         display: inline-block;
-        margin-top: 14px;
+        margin-top: 12px;
         font-size: 9px;
         letter-spacing: 2.5px;
         text-transform: uppercase;
-        color: var(--gold);
-        opacity: 0.6;
-        border: 1px solid var(--gold-dim);
+        color: var(--gold-dark);
+        border: 1px solid var(--border);
         border-radius: 2px;
         padding: 4px 10px;
       }
 
-      /* ── MANIFESTO BANNER ────────────────────────────────────────────── */
-      .manifesto {
-        margin: 100px 40px;
-        max-width: 920px;
-        margin-left: auto;
-        margin-right: auto;
-        background: linear-gradient(145deg, #1e1009, #2a160a);
-        border: 1px solid var(--border);
-        border-radius: 20px;
-        padding: 72px 64px;
+      /* ── 4. QUOTE — DARK ────────────────────────────────────────────── */
+      .quote-band {
+        background: var(--roast);
+        padding: 100px 40px;
         text-align: center;
         position: relative;
         overflow: hidden;
       }
-      .manifesto::before {
+      .quote-band::before {
         content: '';
         position: absolute;
         top: -100px;
-        right: -100px;
-        width: 420px;
-        height: 420px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 600px;
+        height: 600px;
         border-radius: 50%;
-        background: radial-gradient(circle, rgba(201, 149, 87, 0.18) 0%, transparent 65%);
+        background: radial-gradient(circle, rgba(143, 94, 59, 0.2) 0%, transparent 65%);
         pointer-events: none;
       }
-      .manifesto::after {
-        content: '';
-        position: absolute;
-        bottom: -80px;
-        left: -80px;
-        width: 320px;
-        height: 320px;
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(143, 94, 59, 0.14) 0%, transparent 65%);
-        pointer-events: none;
-      }
-      .manifesto-inner {
+      .quote-inner {
         position: relative;
         z-index: 1;
+        max-width: 760px;
+        margin: 0 auto;
       }
-      .manifesto-mark {
+      .quote-mark {
         font-family: 'Playfair Display', serif;
-        font-size: 80px;
+        font-size: 96px;
         font-weight: 700;
         color: var(--gold);
-        opacity: 0.25;
+        opacity: 0.2;
         line-height: 0.6;
         display: block;
-        margin-bottom: 24px;
+        margin-bottom: 28px;
       }
-      .manifesto-text {
+      .quote-text {
         font-family: 'Playfair Display', serif;
-        font-size: clamp(20px, 3vw, 28px);
+        font-size: clamp(22px, 3.5vw, 34px);
         font-style: italic;
-        color: var(--cream);
-        line-height: 1.6;
-        opacity: 0.9;
+        font-weight: 400;
+        color: rgba(253, 248, 241, 0.88);
+        line-height: 1.55;
         margin: 0;
         text-align: center;
       }
+      .quote-text strong {
+        font-style: normal;
+        font-weight: 700;
+        color: var(--gold-light);
+      }
 
-      /* ── HOW IT WORKS ────────────────────────────────────────────────── */
-      .how {
-        padding: 0 40px 100px;
-        max-width: 1000px;
+      /* ── 5. STEPS — CREAM ───────────────────────────────────────────── */
+      .steps {
+        background: var(--cream);
+        padding: 100px 40px;
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+      }
+      .steps-inner {
+        max-width: 900px;
         margin: 0 auto;
+      }
+      .steps-header {
+        margin-bottom: 64px;
+        max-width: 500px;
+      }
+      .steps-header h2 {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(28px, 4vw, 42px);
+        font-weight: 700;
+        color: var(--ink);
+        line-height: 1.15;
+        margin: 0 0 14px;
+      }
+      .steps-header h2 em {
+        font-style: italic;
+        color: var(--gold-dark);
+      }
+      .steps-header p {
+        font-size: 15px;
+        color: var(--ink-muted);
+        line-height: 1.75;
+        margin: 0;
       }
       .steps-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 2px;
-        margin-top: 64px;
-        background: var(--border-soft);
-        border: 1px solid var(--border-soft);
+        gap: 24px;
+      }
+      .step-card {
+        background: var(--cream-alt);
+        border: 1px solid var(--border);
         border-radius: 16px;
-        overflow: hidden;
-      }
-      .step {
-        background: var(--roast-card);
-        padding: 48px 36px;
+        padding: 44px 32px 40px;
         position: relative;
-        transition: background 0.3s;
+        transition:
+          border-color 0.25s,
+          box-shadow 0.25s;
       }
-      .step:hover {
-        background: #2a170a;
+      .step-card:hover {
+        border-color: var(--gold-dark);
+        box-shadow: 0 8px 32px rgba(143, 94, 59, 0.1);
       }
       .step-index {
         font-family: 'Playfair Display', serif;
-        font-size: 64px;
+        font-size: 72px;
         font-weight: 700;
         color: var(--gold);
-        opacity: 0.12;
+        opacity: 0.1;
         line-height: 1;
         position: absolute;
-        top: 24px;
-        right: 28px;
+        top: 20px;
+        right: 24px;
+        pointer-events: none;
       }
       .step-label {
         font-size: 9px;
         letter-spacing: 3px;
         text-transform: uppercase;
-        color: var(--gold);
-        opacity: 0.6;
-        margin-bottom: 20px;
+        color: var(--gold-dark);
+        opacity: 0.7;
+        margin-bottom: 16px;
         display: block;
       }
       .step-title {
         font-family: 'Playfair Display', serif;
         font-size: 20px;
         font-weight: 700;
-        color: var(--cream);
-        margin-bottom: 12px;
+        color: var(--ink);
+        margin-bottom: 10px;
         line-height: 1.25;
       }
       .step-desc {
         font-size: 14px;
-        color: var(--cream-muted);
-        line-height: 1.75;
+        color: var(--ink-muted);
+        line-height: 1.8;
         margin: 0;
       }
 
-      /* ── FAQ ─────────────────────────────────────────────────────────── */
+      /* ── 6. FAQ — CREAM WARM ────────────────────────────────────────── */
       .faq-section {
-        padding: 0 40px 100px;
+        background: var(--cream-warm);
+        padding: 100px 40px;
+        border-bottom: 1px solid var(--border);
+      }
+      .faq-inner {
         max-width: 780px;
         margin: 0 auto;
       }
+      .faq-header {
+        margin-bottom: 56px;
+        max-width: 480px;
+      }
+      .faq-header h2 {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(28px, 4vw, 42px);
+        font-weight: 700;
+        color: var(--ink);
+        line-height: 1.15;
+        margin: 0;
+      }
+      .faq-header h2 em {
+        font-style: italic;
+        color: var(--gold-dark);
+      }
       .faq {
-        margin-top: 48px;
         display: flex;
         flex-direction: column;
         gap: 3px;
       }
       .faq details {
-        border: 1px solid var(--border-soft);
+        border: 1px solid var(--border);
         border-radius: 8px;
-        background: var(--roast-card);
+        background: var(--cream);
         overflow: hidden;
         transition:
           border-color 0.2s,
-          background 0.2s;
+          box-shadow 0.2s;
       }
       .faq details[open],
       .faq details:hover {
-        border-color: var(--gold-dim);
-        background: #251509;
+        border-color: var(--gold-dark);
+        box-shadow: 0 4px 20px rgba(143, 94, 59, 0.08);
       }
       .faq summary {
         padding: 20px 24px;
         font-size: 15px;
-        font-weight: 500;
-        color: var(--cream);
+        font-weight: 600;
+        color: var(--ink);
         cursor: pointer;
         list-style: none;
         display: flex;
@@ -587,7 +585,6 @@
         align-items: center;
         gap: 16px;
         user-select: none;
-        letter-spacing: 0.1px;
       }
       .faq summary::-webkit-details-marker {
         display: none;
@@ -596,7 +593,7 @@
         content: '+';
         font-size: 22px;
         font-weight: 300;
-        color: var(--gold);
+        color: var(--gold-dark);
         flex-shrink: 0;
         transition: transform 0.2s;
         line-height: 1;
@@ -608,48 +605,46 @@
       .faq details p {
         padding: 0 24px 20px;
         font-size: 14px;
-        color: var(--cream-muted);
+        color: var(--ink-muted);
         line-height: 1.8;
         margin: 0;
-        border-top: 1px solid var(--border-soft);
+        border-top: 1px solid var(--border);
         padding-top: 16px;
       }
 
-      /* ── DARK CTA ────────────────────────────────────────────────────── */
+      /* ── 7. CTA — DARK ──────────────────────────────────────────────── */
       .cta {
-        position: relative;
         background: var(--espresso);
         padding: 120px 40px 100px;
         text-align: center;
+        position: relative;
         overflow: hidden;
-        border-top: 1px solid var(--border-soft);
       }
       .cta::before {
         content: '';
         position: absolute;
-        top: -140px;
+        top: -150px;
         left: 50%;
         transform: translateX(-50%);
         width: 700px;
         height: 700px;
         border-radius: 50%;
-        background: radial-gradient(circle, rgba(143, 94, 59, 0.22) 0%, transparent 65%);
+        background: radial-gradient(circle, rgba(143, 94, 59, 0.24) 0%, transparent 65%);
         pointer-events: none;
       }
       .cta-inner {
         position: relative;
         z-index: 1;
-        max-width: 600px;
+        max-width: 580px;
         margin: 0 auto;
       }
       .cta-title {
         font-family: 'Playfair Display', serif;
-        font-size: clamp(32px, 5.5vw, 58px);
+        font-size: clamp(34px, 5.5vw, 60px);
         font-weight: 700;
-        color: var(--cream);
-        margin-bottom: 20px;
+        color: #fdf8f1;
         line-height: 1.1;
-        margin-top: 0;
+        margin: 0 0 20px;
       }
       .cta-title em {
         font-style: italic;
@@ -657,133 +652,94 @@
       }
       .cta-sub {
         font-size: 17px;
-        color: var(--cream-muted);
-        margin-bottom: 52px;
+        color: rgba(253, 248, 241, 0.52);
+        margin: 0 0 52px;
         text-align: center;
         line-height: 1.7;
       }
       .cta-note {
-        margin-top: 28px;
-        font-size: 12px;
-        color: var(--cream-soft);
-        letter-spacing: 0.5px;
+        margin-top: 26px;
+        font-size: 11px;
+        letter-spacing: 1px;
+        color: rgba(253, 248, 241, 0.28);
         text-align: center;
       }
 
-      /* ── DIVIDER ─────────────────────────────────────────────────────── */
-      .sep {
-        height: 1px;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          var(--border) 30%,
-          var(--border) 70%,
-          transparent
-        );
-        max-width: 860px;
-        margin: 0 auto;
+      /* ── NAV / FOOTER overrides ─────────────────────────────────────── */
+      nav {
+        background: rgba(26, 13, 7, 0.95) !important;
+        border-bottom-color: rgba(228, 195, 164, 0.15) !important;
+        backdrop-filter: blur(16px) !important;
       }
-
-      /* ── FOOTER override ─────────────────────────────────────────────── */
-      footer {
-        background: var(--espresso) !important;
-        border-top-color: var(--border-soft) !important;
+      .nav-wordmark {
+        color: #fdf8f1 !important;
       }
-      footer * {
-        color: var(--cream-muted) !important;
+      .nav-link {
+        color: rgba(253, 248, 241, 0.6) !important;
       }
-      footer .footer-wordmark-sm {
-        color: var(--cream) !important;
-      }
-      footer a:hover {
+      .nav-link:hover {
         color: var(--gold) !important;
       }
+      .nav-hamburger span {
+        background: rgba(253, 248, 241, 0.7) !important;
+      }
 
-      /* ── RESPONSIVE ──────────────────────────────────────────────────── */
+      /* ── RESPONSIVE ─────────────────────────────────────────────────── */
       @media (max-width: 768px) {
         .hero {
           padding: 120px 24px 90px;
         }
-        .hero-stats {
-          gap: 0;
-          flex-wrap: wrap;
-        }
-        .hero-stat {
-          flex: 0 0 50%;
-          border-right: none;
-          border-bottom: 1px solid var(--border-soft);
-          padding: 20px 0;
-        }
-        .hero-stat:nth-child(odd) {
-          border-right: 1px solid var(--border-soft);
-        }
-
-        .statement {
+        .intro {
           padding: 72px 24px;
         }
-
+        .intro-inner {
+          grid-template-columns: 1fr;
+          gap: 40px;
+        }
         .features {
-          padding: 72px 24px 0;
+          padding: 72px 24px;
         }
         .feature-item {
-          grid-template-columns: 44px 1fr;
+          grid-template-columns: 40px 1fr;
           gap: 20px;
-          padding: 32px 0;
+          padding: 28px 0;
         }
-
-        .manifesto {
-          margin: 72px 24px;
-          padding: 48px 32px;
+        .quote-band {
+          padding: 72px 24px;
         }
-
-        .how {
-          padding: 0 24px 80px;
+        .steps {
+          padding: 72px 24px;
         }
         .steps-grid {
           grid-template-columns: 1fr;
-          gap: 0;
+          gap: 16px;
         }
         .step-index {
-          font-size: 48px;
-          top: 18px;
-          right: 20px;
+          font-size: 56px;
         }
-
         .faq-section {
-          padding: 0 24px 80px;
+          padding: 72px 24px;
         }
-
         .cta {
           padding: 90px 24px 80px;
-        }
-
-        .sep {
-          margin: 0 24px;
         }
       }
 
       @media (max-width: 480px) {
         .hero-title {
-          font-size: clamp(38px, 11vw, 56px);
+          font-size: clamp(38px, 12vw, 56px);
         }
-        .download-group {
+        .btn-group {
           flex-direction: column;
           align-items: center;
         }
-        .btn-dl {
+        .btn-store {
           width: 100%;
           max-width: 280px;
           justify-content: center;
         }
-        .hero-stat {
-          flex: 0 0 100%;
-          border-right: none !important;
-        }
-        .manifesto {
-          padding: 40px 24px;
-        }
-        .step {
-          padding: 36px 24px;
+        .hero-badges {
+          gap: 16px;
         }
       }
     </style>
@@ -801,306 +757,300 @@
       </button>
     </nav>
 
-    <!-- ── HERO ──────────────────────────────────────────────────────────── -->
+    <!-- ── 1. HERO — oscuro ───────────────────────────────────────────── -->
     <section class="hero" id="main-content">
       <div class="hero-inner">
-        <span class="eyebrow">App · iOS &amp; Android · Descarga gratuita</span>
+        <span class="eyebrow-light">App · iOS &amp; Android · Descarga gratuita</span>
         <h1 class="hero-title">
           El café de especialidad<br />merece una app<br /><em>a su altura</em>
         </h1>
         <p class="hero-sub">
-          Descubre, cata y colecciona los mejores cafés del mundo.<br />
-          Tu guía personal para encontrar el café que es exactamente para ti.
+          Descubre, cata y colecciona los mejores cafés del mundo. Tu guía personal para encontrar
+          el café que es exactamente para ti.
         </p>
-        <div class="hero-divider">
-          <div class="gold-rule"><div class="gold-rule-dot"></div></div>
-        </div>
-        <div class="download-group">
+        <div class="hero-rule"><div class="hero-rule-dot"></div></div>
+        <div class="btn-group">
           <a
             href="https://apps.apple.com/app/etiove"
             target="_blank"
             rel="noopener noreferrer"
-            class="btn-dl"
+            class="btn-store"
           >
-            <svg class="btn-dl-icon" viewBox="0 0 24 24" fill="currentColor">
+            <svg class="btn-store-icon" viewBox="0 0 24 24" fill="currentColor">
               <path
                 d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"
               />
             </svg>
-            <div class="btn-dl-copy">
-              <span class="btn-dl-sub">Descarga en</span>
-              <span class="btn-dl-main">App Store</span>
+            <div class="btn-store-copy">
+              <span class="btn-store-sub">Descarga en</span>
+              <span class="btn-store-main">App Store</span>
             </div>
           </a>
           <a
             href="https://play.google.com/store/apps/details?id=com.zarezfamily.etiove"
             target="_blank"
             rel="noopener noreferrer"
-            class="btn-dl"
+            class="btn-store"
           >
-            <svg class="btn-dl-icon" viewBox="0 0 24 24" fill="currentColor">
+            <svg class="btn-store-icon" viewBox="0 0 24 24" fill="currentColor">
               <path
                 d="M3.18 23.76c.3.17.64.24.99.19l12.6-7.27-2.72-2.72-10.87 9.8zm16.11-9.37L5.83 6.93l2.72 2.72 10.74-9.65zm1.61.93c.32-.18.5-.5.5-.87s-.18-.69-.5-.87L18.1 12l-2.59 2.59 2.6 2.6 2.79-1.87zM3.18.24C2.86.07 2.5 0 2.17.19c-.33.18-.5.5-.5.87v21.88c0 .37.17.69.5.87.16.09.34.13.5.13.17 0 .33-.04.49-.13l.02-.01 10.85-9.73-2.7-2.7L3.18.24z"
               />
             </svg>
-            <div class="btn-dl-copy">
-              <span class="btn-dl-sub">Disponible en</span>
-              <span class="btn-dl-main">Google Play</span>
+            <div class="btn-store-copy">
+              <span class="btn-store-sub">Disponible en</span>
+              <span class="btn-store-main">Google Play</span>
             </div>
           </a>
         </div>
-        <div class="hero-stats">
-          <div class="hero-stat">
-            <span class="hero-stat-val">Gratis</span>
-            <span class="hero-stat-label">Sin coste</span>
-          </div>
-          <div class="hero-stat">
-            <span class="hero-stat-val">0</span>
-            <span class="hero-stat-label">Sin anuncios</span>
-          </div>
-          <div class="hero-stat">
-            <span class="hero-stat-val">iOS + Android</span>
-            <span class="hero-stat-label">Multiplataforma</span>
-          </div>
-          <div class="hero-stat">
-            <span class="hero-stat-val">España</span>
-            <span class="hero-stat-label">Hecho aquí</span>
-          </div>
+        <div class="hero-badges">
+          <span class="hero-badge">Descarga gratuita</span>
+          <span class="hero-badge">Sin anuncios</span>
+          <span class="hero-badge">iOS y Android</span>
+          <span class="hero-badge">Hecho en España</span>
         </div>
       </div>
     </section>
 
-    <!-- ── STATEMENT ─────────────────────────────────────────────────────── -->
-    <section class="statement">
-      <div class="statement-inner">
-        <p class="statement-quote">
-          Cada taza tiene un origen, un proceso, una historia.<br />
-          <strong>Etiove existe para que nunca la pierdas.</strong>
-        </p>
-        <p class="statement-attr">Etiove · La app del café de especialidad</p>
+    <!-- ── 2. INTRO — crema ───────────────────────────────────────────── -->
+    <section class="intro">
+      <div class="intro-inner">
+        <h2 class="intro-heading">
+          Cada taza tiene un origen.<br />Etiove te ayuda a<br /><em>encontrarlo.</em>
+        </h2>
+        <div class="intro-body">
+          <p>
+            El café de especialidad no es solo una bebida: es un sistema complejo de origen,
+            varietal, proceso y tueste. Etiove te da las herramientas para entenderlo, disfrutarlo y
+            compartirlo.
+          </p>
+          <p>
+            Diseñada para curiosos, para catadores y para los que simplemente quieren saber por qué
+            ese café les gustó tanto.
+          </p>
+          <span class="intro-detail">Gratis · iOS y Android · Sin anuncios</span>
+        </div>
       </div>
     </section>
 
-    <!-- ── FEATURES ──────────────────────────────────────────────────────── -->
+    <!-- ── 3. FEATURES — crema cálida ────────────────────────────────── -->
     <section class="features" id="features">
-      <div class="section-header">
-        <span class="eyebrow">Funcionalidades</span>
-        <h2>Diseñada para los que toman<br />el café <em>en serio</em></h2>
-        <p>
-          Todo lo que necesitas para descubrir mejor, elegir mejor y disfrutar más de cada taza.
-        </p>
+      <div class="features-inner">
+        <div class="features-header">
+          <span class="eyebrow-dark">Funcionalidades</span>
+          <h2>Todo lo que puedes hacer<br />con <em>Etiove</em></h2>
+          <p>Diseñada para los que toman el café en serio, sin ser complicada para nadie.</p>
+        </div>
+        <ul class="feature-list">
+          <li class="feature-item">
+            <span class="feature-num">01</span>
+            <div>
+              <h3 class="feature-title">Descubre cafés de especialidad</h3>
+              <p class="feature-desc">
+                Explora por origen, perfil sensorial, tueste y proceso. Filtra hasta encontrar el
+                café que encaja exactamente con tu paladar y tu método de preparación.
+              </p>
+              <span class="feature-tag">Exploración</span>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-num">02</span>
+            <div>
+              <h3 class="feature-title">Diario de catas personal</h3>
+              <p class="feature-desc">
+                Registra tus notas, puntuaciones e impresiones en tiempo real. Con el tiempo, tu
+                historial revela con precisión qué perfiles de sabor te emocionan de verdad.
+              </p>
+              <span class="feature-tag">Cata</span>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-num">03</span>
+            <div>
+              <h3 class="feature-title">Valora y contribuye</h3>
+              <p class="feature-desc">
+                Puntúa cada café que pruebas y contribuye al ranking colectivo. Tus valoraciones
+                ayudan a otros a descubrir joyas de tostadores independientes.
+              </p>
+              <span class="feature-tag">Comunidad</span>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-num">04</span>
+            <div>
+              <h3 class="feature-title">Colecciona tus favoritos</h3>
+              <p class="feature-desc">
+                Guarda los cafés que quieres repetir y construye tu biblioteca personal. Nunca más
+                perderás la referencia de ese café que te dejó sin palabras.
+              </p>
+              <span class="feature-tag">Biblioteca</span>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-num">05</span>
+            <div>
+              <h3 class="feature-title">Tu perfil sensorial exacto</h3>
+              <p class="feature-desc">
+                Responde el quiz de sabor y descubre qué tipo de café encaja con tu paladar: floral,
+                achocolatado, cítrico, especiado. Recomendaciones personalizadas desde el primer
+                minuto.
+              </p>
+              <span class="feature-tag">Quiz · Perfil</span>
+            </div>
+          </li>
+          <li class="feature-item">
+            <span class="feature-num">06</span>
+            <div>
+              <h3 class="feature-title">Comunidad de catadores</h3>
+              <p class="feature-desc">
+                Conecta con otros amantes del café de especialidad. Foro activo, conversaciones
+                reales y conocimiento compartido entre personas que saben lo que es una buena taza.
+              </p>
+              <span class="feature-tag">Foro</span>
+            </div>
+          </li>
+        </ul>
       </div>
-      <ul class="feature-list">
-        <li class="feature-item">
-          <span class="feature-num">01</span>
-          <div class="feature-body">
-            <h3 class="feature-title">Descubre cafés de especialidad</h3>
-            <p class="feature-desc">
-              Explora por origen, perfil sensorial, tueste y proceso de beneficio. Filtra hasta
-              encontrar el café que encaja exactamente con tu paladar y tu método de preparación.
-            </p>
-            <span class="feature-tag">Exploración</span>
-          </div>
-        </li>
-        <li class="feature-item">
-          <span class="feature-num">02</span>
-          <div class="feature-body">
-            <h3 class="feature-title">Diario de catas personal</h3>
-            <p class="feature-desc">
-              Registra tus notas de cata, puntuaciones e impresiones en tiempo real. Con el tiempo,
-              tu historial te revela con precisión qué perfiles de sabor te emocionan de verdad.
-            </p>
-            <span class="feature-tag">Cata</span>
-          </div>
-        </li>
-        <li class="feature-item">
-          <span class="feature-num">03</span>
-          <div class="feature-body">
-            <h3 class="feature-title">Valora y contribuye</h3>
-            <p class="feature-desc">
-              Puntúa cada café que pruebas y contribuye al ranking colectivo. Tus valoraciones
-              ayudan a otros catadores a descubrir joyas ocultas de tostadores independientes.
-            </p>
-            <span class="feature-tag">Comunidad</span>
-          </div>
-        </li>
-        <li class="feature-item">
-          <span class="feature-num">04</span>
-          <div class="feature-body">
-            <h3 class="feature-title">Colecciona tus favoritos</h3>
-            <p class="feature-desc">
-              Guarda los cafés que quieres repetir y construye tu colección personal. Nunca más
-              perderás la referencia de ese café que te dejó sin palabras.
-            </p>
-            <span class="feature-tag">Biblioteca</span>
-          </div>
-        </li>
-        <li class="feature-item">
-          <span class="feature-num">05</span>
-          <div class="feature-body">
-            <h3 class="feature-title">Tu perfil sensorial exacto</h3>
-            <p class="feature-desc">
-              Responde el quiz de sabor y descubre qué tipo de café encaja con tu paladar: floral,
-              achocolatado, cítrico, especiado. Recomendaciones personalizadas desde el primer
-              minuto.
-            </p>
-            <span class="feature-tag">Quiz · Perfil</span>
-          </div>
-        </li>
-        <li class="feature-item">
-          <span class="feature-num">06</span>
-          <div class="feature-body">
-            <h3 class="feature-title">Comunidad de catadores</h3>
-            <p class="feature-desc">
-              Conecta con otros amantes del café de especialidad. Foro activo, conversaciones reales
-              y conocimiento compartido entre personas que saben lo que es una buena taza.
-            </p>
-            <span class="feature-tag">Foro</span>
-          </div>
-        </li>
-      </ul>
     </section>
 
-    <!-- ── MANIFESTO QUOTE ────────────────────────────────────────────────── -->
-    <div class="manifesto">
-      <div class="manifesto-inner">
-        <span class="manifesto-mark">"</span>
-        <p class="manifesto-text">
+    <!-- ── 4. QUOTE — oscuro ──────────────────────────────────────────── -->
+    <div class="quote-band">
+      <div class="quote-inner">
+        <span class="quote-mark">"</span>
+        <p class="quote-text">
           El café de especialidad no es un lujo.<br />
-          Es la forma más honesta de disfrutar algo con origen, historia y sabor de verdad.
+          Es la forma más honesta de disfrutar algo con
+          <strong>origen, historia y sabor de verdad.</strong>
         </p>
       </div>
     </div>
 
-    <div class="sep"></div>
-
-    <!-- ── HOW IT WORKS ───────────────────────────────────────────────────── -->
-    <section class="how">
-      <div class="section-header">
-        <span class="eyebrow">Cómo funciona</span>
-        <h2>Empieza en <em>tres pasos</em></h2>
-        <p>
-          Simple, rápido y pensado para que lo uses desde el primer día sin curva de aprendizaje.
-        </p>
-      </div>
-      <div class="steps-grid">
-        <div class="step">
-          <span class="step-index">01</span>
-          <span class="step-label">Paso uno</span>
-          <h3 class="step-title">Descarga la app</h3>
-          <p class="step-desc">
-            Disponible gratis en App Store y Google Play. Sin suscripción, sin barreras de entrada,
-            sin anuncios.
-          </p>
+    <!-- ── 5. STEPS — crema ───────────────────────────────────────────── -->
+    <section class="steps">
+      <div class="steps-inner">
+        <div class="steps-header">
+          <span class="eyebrow-dark">Cómo funciona</span>
+          <h2>Empieza en <em>tres pasos</em></h2>
+          <p>Simple y pensado para que lo uses desde el primer día sin curva de aprendizaje.</p>
         </div>
-        <div class="step">
-          <span class="step-index">02</span>
-          <span class="step-label">Paso dos</span>
-          <h3 class="step-title">Descubre tu perfil</h3>
-          <p class="step-desc">
-            Responde el quiz de sabor en dos minutos y recibe recomendaciones personalizadas basadas
-            en tu paladar real.
-          </p>
-        </div>
-        <div class="step">
-          <span class="step-index">03</span>
-          <span class="step-label">Paso tres</span>
-          <h3 class="step-title">Explora y cata</h3>
-          <p class="step-desc">
-            Registra tus cafés, guarda favoritos, puntúa tostados y conecta con una comunidad que
-            comparte tu misma pasión.
-          </p>
+        <div class="steps-grid">
+          <div class="step-card">
+            <span class="step-index">01</span>
+            <span class="step-label">Paso uno</span>
+            <h3 class="step-title">Descarga la app</h3>
+            <p class="step-desc">
+              Gratis en App Store y Google Play. Sin suscripción, sin barreras, sin anuncios.
+            </p>
+          </div>
+          <div class="step-card">
+            <span class="step-index">02</span>
+            <span class="step-label">Paso dos</span>
+            <h3 class="step-title">Descubre tu perfil</h3>
+            <p class="step-desc">
+              El quiz de sabor en dos minutos te da recomendaciones personalizadas basadas en tu
+              paladar real.
+            </p>
+          </div>
+          <div class="step-card">
+            <span class="step-index">03</span>
+            <span class="step-label">Paso tres</span>
+            <h3 class="step-title">Explora y cata</h3>
+            <p class="step-desc">
+              Registra cafés, guarda favoritos, puntúa tostados y conecta con una comunidad que
+              comparte tu pasión.
+            </p>
+          </div>
         </div>
       </div>
     </section>
 
-    <div class="sep"></div>
-
-    <!-- ── FAQ ───────────────────────────────────────────────────────────── -->
+    <!-- ── 6. FAQ — crema cálida ──────────────────────────────────────── -->
     <section class="faq-section">
-      <div class="section-header">
-        <span class="eyebrow">Preguntas frecuentes</span>
-        <h2>Todo lo que necesitas<br /><em>saber</em></h2>
-      </div>
-      <div class="faq">
-        <details>
-          <summary>¿Etiove es completamente gratuita?</summary>
-          <p>
-            Sí. La descarga y el uso de la app son totalmente gratuitos y sin anuncios. En el futuro
-            puede haber funciones premium opcionales, pero el núcleo de la experiencia siempre será
-            gratis.
-          </p>
-        </details>
-        <details>
-          <summary>¿Está disponible en iOS y Android?</summary>
-          <p>
-            Sí, Etiove está disponible tanto en la App Store de Apple como en Google Play para
-            Android. Descarga la que corresponda a tu dispositivo.
-          </p>
-        </details>
-        <details>
-          <summary>¿Hace falta ser experto en café para usarla?</summary>
-          <p>
-            Para nada. Etiove está pensada tanto para quienes se inician en el café de especialidad
-            como para catadores con experiencia. El quiz de sabor te orienta desde el primer minuto
-            sin necesitar conocimientos previos.
-          </p>
-        </details>
-        <details>
-          <summary>¿Qué hace Etiove diferente a otras apps de café?</summary>
-          <p>
-            Etiove combina el descubrimiento de cafés, el diario de catas personal y una comunidad
-            activa en una sola app. No es solo contenido ni solo un listado: es una herramienta para
-            construir tu propio criterio de catador.
-          </p>
-        </details>
-        <details>
-          <summary>¿Puedo usar Etiove sin crear una cuenta?</summary>
-          <p>
-            Puedes explorar cafés sin cuenta. Para guardar favoritos, registrar catas y participar
-            en la comunidad necesitarás registrarte, lo cual es gratuito y lleva menos de un minuto.
-          </p>
-        </details>
+      <div class="faq-inner">
+        <div class="faq-header">
+          <span class="eyebrow-dark">Preguntas frecuentes</span>
+          <h2>Todo lo que necesitas <em>saber</em></h2>
+        </div>
+        <div class="faq">
+          <details>
+            <summary>¿Etiove es completamente gratuita?</summary>
+            <p>
+              Sí. La descarga y el uso son totalmente gratuitos y sin anuncios. En el futuro puede
+              haber funciones premium opcionales, pero el núcleo de la experiencia siempre será
+              gratis.
+            </p>
+          </details>
+          <details>
+            <summary>¿Está disponible en iOS y Android?</summary>
+            <p>
+              Sí, disponible en la App Store de Apple y en Google Play para Android. Descarga la que
+              corresponda a tu dispositivo.
+            </p>
+          </details>
+          <details>
+            <summary>¿Hace falta ser experto en café para usarla?</summary>
+            <p>
+              Para nada. Está pensada tanto para quienes se inician en el café de especialidad como
+              para catadores con experiencia. El quiz de sabor te orienta desde el primer minuto.
+            </p>
+          </details>
+          <details>
+            <summary>¿Qué hace Etiove diferente a otras apps de café?</summary>
+            <p>
+              Combina descubrimiento, diario de catas y comunidad en una sola app. No es solo
+              contenido ni solo un listado: es una herramienta para construir tu propio criterio de
+              catador.
+            </p>
+          </details>
+          <details>
+            <summary>¿Puedo usar Etiove sin crear una cuenta?</summary>
+            <p>
+              Puedes explorar cafés sin cuenta. Para guardar favoritos, registrar catas y participar
+              en la comunidad necesitarás registrarte, lo cual es gratuito y tarda menos de un
+              minuto.
+            </p>
+          </details>
+        </div>
       </div>
     </section>
 
-    <!-- ── CTA ────────────────────────────────────────────────────────────── -->
+    <!-- ── 7. CTA — oscuro ────────────────────────────────────────────── -->
     <section class="cta" id="cta">
       <div class="cta-inner">
-        <span class="eyebrow">Descarga gratuita · iOS &amp; Android</span>
+        <span class="eyebrow-light">Descarga gratuita · iOS &amp; Android</span>
         <h2 class="cta-title">Tu próximo café favorito<br />te está <em>esperando</em></h2>
         <p class="cta-sub">Únete a la comunidad de amantes del café de especialidad.</p>
-        <div class="download-group">
+        <div class="btn-group">
           <a
             href="https://apps.apple.com/app/etiove"
             target="_blank"
             rel="noopener noreferrer"
-            class="btn-dl"
+            class="btn-store"
           >
-            <svg class="btn-dl-icon" viewBox="0 0 24 24" fill="currentColor">
+            <svg class="btn-store-icon" viewBox="0 0 24 24" fill="currentColor">
               <path
                 d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"
               />
             </svg>
-            <div class="btn-dl-copy">
-              <span class="btn-dl-sub">Descarga en</span>
-              <span class="btn-dl-main">App Store</span>
+            <div class="btn-store-copy">
+              <span class="btn-store-sub">Descarga en</span>
+              <span class="btn-store-main">App Store</span>
             </div>
           </a>
           <a
             href="https://play.google.com/store/apps/details?id=com.zarezfamily.etiove"
             target="_blank"
             rel="noopener noreferrer"
-            class="btn-dl"
+            class="btn-store"
           >
-            <svg class="btn-dl-icon" viewBox="0 0 24 24" fill="currentColor">
+            <svg class="btn-store-icon" viewBox="0 0 24 24" fill="currentColor">
               <path
                 d="M3.18 23.76c.3.17.64.24.99.19l12.6-7.27-2.72-2.72-10.87 9.8zm16.11-9.37L5.83 6.93l2.72 2.72 10.74-9.65zm1.61.93c.32-.18.5-.5.5-.87s-.18-.69-.5-.87L18.1 12l-2.59 2.59 2.6 2.6 2.79-1.87zM3.18.24C2.86.07 2.5 0 2.17.19c-.33.18-.5.5-.5.87v21.88c0 .37.17.69.5.87.16.09.34.13.5.13.17 0 .33-.04.49-.13l.02-.01 10.85-9.73-2.7-2.7L3.18.24z"
               />
             </svg>
-            <div class="btn-dl-copy">
-              <span class="btn-dl-sub">Disponible en</span>
-              <span class="btn-dl-main">Google Play</span>
+            <div class="btn-store-copy">
+              <span class="btn-store-sub">Disponible en</span>
+              <span class="btn-store-main">Google Play</span>
             </div>
           </a>
         </div>
@@ -1108,7 +1058,7 @@
       </div>
     </section>
 
-    <!-- ── FOOTER ─────────────────────────────────────────────────────────── -->
+    <!-- ── FOOTER ─────────────────────────────────────────────────────── -->
     <footer>
       <nav class="footer-nav" aria-label="Navegación del sitio">
         <div class="footer-nav-group">

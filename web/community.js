@@ -3374,6 +3374,17 @@ const initMentionAutocomplete = (textarea) => {
 const init = async () => {
   initializeMetaDefaults();
   renderCategories();
+
+  // Validar sesión al inicio: evita mostrar "Sesión activa" con token caducado
+  if (auth.uid && auth.token) {
+    const rt = localStorage.getItem('etiove_web_refresh_token');
+    if (!rt) {
+      clearAuthToken();
+    } else {
+      await refreshFirebaseToken();
+    }
+  }
+
   renderAuthState();
 
   // Pre-rellenar campos de login si hay credenciales guardadas (Recordarme)

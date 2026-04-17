@@ -1809,9 +1809,13 @@
       renderHeader();
       attachActionEvents();
       renderButtons();
-      const initialTab = getTabFromHash() || 'activity';
-      renderTab(initialTab);
       state.loaded = true;
+      try {
+        const initialTab = getTabFromHash() || 'activity';
+        renderTab(initialTab);
+      } catch {
+        renderEmpty('No hay actividad para mostrar.');
+      }
     } catch {
       renderEmpty('No se pudieron cargar los datos de este perfil.');
     }

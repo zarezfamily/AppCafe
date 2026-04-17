@@ -54,6 +54,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-title" content="Etiove" />
     <meta name="theme-color" content="#21150f" />
+    <meta name="color-scheme" content="light" />
     <link rel="manifest" href="/site.webmanifest" />
     <link
       href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Manrope:wght@500;700&display=swap"
@@ -66,6 +67,7 @@
         padding: 0;
       }
       :root {
+        color-scheme: light;
         --ink: #21150f;
         --ink-soft: #4d3529;
         --ink-muted: #7f6553;
@@ -1779,91 +1781,6 @@
         }
         .scroll-indicator svg {
           animation: none !important;
-        }
-      }
-
-      @media (prefers-color-scheme: dark) {
-        :root {
-          --ink: #f0e8de;
-          --ink-soft: #c9b8a8;
-          --ink-muted: #9a8778;
-          --cream: #1a110a;
-          --cream-alt: #211509;
-          --accent: #c99557;
-          --accent-deep: #efd5ad;
-          --gold: #efd5ad;
-          --gold-soft: #5a3820;
-          --border: #3a2518;
-          --border-soft: rgba(58, 37, 24, 0.55);
-          --danger: #e06060;
-          --success: #6ab870;
-        }
-        nav {
-          background: rgba(26, 17, 10, 0.92);
-        }
-        .main-card,
-        .sidebar-card {
-          background: #211509;
-          border-color: var(--border);
-        }
-        .thread {
-          border-bottom-color: var(--border);
-          background: rgba(30, 18, 10, 0.8);
-        }
-        .thread h3 {
-          color: var(--ink);
-        }
-        .btn {
-          background: #2d1a0e;
-          border-color: var(--border);
-          color: var(--ink);
-        }
-        .btn.primary {
-          background: var(--accent);
-          color: #1a110a;
-        }
-        input,
-        textarea,
-        select {
-          background: #2d1a0e;
-          color: var(--ink);
-          border-color: var(--border);
-        }
-        .chip {
-          background: rgba(40, 24, 14, 0.85);
-          border-color: var(--border);
-          color: var(--ink-soft);
-        }
-        .chip.active {
-          background: var(--accent-deep);
-          border-color: var(--accent-deep);
-          color: #fff8f0;
-        }
-        .pill.category {
-          background: rgba(65, 38, 20, 0.7);
-          color: var(--ink-soft);
-          border-color: var(--border);
-        }
-        .member-evo {
-          background: linear-gradient(135deg, #2a1a0e 0%, #221408 100%);
-        }
-        .member-evo-name {
-          color: var(--ink);
-        }
-        .member-evo-stat {
-          background: rgba(255, 255, 255, 0.04);
-          border-color: var(--border);
-        }
-        .member-evo-stat-label {
-          color: var(--ink-muted);
-        }
-        .member-evo-stat-value {
-          color: var(--ink);
-        }
-        .member-evo-badge {
-          background: rgba(50, 30, 15, 0.9);
-          border-color: #4a2e18;
-          color: var(--ink-soft);
         }
       }
 

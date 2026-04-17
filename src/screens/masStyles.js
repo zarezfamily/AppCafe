@@ -205,7 +205,7 @@ const mas = StyleSheet.create({
   newsletterStatusTextOn: { color: '#6b4a37' },
   newsletterStatusTextOff: { color: '#8d7a6c' },
   newsletterEmail: { color: '#3a2a20', fontSize: 13, fontWeight: '600' },
-  newsletterNote: { color: '#8c847d', fontSize: 12, lineHeight: 18, marginTop: 10 },
+  newsletterNote: { color: '#4a3428', fontSize: 12, lineHeight: 18, marginTop: 10 },
   newsletterBtn: {
     alignItems: 'center',
     justifyContent: 'center',

@@ -132,7 +132,7 @@ footer {
   left: 0;
   right: 0;
   z-index: 9000;
-  background: var(--ink);
+  background: #1c120d;
   color: #f6efe7;
   padding: 20px 40px;
   display: flex;
@@ -144,6 +144,7 @@ footer {
   box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.25);
   transform: translateY(100%);
   transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  color-scheme: dark;
 }
 #cookieBanner.visible {
   transform: translateY(0);
@@ -151,7 +152,7 @@ footer {
 .cookie-text {
   font-size: 13px;
   line-height: 1.6;
-  color: rgba(246, 239, 231, 0.8);
+  color: rgba(246, 239, 231, 0.88);
   flex: 1;
   min-width: 240px;
 }
@@ -179,7 +180,7 @@ footer {
 }
 .cookie-btn-accept {
   background: #efd5ad;
-  color: var(--ink);
+  color: #1c120d;
 }
 .cookie-btn-accept:hover {
   background: #fff;

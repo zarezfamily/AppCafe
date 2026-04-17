@@ -81,8 +81,6 @@
     quote: document.getElementById('profileQuote'),
     status: document.getElementById('profileStatus'),
     actions: document.getElementById('profileActions'),
-    ownerActions: document.getElementById('ownerActions'),
-    exportDataBtn: document.getElementById('exportDataBtn'),
     followBtn: document.getElementById('followBtn'),
     dmBtn: document.getElementById('dmBtn'),
     photoInput: document.getElementById('photoInput'),
@@ -231,14 +229,18 @@
   };
 
   const updateDocument = async (name, id, data) => {
-    const query = new URLSearchParams({ key: FIREBASE_API_KEY });
-    Object.keys(data).forEach((field) => query.append('updateMask.fieldPaths', field));
-    const res = await fetch(`${BASE_URL}/${name}/${id}?${query.toString()}`, {
-      method: 'PATCH',
-      headers: authedHeaders(),
-      body: JSON.stringify(toFields(data)),
-    });
-    return res.ok;
+    try {
+      const query = new URLSearchParams({ key: FIREBASE_API_KEY });
+      Object.keys(data).forEach((field) => query.append('updateMask.fieldPaths', field));
+      const res = await fetch(`${BASE_URL}/${name}/${id}?${query.toString()}`, {
+        method: 'PATCH',
+        headers: authedHeaders(),
+        body: JSON.stringify(toFields(data)),
+      });
+      return res.ok;
+    } catch {
+      return false;
+    }
   };
 
   const addDocument = async (name, data) => {
@@ -848,15 +850,6 @@
         el.dmBtn.textContent = 'Mensaje directo';
       }
     }
-
-    // Owner-only actions
-    if (el.ownerActions) {
-      el.ownerActions.style.display = isOwner() ? 'block' : 'none';
-    }
-    if (el.exportDataBtn && !el.exportDataBtn.dataset.wired) {
-      el.exportDataBtn.addEventListener('click', exportMyData);
-      el.exportDataBtn.dataset.wired = '1';
-    }
   };
 
   const refreshFollowState = () => {
@@ -1175,64 +1168,6 @@
         `;
       })
       .join('');
-  };
-
-  // ─── EXPORTAR MIS DATOS (RGPD Art. 20 — Portabilidad) ───────────────────
-  const exportMyData = () => {
-    if (!isOwner() || !auth.uid) return;
-
-    const data = {
-      exportDate: new Date().toISOString(),
-      user: {
-        uid: auth.uid,
-        email: auth.email || '',
-        alias: String(localStorage.getItem('etiove_web_alias') || ''),
-        emailVerified: auth.emailVerified,
-      },
-      profile: state.profile || {},
-      threads: state.threads.map((t) => ({
-        id: t.id,
-        title: t.title,
-        body: t.body,
-        categoryId: t.categoryId,
-        createdAt: t.createdAt,
-        upvotes: t.upvotes,
-        accessLevel: t.accessLevel,
-      })),
-      replies: state.replies.map((r) => ({
-        id: r.id,
-        threadId: r.threadId,
-        body: r.body,
-        createdAt: r.createdAt,
-        upvotes: r.upvotes,
-      })),
-      messages: state.messages
-        .filter((m) => m.senderUid === auth.uid || m.recipientUid === auth.uid)
-        .map((m) => ({
-          id: m.id,
-          body: m.body,
-          createdAt: m.createdAt,
-          direction: m.senderUid === auth.uid ? 'sent' : 'received',
-          otherUser: m.senderUid === auth.uid ? m.recipientName : m.senderName,
-        })),
-      quizProfile: (() => {
-        try {
-          return JSON.parse(localStorage.getItem('etiove_quiz_prefs') || 'null');
-        } catch {
-          return null;
-        }
-      })(),
-    };
-
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `etiove-mis-datos-${new Date().toISOString().slice(0, 10)}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
   };
 
   // ─── BADGE DE MENSAJES NO LEÍDOS ─────────────────────────────────────────
@@ -1804,8 +1739,11 @@
   };
 
   const init = async () => {
+    // Wire up navigation immediately — tabs and scroll work regardless of data load result
+    attachTabEvents();
+    setupScrollTop();
+
     if (!uid && !pathAlias) {
-      // No uid en la URL y no hay sesión — redirigir a comunidad con mensaje amable
       if (!el.content) {
         window.location.replace('/comunidad.html');
         return;
@@ -1823,9 +1761,9 @@
       return;
     }
 
-    // ── Resolver uid desde alias si viene de URL limpia /perfil/@alias ──────
-    if (!uid && pathAlias) {
-      try {
+    try {
+      // ── Resolver uid desde alias si viene de URL limpia /perfil/@alias ──
+      if (!uid && pathAlias) {
         const normAlias = (v) =>
           String(v || '')
             .normalize('NFD')
@@ -1840,48 +1778,44 @@
             [p.displayName, p.alias, p.nickname].some((v) => normAlias(v) === needle)
           ) || profiles.find((p) => String(p.uid || '').trim() === pathAlias);
         if (hit && hit.uid) uid = String(hit.uid).trim();
-      } catch (_) {}
+      }
+
+      const [threads, replies, blogComments, follows, profile] = await Promise.all([
+        getCollection('foro_hilos', 1200),
+        getCollection('foro_respuestas', 2000),
+        getCollection('blog_comentarios', 2000),
+        getCollection('profile_follows', 4000),
+        getDocument('user_profiles', uid),
+      ]);
+
+      state.threads = threads.filter((item) => item.authorUid === uid);
+      state.replies = replies.filter((item) => item.authorUid === uid);
+      state.blogComments = blogComments.filter((item) => item.authorUid === uid);
+      state.follows = follows;
+      state.profile = profile;
+
+      const pName = state.profile
+        ? String(state.profile.displayName || state.profile.alias || queryName || '').trim()
+        : String(queryName || '').trim();
+      if (pName) injectPersonSchema(state.profile, pName);
+      if (Array.isArray(resolvedProfilesCache) && resolvedProfilesCache.length) {
+        state.profiles = resolvedProfilesCache;
+        state.profilesLoaded = true;
+      }
+
+      await syncOwnerProfileIfNeeded();
+
+      refreshFollowState();
+      renderHeader();
+      attachActionEvents();
+      renderButtons();
+      const initialTab = getTabFromHash() || 'activity';
+      renderTab(initialTab);
+      state.loaded = true;
+    } catch {
+      renderEmpty('No se pudieron cargar los datos de este perfil.');
     }
-
-    const [threads, replies, blogComments, follows, profile] = await Promise.all([
-      getCollection('foro_hilos', 1200),
-      getCollection('foro_respuestas', 2000),
-      getCollection('blog_comentarios', 2000),
-      getCollection('profile_follows', 4000),
-      getDocument('user_profiles', uid),
-    ]);
-
-    state.threads = threads.filter((item) => item.authorUid === uid);
-    state.replies = replies.filter((item) => item.authorUid === uid);
-    state.blogComments = blogComments.filter((item) => item.authorUid === uid);
-    state.follows = follows;
-    state.profile = profile;
-    // Inject Person schema for SEO
-    const pName = state.profile
-      ? String(state.profile.displayName || state.profile.alias || queryName || '').trim()
-      : String(queryName || '').trim();
-    if (pName) injectPersonSchema(state.profile, pName);
-    if (Array.isArray(resolvedProfilesCache) && resolvedProfilesCache.length) {
-      state.profiles = resolvedProfilesCache;
-      state.profilesLoaded = true;
-    }
-
-    // Para el dueño del perfil: importar foto/nombre/frase desde fuentes legacy o Auth.
-    await syncOwnerProfileIfNeeded();
-
-    refreshFollowState();
-
-    renderHeader();
-    attachTabEvents();
-    attachActionEvents();
-    setupScrollTop();
-    renderButtons();
-    const initialTab = getTabFromHash() || 'activity';
-    renderTab(initialTab);
-    state.loaded = true;
   };
 
-  init().catch(() => {
-    renderEmpty('No se pudo cargar este perfil en este momento.');
-  });
+  init();
 })();

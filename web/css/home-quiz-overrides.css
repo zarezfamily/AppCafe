@@ -134,11 +134,26 @@
   color: #9a7963 !important;
 }
 
-#webQuizRoot .eq-step-dot {
-  background: #e4d3c2 !important;
+#webQuizRoot .eq-prog-seg {
+  height: 2px !important;
+  background: #ddd0c0 !important;
+  border-radius: 2px !important;
 }
-#webQuizRoot .eq-step-dot.active {
-  background: #8f5e3b !important;
+#webQuizRoot .eq-prog-seg.active {
+  background: #7a4f2e !important;
+}
+#webQuizRoot .eq-prog-node {
+  border-color: #ddd0c0 !important;
+  background: transparent !important;
+}
+#webQuizRoot .eq-prog-node.done {
+  background: #7a4f2e !important;
+  border-color: #7a4f2e !important;
+}
+#webQuizRoot .eq-prog-node.current {
+  border-color: #7a4f2e !important;
+  background: #fff !important;
+  box-shadow: 0 0 0 3px rgba(122, 79, 46, 0.2) !important;
 }
 
 #webQuizRoot .eq-result-icon {

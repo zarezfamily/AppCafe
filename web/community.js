@@ -1310,6 +1310,10 @@ const uploadImageWithRetry = async (file, folder, maxAttempts = 3) => {
 };
 
 const renderAuthState = () => {
+  // Sesión fantasma: hay uid/token en localStorage pero sin refresh token → limpiar
+  if (auth.uid && auth.token && !localStorage.getItem('etiove_web_refresh_token')) {
+    clearAuthToken();
+  }
   const logged = !!auth.token;
   // Ocultar bloque login completo si está logueado
   const loginSection = document.querySelector('.login-section');

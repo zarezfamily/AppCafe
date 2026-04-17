@@ -71,6 +71,10 @@ export default function MainScreen({ onLogout }) {
       }),
     s,
     premiumAccent: PREMIUM_ACCENT,
+    allCafes: domain.allCafes,
+    setCafeDetalle: ui.setCafeDetalle,
+    setScanning: ui.setScanning,
+    showDialog: ui.showDialog,
   });
 
   if (transientView) {

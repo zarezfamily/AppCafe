@@ -206,29 +206,29 @@ export const QUIZ_STYLES = `
     color: rgba(255,249,241,0.32);
     font-weight: 300;
     font-style: italic;
-    margin-bottom: 36px;
+    margin-bottom: 44px;
   }
 
   .eq-options {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 36px;
+    gap: 16px;
+    margin-bottom: 40px;
   }
   .eq-options.cols-3 { grid-template-columns: repeat(3, 1fr); }
 
   .eq-option {
     background: rgba(255,249,241,0.04);
     border: 1px solid rgba(228,195,164,0.20);
-    border-radius: 12px;
+    border-radius: 14px;
     cursor: pointer;
     text-align: left;
-    padding: 22px 20px 20px;
+    padding: 28px 24px 24px;
     transition: border-color 0.2s, background 0.2s, transform 0.18s, box-shadow 0.2s;
     font-family: inherit;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 0;
     position: relative;
   }
   .eq-option::before {
@@ -287,23 +287,24 @@ export const QUIZ_STYLES = `
     letter-spacing: 2.5px;
     font-weight: 600;
     text-transform: uppercase;
+    margin-bottom: 10px;
   }
   .eq-option-label {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(17px, 2.4vw, 21px);
+    font-size: clamp(16px, 2.2vw, 20px);
     font-weight: 500;
     color: rgba(255,249,241,0.90);
     letter-spacing: 0.2px;
-    line-height: 1.15;
+    line-height: 1.2;
     transition: color 0.2s;
+    margin-bottom: 8px;
   }
   .eq-option-desc {
     font-size: 12px;
     color: rgba(255,249,241,0.45);
     font-weight: 300;
     letter-spacing: 0.4px;
-    line-height: 1.65;
-    margin-top: 2px;
+    line-height: 1.7;
   }
 
   .eq-foot {
@@ -427,8 +428,9 @@ export const QUIZ_STYLES = `
   }
 
   @media (max-width: 600px) {
-    #webQuizRoot { padding: 80px 24px 100px; min-height: auto; }
-    .eq-options, .eq-options.cols-3 { grid-template-columns: 1fr; }
+    #webQuizRoot { padding: 80px 20px 100px; min-height: auto; }
+    .eq-options, .eq-options.cols-3 { grid-template-columns: 1fr; gap: 12px; }
+    .eq-option { padding: 22px 20px 20px; }
     .eq-btn-primary { padding: 18px 36px; width: 100%; justify-content: center; }
   }
 `;

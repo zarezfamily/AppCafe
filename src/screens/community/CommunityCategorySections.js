@@ -8,17 +8,20 @@ function MotivationCard({ icon, label, xp }) {
         flex: 1,
         alignItems: 'center',
         gap: 6,
-        backgroundColor: '#faf8f5',
-        borderRadius: 12,
-        paddingVertical: 12,
+        backgroundColor: '#fff',
+        borderRadius: 14,
+        paddingVertical: 14,
         paddingHorizontal: 8,
-        borderWidth: 1,
-        borderColor: '#e8dcc8',
+        shadowColor: '#5a2d0c',
+        shadowOpacity: 0.07,
+        shadowRadius: 8,
+        shadowOffset: { width: 0, height: 2 },
+        elevation: 2,
       }}
     >
       <Text style={{ fontSize: 20 }}>{icon}</Text>
-      <Text style={{ fontSize: 10, fontWeight: '700', color: '#1f140f' }}>{label}</Text>
-      <Text style={{ fontSize: 10, fontWeight: '800', color: '#d4a574' }}>{xp}</Text>
+      <Text style={{ fontSize: 10, fontWeight: '700', color: '#180d06' }}>{label}</Text>
+      <Text style={{ fontSize: 10, fontWeight: '800', color: '#a8603c' }}>{xp}</Text>
     </View>
   );
 }
@@ -27,33 +30,45 @@ export function CommunityAchievementsSection({ gamification, achievementDefs }) 
   if (!gamification) return null;
 
   return (
-    <View style={{ paddingHorizontal: 16, paddingVertical: 20, gap: 12 }}>
+    <View style={{ paddingHorizontal: 16, paddingTop: 20, paddingBottom: 16, gap: 12 }}>
       <View>
-        <Text style={{ fontSize: 16, fontWeight: '800', color: '#1f140f', marginBottom: 8 }}>
-          🏆 Logros desbloqueados
+        <Text
+          style={{
+            fontSize: 11,
+            fontWeight: '800',
+            color: '#9e6540',
+            letterSpacing: 1.2,
+            textTransform: 'uppercase',
+            marginBottom: 4,
+          }}
+        >
+          Logros desbloqueados
         </Text>
-        <Text style={{ fontSize: 12, color: '#8b7355', marginBottom: 10 }}>
+        <Text style={{ fontSize: 12, color: '#6b5244' }}>
           {gamification.achievementIds.length > 0
             ? `${gamification.achievementIds.length} de ${achievementDefs.length} logros`
-            : 'Desbloquea logros interactuando en la comunidad'}
+            : 'Interactúa en la comunidad para desbloquear logros'}
         </Text>
       </View>
 
       {gamification.achievementIds.length > 0 ? (
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
           {gamification.achievementIds.map((achievementId) => {
             const achievement = achievementDefs.find((item) => item.id === achievementId);
             return achievement ? (
               <View key={achievementId} style={{ flex: 1, minWidth: 90 }}>
                 <View
                   style={{
-                    backgroundColor: '#faf8f5',
+                    backgroundColor: '#fff',
                     borderRadius: 14,
                     padding: 12,
                     alignItems: 'center',
                     gap: 8,
-                    borderWidth: 1.5,
-                    borderColor: '#d4a574',
+                    shadowColor: '#5a2d0c',
+                    shadowOpacity: 0.08,
+                    shadowRadius: 8,
+                    shadowOffset: { width: 0, height: 2 },
+                    elevation: 2,
                   }}
                 >
                   <Text style={{ fontSize: 24 }}>{achievement.icon}</Text>
@@ -61,7 +76,7 @@ export function CommunityAchievementsSection({ gamification, achievementDefs }) 
                     style={{
                       fontSize: 11,
                       fontWeight: '700',
-                      color: '#1f140f',
+                      color: '#180d06',
                       textAlign: 'center',
                       lineHeight: 14,
                     }}
@@ -76,17 +91,19 @@ export function CommunityAchievementsSection({ gamification, achievementDefs }) 
       ) : (
         <View
           style={{
-            backgroundColor: '#faf8f5',
+            backgroundColor: '#fff',
             borderRadius: 14,
-            padding: 16,
+            padding: 18,
             alignItems: 'center',
             gap: 8,
-            borderWidth: 1,
-            borderColor: '#e8dcc8',
+            shadowColor: '#5a2d0c',
+            shadowOpacity: 0.06,
+            shadowRadius: 8,
+            elevation: 1,
           }}
         >
           <Text style={{ fontSize: 28 }}>🎯</Text>
-          <Text style={{ fontSize: 13, fontWeight: '600', color: '#1f140f', textAlign: 'center' }}>
+          <Text style={{ fontSize: 13, fontWeight: '600', color: '#180d06', textAlign: 'center' }}>
             Empieza a interactuar para desbloquear logros
           </Text>
         </View>
@@ -98,8 +115,17 @@ export function CommunityAchievementsSection({ gamification, achievementDefs }) 
 export function CommunityMotivationSection() {
   return (
     <View style={{ paddingHorizontal: 16, paddingBottom: 20, gap: 10 }}>
-      <Text style={{ fontSize: 14, fontWeight: '800', color: '#1f140f', marginBottom: 4 }}>
-        ⚡ Gana puntos
+      <Text
+        style={{
+          fontSize: 11,
+          fontWeight: '800',
+          color: '#9e6540',
+          letterSpacing: 1.2,
+          textTransform: 'uppercase',
+          marginBottom: 2,
+        }}
+      >
+        Gana puntos
       </Text>
       <View style={{ flexDirection: 'row', gap: 10 }}>
         <MotivationCard icon="💬" label="Responder" xp="+14 XP" />
@@ -122,7 +148,16 @@ export function CommunityCategoryList({
 }) {
   return (
     <View style={{ paddingHorizontal: 16, paddingBottom: 20 }}>
-      <Text style={{ fontSize: 14, fontWeight: '800', color: '#1f140f', marginBottom: 12 }}>
+      <Text
+        style={{
+          fontSize: 11,
+          fontWeight: '800',
+          color: '#9e6540',
+          letterSpacing: 1.2,
+          textTransform: 'uppercase',
+          marginBottom: 12,
+        }}
+      >
         Categorías
       </Text>
       <View style={{ gap: 10 }}>

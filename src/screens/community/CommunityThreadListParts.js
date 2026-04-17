@@ -48,7 +48,7 @@ export function CommunityThreadListHeader({
         </TouchableOpacity>
       </View>
 
-      <View style={{ paddingHorizontal: 16, paddingBottom: 8 }}>
+      <View style={{ paddingHorizontal: 16, paddingBottom: 12 }}>
         <Text style={s.sectionTitle}>
           {forumCategory.emoji} {forumCategory.label}
         </Text>
@@ -77,7 +77,7 @@ export function CommunityThreadListHeader({
 
 export function CommunityThreadListSkeleton({ s, skeletonShimmerAnim }) {
   return (
-    <View style={s.forumSkeletonWrap}>
+    <View style={[s.forumSkeletonWrap, { flex: 1, backgroundColor: '#f5ede3' }]}>
       {[0, 1, 2].map((idx) => (
         <View key={idx} style={s.forumSkeletonCard}>
           <Animated.View
@@ -191,7 +191,10 @@ export function CommunityThreadListContent({
   handleOpenThread,
 }) {
   return (
-    <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 110, gap: 10 }}>
+    <ScrollView
+      style={{ flex: 1, backgroundColor: '#f5ede3' }}
+      contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 110, gap: 10 }}
+    >
       {forumThreadsByCategory.map((thread, idx) => {
         const rowAnim = threadRowAnimsRef.current[idx] || new Animated.Value(1);
         const pressAnim = getPressAnim(threadPressAnimsRef, idx);

@@ -20,8 +20,11 @@ export default function CommunityCategoriesView({
   const achievementDefs = getAchievementDefs();
 
   return (
-    <View style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 110, gap: 0 }}>
+    <View style={{ flex: 1, backgroundColor: '#f5ede3' }}>
+      <ScrollView
+        style={{ backgroundColor: '#f5ede3' }}
+        contentContainerStyle={{ paddingBottom: 110, gap: 0 }}
+      >
         <CommunityAchievementsSection
           gamification={gamification}
           achievementDefs={achievementDefs}

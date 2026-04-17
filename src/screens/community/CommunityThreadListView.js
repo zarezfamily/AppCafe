@@ -30,6 +30,7 @@ export default function CommunityThreadListView({
     <Animated.View
       style={{
         flex: 1,
+        backgroundColor: '#f5ede3',
         opacity: threadListEnterAnim,
         transform: [
           {

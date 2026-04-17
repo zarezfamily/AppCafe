@@ -84,7 +84,6 @@ export const QUIZ_STYLES = `
     color: rgba(255,249,241,0.5);
     font-weight: 300;
     line-height: 1.85;
-    max-width: 460px;
     margin-bottom: 48px;
     letter-spacing: 0.2px;
   }
@@ -231,7 +230,6 @@ export const QUIZ_STYLES = `
     flex-direction: column;
     gap: 6px;
     position: relative;
-    overflow: hidden;
   }
   .eq-option::before {
     content: '';
@@ -239,7 +237,7 @@ export const QUIZ_STYLES = `
     top: 0; bottom: 0; left: 0;
     width: 3px;
     background: linear-gradient(to bottom, #c99557, #efd5ad);
-    border-radius: 0 0 0 12px;
+    border-radius: 12px 0 0 12px;
     opacity: 0;
     transition: opacity 0.2s;
   }
@@ -401,7 +399,6 @@ export const QUIZ_STYLES = `
     border: 1px solid rgba(228,195,164,0.18);
     border-radius: 12px;
     position: relative;
-    overflow: hidden;
   }
   .eq-summary-pill::before {
     content: '';
@@ -409,6 +406,7 @@ export const QUIZ_STYLES = `
     top: 0; left: 0; right: 0;
     height: 2px;
     background: linear-gradient(90deg, #c99557, transparent);
+    border-radius: 12px 12px 0 0;
     opacity: 0.6;
   }
   .eq-summary-key {

@@ -67,7 +67,6 @@ function renderQuiz() {
     saveQuizProfile(prefs);
 
     inner.innerHTML = `
-      <div class="eq-result-icon">☕</div>
       <span class="eq-eyebrow">Perfil completado · Etiove</span>
       <h2 class="eq-title">Tu café perfecto <em>te está esperando</em></h2>
       <div class="eq-summary-row">${renderQuizSummary(prefs)}</div>
@@ -79,13 +78,6 @@ function renderQuiz() {
         </a>
         <button class="eq-btn-text" id="eq-restart">Repetir el quiz</button>
       </div>
-      <nav class="eq-footer-nav">
-        <a class="eq-footer-link" href="/comunidad.html">Comunidad</a>
-        <span class="eq-footer-sep">·</span>
-        <a class="eq-footer-link" href="/blog/">Blog</a>
-        <span class="eq-footer-sep">·</span>
-        <a class="eq-footer-link" href="/">Inicio</a>
-      </nav>
     `;
 
     inner.querySelector('#eq-restart').onclick = () => {

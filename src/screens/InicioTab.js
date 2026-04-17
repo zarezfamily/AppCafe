@@ -83,7 +83,7 @@ export default function InicioTab({
         placeholder="Buscar cualquier café..."
       />
 
-      {busqueda.trim() ? (
+      {busqueda?.trim() ? (
         <>
           <SearchResultsSection
             s={s}

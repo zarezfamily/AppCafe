@@ -348,7 +348,7 @@ function normalizeAiResult(parsed, cafe, job, barcodeData) {
 }
 
 async function callOpenAIForCoffeeEnrichment({ job, cafe, barcodeData }) {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY || process.env.OPENAI_KEY;
   if (!apiKey) {
     throw new Error('OPENAI_API_KEY_NOT_CONFIGURED');
   }

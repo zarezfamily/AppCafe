@@ -1,104 +1,102 @@
-import { Ionicons } from '@expo/vector-icons';
-import { CameraView } from 'expo-camera';
-import { useRef } from 'react';
-import { StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useCallback, useRef, useState } from 'react';
+import { Alert, Button, StyleSheet, Text, View } from 'react-native';
+import { resolveScan } from '../services/cafeService';
+// Si tienes auth/contexto, cámbialo aquí:
+// import { useAuth } from '../context/AuthContext';
 
-export default function ScannerScreen({ onScanned, onSkip, onBack, premiumAccent }) {
-  const scannedRef = useRef(false);
+export default function ScanScreen({ navigation }) {
+  // const { user } = useAuth();
+  const user = null;
 
-  const handleScan = (event) => {
-    if (scannedRef.current) return;
+  const [loading, setLoading] = useState(false);
+  const lockRef = useRef(false);
 
-    const raw = event?.data || '';
-    const normalized = String(raw).replace(/\D/g, '');
+  const handleResolvedNavigation = useCallback(
+    (result) => {
+      if (!result?.cafeId) {
+        Alert.alert('Error', 'No se pudo resolver el café escaneado');
+        return;
+      }
 
-    if (normalized.length < 8) return;
+      switch (result.action) {
+        case 'edit_new_pending':
+        case 'continue_pending':
+          navigation.navigate('CafeEditorScreen', {
+            cafeId: result.cafeId,
+            mode: result.action,
+          });
+          break;
 
-    scannedRef.current = true;
+        case 'view_pending':
+        case 'view_approved':
+        case 'view_existing':
+        default:
+          navigation.navigate('CafeDetailScreen', {
+            cafeId: result.cafeId,
+            mode: result.action,
+          });
+          break;
+      }
+    },
+    [navigation]
+  );
 
-    onScanned?.({
-      raw,
-      ean: normalized,
-      type: event?.type,
-    });
+  const onBarcodeDetected = useCallback(
+    async (rawEan) => {
+      if (lockRef.current || loading) return;
 
-    setTimeout(() => {
-      scannedRef.current = false;
-    }, 2000);
-  };
+      try {
+        lockRef.current = true;
+        setLoading(true);
 
+        const result = await resolveScan(rawEan, user?.uid || null);
+        handleResolvedNavigation(result);
+      } catch (error) {
+        Alert.alert('Error', error?.message || 'No se pudo procesar el escaneo');
+      } finally {
+        setLoading(false);
+        setTimeout(() => {
+          lockRef.current = false;
+        }, 1200);
+      }
+    },
+    [handleResolvedNavigation, loading, user]
+  );
+
+  /**
+   * Integra aquí tu lector real.
+   * Este botón es solo para prueba rápida.
+   */
   return (
-    <View style={styles.screen}>
-      <StatusBar barStyle="light-content" />
-      <CameraView onBarcodeScanned={handleScan} style={StyleSheet.absoluteFillObject} />
-      <View style={styles.overlay}>
-        <View style={styles.top} />
-        <View style={styles.middle}>
-          <View style={styles.side} />
-          <View style={styles.window}>
-            <View style={[styles.corner, styles.tl, { borderColor: premiumAccent }]} />
-            <View style={[styles.corner, styles.tr, { borderColor: premiumAccent }]} />
-            <View style={[styles.corner, styles.bl, { borderColor: premiumAccent }]} />
-            <View style={[styles.corner, styles.br, { borderColor: premiumAccent }]} />
-            <View style={[styles.scanLine, { backgroundColor: premiumAccent }]} />
-          </View>
-          <View style={styles.side} />
-        </View>
-        <View style={styles.bottom}>
-          <Text style={styles.hint}>Enfoca el paquete de café dentro del marco</Text>
-          <TouchableOpacity style={styles.skipBtn} onPress={onSkip}>
-            <Text style={styles.skipText}>Añadir sin escanear</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-      <TouchableOpacity style={styles.backBtn} onPress={onBack}>
-        <Ionicons name="chevron-back" size={28} color="#fff" />
-      </TouchableOpacity>
+    <View style={styles.container}>
+      <Text style={styles.title}>Escanear café</Text>
+      <Text style={styles.subtitle}>
+        Escanea un EAN y el sistema decidirá si crear, completar o mostrar la ficha.
+      </Text>
+
+      <Button
+        title={loading ? 'Procesando...' : 'Simular escaneo'}
+        disabled={loading}
+        onPress={() => onBarcodeDetected('8414606900012')}
+      />
     </View>
   );
 }
 
-const WINDOW_SIZE = 280;
-
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#000' },
-  overlay: { flex: 1 },
-  top: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)' },
-  middle: { flexDirection: 'row', height: WINDOW_SIZE },
-  side: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)' },
-  window: { width: WINDOW_SIZE, height: WINDOW_SIZE },
-  bottom: {
+  container: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
-    alignItems: 'center',
-    paddingTop: 24,
-    gap: 20,
-  },
-  hint: { color: '#fff', fontSize: 15, textAlign: 'center', paddingHorizontal: 32 },
-  corner: { position: 'absolute', width: 24, height: 24, borderWidth: 3 },
-  tl: { top: 0, left: 0, borderBottomWidth: 0, borderRightWidth: 0 },
-  tr: { top: 0, right: 0, borderBottomWidth: 0, borderLeftWidth: 0 },
-  bl: { bottom: 0, left: 0, borderTopWidth: 0, borderRightWidth: 0 },
-  br: { bottom: 0, right: 0, borderTopWidth: 0, borderLeftWidth: 0 },
-  scanLine: { position: 'absolute', top: '50%', left: 0, right: 0, height: 2, opacity: 0.8 },
-  backBtn: {
-    position: 'absolute',
-    top: 52,
-    left: 16,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    alignItems: 'center',
+    padding: 24,
     justifyContent: 'center',
   },
-  skipBtn: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 999,
-    backgroundColor: 'rgba(255,255,255,0.18)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.24)',
+  title: {
+    fontSize: 24,
+    fontWeight: '700',
+    marginBottom: 12,
   },
-  skipText: { color: '#fff', fontSize: 14, fontWeight: '700' },
+  subtitle: {
+    fontSize: 15,
+    marginBottom: 20,
+    color: '#555',
+  },
 });

@@ -13,6 +13,8 @@ const OPENAI_API_URL = 'https://api.openai.com/v1/responses';
 const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4.1-mini';
 const AI_AUTO_APPROVE_THRESHOLD = Number(process.env.AI_AUTO_APPROVE_THRESHOLD || 0.85);
 
+const BARCODE_LOOKUP_API_URL = 'https://api.barcodelookup.com/v3/products';
+
 const buildMessage = (token, title, body, data = {}) => ({
   to: token,
   title,
@@ -250,7 +252,72 @@ function safeJsonParse(text) {
   }
 }
 
-function normalizeAiResult(parsed, cafe, job) {
+function pickFirstImage(product) {
+  if (!product) return '';
+
+  if (Array.isArray(product.images) && product.images.length > 0) {
+    return String(product.images[0] || '').trim();
+  }
+
+  if (typeof product.image === 'string') return product.image.trim();
+  if (typeof product.thumbnail === 'string') return product.thumbnail.trim();
+
+  return '';
+}
+
+async function lookupProductByBarcode(barcode) {
+  const apiKey = process.env.BARCODE_LOOKUP_API_KEY;
+  const normalized = String(barcode || '')
+    .replace(/\D/g, '')
+    .trim();
+
+  if (!apiKey || !normalized) return null;
+
+  try {
+    const url =
+      `${BARCODE_LOOKUP_API_URL}?barcode=${encodeURIComponent(normalized)}` +
+      `&formatted=y&key=${encodeURIComponent(apiKey)}`;
+
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+      },
+    });
+
+    const json = await res.json().catch(() => null);
+
+    if (!res.ok) {
+      logger.error('Barcode lookup failed', {
+        status: res.status,
+        barcode: normalized,
+        body: json,
+      });
+      return null;
+    }
+
+    const product = Array.isArray(json?.products) ? json.products[0] : null;
+    if (!product) return null;
+
+    return {
+      barcode: String(product.barcode_number || normalized).trim(),
+      nombre: String(product.title || '').trim(),
+      marca: String(product.brand || product.manufacturer || '').trim(),
+      categoria: String(product.category || '').trim(),
+      descripcion: String(product.description || '').trim(),
+      imagen: pickFirstImage(product),
+      raw: product,
+    };
+  } catch (error) {
+    logger.error('Barcode lookup exception', {
+      barcode: normalized,
+      error: String(error?.message || error),
+    });
+    return null;
+  }
+}
+
+function normalizeAiResult(parsed, cafe, job, barcodeData) {
   const confidence = Number(parsed?.confidence ?? parsed?.aiConfidenceScore ?? 0);
   const boundedConfidence = Number.isFinite(confidence) ? Math.max(0, Math.min(1, confidence)) : 0;
 
@@ -258,8 +325,14 @@ function normalizeAiResult(parsed, cafe, job) {
   const isSpecialty = typeof parsed?.isSpecialty === 'boolean' ? parsed.isSpecialty : false;
 
   return {
-    nombre: String(parsed?.nombre || parsed?.name || cafe?.nombre || '').trim(),
-    marca: String(parsed?.marca || parsed?.brand || '').trim(),
+    nombre: String(
+      parsed?.nombre ||
+        parsed?.name ||
+        barcodeData?.nombre ||
+        cafe?.nombre ||
+        'Pendiente de identificar'
+    ).trim(),
+    marca: String(parsed?.marca || parsed?.brand || barcodeData?.marca || cafe?.marca || '').trim(),
     origen: String(parsed?.origen || cafe?.origen || '').trim(),
     notasIA: String(parsed?.notasIA || parsed?.summary || '').trim(),
     isSpecialty,
@@ -268,18 +341,18 @@ function normalizeAiResult(parsed, cafe, job) {
     imageReason: String(parsed?.imageReason || '').trim(),
     summary: String(parsed?.summary || parsed?.notasIA || '').trim(),
     raw: parsed,
-    ean: String(parsed?.ean || job?.ean || cafe?.ean || '').trim(),
+    ean: String(parsed?.ean || barcodeData?.barcode || job?.ean || cafe?.ean || '').trim(),
   };
 }
 
-async function callOpenAIForCoffeeEnrichment({ job, cafe }) {
+async function callOpenAIForCoffeeEnrichment({ job, cafe, barcodeData }) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     throw new Error('OPENAI_API_KEY_NOT_CONFIGURED');
   }
 
   const prompt = `
-Analiza este producto de café y responde SOLO en JSON válido.
+Analiza este producto y responde SOLO en JSON válido.
 No añadas texto extra.
 
 Devuelve este esquema exacto:
@@ -296,11 +369,11 @@ Devuelve este esquema exacto:
 }
 
 Reglas:
-- "isCoffeePackage" debe ser false si la imagen no parece un paquete o producto de café.
+- "isCoffeePackage" debe ser false si la imagen o el contexto no parecen un paquete o producto de café.
 - "isSpecialty" debe indicar si probablemente es café de especialidad.
 - "confidence" entre 0 y 1.
 - Si no sabes un campo, devuelve cadena vacía.
-- Usa el EAN si lo ves o si ya viene dado.
+- Si el lookup por código de barras sugiere otro tipo de producto, tenlo en cuenta.
 - No inventes demasiado.
 `.trim();
 
@@ -309,11 +382,18 @@ Reglas:
       type: 'input_text',
       text: `${prompt}
 
-Datos previos:
+Datos previos del registro:
 - ean: ${job?.ean || cafe?.ean || ''}
 - nombre actual: ${cafe?.nombre || ''}
 - origen actual: ${cafe?.origen || ''}
 - notas actuales: ${cafe?.notas || ''}
+
+Datos del lookup por barcode:
+- nombre lookup: ${barcodeData?.nombre || ''}
+- marca lookup: ${barcodeData?.marca || ''}
+- categoría lookup: ${barcodeData?.categoria || ''}
+- descripción lookup: ${barcodeData?.descripcion || ''}
+- imagen lookup: ${barcodeData?.imagen || ''}
 `,
     },
   ];
@@ -322,6 +402,11 @@ Datos previos:
     content.push({
       type: 'input_image',
       image_url: job.foto,
+    });
+  } else if (barcodeData?.imagen) {
+    content.push({
+      type: 'input_image',
+      image_url: barcodeData.imagen,
     });
   }
 
@@ -361,106 +446,133 @@ Datos previos:
     throw new Error('OPENAI_INVALID_JSON');
   }
 
-  return normalizeAiResult(parsed, cafe, job);
+  return normalizeAiResult(parsed, cafe, job, barcodeData);
 }
 
 // 🔥 AI JOB PROCESSOR (coffee_enrichment)
-exports.onAiJobCreatedProcessCoffee = onDocumentCreated('ai_jobs/{jobId}', async (event) => {
-  const job = event.data?.data();
-  if (!job) return;
+exports.onAiJobCreatedProcessCoffee = onDocumentCreated(
+  {
+    document: 'ai_jobs/{jobId}',
+    region: 'europe-west1',
+    timeoutSeconds: 120,
+    memory: '512MiB',
+    secrets: [
+      'OPENAI_API_KEY',
+      'BARCODE_LOOKUP_API_KEY',
+      'OPENAI_MODEL',
+      'AI_AUTO_APPROVE_THRESHOLD',
+    ],
+  },
+  async (event) => {
+    const job = event.data?.data();
+    if (!job) return;
 
-  if (job.type !== 'coffee_enrichment' || job.status !== 'queued') return;
+    if (job.type !== 'coffee_enrichment' || job.status !== 'queued') return;
 
-  const jobId = String(event.params.jobId || '');
-  const jobRef = db.collection('ai_jobs').doc(jobId);
+    const jobId = String(event.params.jobId || '');
+    const jobRef = db.collection('ai_jobs').doc(jobId);
 
-  try {
-    await jobRef.update({
-      status: 'processing',
-      updatedAt: new Date().toISOString(),
-    });
+    try {
+      await jobRef.update({
+        status: 'processing',
+        updatedAt: new Date().toISOString(),
+      });
 
-    const targetCollection = String(job.targetCollection || 'cafes');
-    const targetId = String(job.targetId || '');
-    if (!targetId) throw new Error('MISSING_TARGET_ID');
+      const targetCollection = String(job.targetCollection || 'cafes');
+      const targetId = String(job.targetId || '');
+      if (!targetId) throw new Error('MISSING_TARGET_ID');
 
-    const cafeRef = db.collection(targetCollection).doc(targetId);
-    const cafeSnap = await cafeRef.get();
-    if (!cafeSnap.exists) throw new Error('CAFE_NOT_FOUND');
+      const cafeRef = db.collection(targetCollection).doc(targetId);
+      const cafeSnap = await cafeRef.get();
+      if (!cafeSnap.exists) throw new Error('CAFE_NOT_FOUND');
 
-    const cafe = cafeSnap.data() || {};
+      const cafe = cafeSnap.data() || {};
 
-    const ai = await callOpenAIForCoffeeEnrichment({ job, cafe });
+      const barcodeData = await lookupProductByBarcode(job?.ean || cafe?.ean || '');
+      const ai = await callOpenAIForCoffeeEnrichment({ job, cafe, barcodeData });
 
-    const imageValidationStatus = ai.isCoffeePackage ? 'approved' : 'rejected';
-    const shouldAutoApprove =
-      ai.isCoffeePackage && ai.isSpecialty === true && ai.confidence >= AI_AUTO_APPROVE_THRESHOLD;
+      const imageValidationStatus = ai.isCoffeePackage ? 'approved' : 'rejected';
+      const shouldAutoApprove =
+        ai.isCoffeePackage &&
+        ai.isSpecialty === true &&
+        ai.confidence >= Number(process.env.AI_AUTO_APPROVE_THRESHOLD || 0.85);
 
-    const cafeUpdate = {
-      aiGenerated: true,
-      aiSuggestion: {
-        nombre: ai.nombre,
-        marca: ai.marca,
-        origen: ai.origen,
-        isSpecialty: ai.isSpecialty,
-        ean: ai.ean,
-        summary: ai.summary,
-      },
-      aiConfidenceScore: ai.confidence,
-      aiStatus: shouldAutoApprove ? 'auto_approved' : 'completed',
-      updatedAt: new Date().toISOString(),
-      imageValidation: {
-        status: imageValidationStatus,
-        reason: ai.imageReason || (ai.isCoffeePackage ? '' : 'not_coffee_package'),
-        confidence: ai.confidence,
-      },
-    };
-
-    if (!ai.isCoffeePackage) {
-      cafeUpdate.reviewStatus = 'rejected';
-      cafeUpdate.appVisible = false;
-      cafeUpdate.scannerVisible = false;
-      cafeUpdate.isSpecialty = false;
-    } else if (shouldAutoApprove) {
-      cafeUpdate.reviewStatus = 'approved';
-      cafeUpdate.appVisible = true;
-      cafeUpdate.scannerVisible = true;
-      cafeUpdate.isSpecialty = true;
-      cafeUpdate.nombre = ai.nombre || cafe.nombre || '';
-      cafeUpdate.origen = ai.origen || cafe.origen || '';
-      if (ai.ean) cafeUpdate.ean = ai.ean;
-    }
-
-    await cafeRef.update(cafeUpdate);
-
-    await jobRef.update({
-      status: 'done',
-      result: {
+      const cafeUpdate = {
+        aiGenerated: true,
+        aiSuggestion: {
+          nombre: ai.nombre,
+          marca: ai.marca,
+          origen: ai.origen,
+          isSpecialty: ai.isSpecialty,
+          ean: ai.ean,
+          summary: ai.summary,
+        },
         aiConfidenceScore: ai.confidence,
-        isSpecialty: ai.isSpecialty,
-        isCoffeePackage: ai.isCoffeePackage,
+        aiStatus: shouldAutoApprove ? 'auto_approved' : 'completed',
+        updatedAt: new Date().toISOString(),
+        imageValidation: {
+          status: imageValidationStatus,
+          reason: ai.imageReason || (ai.isCoffeePackage ? '' : 'not_coffee_package'),
+          confidence: ai.confidence,
+        },
+        nombre: ai.nombre || barcodeData?.nombre || cafe?.nombre || 'Pendiente de identificar',
+        marca: ai.marca || barcodeData?.marca || cafe?.marca || '',
+        origen: ai.origen || cafe?.origen || '',
+      };
+
+      if (ai.ean) {
+        cafeUpdate.ean = ai.ean;
+      }
+
+      if (!cafe?.foto && barcodeData?.imagen) {
+        cafeUpdate.foto = barcodeData.imagen;
+      }
+
+      if (!ai.isCoffeePackage) {
+        cafeUpdate.reviewStatus = 'rejected';
+        cafeUpdate.appVisible = false;
+        cafeUpdate.scannerVisible = false;
+        cafeUpdate.isSpecialty = false;
+      } else if (shouldAutoApprove) {
+        cafeUpdate.reviewStatus = 'approved';
+        cafeUpdate.appVisible = true;
+        cafeUpdate.scannerVisible = true;
+        cafeUpdate.isSpecialty = true;
+      }
+
+      await cafeRef.update(cafeUpdate);
+
+      await jobRef.update({
+        status: 'done',
+        result: {
+          aiConfidenceScore: ai.confidence,
+          isSpecialty: ai.isSpecialty,
+          isCoffeePackage: ai.isCoffeePackage,
+          autoApproved: shouldAutoApprove,
+          barcodeLookupFound: !!barcodeData,
+        },
+        updatedAt: new Date().toISOString(),
+      });
+
+      logger.info('AI job processed successfully', {
+        jobId,
+        targetCollection,
+        targetId,
+        confidence: ai.confidence,
         autoApproved: shouldAutoApprove,
-      },
-      updatedAt: new Date().toISOString(),
-    });
+        barcodeLookupFound: !!barcodeData,
+      });
+    } catch (error) {
+      logger.error('AI job failed', {
+        jobId,
+        error: String(error?.message || error),
+      });
 
-    logger.info('AI job processed successfully', {
-      jobId,
-      targetCollection,
-      targetId,
-      confidence: ai.confidence,
-      autoApproved: shouldAutoApprove,
-    });
-  } catch (error) {
-    logger.error('AI job failed', {
-      jobId,
-      error: String(error?.message || error),
-    });
-
-    await jobRef.update({
-      status: 'failed',
-      error: String(error?.message || error),
-      updatedAt: new Date().toISOString(),
-    });
+      await jobRef.update({
+        status: 'failed',
+        error: String(error?.message || error),
+        updatedAt: new Date().toISOString(),
+      });
+    }
   }
-});
+);

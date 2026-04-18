@@ -53,8 +53,12 @@ export default function FormScreen({ onSave, onBack, onCafeAdded, s, premiumAcce
   };
 
   const guardarCafe = async () => {
-    if (!nombreCafe.trim()) {
-      Alert.alert('Aviso', 'Escribe el nombre del café');
+    const hasBarcode = !!String(scannedData?.ean || ean || '').trim();
+    const hasPhoto = !!foto;
+    const canAutoEnrich = hasBarcode || hasPhoto;
+
+    if (!nombreCafe.trim() && !canAutoEnrich) {
+      Alert.alert('Aviso', 'Añade al menos un nombre, una foto o un código de barras.');
       return;
     }
 
@@ -62,6 +66,9 @@ export default function FormScreen({ onSave, onBack, onCafeAdded, s, premiumAcce
 
     try {
       const isFromScanner = !!scannedData?.ean;
+      const isPhotoOnlyFlow = !isFromScanner && !!foto && !nombreCafe.trim();
+      const isAutoFlow = isFromScanner || isPhotoOnlyFlow;
+
       const normalizedEan = String(ean || '')
         .replace(/\s+/g, '')
         .trim();
@@ -83,7 +90,7 @@ export default function FormScreen({ onSave, onBack, onCafeAdded, s, premiumAcce
       const now = new Date().toISOString();
 
       const cafePayload = {
-        nombre: nombreCafe.trim(),
+        nombre: nombreCafe.trim() || 'Pendiente de identificar',
         origen: origen.trim(),
         puntuacion: rating,
         notas,
@@ -94,29 +101,33 @@ export default function FormScreen({ onSave, onBack, onCafeAdded, s, premiumAcce
         uid: user.uid,
         ean: normalizedEan,
 
-        reviewStatus: isFromScanner ? 'pending' : 'approved',
-        sourceType: isFromScanner ? 'scanner_pending' : 'manual',
+        reviewStatus: isAutoFlow ? 'pending' : 'approved',
+        sourceType: isFromScanner
+          ? 'scanner_pending'
+          : isPhotoOnlyFlow
+            ? 'photo_pending'
+            : 'manual',
         aiGenerated: false,
         aiConfidenceScore: 0,
         aiSuggestion: {},
-        aiStatus: isFromScanner ? 'queued' : 'manual',
+        aiStatus: isAutoFlow ? 'queued' : 'manual',
         imageValidation: {
           status: finalFoto ? 'pending' : 'not_provided',
         },
         isSpecialty: true,
-        appVisible: !isFromScanner,
+        appVisible: !isAutoFlow,
         scannerVisible: true,
       };
 
       const created = await addDocument('cafes', cafePayload);
 
-      if (isFromScanner && created?.id) {
+      if (isAutoFlow && created?.id) {
         await addDocument('ai_jobs', {
           type: 'coffee_enrichment',
           targetCollection: 'cafes',
           targetId: created.id,
           status: 'queued',
-          sourceType: 'scanner_pending',
+          sourceType: isFromScanner ? 'scanner_pending' : 'photo_pending',
           ean: normalizedEan,
           foto: finalFoto || '',
           payload: {
@@ -130,8 +141,7 @@ export default function FormScreen({ onSave, onBack, onCafeAdded, s, premiumAcce
         });
       }
 
-      const rankId = nombreCafe
-        .trim()
+      const rankId = (nombreCafe.trim() || 'pendiente_de_identificar')
         .toLowerCase()
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
@@ -141,16 +151,19 @@ export default function FormScreen({ onSave, onBack, onCafeAdded, s, premiumAcce
       if (existente) {
         await updateDocument('ranking', rankId, { votos: (existente.votos || 0) + 1 });
       } else {
-        await setDocument('ranking', rankId, { nombre: nombreCafe.trim(), votos: 1 });
+        await setDocument('ranking', rankId, {
+          nombre: nombreCafe.trim() || 'Pendiente de identificar',
+          votos: 1,
+        });
       }
 
       onCafeAdded?.({
         ...cafePayload,
         id: created?.id || rankId,
-        aiJobQueued: isFromScanner,
+        aiJobQueued: isAutoFlow,
       });
 
-      if (isFromScanner) {
+      if (isAutoFlow) {
         Alert.alert(
           'Café enviado a revisión',
           'Se ha creado el café pendiente y se ha puesto en cola para enriquecimiento automático con IA.'
@@ -207,7 +220,7 @@ export default function FormScreen({ onSave, onBack, onCafeAdded, s, premiumAcce
         <Text style={s.label}>Nombre del café</Text>
         <TextInput
           style={s.input}
-          placeholder="Ej: Yirgacheffe Etiopía"
+          placeholder="Opcional si hay foto o código de barras"
           placeholderTextColor="#bbb"
           value={nombreCafe}
           onChangeText={setNombreCafe}
@@ -216,7 +229,7 @@ export default function FormScreen({ onSave, onBack, onCafeAdded, s, premiumAcce
         <Text style={s.label}>Origen / Tostado</Text>
         <TextInput
           style={s.input}
-          placeholder="Ej: Etiopía · Tostado medio · Floral"
+          placeholder="Opcional"
           placeholderTextColor="#bbb"
           value={origen}
           onChangeText={setOrigen}
@@ -230,7 +243,7 @@ export default function FormScreen({ onSave, onBack, onCafeAdded, s, premiumAcce
         <Text style={s.label}>Notas de cata</Text>
         <TextInput
           style={[s.input, { height: 80, textAlignVertical: 'top' }]}
-          placeholder="Aromas, sabores, acidez..."
+          placeholder="Opcional"
           placeholderTextColor="#bbb"
           value={notas}
           onChangeText={setNotas}

@@ -48,7 +48,6 @@ const BOOTSTRAP_KEYS = {
 export default function useMainScreenComposition({ onLogout, services, ui }) {
   const { user } = useAuth();
   const { restoreAuthTokenFromSecureStore, setDocument, addDocument, queryCollection } = services;
-
   const {
     CardHorizontal,
     CardVertical,
@@ -60,44 +59,61 @@ export default function useMainScreenComposition({ onLogout, services, ui }) {
   } = ui;
 
   const createPendingCoffee = async (scanResult) => {
-    if (!scanResult?.ean) {
-      throw new Error('SCAN_RESULT_WITHOUT_EAN');
+    const normalizedEan = String(scanResult?.ean || '')
+      .replace(/\D/g, '')
+      .trim();
+
+    if (!normalizedEan) {
+      throw new Error('MISSING_EAN');
     }
 
-    const existing = await queryCollection('cafes', 'ean', scanResult.ean);
+    const existing = await queryCollection('cafes', 'ean', normalizedEan);
     if (existing?.length) {
       return existing[0];
     }
 
-    return addDocument('cafes', {
-      ean: scanResult.ean,
+    const now = new Date().toISOString();
 
-      nombre: scanResult.name || '',
+    const newCafe = await addDocument('cafes', {
+      ean: normalizedEan,
+      nombre: scanResult?.name || 'Pendiente de identificar',
+      marca: scanResult?.brand || '',
+      foto: scanResult?.foto || '',
       origen: '',
-      puntuacion: 0,
       notas: '',
-      foto: scanResult.foto || '',
-
+      puntuacion: 0,
       reviewStatus: 'pending',
       sourceType: 'scanner_pending',
-
       aiGenerated: false,
       aiConfidenceScore: 0,
       aiSuggestion: {},
       aiStatus: 'queued',
-
       imageValidation: {
-        status: 'pending',
+        status: scanResult?.foto ? 'pending' : 'not_provided',
       },
-
       isSpecialty: false,
       appVisible: false,
       scannerVisible: true,
-
       uid: user?.uid || '',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: now,
+      updatedAt: now,
     });
+
+    if (newCafe?.id) {
+      await addDocument('ai_jobs', {
+        type: 'coffee_enrichment',
+        status: 'queued',
+        targetCollection: 'cafes',
+        targetId: newCafe.id,
+        ean: normalizedEan,
+        foto: scanResult?.foto || '',
+        createdAt: now,
+        updatedAt: now,
+        uid: user?.uid || '',
+      });
+    }
+
+    return newCafe;
   };
 
   const screenUi = useMainScreenUiState({

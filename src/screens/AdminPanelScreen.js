@@ -21,6 +21,7 @@ function isValidEAN13(code) {
   const value = String(code || '')
     .replace(/\s+/g, '')
     .trim();
+
   if (!value) return true;
   if (!/^\d{13}$/.test(value)) return false;
 
@@ -54,6 +55,7 @@ function formatDate(value) {
 function getSourceLabel(item) {
   if (item?.sourceType === 'verified_web') return 'Web verificada';
   if (item?.sourceType === 'scanner_pending') return 'Escáner';
+  if (item?.sourceType === 'photo_pending') return 'Foto';
   if (item?.sourceType === 'ai_enriched') return 'IA';
   if (item?.sourceType) return item.sourceType;
   return 'Manual';
@@ -147,6 +149,7 @@ export default function AdminPanelScreen() {
   const [editReviewStatus, setEditReviewStatus] = useState(FILTERS.PENDING);
   const [editAppVisible, setEditAppVisible] = useState(false);
   const [editScannerVisible, setEditScannerVisible] = useState(true);
+  const [editOrigen, setEditOrigen] = useState('');
   const [editError, setEditError] = useState('');
 
   const loadCounters = useCallback(async () => {
@@ -209,6 +212,7 @@ export default function AdminPanelScreen() {
       isSpecialty: true,
       appVisible: true,
       scannerVisible: true,
+      aiStatus: coffee?.aiStatus || 'manual_reviewed',
     });
     await refreshCurrentView();
   };
@@ -219,6 +223,7 @@ export default function AdminPanelScreen() {
       isSpecialty: false,
       appVisible: false,
       scannerVisible: true,
+      aiStatus: coffee?.aiStatus || 'manual_reviewed',
     });
     await refreshCurrentView();
   };
@@ -229,6 +234,7 @@ export default function AdminPanelScreen() {
       isSpecialty: !!coffee?.isSpecialty,
       appVisible: false,
       scannerVisible: true,
+      aiStatus: coffee?.aiStatus || 'manual_reviewed',
     });
     await refreshCurrentView();
   };
@@ -238,6 +244,7 @@ export default function AdminPanelScreen() {
       reviewStatus: FILTERS.REJECTED,
       appVisible: false,
       scannerVisible: false,
+      aiStatus: coffee?.aiStatus || 'manual_reviewed',
     });
     await refreshCurrentView();
   };
@@ -282,7 +289,8 @@ export default function AdminPanelScreen() {
 
     await updateDocument('cafes', coffee.id, {
       nombre: aiSuggestion.name || aiSuggestion.nombre || coffee?.name || coffee?.nombre || '',
-      marca: aiSuggestion.brand || aiSuggestion.marca || coffee?.brand || coffee?.roaster || '',
+      marca: aiSuggestion.brand || aiSuggestion.marca || coffee?.brand || coffee?.marca || '',
+      origen: aiSuggestion.origen || coffee?.origen || '',
       ean: aiSuggestion.ean || coffee?.ean || '',
       isSpecialty: nextIsSpecialty,
       reviewStatus: nextIsSpecialty ? FILTERS.APPROVED : FILTERS.PENDING,
@@ -297,7 +305,8 @@ export default function AdminPanelScreen() {
   const openEditor = (coffee) => {
     setEditingCoffee(coffee);
     setEditName(coffee?.name || coffee?.nombre || '');
-    setEditBrand(coffee?.brand || coffee?.marca || coffee?.roaster || '');
+    setEditBrand(coffee?.brand || coffee?.marca || '');
+    setEditOrigen(coffee?.origen || '');
     setEditEan(coffee?.ean || '');
     setEditIsSpecialty(!!coffee?.isSpecialty);
     setEditReviewStatus(coffee?.reviewStatus || FILTERS.PENDING);
@@ -310,6 +319,7 @@ export default function AdminPanelScreen() {
     setEditingCoffee(null);
     setEditName('');
     setEditBrand('');
+    setEditOrigen('');
     setEditEan('');
     setEditIsSpecialty(false);
     setEditReviewStatus(FILTERS.PENDING);
@@ -342,11 +352,13 @@ export default function AdminPanelScreen() {
     await updateDocument('cafes', editingCoffee.id, {
       nombre: editName,
       marca: editBrand,
+      origen: editOrigen,
       ean: normalizedEan,
       isSpecialty: editIsSpecialty,
       reviewStatus: editReviewStatus,
       appVisible: editAppVisible,
       scannerVisible: editScannerVisible,
+      updatedAt: new Date().toISOString(),
     });
 
     closeEditor();
@@ -445,7 +457,16 @@ export default function AdminPanelScreen() {
     if (!term) return sorted;
 
     return sorted.filter((item) => {
-      const haystack = [item.name, item.nombre, item.brand, item.marca, item.roaster, item.ean]
+      const haystack = [
+        item.name,
+        item.nombre,
+        item.brand,
+        item.marca,
+        item.roaster,
+        item.marca,
+        item.origen,
+        item.ean,
+      ]
         .filter(Boolean)
         .join(' ')
         .toLowerCase();
@@ -477,6 +498,10 @@ export default function AdminPanelScreen() {
       <Text style={{ color: '#aaa' }}>
         {item.brand || item.marca || item.roaster || 'Marca desconocida'}
       </Text>
+
+      {!!item.origen && (
+        <Text style={{ color: '#888', fontSize: 12, marginTop: 4 }}>{item.origen}</Text>
+      )}
 
       <Text style={{ color: '#666', fontSize: 12, marginTop: 4 }}>EAN: {item.ean || '—'}</Text>
 
@@ -571,12 +596,19 @@ export default function AdminPanelScreen() {
             <Text style={{ color: '#c7a6ff', fontWeight: '800', marginBottom: 6 }}>
               Sugerencia IA
             </Text>
+
             <Text style={{ color: '#ddd', fontSize: 12 }}>
               Nombre: {item.aiSuggestion.name || item.aiSuggestion.nombre || '—'}
             </Text>
+
             <Text style={{ color: '#ddd', fontSize: 12, marginTop: 2 }}>
               Marca: {item.aiSuggestion.brand || item.aiSuggestion.marca || '—'}
             </Text>
+
+            <Text style={{ color: '#ddd', fontSize: 12, marginTop: 2 }}>
+              Origen: {item.aiSuggestion.origen || '—'}
+            </Text>
+
             <Text style={{ color: '#ddd', fontSize: 12, marginTop: 2 }}>
               Specialty sugerido:{' '}
               {typeof item.aiSuggestion.isSpecialty === 'boolean'
@@ -585,6 +617,7 @@ export default function AdminPanelScreen() {
                   : 'No'
                 : '—'}
             </Text>
+
             {!!item.aiSuggestion.summary && (
               <Text style={{ color: '#cfc3ef', fontSize: 12, marginTop: 6 }}>
                 {item.aiSuggestion.summary}
@@ -617,7 +650,7 @@ export default function AdminPanelScreen() {
       <TextInput
         value={search}
         onChangeText={setSearch}
-        placeholder="Buscar por nombre, marca o EAN"
+        placeholder="Buscar por nombre, marca, origen o EAN"
         placeholderTextColor="#777"
         style={{
           backgroundColor: '#111',
@@ -701,6 +734,24 @@ export default function AdminPanelScreen() {
                 value={editBrand}
                 onChangeText={setEditBrand}
                 placeholder="Marca"
+                placeholderTextColor="#777"
+                style={{
+                  backgroundColor: '#111',
+                  borderWidth: 1,
+                  borderColor: '#2a2a2a',
+                  color: '#fff',
+                  borderRadius: 12,
+                  paddingHorizontal: 14,
+                  paddingVertical: 12,
+                  marginBottom: 12,
+                }}
+              />
+
+              <Text style={{ color: '#aaa', marginBottom: 6 }}>Origen</Text>
+              <TextInput
+                value={editOrigen}
+                onChangeText={setEditOrigen}
+                placeholder="Origen"
                 placeholderTextColor="#777"
                 style={{
                   backgroundColor: '#111',

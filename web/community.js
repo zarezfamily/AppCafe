@@ -2141,8 +2141,11 @@ const loadForum = async () => {
   // Normalizar y filtrar los hilos visibles para el usuario
   const normalizedVisibleThreads = threads.filter(isThreadVisible);
 
-  const myProfile =
+  const bulkProfile =
     profiles.find((profile) => String(profile.uid || '').trim() === auth.uid) || null;
+  const myProfile = auth.uid
+    ? await getDocument('user_profiles', auth.uid).catch(() => bulkProfile)
+    : bulkProfile;
   renderMemberEvolutionCard({
     profile: myProfile,
     allThreads: h.map((item) => applyCanonicalAlias(item)),
@@ -2908,48 +2911,6 @@ const refreshFirebaseToken = async () => {
   } catch (_) {
     /* red caída — no limpiar sesión */
   }
-};
-
-// ─── BANNER SESIÓN CADUCADA ───────────────────────────────────────────────────
-const showSessionExpiredBanner = () => {
-  if (document.getElementById('sessionExpiredBanner')) return;
-  const banner = document.createElement('div');
-  banner.id = 'sessionExpiredBanner';
-  banner.style.cssText = [
-    'position:fixed;top:0;left:0;right:0;z-index:9999',
-    'background:#5f3a25;color:#fff9f1',
-    'padding:12px 20px',
-    'display:flex;align-items:center;justify-content:space-between;gap:16px',
-    'font-size:13px;font-family:-apple-system,BlinkMacSystemFont,sans-serif',
-    'box-shadow:0 2px 12px rgba(0,0,0,0.25)',
-  ].join(';');
-  banner.innerHTML = `
-    <span>⏱ Tu sesión ha caducado. Vuelve a iniciar sesión para seguir participando.</span>
-    <div style="display:flex;gap:10px;align-items:center;flex-shrink:0;">
-      <button id="sessionExpiredLogin"
-        style="background:#e8d5be;color:#1a0f08;border:none;padding:7px 16px;border-radius:6px;
-               font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
-               cursor:pointer;font-family:inherit;">
-        Iniciar sesión
-      </button>
-      <button id="sessionExpiredClose"
-        style="background:transparent;color:rgba(255,249,241,0.6);border:none;
-               font-size:18px;line-height:1;cursor:pointer;padding:0 4px;">
-        ×
-      </button>
-    </div>`;
-  document.body.prepend(banner);
-  document.getElementById('sessionExpiredClose').onclick = () => banner.remove();
-  document.getElementById('sessionExpiredLogin').onclick = () => {
-    banner.remove();
-    const loginSection = document.querySelector('.login-section');
-    if (loginSection) {
-      loginSection.style.display = '';
-      loginSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-    const emailInput = document.getElementById('email');
-    if (emailInput) setTimeout(() => emailInput.focus(), 400);
-  };
 };
 
 // ─── NOTIFICACIONES CON BADGE ─────────────────────────────────────────────────

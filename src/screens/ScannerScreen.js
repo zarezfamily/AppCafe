@@ -1,102 +1,146 @@
+import { Ionicons } from '@expo/vector-icons';
+import { CameraView } from 'expo-camera';
 import { useCallback, useRef, useState } from 'react';
-import { Alert, Button, StyleSheet, Text, View } from 'react-native';
-import { resolveScan } from '../services/cafeService';
-// Si tienes auth/contexto, cámbialo aquí:
-// import { useAuth } from '../context/AuthContext';
+import { SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-export default function ScanScreen({ navigation }) {
-  // const { user } = useAuth();
-  const user = null;
+const BARCODE_TYPES = ['ean13', 'ean8', 'upc_a', 'upc_e'];
 
-  const [loading, setLoading] = useState(false);
+export default function ScannerScreen({ onScanned, onSkip, onBack, premiumAccent = '#c8a97c' }) {
+  const [active, setActive] = useState(true);
   const lockRef = useRef(false);
 
-  const handleResolvedNavigation = useCallback(
-    (result) => {
-      if (!result?.cafeId) {
-        Alert.alert('Error', 'No se pudo resolver el café escaneado');
-        return;
-      }
-
-      switch (result.action) {
-        case 'edit_new_pending':
-        case 'continue_pending':
-          navigation.navigate('CafeEditorScreen', {
-            cafeId: result.cafeId,
-            mode: result.action,
-          });
-          break;
-
-        case 'view_pending':
-        case 'view_approved':
-        case 'view_existing':
-        default:
-          navigation.navigate('CafeDetailScreen', {
-            cafeId: result.cafeId,
-            mode: result.action,
-          });
-          break;
-      }
+  const handleBarcodeScanned = useCallback(
+    ({ data }) => {
+      if (!active || lockRef.current) return;
+      lockRef.current = true;
+      setActive(false);
+      onScanned?.({ ean: data });
     },
-    [navigation]
+    [active, onScanned]
   );
 
-  const onBarcodeDetected = useCallback(
-    async (rawEan) => {
-      if (lockRef.current || loading) return;
-
-      try {
-        lockRef.current = true;
-        setLoading(true);
-
-        const result = await resolveScan(rawEan, user?.uid || null);
-        handleResolvedNavigation(result);
-      } catch (error) {
-        Alert.alert('Error', error?.message || 'No se pudo procesar el escaneo');
-      } finally {
-        setLoading(false);
-        setTimeout(() => {
-          lockRef.current = false;
-        }, 1200);
-      }
-    },
-    [handleResolvedNavigation, loading, user]
-  );
-
-  /**
-   * Integra aquí tu lector real.
-   * Este botón es solo para prueba rápida.
-   */
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Escanear café</Text>
-      <Text style={styles.subtitle}>
-        Escanea un EAN y el sistema decidirá si crear, completar o mostrar la ficha.
-      </Text>
+    <SafeAreaView style={styles.root}>
+      <StatusBar barStyle="light-content" backgroundColor="#000" />
 
-      <Button
-        title={loading ? 'Procesando...' : 'Simular escaneo'}
-        disabled={loading}
-        onPress={() => onBarcodeDetected('8414606900012')}
+      <CameraView
+        style={StyleSheet.absoluteFill}
+        facing="back"
+        barcodeScannerSettings={{ barcodeTypes: BARCODE_TYPES }}
+        onBarcodeScanned={active ? handleBarcodeScanned : undefined}
       />
-    </View>
+
+      <View style={styles.overlay}>
+        <View style={styles.topBar}>
+          <TouchableOpacity style={styles.iconBtn} onPress={onBack}>
+            <Ionicons name="arrow-back" size={24} color="#fff" />
+          </TouchableOpacity>
+          <Text style={styles.label}>Escanear café</Text>
+          <TouchableOpacity style={styles.iconBtn} onPress={onSkip}>
+            <Text style={[styles.skipText, { color: premiumAccent }]}>Omitir</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.viewfinderWrap}>
+          <View style={[styles.corner, styles.tl, { borderColor: premiumAccent }]} />
+          <View style={[styles.corner, styles.tr, { borderColor: premiumAccent }]} />
+          <View style={[styles.corner, styles.bl, { borderColor: premiumAccent }]} />
+          <View style={[styles.corner, styles.br, { borderColor: premiumAccent }]} />
+        </View>
+
+        <View style={styles.hintWrap}>
+          <Text style={styles.hint}>Apunta al código de barras del paquete</Text>
+        </View>
+      </View>
+    </SafeAreaView>
   );
 }
 
+const CORNER = 28;
+const BORDER = 3;
+
 const styles = StyleSheet.create({
-  container: {
+  root: {
     flex: 1,
-    padding: 24,
+    backgroundColor: '#000',
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'space-between',
+  },
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 8,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+  },
+  iconBtn: {
+    width: 44,
+    height: 44,
+    alignItems: 'center',
     justifyContent: 'center',
   },
-  title: {
-    fontSize: 24,
+  label: {
+    color: '#fff',
+    fontSize: 16,
     fontWeight: '700',
-    marginBottom: 12,
+    letterSpacing: 0.3,
   },
-  subtitle: {
-    fontSize: 15,
-    marginBottom: 20,
-    color: '#555',
+  skipText: {
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  viewfinderWrap: {
+    width: 260,
+    height: 160,
+    alignSelf: 'center',
+    position: 'relative',
+  },
+  corner: {
+    position: 'absolute',
+    width: CORNER,
+    height: CORNER,
+  },
+  tl: {
+    top: 0,
+    left: 0,
+    borderTopWidth: BORDER,
+    borderLeftWidth: BORDER,
+    borderTopLeftRadius: 4,
+  },
+  tr: {
+    top: 0,
+    right: 0,
+    borderTopWidth: BORDER,
+    borderRightWidth: BORDER,
+    borderTopRightRadius: 4,
+  },
+  bl: {
+    bottom: 0,
+    left: 0,
+    borderBottomWidth: BORDER,
+    borderLeftWidth: BORDER,
+    borderBottomLeftRadius: 4,
+  },
+  br: {
+    bottom: 0,
+    right: 0,
+    borderBottomWidth: BORDER,
+    borderRightWidth: BORDER,
+    borderBottomRightRadius: 4,
+  },
+  hintWrap: {
+    paddingBottom: 48,
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    paddingTop: 20,
+  },
+  hint: {
+    color: 'rgba(255,255,255,0.75)',
+    fontSize: 13,
+    fontWeight: '500',
   },
 });

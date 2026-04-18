@@ -1,9 +1,7 @@
-import { collection, onSnapshot, orderBy, query, where } from 'firebase/firestore';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
-  Button,
   FlatList,
   Image,
   RefreshControl,
@@ -14,9 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { db } from '../config/firebase';
-import { approveCafe, canBeApproved, isCafeIncomplete, rejectCafe } from '../services/cafeService';
-// import { useAuth } from '../context/AuthContext';
+import { queryCollection, updateDocument } from '../services/firestoreService';
 
 const FILTERS = {
   ALL: 'all',
@@ -32,23 +28,41 @@ function normalizeText(value) {
     .toLowerCase();
 }
 
+function isCafeIncomplete(cafe) {
+  if (!cafe) return true;
+  return !(
+    String(cafe.ean || '').trim() &&
+    String(cafe.nombre || cafe.name || '').trim() &&
+    String(cafe.marca || cafe.roaster || '').trim() &&
+    String(cafe.foto || cafe.imageUrl || '').trim()
+  );
+}
+
+function canBeApproved(cafe) {
+  return !isCafeIncomplete(cafe);
+}
+
 function matchesSearch(cafe, term) {
   if (!term) return true;
-
   const q = normalizeText(term);
-
-  const haystack = [cafe.name, cafe.ean, cafe.roaster, cafe.origin, cafe.process, cafe.variety]
+  const haystack = [
+    cafe.nombre,
+    cafe.name,
+    cafe.ean,
+    cafe.marca,
+    cafe.roaster,
+    cafe.origen,
+    cafe.origin,
+  ]
     .map(normalizeText)
     .join(' ');
-
   return haystack.includes(q);
 }
 
 function getCafePriority(cafe) {
   const incomplete = isCafeIncomplete(cafe);
-  const hasImage = Boolean(String(cafe.imageUrl || '').trim());
+  const hasImage = Boolean(String(cafe.foto || cafe.imageUrl || '').trim());
   const ready = canBeApproved(cafe);
-
   if (incomplete && !hasImage) return 1;
   if (incomplete && hasImage) return 2;
   if (ready) return 3;
@@ -59,29 +73,18 @@ function sortCafes(items) {
   return [...items].sort((a, b) => {
     const pa = getCafePriority(a);
     const pb = getCafePriority(b);
-
     if (pa !== pb) return pa - pb;
-
-    const aUpdated = a.updatedAt?.seconds || 0;
-    const bUpdated = b.updatedAt?.seconds || 0;
-
-    return bUpdated - aUpdated;
+    const aU = String(a.updatedAt || '');
+    const bU = String(b.updatedAt || '');
+    return bU.localeCompare(aU);
   });
 }
 
 function getStatusBadge(cafe) {
-  if (cafe.status === 'approved') {
-    return { label: 'Aprobado', kind: 'success' };
-  }
-
-  if (cafe.status === 'rejected') {
-    return { label: 'Rechazado', kind: 'danger' };
-  }
-
-  if (canBeApproved(cafe)) {
-    return { label: 'Listo para aprobar', kind: 'successSoft' };
-  }
-
+  const status = String(cafe.reviewStatus || cafe.status || '');
+  if (status === 'approved') return { label: 'Aprobado', kind: 'success' };
+  if (status === 'rejected') return { label: 'Rechazado', kind: 'danger' };
+  if (canBeApproved(cafe)) return { label: 'Listo para aprobar', kind: 'successSoft' };
   return { label: 'Incompleto', kind: 'warning' };
 }
 
@@ -141,10 +144,13 @@ function FieldRow({ label, value }) {
   );
 }
 
-function PendingCafeCard({ item, onEdit, onApprove, onReject, busy }) {
+function PendingCafeCard({ item, onApprove, onReject, busy }) {
   const allowApprove = canBeApproved(item);
   const incomplete = isCafeIncomplete(item);
-  const hasImage = Boolean(String(item.imageUrl || '').trim());
+  const nombre = item.nombre || item.name || 'Sin nombre';
+  const marca = item.marca || item.roaster || '';
+  const origen = item.origen || item.origin || '';
+  const foto = item.foto || item.imageUrl || '';
   const badge = getStatusBadge(item);
 
   return (
@@ -152,19 +158,19 @@ function PendingCafeCard({ item, onEdit, onApprove, onReject, busy }) {
       <View style={styles.cardHeader}>
         <View style={{ flex: 1, paddingRight: 12 }}>
           <Text style={styles.cardTitle} numberOfLines={2}>
-            {item.name || 'Sin nombre'}
+            {nombre}
           </Text>
-
           <View style={styles.badgeRow}>
             <Badge label={badge.label} kind={badge.kind} />
-            {item.provisional ? <Badge label="Provisional" kind="warning" /> : null}
-            {!hasImage ? <Badge label="Sin imagen" kind="danger" /> : null}
+            {item.aiStatus === 'auto_approved' ? (
+              <Badge label="Auto-IA" kind="successSoft" />
+            ) : null}
+            {!foto ? <Badge label="Sin imagen" kind="danger" /> : null}
           </View>
         </View>
-
         <View style={styles.thumbnailWrap}>
-          {hasImage ? (
-            <Image source={{ uri: item.imageUrl }} style={styles.thumbnail} />
+          {foto ? (
+            <Image source={{ uri: foto }} style={styles.thumbnail} />
           ) : (
             <View style={[styles.thumbnail, styles.thumbnailPlaceholder]}>
               <Text style={styles.thumbnailPlaceholderText}>No img</Text>
@@ -175,48 +181,52 @@ function PendingCafeCard({ item, onEdit, onApprove, onReject, busy }) {
 
       <View style={styles.cardBody}>
         <FieldRow label="EAN" value={item.ean} />
-        <FieldRow label="Tostador" value={item.roaster} />
-        <FieldRow label="Origen" value={item.origin} />
-        <FieldRow label="Proceso" value={item.process} />
-        <FieldRow label="Variedad" value={item.variety} />
+        <FieldRow label="Marca" value={marca} />
+        <FieldRow label="Origen" value={origen} />
+        {!!item.aiConfidenceScore && (
+          <FieldRow label="Confianza IA" value={`${Math.round(item.aiConfidenceScore * 100)}%`} />
+        )}
       </View>
 
       {incomplete ? (
         <View style={styles.warningBox}>
-          <Text style={styles.warningText}>Faltan datos obligatorios para aprobar.</Text>
-          <Text style={styles.warningSubtext}>Revisa al menos nombre, tostador e imagen.</Text>
+          <Text style={styles.warningText}>Faltan datos para aprobar.</Text>
+          <Text style={styles.warningSubtext}>Revisa nombre, marca e imagen.</Text>
         </View>
       ) : (
         <View style={styles.readyBox}>
-          <Text style={styles.readyText}>Esta ficha ya está lista para validación.</Text>
+          <Text style={styles.readyText}>Lista para validación.</Text>
         </View>
       )}
 
       <View style={styles.actions}>
-        <View style={styles.actionButton}>
-          <Button title="Editar" onPress={() => onEdit(item)} disabled={busy} />
-        </View>
+        <TouchableOpacity
+          style={[
+            styles.actionBtn,
+            styles.approveBtn,
+            (!allowApprove || busy) && styles.actionBtnDisabled,
+          ]}
+          onPress={() => onApprove(item)}
+          disabled={!allowApprove || busy}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.actionBtnText}>Aprobar</Text>
+        </TouchableOpacity>
 
-        <View style={styles.actionButton}>
-          <Button
-            title="Aprobar"
-            onPress={() => onApprove(item)}
-            disabled={!allowApprove || busy}
-          />
-        </View>
-
-        <View style={styles.actionButton}>
-          <Button title="Rechazar" onPress={() => onReject(item)} disabled={busy} />
-        </View>
+        <TouchableOpacity
+          style={[styles.actionBtn, styles.rejectBtn, busy && styles.actionBtnDisabled]}
+          onPress={() => onReject(item)}
+          disabled={busy}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.actionBtnTextDark}>Rechazar</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
 }
 
-export default function AdminPanelScreen({ navigation }) {
-  // const { user } = useAuth();
-  const user = null;
-
+export default function AdminPanelScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [busyId, setBusyId] = useState(null);
@@ -224,119 +234,98 @@ export default function AdminPanelScreen({ navigation }) {
   const [searchText, setSearchText] = useState('');
   const [activeFilter, setActiveFilter] = useState(FILTERS.ALL);
 
+  const loadCafes = useCallback(async () => {
+    try {
+      const rows = await queryCollection('cafes', 'reviewStatus', 'pending');
+      setPendingCafes(rows || []);
+    } catch (error) {
+      console.error('Error cargando pendientes:', error);
+      Alert.alert('Error', 'No se pudieron cargar los cafés pendientes');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
   useEffect(() => {
-    const q = query(
-      collection(db, 'cafes'),
-      where('status', '==', 'pending'),
-      orderBy('updatedAt', 'desc')
-    );
+    loadCafes();
+  }, [loadCafes]);
 
-    const unsub = onSnapshot(
-      q,
-      (snap) => {
-        const rows = snap.docs.map((d) => ({
-          id: d.id,
-          ...d.data(),
-        }));
+  const handleRefresh = useCallback(() => {
+    setRefreshing(true);
+    loadCafes();
+  }, [loadCafes]);
 
-        setPendingCafes(rows);
-        setLoading(false);
-        setRefreshing(false);
-      },
-      (error) => {
-        console.error('Error cargando pendientes:', error);
-        setLoading(false);
-        setRefreshing(false);
-        Alert.alert('Error', 'No se pudieron cargar los cafés pendientes');
-      }
-    );
+  const handleApprove = useCallback(async (item) => {
+    try {
+      setBusyId(item.id);
+      await updateDocument('cafes', item.id, {
+        reviewStatus: 'approved',
+        appVisible: true,
+        scannerVisible: true,
+        updatedAt: new Date().toISOString(),
+      });
+      setPendingCafes((prev) => prev.filter((c) => c.id !== item.id));
+      Alert.alert('OK', 'Café aprobado');
+    } catch (error) {
+      Alert.alert('Error', error?.message || 'No se pudo aprobar');
+    } finally {
+      setBusyId(null);
+    }
+  }, []);
 
-    return () => unsub();
+  const handleReject = useCallback(async (item) => {
+    try {
+      setBusyId(item.id);
+      await updateDocument('cafes', item.id, {
+        reviewStatus: 'rejected',
+        appVisible: false,
+        scannerVisible: false,
+        updatedAt: new Date().toISOString(),
+      });
+      setPendingCafes((prev) => prev.filter((c) => c.id !== item.id));
+      Alert.alert('OK', 'Café rechazado');
+    } catch (error) {
+      Alert.alert('Error', error?.message || 'No se pudo rechazar');
+    } finally {
+      setBusyId(null);
+    }
   }, []);
 
   const stats = useMemo(() => {
     const total = pendingCafes.length;
-    const incomplete = pendingCafes.filter((c) => isCafeIncomplete(c)).length;
-    const ready = pendingCafes.filter((c) => canBeApproved(c)).length;
-    const withImage = pendingCafes.filter((c) => Boolean(String(c.imageUrl || '').trim())).length;
-
+    const incomplete = pendingCafes.filter(isCafeIncomplete).length;
+    const ready = pendingCafes.filter(canBeApproved).length;
+    const withImage = pendingCafes.filter((c) =>
+      Boolean(String(c.foto || c.imageUrl || '').trim())
+    ).length;
     return { total, incomplete, ready, withImage };
   }, [pendingCafes]);
 
   const filteredCafes = useMemo(() => {
     let rows = pendingCafes.filter((cafe) => matchesSearch(cafe, searchText));
-
     switch (activeFilter) {
       case FILTERS.INCOMPLETE:
-        rows = rows.filter((cafe) => isCafeIncomplete(cafe));
+        rows = rows.filter(isCafeIncomplete);
         break;
       case FILTERS.READY:
-        rows = rows.filter((cafe) => canBeApproved(cafe));
+        rows = rows.filter(canBeApproved);
         break;
       case FILTERS.WITH_IMAGE:
-        rows = rows.filter((cafe) => Boolean(String(cafe.imageUrl || '').trim()));
+        rows = rows.filter((c) => Boolean(String(c.foto || c.imageUrl || '').trim()));
         break;
       case FILTERS.WITHOUT_IMAGE:
-        rows = rows.filter((cafe) => !String(cafe.imageUrl || '').trim());
+        rows = rows.filter((c) => !String(c.foto || c.imageUrl || '').trim());
         break;
-      case FILTERS.ALL:
       default:
         break;
     }
-
     return sortCafes(rows);
   }, [pendingCafes, searchText, activeFilter]);
-
-  const handleRefresh = useCallback(() => {
-    setRefreshing(true);
-  }, []);
-
-  const handleEdit = useCallback(
-    (item) => {
-      navigation.navigate('CafeEditorScreen', {
-        cafeId: item.id,
-        mode: 'admin_edit',
-      });
-    },
-    [navigation]
-  );
-
-  const handleApprove = useCallback(
-    async (item) => {
-      try {
-        setBusyId(item.id);
-        await approveCafe(item.id, user?.uid || null);
-        Alert.alert('OK', 'Café aprobado correctamente');
-      } catch (error) {
-        console.error('Error aprobando café:', error);
-        Alert.alert('Error', error?.message || 'No se pudo aprobar');
-      } finally {
-        setBusyId(null);
-      }
-    },
-    [user]
-  );
-
-  const handleReject = useCallback(
-    async (item) => {
-      try {
-        setBusyId(item.id);
-        await rejectCafe(item.id, user?.uid || null);
-        Alert.alert('OK', 'Café rechazado');
-      } catch (error) {
-        console.error('Error rechazando café:', error);
-        Alert.alert('Error', error?.message || 'No se pudo rechazar');
-      } finally {
-        setBusyId(null);
-      }
-    },
-    [user]
-  );
 
   const renderItem = ({ item }) => (
     <PendingCafeCard
       item={item}
-      onEdit={handleEdit}
       onApprove={handleApprove}
       onReject={handleReject}
       busy={busyId === item.id}
@@ -355,15 +344,13 @@ export default function AdminPanelScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Admin · Validación de cafés</Text>
-      <Text style={styles.subtitle}>
-        Gestiona cafés pendientes, detecta incompletos y valida más rápido.
-      </Text>
+      <Text style={styles.subtitle}>Gestiona cafés pendientes y valida más rápido.</Text>
 
       <View style={styles.searchBox}>
         <TextInput
           value={searchText}
           onChangeText={setSearchText}
-          placeholder="Buscar por nombre, EAN o tostador"
+          placeholder="Buscar por nombre, EAN o marca"
           style={styles.searchInput}
           autoCapitalize="none"
         />
@@ -423,7 +410,7 @@ export default function AdminPanelScreen({ navigation }) {
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Text style={styles.emptyTitle}>No hay resultados</Text>
-            <Text style={styles.emptyText}>Prueba a cambiar el filtro o el texto de búsqueda.</Text>
+            <Text style={styles.emptyText}>Prueba a cambiar el filtro o la búsqueda.</Text>
           </View>
         }
       />
@@ -432,12 +419,7 @@ export default function AdminPanelScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FAFAFA',
-    paddingHorizontal: 16,
-    paddingTop: 16,
-  },
+  container: { flex: 1, backgroundColor: '#FAFAFA', paddingHorizontal: 16, paddingTop: 16 },
   centered: {
     flex: 1,
     alignItems: 'center',
@@ -445,25 +427,10 @@ const styles = StyleSheet.create({
     padding: 24,
     backgroundColor: '#FAFAFA',
   },
-  loadingText: {
-    marginTop: 10,
-    fontSize: 14,
-    color: '#555',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: '#111',
-  },
-  subtitle: {
-    marginTop: 6,
-    marginBottom: 14,
-    color: '#666',
-    fontSize: 14,
-  },
-  searchBox: {
-    marginBottom: 12,
-  },
+  loadingText: { marginTop: 10, fontSize: 14, color: '#555' },
+  title: { fontSize: 24, fontWeight: '800', color: '#111' },
+  subtitle: { marginTop: 6, marginBottom: 14, color: '#666', fontSize: 14 },
+  searchBox: { marginBottom: 12 },
   searchInput: {
     height: 46,
     backgroundColor: '#FFF',
@@ -474,10 +441,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#111',
   },
-  filtersRow: {
-    paddingBottom: 8,
-    gap: 8,
-  },
+  filtersRow: { paddingBottom: 8, gap: 8 },
   filterChip: {
     height: 36,
     paddingHorizontal: 14,
@@ -487,23 +451,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: 8,
   },
-  filterChipActive: {
-    backgroundColor: '#111827',
-  },
-  filterChipText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#334155',
-  },
-  filterChipTextActive: {
-    color: '#FFF',
-  },
-  statsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginTop: 4,
-    marginBottom: 10,
-  },
+  filterChipActive: { backgroundColor: '#111827' },
+  filterChipText: { fontSize: 13, fontWeight: '600', color: '#334155' },
+  filterChipTextActive: { color: '#FFF' },
+  statsRow: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 4, marginBottom: 10 },
   infoPill: {
     backgroundColor: '#FFF',
     borderWidth: 1,
@@ -515,44 +466,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     minWidth: 96,
   },
-  infoPillLabel: {
-    fontSize: 12,
-    color: '#6B7280',
-    marginBottom: 4,
-  },
-  infoPillValue: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#111827',
-  },
-  resultsText: {
-    fontSize: 13,
-    color: '#6B7280',
-    marginBottom: 10,
-  },
-  listContainer: {
-    paddingBottom: 30,
-  },
-  emptyContainer: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    paddingBottom: 50,
-  },
-  emptyState: {
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#111',
-    marginBottom: 6,
-  },
-  emptyText: {
-    textAlign: 'center',
-    color: '#666',
-    fontSize: 14,
-  },
+  infoPillLabel: { fontSize: 12, color: '#6B7280', marginBottom: 4 },
+  infoPillValue: { fontSize: 18, fontWeight: '800', color: '#111827' },
+  resultsText: { fontSize: 13, color: '#6B7280', marginBottom: 10 },
+  listContainer: { paddingBottom: 30 },
+  emptyContainer: { flexGrow: 1, justifyContent: 'center', paddingBottom: 50 },
+  emptyState: { alignItems: 'center', paddingHorizontal: 20 },
+  emptyTitle: { fontSize: 18, fontWeight: '700', color: '#111', marginBottom: 6 },
+  emptyText: { textAlign: 'center', color: '#666', fontSize: 14 },
   card: {
     backgroundColor: '#FFF',
     borderWidth: 1,
@@ -561,21 +482,9 @@ const styles = StyleSheet.create({
     padding: 14,
     marginBottom: 12,
   },
-  cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#111827',
-    marginBottom: 8,
-  },
-  badgeRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 6,
-  },
+  cardHeader: { flexDirection: 'row', alignItems: 'flex-start' },
+  cardTitle: { fontSize: 18, fontWeight: '800', color: '#111827', marginBottom: 8 },
+  badgeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   badge: {
     borderRadius: 999,
     paddingHorizontal: 10,
@@ -583,96 +492,32 @@ const styles = StyleSheet.create({
     marginRight: 6,
     marginBottom: 6,
   },
-  badgeWarning: {
-    backgroundColor: '#FEF3C7',
-  },
-  badgeSuccess: {
-    backgroundColor: '#DCFCE7',
-  },
-  badgeDanger: {
-    backgroundColor: '#FEE2E2',
-  },
-  badgeSuccessSoft: {
-    backgroundColor: '#E0F2FE',
-  },
-  badgeText: {
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  badgeTextWarning: {
-    color: '#92400E',
-  },
-  badgeTextSuccess: {
-    color: '#166534',
-  },
-  badgeTextDanger: {
-    color: '#991B1B',
-  },
-  badgeTextSuccessSoft: {
-    color: '#075985',
-  },
-  thumbnailWrap: {
-    width: 82,
-    height: 82,
-  },
-  thumbnail: {
-    width: 82,
-    height: 82,
-    borderRadius: 14,
-    backgroundColor: '#EEE',
-  },
-  thumbnailPlaceholder: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  thumbnailPlaceholderText: {
-    color: '#888',
-    fontWeight: '700',
-    fontSize: 12,
-  },
-  cardBody: {
-    marginTop: 12,
-  },
-  cardLine: {
-    fontSize: 14,
-    color: '#374151',
-    marginBottom: 5,
-  },
-  cardLineLabel: {
-    fontWeight: '700',
-    color: '#111827',
-  },
-  warningBox: {
-    marginTop: 12,
-    backgroundColor: '#FFF7ED',
-    borderRadius: 12,
-    padding: 12,
-  },
-  warningText: {
-    color: '#9A3412',
-    fontWeight: '700',
-    marginBottom: 4,
-  },
-  warningSubtext: {
-    color: '#C2410C',
-    fontSize: 13,
-  },
-  readyBox: {
-    marginTop: 12,
-    backgroundColor: '#F0FDF4',
-    borderRadius: 12,
-    padding: 12,
-  },
-  readyText: {
-    color: '#166534',
-    fontWeight: '700',
-  },
-  actions: {
-    flexDirection: 'row',
-    marginTop: 14,
-  },
-  actionButton: {
-    flex: 1,
-    marginRight: 8,
-  },
+  badgeWarning: { backgroundColor: '#FEF3C7' },
+  badgeSuccess: { backgroundColor: '#DCFCE7' },
+  badgeDanger: { backgroundColor: '#FEE2E2' },
+  badgeSuccessSoft: { backgroundColor: '#E0F2FE' },
+  badgeText: { fontSize: 12, fontWeight: '700' },
+  badgeTextWarning: { color: '#92400E' },
+  badgeTextSuccess: { color: '#166534' },
+  badgeTextDanger: { color: '#991B1B' },
+  badgeTextSuccessSoft: { color: '#075985' },
+  thumbnailWrap: { width: 82, height: 82 },
+  thumbnail: { width: 82, height: 82, borderRadius: 14, backgroundColor: '#EEE' },
+  thumbnailPlaceholder: { alignItems: 'center', justifyContent: 'center' },
+  thumbnailPlaceholderText: { color: '#888', fontWeight: '700', fontSize: 12 },
+  cardBody: { marginTop: 12 },
+  cardLine: { fontSize: 14, color: '#374151', marginBottom: 5 },
+  cardLineLabel: { fontWeight: '700', color: '#111827' },
+  warningBox: { marginTop: 12, backgroundColor: '#FFF7ED', borderRadius: 12, padding: 12 },
+  warningText: { color: '#9A3412', fontWeight: '700', marginBottom: 4 },
+  warningSubtext: { color: '#C2410C', fontSize: 13 },
+  readyBox: { marginTop: 12, backgroundColor: '#F0FDF4', borderRadius: 12, padding: 12 },
+  readyText: { color: '#166534', fontWeight: '700' },
+  actions: { flexDirection: 'row', marginTop: 14, gap: 10 },
+  actionBtn: { flex: 1, paddingVertical: 12, borderRadius: 12, alignItems: 'center' },
+  approveBtn: { backgroundColor: '#166534' },
+  rejectBtn: { backgroundColor: '#FEE2E2', borderWidth: 1, borderColor: '#FECACA' },
+  actionBtnDisabled: { opacity: 0.4 },
+  actionBtnText: { color: '#FFF', fontWeight: '700', fontSize: 14 },
+  actionBtnTextDark: { color: '#991B1B', fontWeight: '700', fontSize: 14 },
 });

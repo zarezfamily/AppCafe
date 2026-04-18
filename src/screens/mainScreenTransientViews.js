@@ -1,5 +1,14 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Animated, SafeAreaView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import {
+  Animated,
+  Image,
+  SafeAreaView,
+  StatusBar,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 import AppDialogModal from '../components/AppDialogModal';
 import OnboardingModal from '../components/OnboardingModal';
@@ -13,6 +22,259 @@ function normalizeEan(value) {
   return String(value || '')
     .replace(/\D/g, '')
     .trim();
+}
+
+function ExistingCafeMatchScreen({ cafe, premiumAccent, onOpenNow, onClose }) {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const start = Date.now();
+    const duration = 900;
+
+    const timer = setInterval(() => {
+      const elapsed = Date.now() - start;
+      const next = Math.min(elapsed / duration, 1);
+      setProgress(next);
+      if (next >= 1) clearInterval(timer);
+    }, 16);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#0b0b0b' }}>
+      <StatusBar barStyle="light-content" backgroundColor="#0b0b0b" />
+
+      <View
+        style={{
+          flex: 1,
+          paddingHorizontal: 24,
+          paddingTop: 28,
+          paddingBottom: 32,
+          justifyContent: 'space-between',
+        }}
+      >
+        <TouchableOpacity
+          onPress={onClose}
+          style={{
+            width: 44,
+            height: 44,
+            borderRadius: 22,
+            backgroundColor: 'rgba(255,255,255,0.08)',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Ionicons name="close" size={24} color="#fff" />
+        </TouchableOpacity>
+
+        <View style={{ alignItems: 'center' }}>
+          <View
+            style={{
+              width: 88,
+              height: 88,
+              borderRadius: 44,
+              backgroundColor: 'rgba(255,255,255,0.08)',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: 18,
+              borderWidth: 1,
+              borderColor: 'rgba(255,255,255,0.12)',
+            }}
+          >
+            <Ionicons name="checkmark" size={42} color={premiumAccent} />
+          </View>
+
+          <Text
+            style={{
+              color: '#fff',
+              fontSize: 28,
+              fontWeight: '800',
+              textAlign: 'center',
+              marginBottom: 10,
+            }}
+          >
+            Ya lo tenemos ☕
+          </Text>
+
+          <Text
+            style={{
+              color: '#b8b8b8',
+              fontSize: 15,
+              textAlign: 'center',
+              lineHeight: 22,
+              marginBottom: 26,
+            }}
+          >
+            Este café ya está en Etiove. Abrimos su ficha automáticamente.
+          </Text>
+
+          {!!cafe?.foto && (
+            <View
+              style={{
+                width: '100%',
+                borderRadius: 22,
+                overflow: 'hidden',
+                marginBottom: 18,
+                backgroundColor: '#161616',
+              }}
+            >
+              <Image source={{ uri: cafe.foto }} style={{ width: '100%', height: 220 }} />
+            </View>
+          )}
+
+          <View
+            style={{
+              width: '100%',
+              borderRadius: 22,
+              backgroundColor: '#151515',
+              borderWidth: 1,
+              borderColor: '#262626',
+              padding: 18,
+            }}
+          >
+            <Text style={{ color: '#fff', fontSize: 22, fontWeight: '800' }}>
+              {cafe?.nombre || cafe?.name || 'Café encontrado'}
+            </Text>
+
+            {!!(cafe?.marca || cafe?.brand) && (
+              <Text style={{ color: '#c7c7c7', fontSize: 15, marginTop: 8 }}>
+                {cafe?.marca || cafe?.brand}
+              </Text>
+            )}
+
+            {!!(cafe?.origen || cafe?.origin) && (
+              <Text style={{ color: '#8f8f8f', fontSize: 13, marginTop: 8 }}>
+                {cafe?.origen || cafe?.origin}
+              </Text>
+            )}
+
+            {!!cafe?.ean && (
+              <Text style={{ color: '#737373', fontSize: 12, marginTop: 10 }}>EAN: {cafe.ean}</Text>
+            )}
+          </View>
+        </View>
+
+        <View>
+          <View
+            style={{
+              height: 6,
+              borderRadius: 999,
+              backgroundColor: '#1f1f1f',
+              overflow: 'hidden',
+              marginBottom: 16,
+            }}
+          >
+            <View
+              style={{
+                width: `${Math.round(progress * 100)}%`,
+                height: '100%',
+                backgroundColor: premiumAccent,
+              }}
+            />
+          </View>
+
+          <TouchableOpacity
+            onPress={onOpenNow}
+            style={{
+              borderRadius: 16,
+              backgroundColor: premiumAccent,
+              paddingVertical: 16,
+              alignItems: 'center',
+              marginBottom: 10,
+            }}
+          >
+            <Text style={{ color: '#111', fontWeight: '800', fontSize: 15 }}>Ver ficha ahora</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={onClose}
+            style={{
+              borderRadius: 16,
+              borderWidth: 1,
+              borderColor: '#2a2a2a',
+              paddingVertical: 15,
+              alignItems: 'center',
+            }}
+          >
+            <Text style={{ color: '#d0d0d0', fontWeight: '700', fontSize: 14 }}>Cerrar</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+function ScannerMatchFlow({
+  allCafes,
+  onScannerDone,
+  onScannerBack,
+  premiumAccent,
+  setCafeDetalle,
+  setScanning,
+  showDialog,
+}) {
+  const [matchedCafe, setMatchedCafe] = useState(null);
+
+  useEffect(() => {
+    if (!matchedCafe) return undefined;
+
+    const timer = setTimeout(() => {
+      setScanning(false);
+      setCafeDetalle?.(matchedCafe);
+      setMatchedCafe(null);
+    }, 900);
+
+    return () => clearTimeout(timer);
+  }, [matchedCafe, setCafeDetalle, setScanning]);
+
+  if (matchedCafe) {
+    return (
+      <ExistingCafeMatchScreen
+        cafe={matchedCafe}
+        premiumAccent={premiumAccent}
+        onOpenNow={() => {
+          setScanning(false);
+          setCafeDetalle?.(matchedCafe);
+          setMatchedCafe(null);
+        }}
+        onClose={() => {
+          setScanning(false);
+          setMatchedCafe(null);
+        }}
+      />
+    );
+  }
+
+  return (
+    <ScannerScreen
+      onScanned={(result) => {
+        const ean = normalizeEan(result?.ean);
+
+        if (!ean) {
+          showDialog?.('Error', 'No se ha podido leer el código');
+          return;
+        }
+
+        const existing = allCafes.find((c) => normalizeEan(c?.ean) === ean);
+
+        if (existing) {
+          setMatchedCafe(existing);
+          return;
+        }
+
+        onScannerDone?.({
+          ...result,
+          ean,
+          isNew: true,
+          autoCreate: true,
+        });
+      }}
+      onSkip={() => onScannerDone?.({ skip: true })}
+      onBack={onScannerBack}
+      premiumAccent={premiumAccent}
+    />
+  );
 }
 
 export function renderMainScreenTransientView({
@@ -48,50 +310,14 @@ export function renderMainScreenTransientView({
 
   if (scanning) {
     return (
-      <ScannerScreen
-        onScanned={(result) => {
-          const ean = normalizeEan(result?.ean);
-
-          if (!ean) {
-            showDialog?.('Error', 'No se ha podido leer el código');
-            return;
-          }
-
-          const existing = allCafes.find((c) => normalizeEan(c?.ean) === ean);
-
-          if (existing) {
-            setScanning(false);
-
-            // 🔥 UX PRO: feedback inmediato + auto apertura
-            showDialog?.(
-              'Ya lo tenemos ☕',
-              `${existing?.nombre || existing?.name || 'Este café'} ya está en Etiove. Abriendo ficha...`,
-              [
-                {
-                  label: 'Abrir ahora',
-                  onPress: () => setCafeDetalle?.(existing),
-                },
-              ]
-            );
-
-            // apertura automática con pequeño delay (sensación fluida)
-            setTimeout(() => {
-              setCafeDetalle?.(existing);
-            }, 700);
-
-            return;
-          }
-
-          onScannerDone?.({
-            ...result,
-            ean,
-            isNew: true,
-            autoCreate: true,
-          });
-        }}
-        onSkip={() => onScannerDone?.({ skip: true })}
-        onBack={onScannerBack}
+      <ScannerMatchFlow
+        allCafes={allCafes}
+        onScannerDone={onScannerDone}
+        onScannerBack={onScannerBack}
         premiumAccent={premiumAccent}
+        setCafeDetalle={setCafeDetalle}
+        setScanning={setScanning}
+        showDialog={showDialog}
       />
     );
   }

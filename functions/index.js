@@ -451,6 +451,22 @@ Datos del lookup por barcode:
   return normalizeAiResult(parsed, cafe, job, barcodeData);
 }
 
+function pickBestPhoto({ userPhoto, officialPhoto, aiConfidence, isCoffeePackage }) {
+  if (officialPhoto && isCoffeePackage && aiConfidence >= 0.6) {
+    return officialPhoto;
+  }
+
+  return userPhoto || officialPhoto || '';
+}
+
+function pickSelectedPhotoSource({ officialPhoto, aiConfidence, isCoffeePackage }) {
+  if (officialPhoto && isCoffeePackage && aiConfidence >= 0.6) {
+    return 'official';
+  }
+
+  return 'user';
+}
+
 exports.onAiJobCreatedProcessCoffee = onDocumentCreated('ai_jobs/{jobId}', async (event) => {
   const job = event.data?.data();
   if (!job) return;
@@ -483,6 +499,9 @@ exports.onAiJobCreatedProcessCoffee = onDocumentCreated('ai_jobs/{jobId}', async
     const shouldAutoApprove =
       ai.isCoffeePackage && ai.isSpecialty === true && ai.confidence >= AI_AUTO_APPROVE_THRESHOLD;
 
+    const userPhoto = String(cafe?.foto || job?.foto || '').trim();
+    const officialPhoto = String(barcodeData?.imagen || '').trim();
+
     const cafeUpdate = {
       aiGenerated: true,
       aiSuggestion: {
@@ -492,6 +511,7 @@ exports.onAiJobCreatedProcessCoffee = onDocumentCreated('ai_jobs/{jobId}', async
         isSpecialty: ai.isSpecialty,
         ean: ai.ean,
         summary: ai.summary,
+        officialPhoto: officialPhoto || '',
       },
       aiConfidenceScore: ai.confidence,
       aiStatus: shouldAutoApprove ? 'auto_approved' : 'completed',
@@ -510,9 +530,27 @@ exports.onAiJobCreatedProcessCoffee = onDocumentCreated('ai_jobs/{jobId}', async
       cafeUpdate.ean = ai.ean;
     }
 
-    if (!cafe?.foto && barcodeData?.imagen) {
-      cafeUpdate.foto = barcodeData.imagen;
+    if (officialPhoto) {
+      cafeUpdate.officialPhoto = officialPhoto;
     }
+
+    cafeUpdate.bestPhoto = pickBestPhoto({
+      userPhoto,
+      officialPhoto,
+      aiConfidence: ai.confidence,
+      isCoffeePackage: ai.isCoffeePackage,
+    });
+
+    cafeUpdate.photoSources = {
+      userPhoto: userPhoto || '',
+      officialPhoto: officialPhoto || '',
+      bestPhoto: cafeUpdate.bestPhoto || '',
+      selectedBy: pickSelectedPhotoSource({
+        officialPhoto,
+        aiConfidence: ai.confidence,
+        isCoffeePackage: ai.isCoffeePackage,
+      }),
+    };
 
     if (!ai.isCoffeePackage) {
       cafeUpdate.reviewStatus = 'rejected';
@@ -536,6 +574,7 @@ exports.onAiJobCreatedProcessCoffee = onDocumentCreated('ai_jobs/{jobId}', async
         isCoffeePackage: ai.isCoffeePackage,
         autoApproved: shouldAutoApprove,
         barcodeLookupFound: !!barcodeData,
+        selectedPhotoSource: cafeUpdate.photoSources?.selectedBy || 'user',
       },
       updatedAt: new Date().toISOString(),
     });
@@ -547,6 +586,7 @@ exports.onAiJobCreatedProcessCoffee = onDocumentCreated('ai_jobs/{jobId}', async
       confidence: ai.confidence,
       autoApproved: shouldAutoApprove,
       barcodeLookupFound: !!barcodeData,
+      selectedPhotoSource: cafeUpdate.photoSources?.selectedBy || 'user',
     });
   } catch (error) {
     logger.error('AI job failed', {

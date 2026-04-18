@@ -45,7 +45,8 @@ export default function CafeDetailScreen({
   const [dialogVisible, setDialogVisible] = useState(false);
   const [dialogConfig, setDialogConfig] = useState({ title: '', description: '', actions: [] });
 
-  const fotoCafe = cafe.foto || cafe.image || null;
+  const fotoCafe = cafe.bestPhoto || cafe.officialPhoto || cafe.foto || cafe.image || null;
+
   const precioTexto = cafe.precio !== undefined && cafe.precio !== null ? `${cafe.precio} €` : null;
 
   const originText = [cafe.pais, cafe.region].filter(Boolean).join(', ');

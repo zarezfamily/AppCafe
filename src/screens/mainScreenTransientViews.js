@@ -107,6 +107,7 @@ function ExistingCafeMatchScreen({ cafe, premiumAccent, onOpenNow, onClose, onRe
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.96)).current;
   const matchCopy = getCafeMatchCopy(cafe);
+  const image = cafe?.bestPhoto || cafe?.officialPhoto || cafe?.foto || null;
 
   useEffect(() => {
     Animated.parallel([
@@ -229,7 +230,7 @@ function ExistingCafeMatchScreen({ cafe, premiumAccent, onOpenNow, onClose, onRe
             {matchCopy.description}
           </Text>
 
-          {!!cafe?.foto && (
+          {!!image && (
             <View
               style={{
                 width: '100%',
@@ -239,7 +240,7 @@ function ExistingCafeMatchScreen({ cafe, premiumAccent, onOpenNow, onClose, onRe
                 backgroundColor: '#161616',
               }}
             >
-              <Image source={{ uri: cafe.foto }} style={{ width: '100%', height: 220 }} />
+              <Image source={{ uri: image }} style={{ width: '100%', height: 220 }} />
             </View>
           )}
 

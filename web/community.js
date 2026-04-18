@@ -3406,23 +3406,14 @@ const init = async () => {
   el.loginBtn.addEventListener('click', async () => {
     await signIn(false);
     renderAuthState();
-    if (typeof renderMemberEvolutionCard === 'function') {
-      renderMemberEvolutionCard({ profile: null, allThreads: [], allReplies: [] });
-    }
   });
   el.registerBtn.addEventListener('click', async () => {
     await signIn(true);
     renderAuthState();
-    if (typeof renderMemberEvolutionCard === 'function') {
-      renderMemberEvolutionCard({ profile: null, allThreads: [], allReplies: [] });
-    }
   });
   el.logoutBtn.addEventListener('click', async () => {
     await logout();
     renderAuthState();
-    if (typeof renderMemberEvolutionCard === 'function') {
-      renderMemberEvolutionCard({ profile: null, allThreads: [], allReplies: [] });
-    }
   });
   el.createThreadBtn.addEventListener('click', createThread);
   if (el.cancelThreadEditBtn) {

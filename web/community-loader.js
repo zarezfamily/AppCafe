@@ -8,7 +8,7 @@ if (forumSection) {
     communityLoaded = true;
 
     const script = document.createElement('script');
-    script.src = '/community.js?v=20260418a';
+    script.src = '/community.js?v=20260418b';
     script.defer = true;
     document.body.appendChild(script);
   };

@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Image,
@@ -17,7 +17,6 @@ import FormScreen from './FormScreen';
 import ProfileScreen from './ProfileScreen';
 import ScannerScreen from './ScannerScreen';
 
-// 🔥 NUEVO: normalizador de EAN
 function normalizeEan(value) {
   return String(value || '')
     .replace(/\D/g, '')
@@ -26,8 +25,24 @@ function normalizeEan(value) {
 
 function ExistingCafeMatchScreen({ cafe, premiumAccent, onOpenNow, onClose }) {
   const [progress, setProgress] = useState(0);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(0.96)).current;
 
   useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 260,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 8,
+        tension: 70,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
     const start = Date.now();
     const duration = 900;
 
@@ -39,19 +54,21 @@ function ExistingCafeMatchScreen({ cafe, premiumAccent, onOpenNow, onClose }) {
     }, 16);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [fadeAnim, scaleAnim]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#0b0b0b' }}>
       <StatusBar barStyle="light-content" backgroundColor="#0b0b0b" />
 
-      <View
+      <Animated.View
         style={{
           flex: 1,
           paddingHorizontal: 24,
           paddingTop: 28,
           paddingBottom: 32,
           justifyContent: 'space-between',
+          opacity: fadeAnim,
+          transform: [{ scale: scaleAnim }],
         }}
       >
         <TouchableOpacity
@@ -143,6 +160,59 @@ function ExistingCafeMatchScreen({ cafe, premiumAccent, onOpenNow, onClose }) {
               </Text>
             )}
 
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 }}>
+              {!!cafe?.isSpecialty && (
+                <View
+                  style={{
+                    paddingHorizontal: 10,
+                    paddingVertical: 6,
+                    borderRadius: 999,
+                    backgroundColor: 'rgba(202,162,124,0.16)',
+                    borderWidth: 1,
+                    borderColor: 'rgba(202,162,124,0.32)',
+                  }}
+                >
+                  <Text style={{ color: '#f4d7b8', fontSize: 12, fontWeight: '800' }}>
+                    Specialty
+                  </Text>
+                </View>
+              )}
+
+              {!!cafe?.puntuacion && (
+                <View
+                  style={{
+                    paddingHorizontal: 10,
+                    paddingVertical: 6,
+                    borderRadius: 999,
+                    backgroundColor: 'rgba(255,255,255,0.06)',
+                    borderWidth: 1,
+                    borderColor: 'rgba(255,255,255,0.10)',
+                  }}
+                >
+                  <Text style={{ color: '#e7e7e7', fontSize: 12, fontWeight: '800' }}>
+                    {Number(cafe.puntuacion).toFixed(1)} ★
+                  </Text>
+                </View>
+              )}
+
+              {!!cafe?.reviewStatus && (
+                <View
+                  style={{
+                    paddingHorizontal: 10,
+                    paddingVertical: 6,
+                    borderRadius: 999,
+                    backgroundColor: 'rgba(255,255,255,0.06)',
+                    borderWidth: 1,
+                    borderColor: 'rgba(255,255,255,0.10)',
+                  }}
+                >
+                  <Text style={{ color: '#d0d0d0', fontSize: 12, fontWeight: '700' }}>
+                    {String(cafe.reviewStatus).toUpperCase()}
+                  </Text>
+                </View>
+              )}
+            </View>
+
             {!!(cafe?.origen || cafe?.origin) && (
               <Text style={{ color: '#8f8f8f', fontSize: 13, marginTop: 8 }}>
                 {cafe?.origen || cafe?.origin}
@@ -200,7 +270,7 @@ function ExistingCafeMatchScreen({ cafe, premiumAccent, onOpenNow, onClose }) {
             <Text style={{ color: '#d0d0d0', fontWeight: '700', fontSize: 14 }}>Cerrar</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </Animated.View>
     </SafeAreaView>
   );
 }

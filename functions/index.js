@@ -11,6 +11,7 @@ const db = admin.firestore();
 const EXPO_PUSH_URL = 'https://exp.host/--/api/v2/push/send';
 const OPENAI_API_URL = 'https://api.openai.com/v1/responses';
 const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4.1-mini';
+const AI_AUTO_APPROVE_THRESHOLD = Number(process.env.AI_AUTO_APPROVE_THRESHOLD || 0.85);
 
 const buildMessage = (token, title, body, data = {}) => ({
   to: token,
@@ -265,6 +266,7 @@ function normalizeAiResult(parsed, cafe, job) {
     isCoffeePackage,
     confidence: boundedConfidence,
     imageReason: String(parsed?.imageReason || '').trim(),
+    summary: String(parsed?.summary || parsed?.notasIA || '').trim(),
     raw: parsed,
     ean: String(parsed?.ean || job?.ean || cafe?.ean || '').trim(),
   };
@@ -391,6 +393,8 @@ exports.onAiJobCreatedProcessCoffee = onDocumentCreated('ai_jobs/{jobId}', async
     const ai = await callOpenAIForCoffeeEnrichment({ job, cafe });
 
     const imageValidationStatus = ai.isCoffeePackage ? 'approved' : 'rejected';
+    const shouldAutoApprove =
+      ai.isCoffeePackage && ai.isSpecialty === true && ai.confidence >= AI_AUTO_APPROVE_THRESHOLD;
 
     const cafeUpdate = {
       aiGenerated: true,
@@ -400,10 +404,10 @@ exports.onAiJobCreatedProcessCoffee = onDocumentCreated('ai_jobs/{jobId}', async
         origen: ai.origen,
         isSpecialty: ai.isSpecialty,
         ean: ai.ean,
-        summary: ai.notasIA,
+        summary: ai.summary,
       },
       aiConfidenceScore: ai.confidence,
-      aiStatus: 'completed',
+      aiStatus: shouldAutoApprove ? 'auto_approved' : 'completed',
       updatedAt: new Date().toISOString(),
       imageValidation: {
         status: imageValidationStatus,
@@ -417,6 +421,14 @@ exports.onAiJobCreatedProcessCoffee = onDocumentCreated('ai_jobs/{jobId}', async
       cafeUpdate.appVisible = false;
       cafeUpdate.scannerVisible = false;
       cafeUpdate.isSpecialty = false;
+    } else if (shouldAutoApprove) {
+      cafeUpdate.reviewStatus = 'approved';
+      cafeUpdate.appVisible = true;
+      cafeUpdate.scannerVisible = true;
+      cafeUpdate.isSpecialty = true;
+      cafeUpdate.nombre = ai.nombre || cafe.nombre || '';
+      cafeUpdate.origen = ai.origen || cafe.origen || '';
+      if (ai.ean) cafeUpdate.ean = ai.ean;
     }
 
     await cafeRef.update(cafeUpdate);
@@ -427,6 +439,7 @@ exports.onAiJobCreatedProcessCoffee = onDocumentCreated('ai_jobs/{jobId}', async
         aiConfidenceScore: ai.confidence,
         isSpecialty: ai.isSpecialty,
         isCoffeePackage: ai.isCoffeePackage,
+        autoApproved: shouldAutoApprove,
       },
       updatedAt: new Date().toISOString(),
     });
@@ -436,6 +449,7 @@ exports.onAiJobCreatedProcessCoffee = onDocumentCreated('ai_jobs/{jobId}', async
       targetCollection,
       targetId,
       confidence: ai.confidence,
+      autoApproved: shouldAutoApprove,
     });
   } catch (error) {
     logger.error('AI job failed', {

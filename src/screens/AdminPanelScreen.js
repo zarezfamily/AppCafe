@@ -36,6 +36,65 @@ function isValidEAN13(code) {
   return calculated === checkDigit;
 }
 
+function formatDate(value) {
+  if (!value) return 'Sin fecha';
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return 'Fecha inválida';
+
+  return date.toLocaleString('es-ES', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+function getSourceLabel(item) {
+  if (item?.sourceType === 'verified_web') return 'Web verificada';
+  if (item?.sourceType === 'scanner_pending') return 'Escáner';
+  if (item?.sourceType === 'ai_enriched') return 'IA';
+  if (item?.sourceType) return item.sourceType;
+  return 'Manual';
+}
+
+function getAiConfidenceLabel(score) {
+  const value = Number(score || 0);
+  if (value >= 0.9) return 'Muy alta';
+  if (value >= 0.75) return 'Alta';
+  if (value >= 0.5) return 'Media';
+  if (value > 0) return 'Baja';
+  return 'Sin evaluar';
+}
+
+function getAiConfidenceColor(score) {
+  const value = Number(score || 0);
+  if (value >= 0.9) return '#9f9';
+  if (value >= 0.75) return '#f4d7b8';
+  if (value >= 0.5) return '#ffd27f';
+  if (value > 0) return '#ff9f9f';
+  return '#c7c7c7';
+}
+
+function getImageValidationLabel(item) {
+  const status = item?.imageValidation?.status;
+  if (status === 'approved') return 'Imagen válida';
+  if (status === 'rejected') return 'Imagen rechazada';
+  if (status === 'pending') return 'Imagen pendiente';
+  if (status === 'not_provided') return 'Sin imagen';
+  return 'Sin validar';
+}
+
+function getImageValidationColor(item) {
+  const status = item?.imageValidation?.status;
+  if (status === 'approved') return '#9f9';
+  if (status === 'rejected') return '#ff9f9f';
+  if (status === 'pending') return '#ffd27f';
+  if (status === 'not_provided') return '#999';
+  return '#c7c7c7';
+}
+
 function FilterChip({ label, active, onPress }) {
   return (
     <TouchableOpacity
@@ -64,7 +123,7 @@ function FilterChip({ label, active, onPress }) {
 }
 
 async function fetchCoffeeCountByStatus(status) {
-  const docs = await queryCollection('coffees', 'reviewStatus', status);
+  const docs = await queryCollection('cafes', 'reviewStatus', status);
   return docs.length;
 }
 
@@ -107,7 +166,7 @@ export default function AdminPanelScreen() {
   const loadCafes = useCallback(
     async (status = activeFilter) => {
       try {
-        const data = await queryCollection('coffees', 'reviewStatus', status);
+        const data = await queryCollection('cafes', 'reviewStatus', status);
         setCafes(data);
       } catch (e) {
         console.log('Error cargando cafés:', e);
@@ -145,7 +204,7 @@ export default function AdminPanelScreen() {
   }, [activeFilter, loadCafes, loadCounters]);
 
   const approveSpecialty = async (coffee) => {
-    await updateDocument('coffees', coffee.id, {
+    await updateDocument('cafes', coffee.id, {
       reviewStatus: FILTERS.APPROVED,
       isSpecialty: true,
       appVisible: true,
@@ -155,7 +214,7 @@ export default function AdminPanelScreen() {
   };
 
   const approveNoSpecialty = async (coffee) => {
-    await updateDocument('coffees', coffee.id, {
+    await updateDocument('cafes', coffee.id, {
       reviewStatus: FILTERS.APPROVED,
       isSpecialty: false,
       appVisible: false,
@@ -164,8 +223,18 @@ export default function AdminPanelScreen() {
     await refreshCurrentView();
   };
 
+  const approveAndHide = async (coffee) => {
+    await updateDocument('cafes', coffee.id, {
+      reviewStatus: FILTERS.APPROVED,
+      isSpecialty: !!coffee?.isSpecialty,
+      appVisible: false,
+      scannerVisible: true,
+    });
+    await refreshCurrentView();
+  };
+
   const rejectCoffee = async (coffee) => {
-    await updateDocument('coffees', coffee.id, {
+    await updateDocument('cafes', coffee.id, {
       reviewStatus: FILTERS.REJECTED,
       appVisible: false,
       scannerVisible: false,
@@ -174,7 +243,7 @@ export default function AdminPanelScreen() {
   };
 
   const recoverCoffee = async (coffee) => {
-    await updateDocument('coffees', coffee.id, {
+    await updateDocument('cafes', coffee.id, {
       reviewStatus: FILTERS.PENDING,
       appVisible: false,
       scannerVisible: true,
@@ -182,10 +251,53 @@ export default function AdminPanelScreen() {
     await refreshCurrentView();
   };
 
+  const markImageApproved = async (coffee) => {
+    await updateDocument('cafes', coffee.id, {
+      imageValidation: {
+        ...(coffee?.imageValidation || {}),
+        status: 'approved',
+      },
+    });
+    await refreshCurrentView();
+  };
+
+  const markImageRejected = async (coffee) => {
+    await updateDocument('cafes', coffee.id, {
+      imageValidation: {
+        ...(coffee?.imageValidation || {}),
+        status: 'rejected',
+        reason: 'manual_reject',
+      },
+      appVisible: false,
+    });
+    await refreshCurrentView();
+  };
+
+  const applyAiSuggestion = async (coffee) => {
+    const aiSuggestion = coffee?.aiSuggestion || {};
+    const nextIsSpecialty =
+      typeof aiSuggestion.isSpecialty === 'boolean'
+        ? aiSuggestion.isSpecialty
+        : !!coffee?.isSpecialty;
+
+    await updateDocument('cafes', coffee.id, {
+      nombre: aiSuggestion.name || aiSuggestion.nombre || coffee?.name || coffee?.nombre || '',
+      marca: aiSuggestion.brand || aiSuggestion.marca || coffee?.brand || coffee?.roaster || '',
+      ean: aiSuggestion.ean || coffee?.ean || '',
+      isSpecialty: nextIsSpecialty,
+      reviewStatus: nextIsSpecialty ? FILTERS.APPROVED : FILTERS.PENDING,
+      appVisible: nextIsSpecialty,
+      scannerVisible: true,
+      aiStatus: 'applied',
+    });
+
+    await refreshCurrentView();
+  };
+
   const openEditor = (coffee) => {
     setEditingCoffee(coffee);
     setEditName(coffee?.name || coffee?.nombre || '');
-    setEditBrand(coffee?.brand || coffee?.roaster || '');
+    setEditBrand(coffee?.brand || coffee?.marca || coffee?.roaster || '');
     setEditEan(coffee?.ean || '');
     setEditIsSpecialty(!!coffee?.isSpecialty);
     setEditReviewStatus(coffee?.reviewStatus || FILTERS.PENDING);
@@ -219,7 +331,7 @@ export default function AdminPanelScreen() {
     }
 
     if (normalizedEan) {
-      const sameEanDocs = await queryCollection('coffees', 'ean', normalizedEan);
+      const sameEanDocs = await queryCollection('cafes', 'ean', normalizedEan);
       const duplicate = sameEanDocs.find((docItem) => docItem.id !== editingCoffee.id);
       if (duplicate) {
         setEditError('Ya existe otro café con ese EAN en la base de datos.');
@@ -227,9 +339,9 @@ export default function AdminPanelScreen() {
       }
     }
 
-    await updateDocument('coffees', editingCoffee.id, {
-      name: editName,
-      brand: editBrand,
+    await updateDocument('cafes', editingCoffee.id, {
+      nombre: editName,
+      marca: editBrand,
       ean: normalizedEan,
       isSpecialty: editIsSpecialty,
       reviewStatus: editReviewStatus,
@@ -260,16 +372,21 @@ export default function AdminPanelScreen() {
       return (
         <>
           <TouchableOpacity onPress={() => approveSpecialty(item)}>
-            <Text style={{ color: '#0f0' }}>✔ Specialty</Text>
+            <Text style={{ color: '#0f0' }}>✔ Publicar specialty</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => approveNoSpecialty(item)}>
-            <Text style={{ color: '#ff0' }}>✔ No Specialty</Text>
+          <TouchableOpacity onPress={() => approveAndHide(item)}>
+            <Text style={{ color: '#ff0' }}>◐ Aprobar oculto</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => markImageApproved(item)}>
+            <Text style={{ color: '#9f9' }}>🖼 Validar imagen</Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => rejectCoffee(item)}>
             <Text style={{ color: '#f00' }}>✖ Rechazar</Text>
           </TouchableOpacity>
+
           <TouchableOpacity onPress={() => openEditor(item)}>
             <Text style={{ color: '#6cf' }}>✎ Editar</Text>
           </TouchableOpacity>
@@ -280,19 +397,30 @@ export default function AdminPanelScreen() {
     return (
       <>
         <TouchableOpacity onPress={() => approveSpecialty(item)}>
-          <Text style={{ color: '#0f0' }}>✔ Specialty</Text>
+          <Text style={{ color: '#0f0' }}>✔ Publicar specialty</Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => approveNoSpecialty(item)}>
-          <Text style={{ color: '#ff0' }}>✔ No Specialty</Text>
+          <Text style={{ color: '#ff0' }}>✔ No specialty</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => rejectCoffee(item)}>
-          <Text style={{ color: '#f00' }}>✖ Rechazar</Text>
+        <TouchableOpacity onPress={() => markImageApproved(item)}>
+          <Text style={{ color: '#9f9' }}>🖼 Validar imagen</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => markImageRejected(item)}>
+          <Text style={{ color: '#ff8f8f' }}>🚫 Imagen no válida</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity onPress={() => openEditor(item)}>
           <Text style={{ color: '#6cf' }}>✎ Editar</Text>
         </TouchableOpacity>
+
+        {!!item?.aiSuggestion && (
+          <TouchableOpacity onPress={() => applyAiSuggestion(item)}>
+            <Text style={{ color: '#c7a6ff' }}>✨ Aplicar IA</Text>
+          </TouchableOpacity>
+        )}
       </>
     );
   };
@@ -307,10 +435,17 @@ export default function AdminPanelScreen() {
     const term = String(search || '')
       .trim()
       .toLowerCase();
-    if (!term) return cafes;
 
-    return cafes.filter((item) => {
-      const haystack = [item.name, item.nombre, item.brand, item.roaster, item.ean]
+    const sorted = [...cafes].sort((a, b) => {
+      const aTime = new Date(a?.createdAt || a?.fecha || 0).getTime() || 0;
+      const bTime = new Date(b?.createdAt || b?.fecha || 0).getTime() || 0;
+      return bTime - aTime;
+    });
+
+    if (!term) return sorted;
+
+    return sorted.filter((item) => {
+      const haystack = [item.name, item.nombre, item.brand, item.marca, item.roaster, item.ean]
         .filter(Boolean)
         .join(' ')
         .toLowerCase();
@@ -339,7 +474,9 @@ export default function AdminPanelScreen() {
         {item.name || item.nombre || 'Sin nombre'}
       </Text>
 
-      <Text style={{ color: '#aaa' }}>{item.brand || item.roaster || 'Marca desconocida'}</Text>
+      <Text style={{ color: '#aaa' }}>
+        {item.brand || item.marca || item.roaster || 'Marca desconocida'}
+      </Text>
 
       <Text style={{ color: '#666', fontSize: 12, marginTop: 4 }}>EAN: {item.ean || '—'}</Text>
 
@@ -350,6 +487,112 @@ export default function AdminPanelScreen() {
       <Text style={{ color: '#888', fontSize: 12, marginTop: 2 }}>
         Specialty: {item.isSpecialty ? 'Sí' : 'No'}
       </Text>
+
+      {!!item?.aiStatus && (
+        <Text style={{ color: '#8fb7ff', fontSize: 12, marginTop: 4 }}>IA: {item.aiStatus}</Text>
+      )}
+
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
+        <View
+          style={{
+            paddingHorizontal: 10,
+            paddingVertical: 6,
+            borderRadius: 999,
+            backgroundColor: '#1a1a1a',
+            borderWidth: 1,
+            borderColor: '#262626',
+          }}
+        >
+          <Text style={{ color: '#c7c7c7', fontSize: 11, fontWeight: '700' }}>
+            Fuente: {getSourceLabel(item)}
+          </Text>
+        </View>
+
+        <View
+          style={{
+            paddingHorizontal: 10,
+            paddingVertical: 6,
+            borderRadius: 999,
+            backgroundColor: '#1a1a1a',
+            borderWidth: 1,
+            borderColor: '#262626',
+          }}
+        >
+          <Text style={{ color: '#c7c7c7', fontSize: 11, fontWeight: '700' }}>
+            {item.aiGenerated ? 'IA: Sí' : 'IA: No'}
+          </Text>
+        </View>
+      </View>
+
+      <Text style={{ color: '#777', fontSize: 12, marginTop: 8 }}>
+        Creado: {formatDate(item.createdAt || item.fecha)}
+      </Text>
+
+      <View style={{ marginTop: 8 }}>
+        <Text
+          style={{
+            color: getAiConfidenceColor(item?.aiConfidenceScore),
+            fontSize: 12,
+            fontWeight: '700',
+          }}
+        >
+          Confianza IA: {getAiConfidenceLabel(item?.aiConfidenceScore)}
+          {item?.aiConfidenceScore ? ` (${Number(item.aiConfidenceScore).toFixed(2)})` : ''}
+        </Text>
+
+        <Text
+          style={{
+            color: getImageValidationColor(item),
+            fontSize: 12,
+            fontWeight: '700',
+            marginTop: 4,
+          }}
+        >
+          {getImageValidationLabel(item)}
+        </Text>
+
+        {!!item?.imageValidation?.reason && (
+          <Text style={{ color: '#777', fontSize: 12, marginTop: 4 }}>
+            Motivo imagen: {item.imageValidation.reason}
+          </Text>
+        )}
+
+        {!!item?.aiSuggestion && (
+          <View
+            style={{
+              marginTop: 10,
+              padding: 10,
+              borderRadius: 10,
+              backgroundColor: '#16131d',
+              borderWidth: 1,
+              borderColor: '#2c2340',
+            }}
+          >
+            <Text style={{ color: '#c7a6ff', fontWeight: '800', marginBottom: 6 }}>
+              Sugerencia IA
+            </Text>
+            <Text style={{ color: '#ddd', fontSize: 12 }}>
+              Nombre: {item.aiSuggestion.name || item.aiSuggestion.nombre || '—'}
+            </Text>
+            <Text style={{ color: '#ddd', fontSize: 12, marginTop: 2 }}>
+              Marca: {item.aiSuggestion.brand || item.aiSuggestion.marca || '—'}
+            </Text>
+            <Text style={{ color: '#ddd', fontSize: 12, marginTop: 2 }}>
+              Specialty sugerido:{' '}
+              {typeof item.aiSuggestion.isSpecialty === 'boolean'
+                ? item.aiSuggestion.isSpecialty
+                  ? 'Sí'
+                  : 'No'
+                : '—'}
+            </Text>
+            {!!item.aiSuggestion.summary && (
+              <Text style={{ color: '#cfc3ef', fontSize: 12, marginTop: 6 }}>
+                {item.aiSuggestion.summary}
+              </Text>
+            )}
+          </View>
+        )}
+      </View>
 
       <View style={{ flexDirection: 'row', marginTop: 10, gap: 12, flexWrap: 'wrap' }}>
         {renderActions(item)}

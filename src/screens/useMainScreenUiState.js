@@ -4,11 +4,12 @@ import { useRef, useState } from 'react';
 import { Animated } from 'react-native';
 import { MAIN_TABS } from './mainScreenTabs';
 
-export default function useMainScreenUiState({ keyProfile }) {
+export default function useMainScreenUiState({ keyProfile, createPendingCoffee }) {
   const [activeTab, setActiveTab] = useState(MAIN_TABS.HOME);
   const [scanning, setScanning] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [scannedData, setScannedData] = useState(null);
 
   const [busqueda, setBusqueda] = useState('');
   const [busquedaTop, setBusquedaTop] = useState('');
@@ -83,8 +84,30 @@ export default function useMainScreenUiState({ keyProfile }) {
 
   const closeDialog = () => setDialogVisible(false);
 
-  const closeScannerAndOpenForm = () => {
+  const closeScannerAndOpenForm = async (scanResult) => {
     setScanning(false);
+
+    if (scanResult?.ean) {
+      setScannedData(scanResult);
+    }
+
+    if (scanResult?.autoCreate && scanResult?.ean && typeof createPendingCoffee === 'function') {
+      try {
+        await createPendingCoffee(scanResult);
+        setActiveTab(MAIN_TABS.ADMIN);
+        showDialog(
+          'Café pendiente creado',
+          `Se ha creado un registro pendiente para el EAN ${scanResult.ean}. Ya puedes revisarlo en el panel admin.`
+        );
+        return;
+      } catch {
+        showDialog(
+          'No se pudo crear automáticamente',
+          'Abrimos el formulario para que completes el café manualmente.'
+        );
+      }
+    }
+
     setShowForm(true);
   };
 
@@ -119,6 +142,9 @@ export default function useMainScreenUiState({ keyProfile }) {
 
     showProfile,
     setShowProfile,
+
+    scannedData,
+    setScannedData,
 
     busqueda,
     setBusqueda,

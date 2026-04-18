@@ -47,7 +47,8 @@ const BOOTSTRAP_KEYS = {
 
 export default function useMainScreenComposition({ onLogout, services, ui }) {
   const { user } = useAuth();
-  const { restoreAuthTokenFromSecureStore, setDocument, addDocument } = services;
+  const { restoreAuthTokenFromSecureStore, setDocument, addDocument, queryCollection } = services;
+
   const {
     CardHorizontal,
     CardVertical,
@@ -58,18 +59,46 @@ export default function useMainScreenComposition({ onLogout, services, ui }) {
     styles,
   } = ui;
 
-  const createPendingCoffee = (scanResult) =>
-    addDocument('coffees', {
+  const createPendingCoffee = async (scanResult) => {
+    if (!scanResult?.ean) {
+      throw new Error('SCAN_RESULT_WITHOUT_EAN');
+    }
+
+    const existing = await queryCollection('cafes', 'ean', scanResult.ean);
+    if (existing?.length) {
+      return existing[0];
+    }
+
+    return addDocument('cafes', {
       ean: scanResult.ean,
-      name: scanResult.name || null,
-      brand: scanResult.brand || null,
-      foto: scanResult.foto || null,
+
+      nombre: scanResult.name || '',
+      origen: '',
+      puntuacion: 0,
+      notas: '',
+      foto: scanResult.foto || '',
+
       reviewStatus: 'pending',
+      sourceType: 'scanner_pending',
+
+      aiGenerated: false,
+      aiConfidenceScore: 0,
+      aiSuggestion: {},
+      aiStatus: 'queued',
+
+      imageValidation: {
+        status: 'pending',
+      },
+
       isSpecialty: false,
       appVisible: false,
       scannerVisible: true,
+
+      uid: user?.uid || '',
       createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     });
+  };
 
   const screenUi = useMainScreenUiState({
     keyProfile: KEY_PROFILE,

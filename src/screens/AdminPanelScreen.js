@@ -85,6 +85,9 @@ export default function AdminPanelScreen() {
   const [editBrand, setEditBrand] = useState('');
   const [editEan, setEditEan] = useState('');
   const [editIsSpecialty, setEditIsSpecialty] = useState(false);
+  const [editReviewStatus, setEditReviewStatus] = useState(FILTERS.PENDING);
+  const [editAppVisible, setEditAppVisible] = useState(false);
+  const [editScannerVisible, setEditScannerVisible] = useState(true);
   const [editError, setEditError] = useState('');
 
   const loadCounters = useCallback(async () => {
@@ -185,6 +188,9 @@ export default function AdminPanelScreen() {
     setEditBrand(coffee?.brand || coffee?.roaster || '');
     setEditEan(coffee?.ean || '');
     setEditIsSpecialty(!!coffee?.isSpecialty);
+    setEditReviewStatus(coffee?.reviewStatus || FILTERS.PENDING);
+    setEditAppVisible(!!coffee?.appVisible);
+    setEditScannerVisible(coffee?.scannerVisible !== false);
     setEditError('');
   };
 
@@ -194,6 +200,9 @@ export default function AdminPanelScreen() {
     setEditBrand('');
     setEditEan('');
     setEditIsSpecialty(false);
+    setEditReviewStatus(FILTERS.PENDING);
+    setEditAppVisible(false);
+    setEditScannerVisible(true);
     setEditError('');
   };
 
@@ -209,11 +218,23 @@ export default function AdminPanelScreen() {
       return;
     }
 
+    if (normalizedEan) {
+      const sameEanDocs = await queryCollection('coffees', 'ean', normalizedEan);
+      const duplicate = sameEanDocs.find((docItem) => docItem.id !== editingCoffee.id);
+      if (duplicate) {
+        setEditError('Ya existe otro café con ese EAN en la base de datos.');
+        return;
+      }
+    }
+
     await updateDocument('coffees', editingCoffee.id, {
       name: editName,
       brand: editBrand,
       ean: normalizedEan,
       isSpecialty: editIsSpecialty,
+      reviewStatus: editReviewStatus,
+      appVisible: editAppVisible,
+      scannerVisible: editScannerVisible,
     });
 
     closeEditor();
@@ -513,6 +534,109 @@ export default function AdminPanelScreen() {
                 >
                   <Text style={{ color: !editIsSpecialty ? '#ff9' : '#ddd', fontWeight: '700' }}>
                     No Specialty
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              <Text style={{ color: '#aaa', marginBottom: 10 }}>Estado de revisión</Text>
+              <View style={{ flexDirection: 'row', gap: 8, marginBottom: 18, flexWrap: 'wrap' }}>
+                <TouchableOpacity
+                  onPress={() => setEditReviewStatus(FILTERS.PENDING)}
+                  style={{
+                    paddingHorizontal: 12,
+                    paddingVertical: 10,
+                    borderRadius: 999,
+                    borderWidth: 1,
+                    borderColor: editReviewStatus === FILTERS.PENDING ? '#caa27c' : '#2a2a2a',
+                    backgroundColor: editReviewStatus === FILTERS.PENDING ? '#2b1d15' : '#111',
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: editReviewStatus === FILTERS.PENDING ? '#f4d7b8' : '#ddd',
+                      fontWeight: '700',
+                    }}
+                  >
+                    Pendiente
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => setEditReviewStatus(FILTERS.APPROVED)}
+                  style={{
+                    paddingHorizontal: 12,
+                    paddingVertical: 10,
+                    borderRadius: 999,
+                    borderWidth: 1,
+                    borderColor: editReviewStatus === FILTERS.APPROVED ? '#0f0' : '#2a2a2a',
+                    backgroundColor: editReviewStatus === FILTERS.APPROVED ? '#132413' : '#111',
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: editReviewStatus === FILTERS.APPROVED ? '#9f9' : '#ddd',
+                      fontWeight: '700',
+                    }}
+                  >
+                    Aprobado
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => setEditReviewStatus(FILTERS.REJECTED)}
+                  style={{
+                    paddingHorizontal: 12,
+                    paddingVertical: 10,
+                    borderRadius: 999,
+                    borderWidth: 1,
+                    borderColor: editReviewStatus === FILTERS.REJECTED ? '#f55' : '#2a2a2a',
+                    backgroundColor: editReviewStatus === FILTERS.REJECTED ? '#2b1212' : '#111',
+                  }}
+                >
+                  <Text
+                    style={{
+                      color: editReviewStatus === FILTERS.REJECTED ? '#ff9f9f' : '#ddd',
+                      fontWeight: '700',
+                    }}
+                  >
+                    Rechazado
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              <Text style={{ color: '#aaa', marginBottom: 10 }}>Visibilidad</Text>
+              <View style={{ flexDirection: 'row', gap: 8, marginBottom: 18, flexWrap: 'wrap' }}>
+                <TouchableOpacity
+                  onPress={() => setEditAppVisible(!editAppVisible)}
+                  style={{
+                    paddingHorizontal: 12,
+                    paddingVertical: 10,
+                    borderRadius: 999,
+                    borderWidth: 1,
+                    borderColor: editAppVisible ? '#0f0' : '#2a2a2a',
+                    backgroundColor: editAppVisible ? '#132413' : '#111',
+                  }}
+                >
+                  <Text style={{ color: editAppVisible ? '#9f9' : '#ddd', fontWeight: '700' }}>
+                    App visible: {editAppVisible ? 'Sí' : 'No'}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => setEditScannerVisible(!editScannerVisible)}
+                  style={{
+                    paddingHorizontal: 12,
+                    paddingVertical: 10,
+                    borderRadius: 999,
+                    borderWidth: 1,
+                    borderColor: editScannerVisible ? '#caa27c' : '#2a2a2a',
+                    backgroundColor: editScannerVisible ? '#2b1d15' : '#111',
+                  }}
+                >
+                  <Text
+                    style={{ color: editScannerVisible ? '#f4d7b8' : '#ddd', fontWeight: '700' }}
+                  >
+                    Scanner visible: {editScannerVisible ? 'Sí' : 'No'}
                   </Text>
                 </TouchableOpacity>
               </View>

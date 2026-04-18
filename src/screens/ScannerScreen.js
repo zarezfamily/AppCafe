@@ -1,13 +1,36 @@
 import { Ionicons } from '@expo/vector-icons';
 import { CameraView } from 'expo-camera';
-import React from 'react';
+import { useRef } from 'react';
 import { StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function ScannerScreen({ onScanned, onSkip, onBack, premiumAccent }) {
+  const scannedRef = useRef(false);
+
+  const handleScan = (event) => {
+    if (scannedRef.current) return;
+
+    const raw = event?.data || '';
+    const normalized = String(raw).replace(/\D/g, '');
+
+    if (normalized.length < 8) return;
+
+    scannedRef.current = true;
+
+    onScanned?.({
+      raw,
+      ean: normalized,
+      type: event?.type,
+    });
+
+    setTimeout(() => {
+      scannedRef.current = false;
+    }, 2000);
+  };
+
   return (
     <View style={styles.screen}>
       <StatusBar barStyle="light-content" />
-      <CameraView onBarcodeScanned={onScanned} style={StyleSheet.absoluteFillObject} />
+      <CameraView onBarcodeScanned={handleScan} style={StyleSheet.absoluteFillObject} />
       <View style={styles.overlay}>
         <View style={styles.top} />
         <View style={styles.middle}>

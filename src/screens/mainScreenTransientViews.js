@@ -1,6 +1,5 @@
-import React from 'react';
-import { Animated, SafeAreaView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Animated, SafeAreaView, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 
 import AppDialogModal from '../components/AppDialogModal';
 import OnboardingModal from '../components/OnboardingModal';
@@ -25,6 +24,7 @@ export function renderMainScreenTransientView({
   setCafeDetalle,
   setScanning,
   showDialog,
+  scannedData,
 }) {
   if (scanning && !permission?.granted) {
     return (
@@ -42,14 +42,31 @@ export function renderMainScreenTransientView({
   if (scanning) {
     return (
       <ScannerScreen
-        onScanned={onScannerDone}
-        onSkip={onScannerDone}
+        onScanned={(result) => {
+          const ean = result?.ean;
+
+          if (!ean) {
+            showDialog?.('Error', 'No se ha podido leer el código');
+            return;
+          }
+
+          const existing = allCafes.find((c) => String(c?.ean || '').trim() === ean);
+
+          if (existing) {
+            setScanning(false);
+            setCafeDetalle?.(existing);
+            return;
+          }
+
+          onScannerDone?.({
+            ...result,
+            isNew: true,
+            autoCreate: true,
+          });
+        }}
+        onSkip={() => onScannerDone?.({ skip: true })}
         onBack={onScannerBack}
         premiumAccent={premiumAccent}
-        cafes={allCafes}
-        setCafeDetalle={setCafeDetalle}
-        setScanning={setScanning}
-        showDialog={showDialog}
       />
     );
   }
@@ -62,6 +79,7 @@ export function renderMainScreenTransientView({
         onBack={onFormBack}
         onSave={onFormSave}
         onCafeAdded={onCafeAdded}
+        scannedData={scannedData}
       />
     );
   }

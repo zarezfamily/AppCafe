@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -14,16 +14,18 @@ import {
   View,
 } from 'react-native';
 
+import Stars from '../components/Stars';
+import { useAuth } from '../context/AuthContext';
 import {
   addDocument,
   getDocument,
+  queryCollection,
   setDocument,
   updateDocument,
 } from '../services/firestoreService';
-import Stars from '../components/Stars';
-import { useAuth } from '../context/AuthContext';
+import { uploadImageToStorage } from '../services/storageService';
 
-export default function FormScreen({ onSave, onBack, onCafeAdded, s, premiumAccent }) {
+export default function FormScreen({ onSave, onBack, onCafeAdded, s, premiumAccent, scannedData }) {
   const { user } = useAuth();
   const [nombreCafe, setNombreCafe] = useState('');
   const [origen, setOrigen] = useState('');
@@ -31,6 +33,13 @@ export default function FormScreen({ onSave, onBack, onCafeAdded, s, premiumAcce
   const [rating, setRating] = useState(0);
   const [foto, setFoto] = useState(null);
   const [subiendo, setSubiendo] = useState(false);
+  const [ean, setEan] = useState(scannedData?.ean || '');
+
+  useEffect(() => {
+    if (scannedData?.ean) {
+      setEan(scannedData.ean);
+    }
+  }, [scannedData]);
 
   const hacerFoto = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
@@ -52,17 +61,75 @@ export default function FormScreen({ onSave, onBack, onCafeAdded, s, premiumAcce
     setSubiendo(true);
 
     try {
+      const isFromScanner = !!scannedData?.ean;
+
+      const normalizedEan = String(ean || '')
+        .replace(/\s+/g, '')
+        .trim();
+
+      if (normalizedEan) {
+        const existingByEan = await queryCollection('cafes', 'ean', normalizedEan);
+        if (existingByEan?.length) {
+          Alert.alert('Ya existe', 'Ya hay un café con ese EAN en la base de datos.');
+          setSubiendo(false);
+          return;
+        }
+      }
+
+      let finalFoto = foto || '';
+      if (finalFoto && !String(finalFoto).startsWith('http')) {
+        finalFoto = await uploadImageToStorage(finalFoto, 'cafes');
+      }
+
+      const now = new Date().toISOString();
+
       const cafePayload = {
         nombre: nombreCafe.trim(),
         origen: origen.trim(),
         puntuacion: rating,
         notas,
-        foto: foto || '',
-        fecha: new Date().toISOString(),
+        foto: finalFoto,
+        fecha: now,
+        createdAt: now,
+        updatedAt: now,
         uid: user.uid,
+        ean: normalizedEan,
+
+        reviewStatus: isFromScanner ? 'pending' : 'approved',
+        sourceType: isFromScanner ? 'scanner_pending' : 'manual',
+        aiGenerated: false,
+        aiConfidenceScore: 0,
+        aiSuggestion: {},
+        aiStatus: isFromScanner ? 'queued' : 'manual',
+        imageValidation: {
+          status: finalFoto ? 'pending' : 'not_provided',
+        },
+        isSpecialty: true,
+        appVisible: !isFromScanner,
+        scannerVisible: true,
       };
 
       const created = await addDocument('cafes', cafePayload);
+
+      if (isFromScanner && created?.id) {
+        await addDocument('ai_jobs', {
+          type: 'coffee_enrichment',
+          targetCollection: 'cafes',
+          targetId: created.id,
+          status: 'queued',
+          sourceType: 'scanner_pending',
+          ean: normalizedEan,
+          foto: finalFoto || '',
+          payload: {
+            nombre: nombreCafe.trim(),
+            origen: origen.trim(),
+            notas,
+          },
+          createdAt: now,
+          updatedAt: now,
+          uid: user.uid,
+        });
+      }
 
       const rankId = nombreCafe
         .trim()
@@ -81,9 +148,19 @@ export default function FormScreen({ onSave, onBack, onCafeAdded, s, premiumAcce
       onCafeAdded?.({
         ...cafePayload,
         id: created?.id || rankId,
+        aiJobQueued: isFromScanner,
       });
+
+      if (isFromScanner) {
+        Alert.alert(
+          'Café enviado a revisión',
+          'Se ha creado el café pendiente y se ha puesto en cola para enriquecimiento automático con IA.'
+        );
+      }
+
       onSave?.();
-    } catch {
+    } catch (error) {
+      console.log('Error guardando café:', error);
       Alert.alert('Error', 'No se pudo guardar el café.');
     } finally {
       setSubiendo(false);
@@ -98,6 +175,7 @@ export default function FormScreen({ onSave, onBack, onCafeAdded, s, premiumAcce
           <Ionicons name="chevron-back" size={20} color={premiumAccent} />
           <Text style={s.backText}>Volver</Text>
         </TouchableOpacity>
+
         <Text style={s.formTitle}>Nuevo café</Text>
 
         <TouchableOpacity style={foto ? undefined : s.fotoEmpty} onPress={hacerFoto}>
@@ -110,11 +188,22 @@ export default function FormScreen({ onSave, onBack, onCafeAdded, s, premiumAcce
             </>
           )}
         </TouchableOpacity>
+
         {foto && (
           <TouchableOpacity onPress={hacerFoto}>
             <Text style={s.retake}>Cambiar foto</Text>
           </TouchableOpacity>
         )}
+
+        <Text style={s.label}>EAN (código de barras)</Text>
+        <TextInput
+          style={s.input}
+          placeholder="Ej: 8411234567890"
+          placeholderTextColor="#bbb"
+          value={ean}
+          onChangeText={setEan}
+          keyboardType="number-pad"
+        />
 
         <Text style={s.label}>Nombre del café</Text>
         <TextInput

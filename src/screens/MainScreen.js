@@ -1,7 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-//  App.js — Etiove ☕  v2.1
-// ─────────────────────────────────────────────────────────────────────────────
-
 import { SafeAreaView } from 'react-native';
 
 import { CardHorizontal, CardVertical } from '../components/Cards';
@@ -75,6 +71,7 @@ export default function MainScreen({ onLogout }) {
     setCafeDetalle: ui.setCafeDetalle,
     setScanning: ui.setScanning,
     showDialog: ui.showDialog,
+    scannedData: ui.scannedData,
   });
 
   if (transientView) {
@@ -121,7 +118,6 @@ export default function MainScreen({ onLogout }) {
         misCafesTabProps={tabProps.misCafesTabProps}
         ultimosAnadidosTabProps={tabProps.ultimosAnadidosTabProps}
         topCafesTabProps={tabProps.topCafesTabProps}
-        trendingTabProps={tabProps.trendingTabProps}
         ofertasTabProps={tabProps.ofertasTabProps}
         masTabProps={tabProps.masTabProps}
         bottomBarProps={tabProps.bottomBarProps}

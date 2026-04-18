@@ -35,12 +35,15 @@ const mapAuthError = (errorMessage, fallbackMessage) => {
   return rawMessage || fallbackMessage;
 };
 
-export const saveAuthTokenToSecureStore = async (token) => {
+export const saveAuthTokenToSecureStore = async (token, refreshToken) => {
   try {
     if (token) {
       await SecureStore.setItemAsync('authToken', token);
     } else {
       await SecureStore.deleteItemAsync('authToken');
+    }
+    if (refreshToken) {
+      await SecureStore.setItemAsync('authRefreshToken', refreshToken);
     }
   } catch (e) {
     console.warn('[SecureStore] Error saving token:', e);
@@ -60,6 +63,32 @@ export const restoreAuthTokenFromSecureStore = async () => {
   return null;
 };
 
+export const refreshIdToken = async () => {
+  try {
+    const refreshToken = await SecureStore.getItemAsync('authRefreshToken');
+    if (!refreshToken) return null;
+
+    const res = await fetch(`https://securetoken.googleapis.com/v1/token?key=${FIREBASE_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ grant_type: 'refresh_token', refresh_token: refreshToken }),
+    });
+    const json = await res.json();
+    if (!res.ok) return null;
+
+    const newToken = json.id_token;
+    const newRefresh = json.refresh_token;
+    if (newToken) {
+      setAuthToken(newToken);
+      await saveAuthTokenToSecureStore(newToken, newRefresh);
+    }
+    return newToken || null;
+  } catch (e) {
+    console.warn('[Auth] Error refreshing token:', e);
+    return null;
+  }
+};
+
 export const registerUser = async (email, password) => {
   const res = await fetch(`${AUTH_URL}:signUp?key=${FIREBASE_API_KEY}`, {
     method: 'POST',
@@ -73,7 +102,7 @@ export const registerUser = async (email, password) => {
   }
 
   setAuthToken(json.idToken);
-  await saveAuthTokenToSecureStore(json.idToken);
+  await saveAuthTokenToSecureStore(json.idToken, json.refreshToken);
   return { uid: json.localId, email: json.email, token: json.idToken };
 };
 
@@ -90,7 +119,7 @@ export const loginUser = async (email, password) => {
   }
 
   setAuthToken(json.idToken);
-  await saveAuthTokenToSecureStore(json.idToken);
+  await saveAuthTokenToSecureStore(json.idToken, json.refreshToken);
   return { uid: json.localId, email: json.email, token: json.idToken };
 };
 

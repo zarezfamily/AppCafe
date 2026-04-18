@@ -1,5 +1,6 @@
 import { BASE_URL, FIREBASE_API_KEY, authHeaders } from './firebaseCore';
 import { docToObject, toFields, toFirestoreValue } from './firestoreMappers';
+import { refreshIdToken } from './authService';
 
 const normalizeFirestoreError = (error, operation) => {
   const message = String(error?.message || error || '');
@@ -16,7 +17,20 @@ const normalizeFirestoreError = (error, operation) => {
 
 const firestoreFetch = async (url, options, operation) => {
   try {
-    return await fetch(url, options);
+    let res = await fetch(url, options);
+
+    if (res.status === 401 || res.status === 403) {
+      const newToken = await refreshIdToken();
+      if (newToken) {
+        const retryOptions = {
+          ...options,
+          headers: { ...options.headers, Authorization: `Bearer ${newToken}` },
+        };
+        res = await fetch(url, retryOptions);
+      }
+    }
+
+    return res;
   } catch (error) {
     console.log('[Firestore] Network error:', operation, String(error?.message || error));
     throw normalizeFirestoreError(error, operation);

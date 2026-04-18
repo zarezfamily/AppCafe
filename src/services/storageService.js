@@ -4,7 +4,9 @@ import {
   FIREBASE_STORAGE_BUCKET,
   clientHeaders,
   getAuthToken,
+  setAuthToken,
 } from './firebaseCore';
+import { refreshIdToken } from './authService';
 
 export const uploadImageToStorage = async (uri, folder = 'uploads') => {
   if (!uri) throw new Error('URI de imagen no válida');
@@ -35,32 +37,41 @@ export const uploadImageToStorage = async (uri, folder = 'uploads') => {
     headers.Authorization = `Bearer ${authToken}`;
   }
 
-  let lastError = null;
+  const tryUpload = async (uploadHeaders) => {
+    for (const bucketName of bucketCandidates) {
+      const uploadUrl = `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o?uploadType=media&name=${encodeURIComponent(fileName)}&key=${FIREBASE_API_KEY}`;
+      const upRes = await fetch(uploadUrl, { method: 'POST', headers: uploadHeaders, body: blob });
+      const upJson = await upRes.json().catch(() => ({}));
 
-  for (const bucketName of bucketCandidates) {
-    const uploadUrl = `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o?uploadType=media&name=${encodeURIComponent(fileName)}&key=${FIREBASE_API_KEY}`;
-    const upRes = await fetch(uploadUrl, {
-      method: 'POST',
-      headers,
-      body: blob,
-    });
-    const upJson = await upRes.json().catch(() => ({}));
+      if (upRes.ok) {
+        const objectName = upJson.name || fileName;
+        const encodedName = encodeURIComponent(objectName);
+        const dlToken = upJson.downloadTokens || upJson.metadata?.downloadTokens || '';
+        return dlToken
+          ? `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodedName}?alt=media&token=${dlToken}`
+          : `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodedName}?alt=media`;
+      }
 
-    if (upRes.ok) {
-      const objectName = upJson.name || fileName;
-      const encodedName = encodeURIComponent(objectName);
-      const token = upJson.downloadTokens || upJson.metadata?.downloadTokens || '';
-      return token
-        ? `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodedName}?alt=media&token=${token}`
-        : `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodedName}?alt=media`;
+      if (upRes.status === 401 || upRes.status === 403) {
+        return { authError: true };
+      }
+
+      if (upRes.status !== 404) {
+        throw new Error(upJson?.error?.message || `Storage error ${upRes.status}`);
+      }
     }
+    throw new Error('No se pudo subir imagen a Firebase Storage');
+  };
 
-    lastError =
-      upJson?.error?.message || `No se pudo subir imagen a Firebase Storage (${upRes.status})`;
-    if (upRes.status !== 404) {
-      break;
-    }
+  let result = await tryUpload(headers);
+
+  if (result?.authError) {
+    const newToken = await refreshIdToken();
+    if (!newToken) throw new Error('SESSION_EXPIRED');
+    const retryHeaders = { ...headers, Authorization: `Bearer ${newToken}` };
+    result = await tryUpload(retryHeaders);
+    if (result?.authError) throw new Error('SESSION_EXPIRED');
   }
 
-  throw new Error(lastError || 'No se pudo subir imagen a Firebase Storage');
+  return result;
 };

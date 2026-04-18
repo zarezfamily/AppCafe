@@ -68,6 +68,18 @@ function ExistingCafeMatchScreen({ cafe, premiumAccent, onOpenNow, onClose }) {
   const matchCopy = getCafeMatchCopy(cafe);
 
   useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 220,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
     if (!matchCopy.autoOpen) {
       setProgress(1);
       return undefined;

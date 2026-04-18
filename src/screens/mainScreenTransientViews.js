@@ -68,27 +68,15 @@ function getCafeMatchCopy(cafe) {
     };
   }
 
-  if (mode === 'rejected' && incomplete) {
+  if (mode === 'rejected') {
     return {
-      title: 'Registro incompleto 🚫',
+      title: 'Reintentar identificación 🔁',
       description:
-        'Este café ya existe pero fue rechazado o quedó incompleto. Puedes añadir una foto para reintentar la identificación.',
+        'Este café fue rechazado anteriormente. Puedes añadir una foto nueva y volver a lanzarlo a IA.',
       primaryLabel: 'Añadir foto y reintentar',
       secondaryLabel: 'Ver ficha',
       autoOpen: false,
       action: 'recover',
-    };
-  }
-
-  if (mode === 'rejected') {
-    return {
-      title: 'Ya existe, pero fue rechazado 🚫',
-      description:
-        'Este registro ya existe en Etiove pero fue rechazado o desactivado. Puedes abrir su ficha para revisarlo.',
-      primaryLabel: 'Ver ficha',
-      secondaryLabel: 'Cerrar',
-      autoOpen: false,
-      action: 'open',
     };
   }
 

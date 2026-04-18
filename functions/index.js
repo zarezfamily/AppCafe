@@ -634,6 +634,7 @@ exports.onAiJobCreatedProcessCoffee = onDocumentCreated(
           skipped: true,
           skipReason: 'already_enriched',
           updatedAt: new Date().toISOString(),
+          error: admin.firestore.FieldValue.delete(),
         });
         return;
       }

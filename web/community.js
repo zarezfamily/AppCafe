@@ -2887,8 +2887,6 @@ const refreshFirebaseToken = async () => {
       body: `grant_type=refresh_token&refresh_token=${encodeURIComponent(refreshToken)}`,
     });
     if (!res.ok) {
-      // Token inválido o revocado → mostrar banner y limpiar sesión
-      showSessionExpiredBanner();
       clearAuthToken();
       renderAuthState();
       return;

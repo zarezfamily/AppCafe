@@ -121,6 +121,7 @@ export default function MainScreen({ onLogout }) {
         misCafesTabProps={tabProps.misCafesTabProps}
         ultimosAnadidosTabProps={tabProps.ultimosAnadidosTabProps}
         topCafesTabProps={tabProps.topCafesTabProps}
+        trendingTabProps={tabProps.trendingTabProps}
         ofertasTabProps={tabProps.ofertasTabProps}
         masTabProps={tabProps.masTabProps}
         bottomBarProps={tabProps.bottomBarProps}

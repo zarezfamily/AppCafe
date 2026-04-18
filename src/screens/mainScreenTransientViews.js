@@ -23,25 +23,55 @@ function normalizeEan(value) {
     .trim();
 }
 
+function getCafeMatchMode(cafe) {
+  const status = String(cafe?.reviewStatus || '').toLowerCase();
+  if (status === 'pending') return 'pending';
+  if (status === 'rejected') return 'rejected';
+  return 'approved';
+}
+
+function getCafeMatchCopy(cafe) {
+  const mode = getCafeMatchMode(cafe);
+
+  if (mode === 'pending') {
+    return {
+      title: 'Ya está en revisión ⏳',
+      description:
+        'Este café ya fue detectado y está pendiente de validación. Puedes ver su ficha provisional.',
+      primaryLabel: 'Ver ficha provisional',
+      autoOpen: false,
+    };
+  }
+
+  if (mode === 'rejected') {
+    return {
+      title: 'Ya existe, pero fue rechazado 🚫',
+      description:
+        'Este registro ya existe en Etiove pero fue rechazado o desactivado. Puedes abrir su ficha para revisarlo.',
+      primaryLabel: 'Ver ficha',
+      autoOpen: false,
+    };
+  }
+
+  return {
+    title: 'Ya lo tenemos ☕',
+    description: 'Este café ya está en Etiove. Abrimos su ficha automáticamente.',
+    primaryLabel: 'Ver ficha ahora',
+    autoOpen: true,
+  };
+}
+
 function ExistingCafeMatchScreen({ cafe, premiumAccent, onOpenNow, onClose }) {
   const [progress, setProgress] = useState(0);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.96)).current;
+  const matchCopy = getCafeMatchCopy(cafe);
 
   useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 260,
-        useNativeDriver: true,
-      }),
-      Animated.spring(scaleAnim, {
-        toValue: 1,
-        friction: 8,
-        tension: 70,
-        useNativeDriver: true,
-      }),
-    ]).start();
+    if (!matchCopy.autoOpen) {
+      setProgress(1);
+      return undefined;
+    }
 
     const start = Date.now();
     const duration = 900;
@@ -54,7 +84,7 @@ function ExistingCafeMatchScreen({ cafe, premiumAccent, onOpenNow, onClose }) {
     }, 16);
 
     return () => clearInterval(timer);
-  }, [fadeAnim, scaleAnim]);
+  }, [fadeAnim, scaleAnim, matchCopy.autoOpen]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#0b0b0b' }}>
@@ -111,7 +141,7 @@ function ExistingCafeMatchScreen({ cafe, premiumAccent, onOpenNow, onClose }) {
               marginBottom: 10,
             }}
           >
-            Ya lo tenemos ☕
+            {matchCopy.title}
           </Text>
 
           <Text
@@ -123,7 +153,7 @@ function ExistingCafeMatchScreen({ cafe, premiumAccent, onOpenNow, onClose }) {
               marginBottom: 26,
             }}
           >
-            Este café ya está en Etiove. Abrimos su ficha automáticamente.
+            {matchCopy.description}
           </Text>
 
           {!!cafe?.foto && (
@@ -254,7 +284,9 @@ function ExistingCafeMatchScreen({ cafe, premiumAccent, onOpenNow, onClose }) {
               marginBottom: 10,
             }}
           >
-            <Text style={{ color: '#111', fontWeight: '800', fontSize: 15 }}>Ver ficha ahora</Text>
+            <Text style={{ color: '#111', fontWeight: '800', fontSize: 15 }}>
+              {matchCopy.primaryLabel}
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -288,6 +320,9 @@ function ScannerMatchFlow({
 
   useEffect(() => {
     if (!matchedCafe) return undefined;
+
+    const matchCopy = getCafeMatchCopy(matchedCafe);
+    if (!matchCopy.autoOpen) return undefined;
 
     const timer = setTimeout(() => {
       setScanning(false);

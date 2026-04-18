@@ -61,20 +61,24 @@ export function renderMainScreenTransientView({
 
           if (existing) {
             setScanning(false);
+
+            // 🔥 UX PRO: feedback inmediato + auto apertura
             showDialog?.(
-              'Ya lo tenemos',
-              `${existing?.nombre || existing?.name || 'Este café'} ya está en la base de datos. Abrimos su ficha.`,
+              'Ya lo tenemos ☕',
+              `${existing?.nombre || existing?.name || 'Este café'} ya está en Etiove. Abriendo ficha...`,
               [
                 {
-                  label: 'Ver ficha',
+                  label: 'Abrir ahora',
                   onPress: () => setCafeDetalle?.(existing),
-                },
-                {
-                  label: 'Cerrar',
-                  variant: 'secondary',
                 },
               ]
             );
+
+            // apertura automática con pequeño delay (sensación fluida)
+            setTimeout(() => {
+              setCafeDetalle?.(existing);
+            }, 700);
+
             return;
           }
 

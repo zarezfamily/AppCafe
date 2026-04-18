@@ -50,7 +50,6 @@ export function renderMainScreenTransientView({
     return (
       <ScannerScreen
         onScanned={(result) => {
-          // 🔥 NORMALIZAMOS EAN
           const ean = normalizeEan(result?.ean);
 
           if (!ean) {
@@ -58,16 +57,27 @@ export function renderMainScreenTransientView({
             return;
           }
 
-          // 🔥 COMPARACIÓN ROBUSTA
           const existing = allCafes.find((c) => normalizeEan(c?.ean) === ean);
 
           if (existing) {
             setScanning(false);
-            setCafeDetalle?.(existing);
+            showDialog?.(
+              'Ya lo tenemos',
+              `${existing?.nombre || existing?.name || 'Este café'} ya está en la base de datos. Abrimos su ficha.`,
+              [
+                {
+                  label: 'Ver ficha',
+                  onPress: () => setCafeDetalle?.(existing),
+                },
+                {
+                  label: 'Cerrar',
+                  variant: 'secondary',
+                },
+              ]
+            );
             return;
           }
 
-          // 🔥 PASAMOS EAN LIMPIO
           onScannerDone?.({
             ...result,
             ean,

@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Animated, Easing } from 'react-native';
+import { refreshIdToken } from '../services/authService';
 import { MAIN_TABS } from './mainScreenTabs';
 
 export default function useMainScreenEffects({
@@ -35,9 +36,8 @@ export default function useMainScreenEffects({
   useEffect(() => {
     if (!userId) return;
     restoreAuthTokenFromSecureStore()
-      .then(() => {
-        setTimeout(() => cargarCatas(), 120);
-      })
+      .then(() => refreshIdToken().catch(() => null))
+      .then(() => cargarCatas())
       .catch((e) => console.warn('[Auth Token] Error:', e));
   }, [cargarCatas, restoreAuthTokenFromSecureStore, userId]);
 

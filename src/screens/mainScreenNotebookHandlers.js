@@ -15,7 +15,12 @@ export function createMainScreenNotebookHandlers({
       const ordenadas = (mias || []).sort((a, b) => new Date(b.fechaHora) - new Date(a.fechaHora));
       notebook.setCatas(ordenadas);
     } catch (error) {
-      console.error('Error cargar catas:', error);
+      const msg = String(error?.message || '');
+      if (msg === 'SESSION_EXPIRED') {
+        showDialog('Sesión caducada', 'Tu sesión ha caducado. Cierra sesión e inicia de nuevo.');
+      } else if (!msg.includes('NETWORK_UNAVAILABLE')) {
+        console.warn('[Catas] Error al cargar:', msg);
+      }
     } finally {
       notebook.setCargando(false);
     }

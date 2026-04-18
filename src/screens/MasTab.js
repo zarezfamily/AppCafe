@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
 import AppDialogModal from '../components/AppDialogModal';
 import MemberInfoModal from '../components/MemberInfoModal';
+import { useAuth } from '../context/AuthContext';
+import { MAIN_TABS } from './mainScreenTabs';
 import mas from './masStyles';
 import {
   AchievementsSection,
@@ -49,12 +51,29 @@ export default function MasTab({
   guardarFeedbackInteracciones,
   guardarModoFeedbackInteracciones,
 }) {
-  // Panel especial para admin/staff
-  const isAdmin = perfil?.role === 'admin';
+  const { user } = useAuth();
+
+  const adminEmail = 'ivancabeza@gmail.com';
+
+  const normalizedUserEmail = useMemo(
+    () =>
+      String(user?.email || perfil?.email || '')
+        .trim()
+        .toLowerCase(),
+    [user?.email, perfil?.email]
+  );
+
+  const isAdmin = perfil?.role === 'admin' || normalizedUserEmail === adminEmail;
+
   const isStaff = perfil?.role === 'staff';
+
   const [showMemberInfo, setShowMemberInfo] = useState(false);
   const [dialogVisible, setDialogVisible] = useState(false);
-  const [dialogConfig, setDialogConfig] = useState({ title: '', description: '', actions: [] });
+  const [dialogConfig, setDialogConfig] = useState({
+    title: '',
+    description: '',
+    actions: [],
+  });
 
   const openDialog = (title, description, actions) => {
     setDialogConfig({ title, description, actions });
@@ -64,7 +83,9 @@ export default function MasTab({
   const abrirAjustesFeedback = () => {
     openDialog(
       'Feedback sensorial',
-      `Estado: ${interactionFeedbackEnabled ? 'Activo' : 'Inactivo'}\nModo: ${interactionFeedbackMode === 'haptic' ? 'Táctil' : 'Sonido'}`,
+      `Estado: ${interactionFeedbackEnabled ? 'Activo' : 'Inactivo'}\nModo: ${
+        interactionFeedbackMode === 'haptic' ? 'Táctil' : 'Sonido'
+      }`,
       [
         {
           label: interactionFeedbackEnabled ? 'Desactivar' : 'Activar',
@@ -92,6 +113,7 @@ export default function MasTab({
   return (
     <View style={{ paddingTop: 20 }}>
       <MemberInfoModal visible={showMemberInfo} onClose={() => setShowMemberInfo(false)} />
+
       <AppDialogModal
         visible={!!dialogVisible}
         onClose={() => setDialogVisible(false)}
@@ -149,11 +171,13 @@ export default function MasTab({
           newsletterEmail={newsletterEmail}
         />
 
+        {/* 🔥 PANEL ADMIN */}
         <ModerationSection
           mas={mas}
           isAdmin={isAdmin}
           isStaff={isStaff}
           openDialog={openDialog}
+          onOpenAdminPanel={() => setActiveTab(MAIN_TABS.ADMIN)}
           premiumAccent={premiumAccent}
           iconFaint={iconFaint}
         />
@@ -173,6 +197,7 @@ export default function MasTab({
 
         <LogoutSection mas={mas} onLogout={onLogout} openDialog={openDialog} />
       </View>
+
       <View style={{ height: 20 }} />
     </View>
   );

@@ -1,0 +1,56 @@
+[
+  {
+    "nombre": "Café de especialidad Colombia Amor Perfecto",
+    "roaster": "Amor Perfecto",
+    "pais": "Colombia",
+    "formato": "250g",
+    "ean": "8437018654123",
+    "barcodeType": "EAN_13",
+    "sku": "AMORPERFECTO-COLOMBIA-250"
+  },
+  {
+    "nombre": "Café Etiopía Yirgacheffe",
+    "roaster": "Cafés El Magnífico",
+    "pais": "Etiopía",
+    "formato": "250g",
+    "ean": "",
+    "barcodeType": "EAN_13",
+    "sku": "MAGNIFICO-YIRGA-250"
+  },
+  {
+    "nombre": "Brasil Cerrado Natural",
+    "roaster": "Nomad Coffee",
+    "pais": "Brasil",
+    "formato": "250g",
+    "ean": "",
+    "barcodeType": "EAN_13",
+    "sku": "NOMAD-BRASIL-250"
+  },
+  {
+    "nombre": "Colombia Pink Bourbon",
+    "roaster": "Hola Coffee",
+    "pais": "Colombia",
+    "formato": "250g",
+    "ean": "",
+    "barcodeType": "EAN_13",
+    "sku": "HOLA-PINK-250"
+  },
+  {
+    "nombre": "Ethiopia Natural Guji",
+    "roaster": "Right Side Coffee",
+    "pais": "Etiopía",
+    "formato": "250g",
+    "ean": "",
+    "barcodeType": "EAN_13",
+    "sku": "RIGHTSIDE-GUJI-250"
+  },
+  {
+    "nombre": "Perú Cajamarca",
+    "roaster": "Ineffable Coffee",
+    "pais": "Perú",
+    "formato": "250g",
+    "ean": "",
+    "barcodeType": "EAN_13",
+    "sku": "INEFFABLE-PERU-250"
+  }
+]

@@ -114,6 +114,31 @@ function ActiveFilterChip({ label, onRemove, accentColor }) {
   );
 }
 
+function MatchBadge({ label }) {
+  return (
+    <View
+      style={{
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 999,
+        backgroundColor: '#f3e7d9',
+        borderWidth: 1,
+        borderColor: '#eadbce',
+      }}
+    >
+      <Text
+        style={{
+          fontSize: 10,
+          fontWeight: '800',
+          color: '#8f5e3b',
+        }}
+      >
+        {label}
+      </Text>
+    </View>
+  );
+}
+
 function FilterSection({ title, options, selected, onSelect, accentColor }) {
   if (!options?.length) return null;
 
@@ -255,6 +280,32 @@ export default function DiscoverTab({
     Boolean
   ).length;
 
+  const topDestacado = itemsFiltrados?.[0] || null;
+
+  const topPaisBase = useMemo(() => {
+    const first = buildRankedOptions(personalizedCafes, 'pais')[0];
+    return first?.label || null;
+  }, [personalizedCafes]);
+
+  const topProcesoBase = useMemo(() => {
+    const first = buildRankedOptions(personalizedCafes, 'proceso')[0];
+    return first?.label || null;
+  }, [personalizedCafes]);
+
+  const topRoasterBase = useMemo(() => {
+    const first = buildRankedOptions(personalizedCafes, 'roaster')[0];
+    return first?.label || null;
+  }, [personalizedCafes]);
+
+  const buildMatchReasons = (item) => {
+    const reasons = [];
+    if (topPaisBase && item?.pais === topPaisBase) reasons.push('Match país');
+    if (topProcesoBase && item?.proceso === topProcesoBase) reasons.push('Match proceso');
+    if (topRoasterBase && item?.roaster === topRoasterBase) reasons.push('Match tostador');
+    if (Number(item?.personalizedScore || 0) >= 8) reasons.push('Alta afinidad');
+    return reasons.slice(0, 3);
+  };
+
   const clearFilters = () => {
     setPaisSeleccionado(null);
     setProcesoSeleccionado(null);
@@ -306,7 +357,7 @@ export default function DiscoverTab({
             }}
           >
             Aquí priorizamos lo que mejor encaja contigo: países, procesos y tostadores que más se
-            repiten en tus gustos recientes.
+            repiten en tus gustos recientes y en tus cafés favoritos.
           </Text>
 
           <View
@@ -473,15 +524,82 @@ export default function DiscoverTab({
         <SkeletonVerticalList />
       ) : (
         <View style={{ paddingHorizontal: 16, marginTop: 16 }}>
+          {!!topDestacado && (
+            <View
+              style={{
+                marginBottom: 14,
+                borderRadius: 18,
+                borderWidth: 1,
+                borderColor: '#eadbce',
+                backgroundColor: '#fffaf5',
+                padding: 14,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 11,
+                  fontWeight: '800',
+                  color: '#8f5e3b',
+                  marginBottom: 6,
+                  letterSpacing: 0.8,
+                  textTransform: 'uppercase',
+                }}
+              >
+                TOP RECOMENDADO
+              </Text>
+              <Text style={{ fontSize: 18, fontWeight: '900', color: '#24160f' }}>
+                {topDestacado.nombre}
+              </Text>
+              <Text style={{ marginTop: 4, fontSize: 13, color: '#6f5a4b' }}>
+                {topDestacado.pais || 'Origen no indicado'}
+                {topDestacado.proceso ? ` · ${topDestacado.proceso}` : ''}
+                {topDestacado.roaster ? ` · ${topDestacado.roaster}` : ''}
+              </Text>
+              <Text style={{ marginTop: 8, fontSize: 13, color: '#8f5e3b', fontWeight: '800' }}>
+                {topDestacado.puntuacion || 0}.0 ⭐ · {topDestacado.votos || 0} votos
+              </Text>
+              {!!buildMatchReasons(topDestacado).length && (
+                <View
+                  style={{
+                    marginTop: 10,
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                    gap: 8,
+                  }}
+                >
+                  {buildMatchReasons(topDestacado).map((reason) => (
+                    <MatchBadge key={reason} label={reason} />
+                  ))}
+                </View>
+              )}
+            </View>
+          )}
+
           {itemsFiltrados.map((item) => (
-            <CardVertical
-              key={item.id}
-              item={item}
-              onDelete={() => {}}
-              onPress={setCafeDetalle}
-              favs={favs}
-              onToggleFav={toggleFav}
-            />
+            <View key={item.id} style={{ marginBottom: 10 }}>
+              {!!buildMatchReasons(item).length && (
+                <View
+                  style={{
+                    marginBottom: 8,
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                    gap: 8,
+                  }}
+                >
+                  {buildMatchReasons(item).map((reason) => (
+                    <MatchBadge key={`${item.id}-${reason}`} label={reason} />
+                  ))}
+                </View>
+              )}
+
+              <CardVertical
+                item={item}
+                onDelete={() => {}}
+                onPress={setCafeDetalle}
+                favs={favs}
+                onToggleFav={toggleFav}
+              />
+            </View>
           ))}
 
           {itemsFiltrados.length === 0 && (

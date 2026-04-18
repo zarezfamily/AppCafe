@@ -21,6 +21,10 @@ export function renderMainScreenTransientView({
   onCafeAdded,
   s,
   premiumAccent,
+  allCafes = [],
+  setCafeDetalle,
+  setScanning,
+  showDialog,
 }) {
   if (scanning && !permission?.granted) {
     return (
@@ -42,6 +46,10 @@ export function renderMainScreenTransientView({
         onSkip={onScannerDone}
         onBack={onScannerBack}
         premiumAccent={premiumAccent}
+        cafes={allCafes}
+        setCafeDetalle={setCafeDetalle}
+        setScanning={setScanning}
+        showDialog={showDialog}
       />
     );
   }

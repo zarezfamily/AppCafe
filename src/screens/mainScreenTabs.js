@@ -9,5 +9,7 @@ export const MAIN_TABS = {
   OFFERS: 'Ofertas',
   MORE: 'Más',
   CAFETERIAS: 'Cafeterías',
+
+  // 🔥 NUEVO
   ADMIN: 'PanelAdmin',
 };

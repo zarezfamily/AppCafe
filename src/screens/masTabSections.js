@@ -345,23 +345,212 @@ export function NewsletterSection({
   );
 }
 
-export function ModerationSection({ mas, isAdmin, isStaff, openDialog, premiumAccent, iconFaint }) {
+export function ModerationSection({
+  mas,
+  isAdmin,
+  isStaff,
+  openDialog,
+  onOpenAdminPanel,
+  premiumAccent,
+  iconFaint,
+}) {
   if (!isAdmin && !isStaff) return null;
+
+  const title = isAdmin ? 'Panel de administración' : 'Panel de staff';
+  const subtitle = isAdmin
+    ? 'Revisa cafés pendientes, aprueba specialty, marca no specialty y rechaza contenido inválido.'
+    : 'Accede a herramientas internas de moderación y revisión.';
 
   return (
     <>
-      <Text style={mas.blockTitle}>Panel de Moderación</Text>
+      <Text style={mas.blockTitle}>Panel interno</Text>
+
+      <View
+        style={[
+          mas.achievementsCard,
+          {
+            padding: 16,
+            borderRadius: 20,
+            borderWidth: 1,
+            borderColor: '#eadbce',
+            backgroundColor: '#fffaf5',
+            marginBottom: 14,
+          },
+        ]}
+      >
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 12,
+            marginBottom: 12,
+          }}
+        >
+          <View style={{ flex: 1 }}>
+            <Text
+              style={{
+                fontSize: 11,
+                fontWeight: '900',
+                color: '#8f5e3b',
+                letterSpacing: 1,
+                marginBottom: 6,
+              }}
+            >
+              ETIOVE ADMIN
+            </Text>
+            <Text
+              style={{
+                fontSize: 18,
+                fontWeight: '900',
+                color: '#24160f',
+              }}
+            >
+              {title}
+            </Text>
+            <Text
+              style={{
+                marginTop: 6,
+                fontSize: 13,
+                lineHeight: 19,
+                color: '#6f5a4b',
+              }}
+            >
+              {subtitle}
+            </Text>
+          </View>
+
+          <View
+            style={{
+              minWidth: 84,
+              alignItems: 'center',
+              justifyContent: 'center',
+              paddingHorizontal: 12,
+              paddingVertical: 10,
+              borderRadius: 16,
+              backgroundColor: '#24160f',
+            }}
+          >
+            <Text style={{ color: '#fff7ef', fontSize: 11, fontWeight: '900' }}>
+              {isAdmin ? 'ADMIN' : 'STAFF'}
+            </Text>
+          </View>
+        </View>
+
+        <View
+          style={{
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            gap: 10,
+            marginBottom: 14,
+          }}
+        >
+          <View
+            style={{
+              borderRadius: 999,
+              backgroundColor: '#f3e7d9',
+              borderWidth: 1,
+              borderColor: '#eadbce',
+              paddingHorizontal: 12,
+              paddingVertical: 8,
+            }}
+          >
+            <Text style={{ fontSize: 11, fontWeight: '800', color: '#8f5e3b' }}>
+              Revisar pendientes
+            </Text>
+          </View>
+          <View
+            style={{
+              borderRadius: 999,
+              backgroundColor: '#f3e7d9',
+              borderWidth: 1,
+              borderColor: '#eadbce',
+              paddingHorizontal: 12,
+              paddingVertical: 8,
+            }}
+          >
+            <Text style={{ fontSize: 11, fontWeight: '800', color: '#8f5e3b' }}>
+              Aprobar specialty
+            </Text>
+          </View>
+          <View
+            style={{
+              borderRadius: 999,
+              backgroundColor: '#f3e7d9',
+              borderWidth: 1,
+              borderColor: '#eadbce',
+              paddingHorizontal: 12,
+              paddingVertical: 8,
+            }}
+          >
+            <Text style={{ fontSize: 11, fontWeight: '800', color: '#8f5e3b' }}>
+              Marcar no specialty
+            </Text>
+          </View>
+        </View>
+
+        <TouchableOpacity
+          activeOpacity={0.88}
+          onPress={() => {
+            if (isAdmin && onOpenAdminPanel) {
+              onOpenAdminPanel();
+              return;
+            }
+
+            openDialog(
+              title,
+              isAdmin
+                ? 'El panel admin avanzado está listo para conectarse con la revisión de cafés pendientes, aprobaciones y rechazos.'
+                : 'Las herramientas de moderación del staff estarán disponibles en este módulo.',
+              [{ label: 'Cerrar' }]
+            );
+          }}
+          style={[
+            mas.newsletterBtn,
+            {
+              alignSelf: 'flex-start',
+              paddingHorizontal: 18,
+              paddingVertical: 12,
+              borderRadius: 999,
+            },
+          ]}
+        >
+          <Text style={mas.newsletterBtnText}>
+            {isAdmin ? 'ABRIR PANEL ADMIN' : 'ABRIR MODERACIÓN'}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       <View style={mas.listCard}>
         <MasItem
           icon="shield-checkmark-outline"
-          label={isAdmin ? 'Panel de administración' : 'Panel de staff'}
-          sub={isAdmin ? 'Gestión total del sistema' : 'Herramientas de moderación'}
+          label="Revisión de cafés"
+          sub="Pendientes, aprobados, rechazados y clasificación specialty"
+          onPress={() => {
+            if (isAdmin && onOpenAdminPanel) {
+              onOpenAdminPanel();
+              return;
+            }
+
+            openDialog(
+              'Revisión de cafés',
+              'Aquí podrás revisar los cafés detectados por escáner o foto, aprobarlos o rechazarlos.',
+              [{ label: 'Cerrar' }]
+            );
+          }}
+          mas={mas}
+          premiumAccent={premiumAccent}
+          iconFaint={iconFaint}
+        />
+
+        <MasItem
+          icon="sparkles-outline"
+          label="Validación IA"
+          sub="Usar IA para completar datos, detectar specialty y filtrar contenido inválido"
           onPress={() =>
             openDialog(
-              isAdmin ? 'Panel de administración' : 'Panel de staff',
-              isAdmin
-                ? 'La moderación avanzada ya está integrada en Comunidad. Si quieres, el siguiente paso es crear una pantalla admin real con métricas, reportes y acciones globales.'
-                : 'Las herramientas de moderación ya están integradas en Comunidad para editar, eliminar y revisar contenido.',
+              'Validación IA',
+              'La siguiente fase conectará el panel con IA para completar datos, detectar si un café es specialty y bloquear imágenes no relacionadas con café.',
               [{ label: 'Cerrar' }]
             )
           }

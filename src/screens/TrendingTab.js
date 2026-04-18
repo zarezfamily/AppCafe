@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useMemo, useState } from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SkeletonVerticalList } from '../components/SkeletonLoader';
 import { MAIN_TABS } from './mainScreenTabs';
 
@@ -100,17 +100,34 @@ function ActiveFilterChip({ label, onRemove, accentColor }) {
         backgroundColor: '#f5ebdf',
       }}
     >
+      <Text style={{ fontSize: 12, fontWeight: '800', color: accentColor }}>{label}</Text>
+      <Ionicons name="close" size={14} color={accentColor} />
+    </TouchableOpacity>
+  );
+}
+
+function MatchBadge({ label }) {
+  return (
+    <View
+      style={{
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 999,
+        backgroundColor: '#f3e7d9',
+        borderWidth: 1,
+        borderColor: '#eadbce',
+      }}
+    >
       <Text
         style={{
-          fontSize: 12,
+          fontSize: 10,
           fontWeight: '800',
-          color: accentColor,
+          color: '#8f5e3b',
         }}
       >
         {label}
       </Text>
-      <Ionicons name="close" size={14} color={accentColor} />
-    </TouchableOpacity>
+    </View>
   );
 }
 
@@ -221,15 +238,16 @@ export default function TrendingTab({
   favs,
   toggleFav,
 }) {
-  const [paisSeleccionado, setPaisSeleccionado] = useState(trendingFilters?.pais || null);
-  const [procesoSeleccionado, setProcesoSeleccionado] = useState(trendingFilters?.proceso || null);
-  const [roasterSeleccionado, setRoasterSeleccionado] = useState(trendingFilters?.roaster || null);
+  const [paisSeleccionado, setPaisSeleccionado] = useState(null);
+  const [procesoSeleccionado, setProcesoSeleccionado] = useState(null);
+  const [roasterSeleccionado, setRoasterSeleccionado] = useState(null);
   const [sortBy, setSortBy] = useState('trending');
 
   useEffect(() => {
-    setPaisSeleccionado(trendingFilters?.pais || null);
-    setProcesoSeleccionado(trendingFilters?.proceso || null);
-    setRoasterSeleccionado(trendingFilters?.roaster || null);
+    if (!trendingFilters) return;
+    setPaisSeleccionado(trendingFilters.pais || null);
+    setProcesoSeleccionado(trendingFilters.proceso || null);
+    setRoasterSeleccionado(trendingFilters.roaster || null);
   }, [trendingFilters]);
 
   useEffect(() => {
@@ -253,18 +271,9 @@ export default function TrendingTab({
     });
 
     return [...base].sort((a, b) => {
-      if (sortBy === 'rating') {
-        return Number(b?.puntuacion || 0) - Number(a?.puntuacion || 0);
-      }
-
-      if (sortBy === 'votes') {
-        return Number(b?.votos || 0) - Number(a?.votos || 0);
-      }
-
-      if (sortBy === 'recent') {
-        return parseDateValue(b?.fecha) - parseDateValue(a?.fecha);
-      }
-
+      if (sortBy === 'rating') return Number(b?.puntuacion || 0) - Number(a?.puntuacion || 0);
+      if (sortBy === 'votes') return Number(b?.votos || 0) - Number(a?.votos || 0);
+      if (sortBy === 'recent') return parseDateValue(b?.fecha) - parseDateValue(a?.fecha);
       return Number(b?.trendingScore || 0) - Number(a?.trendingScore || 0);
     });
   }, [trendingCafes, paisSeleccionado, procesoSeleccionado, roasterSeleccionado, sortBy]);
@@ -272,6 +281,36 @@ export default function TrendingTab({
   const filtrosActivos = [paisSeleccionado, procesoSeleccionado, roasterSeleccionado].filter(
     Boolean
   ).length;
+
+  const topDestacado = itemsFiltrados?.[0] || null;
+  const top10 = itemsFiltrados.slice(0, 10);
+  const screenWidth = Dimensions.get('window').width;
+  const heroCafe = top10?.[0] || null;
+  const rankingRest = top10.slice(1);
+
+  const topPaisBase = useMemo(() => {
+    const first = buildRankedOptions(trendingCafes, 'pais')[0];
+    return first?.label || null;
+  }, [trendingCafes]);
+
+  const topProcesoBase = useMemo(() => {
+    const first = buildRankedOptions(trendingCafes, 'proceso')[0];
+    return first?.label || null;
+  }, [trendingCafes]);
+
+  const topRoasterBase = useMemo(() => {
+    const first = buildRankedOptions(trendingCafes, 'roaster')[0];
+    return first?.label || null;
+  }, [trendingCafes]);
+
+  const buildMatchReasons = (item) => {
+    const reasons = [];
+    if (topPaisBase && item?.pais === topPaisBase) reasons.push('Top país');
+    if (topProcesoBase && item?.proceso === topProcesoBase) reasons.push('Top proceso');
+    if (topRoasterBase && item?.roaster === topRoasterBase) reasons.push('Top tostador');
+    if (Number(item?.trendingScore || 0) >= 4) reasons.push('Alta tracción');
+    return reasons.slice(0, 3);
+  };
 
   const clearFilters = () => {
     setPaisSeleccionado(null);
@@ -288,9 +327,6 @@ export default function TrendingTab({
         </TouchableOpacity>
 
         <Text style={s.pageTitle}>Trending ahora</Text>
-        <Text style={s.sectionSub}>
-          Los cafés que mejor combinan valoración, votos y movimiento real dentro de ETIOVE
-        </Text>
 
         <View
           style={{
@@ -322,8 +358,7 @@ export default function TrendingTab({
               color: '#6f5a4b',
             }}
           >
-            Aquí no solo mandan las estrellas: también cuentan los votos y la tracción de la
-            comunidad. Úsalo para descubrir qué cafés están realmente vivos ahora.
+            Los cafés que mejor combinan valoración, votos y movimiento real dentro de la comunidad.
           </Text>
 
           <View
@@ -366,75 +401,37 @@ export default function TrendingTab({
           </View>
         </View>
 
-        <View
-          style={{
-            marginTop: 14,
-            borderRadius: 18,
-            borderWidth: 1,
-            borderColor: '#eadbce',
-            backgroundColor: '#fffaf5',
-            padding: 14,
-          }}
-        >
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: 12,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 15,
-                fontWeight: '800',
-                color: '#24160f',
-              }}
-            >
-              Filtrar trending
-            </Text>
+        <SortSection sortBy={sortBy} setSortBy={setSortBy} accentColor={premiumAccent} />
 
-            {filtrosActivos > 0 && (
-              <TouchableOpacity onPress={clearFilters} activeOpacity={0.85}>
-                <Text
-                  style={{
-                    fontSize: 12,
-                    fontWeight: '800',
-                    color: premiumAccent,
-                  }}
-                >
-                  Limpiar filtros
-                </Text>
-              </TouchableOpacity>
-            )}
-          </View>
+        <FilterSection
+          title="País"
+          options={paises}
+          selected={paisSeleccionado}
+          onSelect={setPaisSeleccionado}
+          accentColor={premiumAccent}
+        />
 
-          <SortSection sortBy={sortBy} setSortBy={setSortBy} accentColor={premiumAccent} />
+        <FilterSection
+          title="Proceso"
+          options={procesos}
+          selected={procesoSeleccionado}
+          onSelect={setProcesoSeleccionado}
+          accentColor={premiumAccent}
+        />
 
-          <FilterSection
-            title="País"
-            options={paises}
-            selected={paisSeleccionado}
-            onSelect={setPaisSeleccionado}
-            accentColor={premiumAccent}
-          />
+        <FilterSection
+          title="Tostador"
+          options={roasters}
+          selected={roasterSeleccionado}
+          onSelect={setRoasterSeleccionado}
+          accentColor={premiumAccent}
+        />
 
-          <FilterSection
-            title="Proceso"
-            options={procesos}
-            selected={procesoSeleccionado}
-            onSelect={setProcesoSeleccionado}
-            accentColor={premiumAccent}
-          />
-
-          <FilterSection
-            title="Tostador"
-            options={roasters}
-            selected={roasterSeleccionado}
-            onSelect={setRoasterSeleccionado}
-            accentColor={premiumAccent}
-          />
-        </View>
+        {filtrosActivos > 0 && (
+          <TouchableOpacity onPress={clearFilters} style={{ marginTop: 10 }}>
+            <Text style={{ color: premiumAccent, fontWeight: '800' }}>Limpiar filtros</Text>
+          </TouchableOpacity>
+        )}
 
         {filtrosActivos > 0 && (
           <View style={{ marginTop: 14 }}>
@@ -443,8 +440,6 @@ export default function TrendingTab({
                 fontSize: 11,
                 fontWeight: '800',
                 color: '#8f5e3b',
-                letterSpacing: 0.8,
-                textTransform: 'uppercase',
                 marginBottom: 8,
               }}
             >
@@ -489,34 +484,263 @@ export default function TrendingTab({
       {cargando ? (
         <SkeletonVerticalList />
       ) : (
-        <View style={{ paddingHorizontal: 16, marginTop: 16 }}>
-          {itemsFiltrados.map((item) => (
-            <CardVertical
-              key={item.id}
-              item={item}
-              onDelete={() => {}}
-              onPress={setCafeDetalle}
-              favs={favs}
-              onToggleFav={toggleFav}
-            />
-          ))}
-
-          {itemsFiltrados.length === 0 && (
-            <View
-              style={{
-                marginTop: 14,
-                borderRadius: 16,
-                borderWidth: 1,
-                borderColor: '#eadbce',
-                backgroundColor: '#faf7f2',
-                padding: 16,
-              }}
-            >
-              <Text style={[s.empty, { marginTop: 0 }]}>
-                No hay cafés trending con esa combinación de filtros.
+        <View style={{ marginTop: 16 }}>
+          {/* TOP 10 APPLE STYLE */}
+          {!!top10.length && (
+            <View style={{ marginBottom: 22 }}>
+              <Text
+                style={{
+                  fontSize: 13,
+                  fontWeight: '900',
+                  color: '#8f5e3b',
+                  paddingHorizontal: 16,
+                  marginBottom: 12,
+                  letterSpacing: 1,
+                }}
+              >
+                🔥 TOP 10 ETIOVE
               </Text>
+
+              {!!heroCafe && (
+                <TouchableOpacity
+                  activeOpacity={0.9}
+                  onPress={() => setCafeDetalle(heroCafe)}
+                  style={{
+                    marginHorizontal: 16,
+                    marginBottom: 14,
+                    borderRadius: 24,
+                    borderWidth: 1,
+                    borderColor: '#eadbce',
+                    backgroundColor: '#fffaf5',
+                    padding: 18,
+                    overflow: 'hidden',
+                  }}
+                >
+                  <View
+                    style={{
+                      position: 'absolute',
+                      top: 14,
+                      right: 14,
+                      backgroundColor: '#24160f',
+                      borderRadius: 999,
+                      width: 38,
+                      height: 38,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Text style={{ color: '#fff', fontSize: 16, fontWeight: '900' }}>#1</Text>
+                  </View>
+
+                  <Text
+                    style={{
+                      fontSize: 11,
+                      fontWeight: '900',
+                      color: '#8f5e3b',
+                      letterSpacing: 1,
+                      marginBottom: 8,
+                    }}
+                  >
+                    HERO COFFEE
+                  </Text>
+
+                  <Text
+                    style={{ fontSize: 24, fontWeight: '900', color: '#24160f', paddingRight: 48 }}
+                  >
+                    {heroCafe.nombre}
+                  </Text>
+
+                  <Text style={{ marginTop: 6, fontSize: 14, color: '#6f5a4b' }}>
+                    {heroCafe.pais || 'Origen no indicado'}
+                    {heroCafe.proceso ? ` · ${heroCafe.proceso}` : ''}
+                    {heroCafe.roaster ? ` · ${heroCafe.roaster}` : ''}
+                  </Text>
+
+                  <Text
+                    style={{ marginTop: 10, fontSize: 14, color: '#8f5e3b', fontWeight: '900' }}
+                  >
+                    {heroCafe.puntuacion || 0}.0 ⭐ · {heroCafe.votos || 0} votos
+                  </Text>
+
+                  {!!buildMatchReasons(heroCafe).length && (
+                    <View
+                      style={{
+                        marginTop: 12,
+                        flexDirection: 'row',
+                        flexWrap: 'wrap',
+                        gap: 8,
+                      }}
+                    >
+                      {buildMatchReasons(heroCafe).map((reason) => (
+                        <MatchBadge key={`hero-${reason}`} label={reason} />
+                      ))}
+                    </View>
+                  )}
+                </TouchableOpacity>
+              )}
+
+              {!!rankingRest.length && (
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  decelerationRate="fast"
+                  snapToAlignment="start"
+                  snapToInterval={screenWidth * 0.44}
+                  contentContainerStyle={{ paddingHorizontal: 16, gap: 14 }}
+                >
+                  {rankingRest.map((cafe, index) => (
+                    <View
+                      key={cafe.id}
+                      style={{
+                        width: screenWidth * 0.4,
+                      }}
+                    >
+                      <View
+                        style={{
+                          position: 'absolute',
+                          top: -6,
+                          left: -6,
+                          zIndex: 2,
+                          backgroundColor: '#24160f',
+                          borderRadius: 999,
+                          width: 30,
+                          height: 30,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: '#fff',
+                            fontWeight: '900',
+                            fontSize: 12,
+                          }}
+                        >
+                          {index + 2}
+                        </Text>
+                      </View>
+
+                      {!!buildMatchReasons(cafe).length && (
+                        <View
+                          style={{
+                            marginBottom: 8,
+                            flexDirection: 'row',
+                            flexWrap: 'wrap',
+                            gap: 8,
+                          }}
+                        >
+                          {buildMatchReasons(cafe).map((reason) => (
+                            <MatchBadge key={`top10-${cafe.id}-${reason}`} label={reason} />
+                          ))}
+                        </View>
+                      )}
+
+                      <CardVertical
+                        item={cafe}
+                        onDelete={() => {}}
+                        onPress={setCafeDetalle}
+                        favs={favs}
+                        onToggleFav={toggleFav}
+                      />
+                    </View>
+                  ))}
+                </ScrollView>
+              )}
             </View>
           )}
+
+          <View style={{ paddingHorizontal: 16 }}>
+            {!!topDestacado && (
+              <View
+                style={{
+                  marginBottom: 14,
+                  borderRadius: 18,
+                  borderWidth: 1,
+                  borderColor: '#eadbce',
+                  backgroundColor: '#fffaf5',
+                  padding: 14,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 11,
+                    fontWeight: '800',
+                    color: '#8f5e3b',
+                    marginBottom: 6,
+                  }}
+                >
+                  TOP DESTACADO
+                </Text>
+                <Text style={{ fontSize: 18, fontWeight: '900', color: '#24160f' }}>
+                  {topDestacado.nombre}
+                </Text>
+                <Text style={{ marginTop: 4, fontSize: 13, color: '#6f5a4b' }}>
+                  {topDestacado.pais || 'Origen no indicado'}
+                  {topDestacado.proceso ? ` · ${topDestacado.proceso}` : ''}
+                  {topDestacado.roaster ? ` · ${topDestacado.roaster}` : ''}
+                </Text>
+                <Text style={{ marginTop: 8, fontSize: 13, color: '#8f5e3b', fontWeight: '800' }}>
+                  {topDestacado.puntuacion || 0}.0 ⭐ · {topDestacado.votos || 0} votos
+                </Text>
+                {!!buildMatchReasons(topDestacado).length && (
+                  <View
+                    style={{
+                      marginTop: 10,
+                      flexDirection: 'row',
+                      flexWrap: 'wrap',
+                      gap: 8,
+                    }}
+                  >
+                    {buildMatchReasons(topDestacado).map((reason) => (
+                      <MatchBadge key={reason} label={reason} />
+                    ))}
+                  </View>
+                )}
+              </View>
+            )}
+
+            {itemsFiltrados.slice(10).map((cafe) => (
+              <View key={cafe.id} style={{ marginBottom: 10 }}>
+                {!!buildMatchReasons(cafe).length && (
+                  <View
+                    style={{
+                      marginBottom: 8,
+                      flexDirection: 'row',
+                      flexWrap: 'wrap',
+                      gap: 8,
+                    }}
+                  >
+                    {buildMatchReasons(cafe).map((reason) => (
+                      <MatchBadge key={`${cafe.id}-${reason}`} label={reason} />
+                    ))}
+                  </View>
+                )}
+
+                <CardVertical
+                  item={cafe}
+                  onDelete={() => {}}
+                  onPress={setCafeDetalle}
+                  favs={favs}
+                  onToggleFav={toggleFav}
+                />
+              </View>
+            ))}
+
+            {itemsFiltrados.length === 0 && (
+              <View
+                style={{
+                  marginTop: 14,
+                  borderRadius: 16,
+                  borderWidth: 1,
+                  borderColor: '#eadbce',
+                  backgroundColor: '#faf7f2',
+                  padding: 16,
+                }}
+              >
+                <Text style={[s.empty, { marginTop: 0 }]}>No hay cafés con esos filtros.</Text>
+              </View>
+            )}
+          </View>
         </View>
       )}
     </View>

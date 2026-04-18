@@ -1,5 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
+import {
+  FlatList,
+  Image,
+  Modal,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { queryCollection, updateDocument } from '../services/firestoreService';
 
 const FILTERS = {
@@ -7,6 +16,25 @@ const FILTERS = {
   APPROVED: 'approved',
   REJECTED: 'rejected',
 };
+
+function isValidEAN13(code) {
+  const value = String(code || '')
+    .replace(/\s+/g, '')
+    .trim();
+  if (!value) return true;
+  if (!/^\d{13}$/.test(value)) return false;
+
+  const digits = value.split('').map(Number);
+  const checkDigit = digits[12];
+
+  let sum = 0;
+  for (let i = 0; i < 12; i += 1) {
+    sum += digits[i] * (i % 2 === 0 ? 1 : 3);
+  }
+
+  const calculated = (10 - (sum % 10)) % 10;
+  return calculated === checkDigit;
+}
 
 function FilterChip({ label, active, onPress }) {
   return (
@@ -45,11 +73,19 @@ export default function AdminPanelScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [activeFilter, setActiveFilter] = useState(FILTERS.PENDING);
+  const [search, setSearch] = useState('');
   const [counters, setCounters] = useState({
     pending: 0,
     approved: 0,
     rejected: 0,
   });
+
+  const [editingCoffee, setEditingCoffee] = useState(null);
+  const [editName, setEditName] = useState('');
+  const [editBrand, setEditBrand] = useState('');
+  const [editEan, setEditEan] = useState('');
+  const [editIsSpecialty, setEditIsSpecialty] = useState(false);
+  const [editError, setEditError] = useState('');
 
   const loadCounters = useCallback(async () => {
     try {
@@ -143,12 +179,59 @@ export default function AdminPanelScreen() {
     await refreshCurrentView();
   };
 
+  const openEditor = (coffee) => {
+    setEditingCoffee(coffee);
+    setEditName(coffee?.name || coffee?.nombre || '');
+    setEditBrand(coffee?.brand || coffee?.roaster || '');
+    setEditEan(coffee?.ean || '');
+    setEditIsSpecialty(!!coffee?.isSpecialty);
+    setEditError('');
+  };
+
+  const closeEditor = () => {
+    setEditingCoffee(null);
+    setEditName('');
+    setEditBrand('');
+    setEditEan('');
+    setEditIsSpecialty(false);
+    setEditError('');
+  };
+
+  const saveEdition = async () => {
+    if (!editingCoffee?.id) return;
+
+    const normalizedEan = String(editEan || '')
+      .replace(/\s+/g, '')
+      .trim();
+
+    if (normalizedEan && !isValidEAN13(normalizedEan)) {
+      setEditError('El EAN debe tener 13 dígitos válidos.');
+      return;
+    }
+
+    await updateDocument('coffees', editingCoffee.id, {
+      name: editName,
+      brand: editBrand,
+      ean: normalizedEan,
+      isSpecialty: editIsSpecialty,
+    });
+
+    closeEditor();
+    await refreshCurrentView();
+  };
+
   const renderActions = (item) => {
     if (activeFilter === FILTERS.REJECTED) {
       return (
-        <TouchableOpacity onPress={() => recoverCoffee(item)}>
-          <Text style={{ color: '#ff0' }}>↺ Volver a pendientes</Text>
-        </TouchableOpacity>
+        <>
+          <TouchableOpacity onPress={() => recoverCoffee(item)}>
+            <Text style={{ color: '#ff0' }}>↺ Volver a pendientes</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => openEditor(item)}>
+            <Text style={{ color: '#6cf' }}>✎ Editar</Text>
+          </TouchableOpacity>
+        </>
       );
     }
 
@@ -165,6 +248,9 @@ export default function AdminPanelScreen() {
 
           <TouchableOpacity onPress={() => rejectCoffee(item)}>
             <Text style={{ color: '#f00' }}>✖ Rechazar</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => openEditor(item)}>
+            <Text style={{ color: '#6cf' }}>✎ Editar</Text>
           </TouchableOpacity>
         </>
       );
@@ -183,6 +269,9 @@ export default function AdminPanelScreen() {
         <TouchableOpacity onPress={() => rejectCoffee(item)}>
           <Text style={{ color: '#f00' }}>✖ Rechazar</Text>
         </TouchableOpacity>
+        <TouchableOpacity onPress={() => openEditor(item)}>
+          <Text style={{ color: '#6cf' }}>✎ Editar</Text>
+        </TouchableOpacity>
       </>
     );
   };
@@ -192,6 +281,22 @@ export default function AdminPanelScreen() {
     if (activeFilter === FILTERS.REJECTED) return 'Cafés rechazados';
     return 'Cafés pendientes';
   }, [activeFilter]);
+
+  const visibleCafes = useMemo(() => {
+    const term = String(search || '')
+      .trim()
+      .toLowerCase();
+    if (!term) return cafes;
+
+    return cafes.filter((item) => {
+      const haystack = [item.name, item.nombre, item.brand, item.roaster, item.ean]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+
+      return haystack.includes(term);
+    });
+  }, [cafes, search]);
 
   const renderItem = ({ item }) => (
     <View
@@ -245,6 +350,23 @@ export default function AdminPanelScreen() {
         Revisa cafés pendientes, aprobados o rechazados y cambia su clasificación.
       </Text>
 
+      <TextInput
+        value={search}
+        onChangeText={setSearch}
+        placeholder="Buscar por nombre, marca o EAN"
+        placeholderTextColor="#777"
+        style={{
+          backgroundColor: '#111',
+          borderWidth: 1,
+          borderColor: '#2a2a2a',
+          color: '#fff',
+          borderRadius: 12,
+          paddingHorizontal: 14,
+          paddingVertical: 12,
+          marginBottom: 14,
+        }}
+      />
+
       <View style={{ flexDirection: 'row', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
         <FilterChip
           label={`Pendientes (${counters.pending})`}
@@ -265,8 +387,173 @@ export default function AdminPanelScreen() {
 
       <Text style={{ color: '#c7c7c7', marginBottom: 12, fontWeight: '700' }}>{headerText}</Text>
 
+      <Modal
+        visible={!!editingCoffee}
+        transparent
+        animationType="slide"
+        onRequestClose={closeEditor}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            justifyContent: 'flex-end',
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: '#151515',
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
+              padding: 16,
+              maxHeight: '85%',
+            }}
+          >
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <Text style={{ color: '#fff', fontSize: 20, fontWeight: '800', marginBottom: 14 }}>
+                Editar café
+              </Text>
+
+              <Text style={{ color: '#aaa', marginBottom: 6 }}>Nombre</Text>
+              <TextInput
+                value={editName}
+                onChangeText={setEditName}
+                placeholder="Nombre"
+                placeholderTextColor="#777"
+                style={{
+                  backgroundColor: '#111',
+                  borderWidth: 1,
+                  borderColor: '#2a2a2a',
+                  color: '#fff',
+                  borderRadius: 12,
+                  paddingHorizontal: 14,
+                  paddingVertical: 12,
+                  marginBottom: 12,
+                }}
+              />
+
+              <Text style={{ color: '#aaa', marginBottom: 6 }}>Marca / Roaster</Text>
+              <TextInput
+                value={editBrand}
+                onChangeText={setEditBrand}
+                placeholder="Marca"
+                placeholderTextColor="#777"
+                style={{
+                  backgroundColor: '#111',
+                  borderWidth: 1,
+                  borderColor: '#2a2a2a',
+                  color: '#fff',
+                  borderRadius: 12,
+                  paddingHorizontal: 14,
+                  paddingVertical: 12,
+                  marginBottom: 12,
+                }}
+              />
+
+              <Text style={{ color: '#aaa', marginBottom: 6 }}>EAN</Text>
+              <TextInput
+                value={editEan}
+                onChangeText={setEditEan}
+                placeholder="EAN"
+                placeholderTextColor="#777"
+                autoCapitalize="none"
+                keyboardType="number-pad"
+                style={{
+                  backgroundColor: '#111',
+                  borderWidth: 1,
+                  borderColor: '#2a2a2a',
+                  color: '#fff',
+                  borderRadius: 12,
+                  paddingHorizontal: 14,
+                  paddingVertical: 12,
+                  marginBottom: 12,
+                }}
+              />
+
+              {!!editError && (
+                <Text style={{ color: '#ff8f8f', marginBottom: 12, fontWeight: '700' }}>
+                  {editError}
+                </Text>
+              )}
+
+              {!editError && (
+                <Text style={{ color: '#888', marginBottom: 12, fontSize: 12 }}>
+                  Deja el EAN vacío si todavía no está verificado.
+                </Text>
+              )}
+
+              <Text style={{ color: '#aaa', marginBottom: 10 }}>Clasificación</Text>
+              <View style={{ flexDirection: 'row', gap: 8, marginBottom: 18, flexWrap: 'wrap' }}>
+                <TouchableOpacity
+                  onPress={() => setEditIsSpecialty(true)}
+                  style={{
+                    paddingHorizontal: 12,
+                    paddingVertical: 10,
+                    borderRadius: 999,
+                    borderWidth: 1,
+                    borderColor: editIsSpecialty ? '#0f0' : '#2a2a2a',
+                    backgroundColor: editIsSpecialty ? '#132413' : '#111',
+                  }}
+                >
+                  <Text style={{ color: editIsSpecialty ? '#9f9' : '#ddd', fontWeight: '700' }}>
+                    Specialty
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => setEditIsSpecialty(false)}
+                  style={{
+                    paddingHorizontal: 12,
+                    paddingVertical: 10,
+                    borderRadius: 999,
+                    borderWidth: 1,
+                    borderColor: !editIsSpecialty ? '#ff0' : '#2a2a2a',
+                    backgroundColor: !editIsSpecialty ? '#2b2b12' : '#111',
+                  }}
+                >
+                  <Text style={{ color: !editIsSpecialty ? '#ff9' : '#ddd', fontWeight: '700' }}>
+                    No Specialty
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              <View style={{ flexDirection: 'row', gap: 10 }}>
+                <TouchableOpacity
+                  onPress={closeEditor}
+                  style={{
+                    flex: 1,
+                    borderRadius: 12,
+                    borderWidth: 1,
+                    borderColor: '#2a2a2a',
+                    paddingVertical: 14,
+                    alignItems: 'center',
+                  }}
+                >
+                  <Text style={{ color: '#ddd', fontWeight: '700' }}>Cancelar</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={saveEdition}
+                  style={{
+                    flex: 1,
+                    borderRadius: 12,
+                    backgroundColor: '#2b1d15',
+                    borderWidth: 1,
+                    borderColor: '#caa27c',
+                    paddingVertical: 14,
+                    alignItems: 'center',
+                  }}
+                >
+                  <Text style={{ color: '#f4d7b8', fontWeight: '800' }}>Guardar</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
       <FlatList
-        data={cafes}
+        data={visibleCafes}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         onRefresh={refreshCurrentView}
@@ -279,7 +566,11 @@ export default function AdminPanelScreen() {
               backgroundColor: '#111',
             }}
           >
-            <Text style={{ color: '#aaa' }}>No hay cafés en este estado.</Text>
+            <Text style={{ color: '#aaa' }}>
+              {search
+                ? 'No hay cafés que coincidan con la búsqueda.'
+                : 'No hay cafés en este estado.'}
+            </Text>
           </View>
         }
       />

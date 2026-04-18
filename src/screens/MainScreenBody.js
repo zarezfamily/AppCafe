@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { ScrollView, View } from 'react-native';
 
+import AdminPanelScreen from './AdminPanelScreen'; // 🔥 NUEVO
 import BottomBarNav from './BottomBarNav';
 import CafeteriasScreen from './CafeteriasScreen';
 import CataDetailModal from './CataDetailModal';
@@ -14,6 +15,7 @@ import PaywallModal from './PaywallModal';
 import TopCafesTab from './TopCafesTab';
 import TrendingTab from './TrendingTab';
 import UltimosAnadidosTab from './UltimosAnadidosTab';
+
 import { MAIN_TABS } from './mainScreenTabs';
 
 export default function MainScreenBody({
@@ -77,6 +79,9 @@ export default function MainScreenBody({
           {activeTab === MAIN_TABS.TRENDING && <TrendingTab {...trendingTabProps} />}
           {activeTab === MAIN_TABS.OFFERS && <OfertasTab {...ofertasTabProps} />}
           {activeTab === MAIN_TABS.MORE && <MasTab {...masTabProps} />}
+
+          {/* 🔥 PANEL ADMIN REAL */}
+          {activeTab === MAIN_TABS.ADMIN && <AdminPanelScreen />}
         </ScrollView>
       )}
 

@@ -255,7 +255,11 @@ export default function FormScreen({ onSave, onBack, onCafeAdded, s, premiumAcce
       onSave?.();
     } catch (error) {
       console.log('Error guardando café:', error);
-      Alert.alert('Error', error?.message || 'No se pudo guardar el café.');
+      const msg =
+        error?.message === 'SESSION_EXPIRED'
+          ? 'Tu sesión ha caducado. Cierra sesión e inicia de nuevo.'
+          : error?.message || 'No se pudo guardar el café.';
+      Alert.alert('Error', msg);
     } finally {
       setSubiendo(false);
     }

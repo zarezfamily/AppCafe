@@ -27,6 +27,8 @@ const firestoreFetch = async (url, options, operation) => {
           headers: { ...options.headers, Authorization: `Bearer ${newToken}` },
         };
         res = await fetch(url, retryOptions);
+      } else {
+        throw new Error('SESSION_EXPIRED');
       }
     }
 
@@ -156,7 +158,8 @@ export const setDocument = async (colName, docId, data) => {
     },
     `setDocument(${colName}/${docId})`
   );
-  return res.ok;
+  if (!res.ok) throw new Error(`setDocument(${colName}/${docId}) -> ${res.status}`);
+  return true;
 };
 
 export const updateDocument = async (colName, docId, data) => {
@@ -172,7 +175,8 @@ export const updateDocument = async (colName, docId, data) => {
     },
     `updateDocument(${colName}/${docId})`
   );
-  return res.ok;
+  if (!res.ok) throw new Error(`updateDocument(${colName}/${docId}) -> ${res.status}`);
+  return true;
 };
 
 export const deleteDocument = async (colName, docId) => {

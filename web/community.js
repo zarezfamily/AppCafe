@@ -400,7 +400,13 @@ const renderMemberEvolutionCard = ({ profile = null, allThreads = [], allReplies
 
   // Avatar premium
   let avatarUrl =
-    (profile && (profile.photoURL || profile.avatarUrl || profile.avatar || profile.photo || '')) ||
+    (profile &&
+      (profile.foto ||
+        profile.photoURL ||
+        profile.avatarUrl ||
+        profile.avatar ||
+        profile.photo ||
+        '')) ||
     '';
   let displayName = String(
     (profile && (profile.displayName || profile.alias || profile.nickname)) ||

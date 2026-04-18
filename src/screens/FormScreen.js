@@ -62,7 +62,6 @@ export default function FormScreen({ onSave, onBack, onCafeAdded, s, premiumAcce
 
     try {
       const isFromScanner = !!scannedData?.ean;
-
       const normalizedEan = String(ean || '')
         .replace(/\s+/g, '')
         .trim();

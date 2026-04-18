@@ -220,3 +220,57 @@ exports.uploadForumImage = onRequest(
     res.status(200).json({ downloadUrl });
   }
 );
+
+// 🔥 AI JOB PROCESSOR (coffee_enrichment)
+exports.onAiJobCreatedProcessCoffee = onDocumentCreated('ai_jobs/{jobId}', async (event) => {
+  const job = event.data?.data();
+  if (!job) return;
+
+  if (job.type !== 'coffee_enrichment' || job.status !== 'queued') return;
+
+  const jobRef = db.collection('ai_jobs').doc(event.params.jobId);
+
+  try {
+    await jobRef.update({ status: 'processing', updatedAt: new Date().toISOString() });
+
+    const cafeRef = db.collection(job.targetCollection).doc(job.targetId);
+    const cafeSnap = await cafeRef.get();
+    if (!cafeSnap.exists) throw new Error('CAFE_NOT_FOUND');
+
+    const cafe = cafeSnap.data() || {};
+
+    // Aquí irá la IA real más adelante.
+    // De momento dejamos un enriquecimiento base para validar el flujo.
+    const aiSuggestion = {
+      nombre: cafe.nombre || 'Café detectado',
+      marca: 'Desconocida',
+      isSpecialty: false,
+      origen: cafe.origen || 'Origen no identificado',
+    };
+
+    const aiConfidenceScore = 0.6;
+
+    await cafeRef.update({
+      aiGenerated: true,
+      aiSuggestion,
+      aiConfidenceScore,
+      aiStatus: 'completed',
+      updatedAt: new Date().toISOString(),
+    });
+
+    await jobRef.update({
+      status: 'done',
+      updatedAt: new Date().toISOString(),
+    });
+
+    logger.info('AI job processed successfully', { jobId: event.params.jobId });
+  } catch (error) {
+    logger.error('AI job failed', { error });
+
+    await jobRef.update({
+      status: 'failed',
+      error: String(error?.message || error),
+      updatedAt: new Date().toISOString(),
+    });
+  }
+});

@@ -255,7 +255,7 @@ export default function FormScreen({ onSave, onBack, onCafeAdded, s, premiumAcce
       onSave?.();
     } catch (error) {
       console.log('Error guardando café:', error);
-      Alert.alert('Error', 'No se pudo guardar el café.');
+      Alert.alert('Error', error?.message || 'No se pudo guardar el café.');
     } finally {
       setSubiendo(false);
     }

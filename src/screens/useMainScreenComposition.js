@@ -47,7 +47,7 @@ const BOOTSTRAP_KEYS = {
 
 export default function useMainScreenComposition({ onLogout, services, ui }) {
   const { user } = useAuth();
-  const { restoreAuthTokenFromSecureStore, setDocument } = services;
+  const { restoreAuthTokenFromSecureStore, setDocument, addDocument } = services;
   const {
     CardHorizontal,
     CardVertical,
@@ -58,8 +58,22 @@ export default function useMainScreenComposition({ onLogout, services, ui }) {
     styles,
   } = ui;
 
+  const createPendingCoffee = (scanResult) =>
+    addDocument('coffees', {
+      ean: scanResult.ean,
+      name: scanResult.name || null,
+      brand: scanResult.brand || null,
+      foto: scanResult.foto || null,
+      reviewStatus: 'pending',
+      isSpecialty: false,
+      appVisible: false,
+      scannerVisible: true,
+      createdAt: new Date().toISOString(),
+    });
+
   const screenUi = useMainScreenUiState({
     keyProfile: KEY_PROFILE,
+    createPendingCoffee,
   });
 
   const gamification = useGamification({ storageKey: KEY_GAMIFICATION });

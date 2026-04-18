@@ -87,8 +87,13 @@ export default function useMainScreenUiState({ keyProfile, createPendingCoffee }
   const closeScannerAndOpenForm = async (scanResult) => {
     setScanning(false);
 
-    if (scanResult?.ean) {
+    if (scanResult) {
       setScannedData(scanResult);
+    }
+
+    if (scanResult?.recoveryMode && scanResult?.recoveryCafe?.id) {
+      setShowForm(true);
+      return;
     }
 
     if (scanResult?.autoCreate && scanResult?.ean && typeof createPendingCoffee === 'function') {
@@ -113,6 +118,7 @@ export default function useMainScreenUiState({ keyProfile, createPendingCoffee }
 
   const closeFormAndRefreshData = (onRefresh) => {
     setShowForm(false);
+    setScannedData(null);
     setActiveTab(MAIN_TABS.NOTEBOOK);
     onRefresh?.();
   };

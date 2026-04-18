@@ -27,13 +27,17 @@ import { uploadImageToStorage } from '../services/storageService';
 
 export default function FormScreen({ onSave, onBack, onCafeAdded, s, premiumAccent, scannedData }) {
   const { user } = useAuth();
-  const [nombreCafe, setNombreCafe] = useState('');
-  const [origen, setOrigen] = useState('');
-  const [notas, setNotas] = useState('');
-  const [rating, setRating] = useState(0);
+
+  const recoveryCafe = scannedData?.recoveryCafe || null;
+  const isRecoveryMode = !!(scannedData?.recoveryMode && recoveryCafe?.id);
+
+  const [nombreCafe, setNombreCafe] = useState(recoveryCafe?.nombre || recoveryCafe?.name || '');
+  const [origen, setOrigen] = useState(recoveryCafe?.origen || '');
+  const [notas, setNotas] = useState(recoveryCafe?.notas || '');
+  const [rating, setRating] = useState(Number(recoveryCafe?.puntuacion || 0));
   const [foto, setFoto] = useState(null);
   const [subiendo, setSubiendo] = useState(false);
-  const [ean, setEan] = useState(scannedData?.ean || '');
+  const [ean, setEan] = useState(scannedData?.ean || recoveryCafe?.ean || '');
 
   useEffect(() => {
     if (scannedData?.ean) {
@@ -48,32 +52,43 @@ export default function FormScreen({ onSave, onBack, onCafeAdded, s, premiumAcce
       return;
     }
 
-    const res = await ImagePicker.launchCameraAsync({ allowsEditing: true, quality: 0.6 });
-    if (!res.canceled) setFoto(res.assets[0].uri);
+    const res = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      quality: 0.6,
+    });
+
+    if (!res.canceled) {
+      setFoto(res.assets[0].uri);
+    }
   };
 
   const guardarCafe = async () => {
     const hasBarcode = !!String(scannedData?.ean || ean || '').trim();
     const hasPhoto = !!foto;
-    const canAutoEnrich = hasBarcode || hasPhoto;
+    const canAutoEnrich = hasBarcode || hasPhoto || isRecoveryMode;
 
     if (!nombreCafe.trim() && !canAutoEnrich) {
       Alert.alert('Aviso', 'Añade al menos un nombre, una foto o un código de barras.');
       return;
     }
 
+    if (isRecoveryMode && !foto) {
+      Alert.alert('Añade una foto', 'Para completar este café pendiente necesitas hacer una foto.');
+      return;
+    }
+
     setSubiendo(true);
 
     try {
-      const isFromScanner = !!scannedData?.ean;
-      const isPhotoOnlyFlow = !isFromScanner && !!foto && !nombreCafe.trim();
-      const isAutoFlow = isFromScanner || isPhotoOnlyFlow;
+      const isFromScanner = !!scannedData?.ean && !isRecoveryMode;
+      const isPhotoOnlyFlow = !isFromScanner && !!foto && !nombreCafe.trim() && !isRecoveryMode;
+      const isAutoFlow = isFromScanner || isPhotoOnlyFlow || isRecoveryMode;
 
       const normalizedEan = String(ean || '')
-        .replace(/\s+/g, '')
+        .replace(/\D/g, '')
         .trim();
 
-      if (normalizedEan) {
+      if (normalizedEan && !isRecoveryMode) {
         const existingByEan = await queryCollection('cafes', 'ean', normalizedEan);
         if (existingByEan?.length) {
           Alert.alert('Ya existe', 'Ya hay un café con ese EAN en la base de datos.');
@@ -88,6 +103,73 @@ export default function FormScreen({ onSave, onBack, onCafeAdded, s, premiumAcce
       }
 
       const now = new Date().toISOString();
+
+      if (isRecoveryMode) {
+        await updateDocument('cafes', recoveryCafe.id, {
+          nombre:
+            nombreCafe.trim() ||
+            recoveryCafe?.nombre ||
+            recoveryCafe?.name ||
+            'Pendiente de identificar',
+          origen: origen.trim(),
+          notas,
+          puntuacion: rating,
+          foto: finalFoto || recoveryCafe?.foto || '',
+          ean: normalizedEan || recoveryCafe?.ean || '',
+          reviewStatus: 'pending',
+          sourceType: 'photo_pending',
+          aiGenerated: false,
+          aiConfidenceScore: 0,
+          aiSuggestion: {},
+          aiStatus: 'queued',
+          imageValidation: {
+            status: finalFoto ? 'pending' : recoveryCafe?.foto ? 'pending' : 'not_provided',
+          },
+          appVisible: false,
+          scannerVisible: true,
+          updatedAt: now,
+        });
+
+        await addDocument('ai_jobs', {
+          type: 'coffee_enrichment',
+          targetCollection: 'cafes',
+          targetId: recoveryCafe.id,
+          status: 'queued',
+          sourceType: 'photo_pending',
+          ean: normalizedEan || recoveryCafe?.ean || '',
+          foto: finalFoto || recoveryCafe?.foto || '',
+          payload: {
+            nombre: nombreCafe.trim(),
+            origen: origen.trim(),
+            notas,
+          },
+          createdAt: now,
+          updatedAt: now,
+          uid: user.uid,
+        });
+
+        onCafeAdded?.({
+          ...(recoveryCafe || {}),
+          id: recoveryCafe.id,
+          nombre:
+            nombreCafe.trim() ||
+            recoveryCafe?.nombre ||
+            recoveryCafe?.name ||
+            'Pendiente de identificar',
+          origen: origen.trim(),
+          foto: finalFoto || recoveryCafe?.foto || '',
+          ean: normalizedEan || recoveryCafe?.ean || '',
+          aiJobQueued: true,
+        });
+
+        Alert.alert(
+          'Foto enviada',
+          'Hemos actualizado el café pendiente y relanzado la IA para completarlo automáticamente.'
+        );
+
+        onSave?.();
+        return;
+      }
 
       const cafePayload = {
         nombre: nombreCafe.trim() || 'Pendiente de identificar',
@@ -188,22 +270,45 @@ export default function FormScreen({ onSave, onBack, onCafeAdded, s, premiumAcce
           <Text style={s.backText}>Volver</Text>
         </TouchableOpacity>
 
-        <Text style={s.formTitle}>Nuevo café</Text>
+        <Text style={s.formTitle}>
+          {isRecoveryMode ? 'Completar café pendiente' : 'Nuevo café'}
+        </Text>
+
+        {isRecoveryMode && (
+          <View
+            style={{
+              marginBottom: 16,
+              padding: 12,
+              borderRadius: 12,
+              backgroundColor: '#fff7ed',
+              borderWidth: 1,
+              borderColor: '#fed7aa',
+            }}
+          >
+            <Text style={{ color: '#9a3412', fontWeight: '700' }}>
+              Este café ya existe pero le faltan datos. Añade una foto para relanzar la IA.
+            </Text>
+          </View>
+        )}
 
         <TouchableOpacity style={foto ? undefined : s.fotoEmpty} onPress={hacerFoto}>
           {foto ? (
             <Image source={{ uri: foto }} style={s.fotoFull} />
+          ) : recoveryCafe?.foto ? (
+            <Image source={{ uri: recoveryCafe.foto }} style={s.fotoFull} />
           ) : (
             <>
               <Ionicons name="camera-outline" size={32} color="#aaa" />
-              <Text style={s.fotoEmptyText}>Añadir foto</Text>
+              <Text style={s.fotoEmptyText}>
+                {isRecoveryMode ? 'Añadir foto para completar' : 'Añadir foto'}
+              </Text>
             </>
           )}
         </TouchableOpacity>
 
-        {foto && (
+        {(foto || recoveryCafe?.foto) && (
           <TouchableOpacity onPress={hacerFoto}>
-            <Text style={s.retake}>Cambiar foto</Text>
+            <Text style={s.retake}>{foto ? 'Cambiar foto' : 'Añadir una nueva foto'}</Text>
           </TouchableOpacity>
         )}
 
@@ -215,6 +320,7 @@ export default function FormScreen({ onSave, onBack, onCafeAdded, s, premiumAcce
           value={ean}
           onChangeText={setEan}
           keyboardType="number-pad"
+          editable={!isRecoveryMode}
         />
 
         <Text style={s.label}>Nombre del café</Text>
@@ -254,7 +360,9 @@ export default function FormScreen({ onSave, onBack, onCafeAdded, s, premiumAcce
           {subiendo ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={s.redBtnText}>Guardar café</Text>
+            <Text style={s.redBtnText}>
+              {isRecoveryMode ? 'Completar y relanzar IA' : 'Guardar café'}
+            </Text>
           )}
         </TouchableOpacity>
       </ScrollView>

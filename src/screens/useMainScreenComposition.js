@@ -48,6 +48,7 @@ const BOOTSTRAP_KEYS = {
 export default function useMainScreenComposition({ onLogout, services, ui }) {
   const { user } = useAuth();
   const { restoreAuthTokenFromSecureStore, setDocument, addDocument, queryCollection } = services;
+
   const {
     CardHorizontal,
     CardVertical,

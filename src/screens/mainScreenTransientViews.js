@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Image,
@@ -30,8 +30,31 @@ function getCafeMatchMode(cafe) {
   return 'approved';
 }
 
+function isCafeIncompleteForReview(cafe) {
+  const hasFoto = !!String(cafe?.foto || '').trim();
+  const hasNombre = !!String(cafe?.nombre || cafe?.name || '').trim();
+  const hasMarca = !!String(cafe?.marca || cafe?.brand || '').trim();
+  const hasOrigen = !!String(cafe?.origen || '').trim();
+  const hasAiNombre = !!String(cafe?.aiSuggestion?.nombre || cafe?.aiSuggestion?.name || '').trim();
+
+  return !hasFoto || (!hasNombre && !hasAiNombre) || (!hasMarca && !hasOrigen);
+}
+
 function getCafeMatchCopy(cafe) {
   const mode = getCafeMatchMode(cafe);
+  const incomplete = isCafeIncompleteForReview(cafe);
+
+  if (mode === 'pending' && incomplete) {
+    return {
+      title: 'Faltan datos para validarlo 📷',
+      description:
+        'Este café ya está en revisión, pero necesitamos una foto o más contexto para completarlo automáticamente con IA.',
+      primaryLabel: 'Añadir foto y completar',
+      secondaryLabel: 'Ver ficha provisional',
+      autoOpen: false,
+      action: 'recover',
+    };
+  }
 
   if (mode === 'pending') {
     return {
@@ -39,7 +62,21 @@ function getCafeMatchCopy(cafe) {
       description:
         'Este café ya fue detectado y está pendiente de validación. Puedes ver su ficha provisional.',
       primaryLabel: 'Ver ficha provisional',
+      secondaryLabel: 'Cerrar',
       autoOpen: false,
+      action: 'open',
+    };
+  }
+
+  if (mode === 'rejected' && incomplete) {
+    return {
+      title: 'Registro incompleto 🚫',
+      description:
+        'Este café ya existe pero fue rechazado o quedó incompleto. Puedes añadir una foto para reintentar la identificación.',
+      primaryLabel: 'Añadir foto y reintentar',
+      secondaryLabel: 'Ver ficha',
+      autoOpen: false,
+      action: 'recover',
     };
   }
 
@@ -49,7 +86,9 @@ function getCafeMatchCopy(cafe) {
       description:
         'Este registro ya existe en Etiove pero fue rechazado o desactivado. Puedes abrir su ficha para revisarlo.',
       primaryLabel: 'Ver ficha',
+      secondaryLabel: 'Cerrar',
       autoOpen: false,
+      action: 'open',
     };
   }
 
@@ -57,11 +96,13 @@ function getCafeMatchCopy(cafe) {
     title: 'Ya lo tenemos ☕',
     description: 'Este café ya está en Etiove. Abrimos su ficha automáticamente.',
     primaryLabel: 'Ver ficha ahora',
+    secondaryLabel: 'Cerrar',
     autoOpen: true,
+    action: 'open',
   };
 }
 
-function ExistingCafeMatchScreen({ cafe, premiumAccent, onOpenNow, onClose }) {
+function ExistingCafeMatchScreen({ cafe, premiumAccent, onOpenNow, onClose, onRecover }) {
   const [progress, setProgress] = useState(0);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.96)).current;
@@ -71,11 +112,13 @@ function ExistingCafeMatchScreen({ cafe, premiumAccent, onOpenNow, onClose }) {
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
-        duration: 220,
+        duration: 260,
         useNativeDriver: true,
       }),
       Animated.spring(scaleAnim, {
         toValue: 1,
+        friction: 8,
+        tension: 70,
         useNativeDriver: true,
       }),
     ]).start();
@@ -97,6 +140,14 @@ function ExistingCafeMatchScreen({ cafe, premiumAccent, onOpenNow, onClose }) {
 
     return () => clearInterval(timer);
   }, [fadeAnim, scaleAnim, matchCopy.autoOpen]);
+
+  const primaryAction = () => {
+    if (matchCopy.action === 'recover') {
+      onRecover?.();
+      return;
+    }
+    onOpenNow?.();
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#0b0b0b' }}>
@@ -141,7 +192,17 @@ function ExistingCafeMatchScreen({ cafe, premiumAccent, onOpenNow, onClose }) {
               borderColor: 'rgba(255,255,255,0.12)',
             }}
           >
-            <Ionicons name="checkmark" size={42} color={premiumAccent} />
+            <Ionicons
+              name={
+                matchCopy.action === 'recover'
+                  ? 'camera'
+                  : getCafeMatchMode(cafe) === 'rejected'
+                    ? 'close'
+                    : 'checkmark'
+              }
+              size={42}
+              color={premiumAccent}
+            />
           </View>
 
           <Text
@@ -268,26 +329,30 @@ function ExistingCafeMatchScreen({ cafe, premiumAccent, onOpenNow, onClose }) {
         </View>
 
         <View>
-          <View
-            style={{
-              height: 6,
-              borderRadius: 999,
-              backgroundColor: '#1f1f1f',
-              overflow: 'hidden',
-              marginBottom: 16,
-            }}
-          >
+          {matchCopy.autoOpen ? (
             <View
               style={{
-                width: `${Math.round(progress * 100)}%`,
-                height: '100%',
-                backgroundColor: premiumAccent,
+                height: 6,
+                borderRadius: 999,
+                backgroundColor: '#1f1f1f',
+                overflow: 'hidden',
+                marginBottom: 16,
               }}
-            />
-          </View>
+            >
+              <View
+                style={{
+                  width: `${Math.round(progress * 100)}%`,
+                  height: '100%',
+                  backgroundColor: premiumAccent,
+                }}
+              />
+            </View>
+          ) : (
+            <View style={{ height: 6, marginBottom: 16 }} />
+          )}
 
           <TouchableOpacity
-            onPress={onOpenNow}
+            onPress={primaryAction}
             style={{
               borderRadius: 16,
               backgroundColor: premiumAccent,
@@ -301,18 +366,37 @@ function ExistingCafeMatchScreen({ cafe, premiumAccent, onOpenNow, onClose }) {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={onClose}
-            style={{
-              borderRadius: 16,
-              borderWidth: 1,
-              borderColor: '#2a2a2a',
-              paddingVertical: 15,
-              alignItems: 'center',
-            }}
-          >
-            <Text style={{ color: '#d0d0d0', fontWeight: '700', fontSize: 14 }}>Cerrar</Text>
-          </TouchableOpacity>
+          {matchCopy.action === 'recover' ? (
+            <TouchableOpacity
+              onPress={onOpenNow}
+              style={{
+                borderRadius: 16,
+                borderWidth: 1,
+                borderColor: '#2a2a2a',
+                paddingVertical: 15,
+                alignItems: 'center',
+              }}
+            >
+              <Text style={{ color: '#d0d0d0', fontWeight: '700', fontSize: 14 }}>
+                {matchCopy.secondaryLabel}
+              </Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              onPress={onClose}
+              style={{
+                borderRadius: 16,
+                borderWidth: 1,
+                borderColor: '#2a2a2a',
+                paddingVertical: 15,
+                alignItems: 'center',
+              }}
+            >
+              <Text style={{ color: '#d0d0d0', fontWeight: '700', fontSize: 14 }}>
+                {matchCopy.secondaryLabel}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       </Animated.View>
     </SafeAreaView>
@@ -353,6 +437,17 @@ function ScannerMatchFlow({
         onOpenNow={() => {
           setScanning(false);
           setCafeDetalle?.(matchedCafe);
+          setMatchedCafe(null);
+        }}
+        onRecover={() => {
+          setScanning(false);
+          onScannerDone?.({
+            ean: normalizeEan(matchedCafe?.ean),
+            recoveryMode: true,
+            recoveryCafe: matchedCafe,
+            isNew: false,
+            autoCreate: false,
+          });
           setMatchedCafe(null);
         }}
         onClose={() => {

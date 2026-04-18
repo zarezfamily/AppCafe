@@ -1,9 +1,10 @@
+import { refreshIdToken } from './authService';
 import { BASE_URL, FIREBASE_API_KEY, authHeaders } from './firebaseCore';
 import { docToObject, toFields, toFirestoreValue } from './firestoreMappers';
-import { refreshIdToken } from './authService';
 
 const normalizeFirestoreError = (error, operation) => {
   const message = String(error?.message || error || '');
+
   if (
     error instanceof TypeError ||
     message.includes('Network request failed') ||
@@ -12,6 +13,7 @@ const normalizeFirestoreError = (error, operation) => {
   ) {
     return new Error(`${operation} -> NETWORK_UNAVAILABLE`);
   }
+
   return error instanceof Error ? error : new Error(`${operation} -> UNKNOWN_ERROR`);
 };
 
@@ -19,22 +21,37 @@ const firestoreFetch = async (url, options, operation) => {
   try {
     let res = await fetch(url, options);
 
-    if (res.status === 401 || res.status === 403) {
+    // 401 = token ausente/caducado
+    if (res.status === 401) {
       const newToken = await refreshIdToken();
-      if (newToken) {
-        const retryOptions = {
-          ...options,
-          headers: { ...options.headers, Authorization: `Bearer ${newToken}` },
-        };
-        res = await fetch(url, retryOptions);
-      } else {
+
+      if (!newToken) {
+        throw new Error('SESSION_EXPIRED');
+      }
+
+      const retryOptions = {
+        ...options,
+        headers: {
+          ...options.headers,
+          Authorization: `Bearer ${newToken}`,
+        },
+      };
+
+      res = await fetch(url, retryOptions);
+
+      if (res.status === 401) {
         throw new Error('SESSION_EXPIRED');
       }
     }
 
+    // 403 = permisos/reglas, no sesión
+    if (res.status === 403) {
+      throw new Error(`${operation} -> PERMISSION_DENIED`);
+    }
+
     return res;
   } catch (error) {
-    console.log('[Firestore] Network error:', operation, String(error?.message || error));
+    console.log('[Firestore] Error:', operation, String(error?.message || error));
     throw normalizeFirestoreError(error, operation);
   }
 };
@@ -158,13 +175,18 @@ export const setDocument = async (colName, docId, data) => {
     },
     `setDocument(${colName}/${docId})`
   );
-  if (!res.ok) throw new Error(`setDocument(${colName}/${docId}) -> ${res.status}`);
+
+  if (!res.ok) {
+    throw new Error(`setDocument(${colName}/${docId}) -> ${res.status}`);
+  }
+
   return true;
 };
 
 export const updateDocument = async (colName, docId, data) => {
   const params = new URLSearchParams({ key: FIREBASE_API_KEY });
   Object.keys(data).forEach((field) => params.append('updateMask.fieldPaths', field));
+
   const url = `${BASE_URL}/${colName}/${docId}?${params.toString()}`;
   const res = await firestoreFetch(
     url,
@@ -175,7 +197,11 @@ export const updateDocument = async (colName, docId, data) => {
     },
     `updateDocument(${colName}/${docId})`
   );
-  if (!res.ok) throw new Error(`updateDocument(${colName}/${docId}) -> ${res.status}`);
+
+  if (!res.ok) {
+    throw new Error(`updateDocument(${colName}/${docId}) -> ${res.status}`);
+  }
+
   return true;
 };
 
@@ -189,5 +215,6 @@ export const deleteDocument = async (colName, docId) => {
     },
     `deleteDocument(${colName}/${docId})`
   );
+
   return res.ok;
 };

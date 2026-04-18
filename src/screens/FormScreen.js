@@ -62,6 +62,40 @@ export default function FormScreen({ onSave, onBack, onCafeAdded, s, premiumAcce
     }
   };
 
+  const buildUserMessageFromError = (error) => {
+    const raw = String(error?.message || error || '');
+
+    if (raw === 'SESSION_EXPIRED') {
+      return 'Tu sesión ha caducado. Cierra sesión e inicia de nuevo.';
+    }
+
+    if (raw === 'FORBIDDEN') {
+      return 'No tienes permisos para realizar esta acción.';
+    }
+
+    if (raw === 'STORAGE_PERMISSION_DENIED') {
+      return 'No tienes permisos para subir imágenes.';
+    }
+
+    if (raw.includes('NETWORK_UNAVAILABLE')) {
+      return 'No hay conexión con el servidor. Revisa internet e inténtalo otra vez.';
+    }
+
+    if (raw.includes('PERMISSION_DENIED')) {
+      return 'No tienes permisos para modificar este café o crear el job de IA.';
+    }
+
+    if (raw.includes('403')) {
+      return 'No tienes permisos para realizar esta acción.';
+    }
+
+    if (raw.includes('401')) {
+      return 'Tu sesión no es válida ahora mismo. Cierra sesión e inicia de nuevo.';
+    }
+
+    return raw || 'No se pudo guardar el café.';
+  };
+
   const guardarCafe = async () => {
     const hasBarcode = !!String(scannedData?.ean || ean || '').trim();
     const hasPhoto = !!foto;
@@ -69,6 +103,11 @@ export default function FormScreen({ onSave, onBack, onCafeAdded, s, premiumAcce
 
     if (!nombreCafe.trim() && !canAutoEnrich) {
       Alert.alert('Aviso', 'Añade al menos un nombre, una foto o un código de barras.');
+      return;
+    }
+
+    if (!user?.uid) {
+      Alert.alert('Error', 'No hay sesión de usuario activa. Cierra sesión e inicia de nuevo.');
       return;
     }
 
@@ -255,11 +294,7 @@ export default function FormScreen({ onSave, onBack, onCafeAdded, s, premiumAcce
       onSave?.();
     } catch (error) {
       console.log('Error guardando café:', error);
-      const msg =
-        error?.message === 'SESSION_EXPIRED'
-          ? 'Tu sesión ha caducado. Cierra sesión e inicia de nuevo.'
-          : error?.message || 'No se pudo guardar el café.';
-      Alert.alert('Error', msg);
+      Alert.alert('Error', buildUserMessageFromError(error));
     } finally {
       setSubiendo(false);
     }

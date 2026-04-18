@@ -8,6 +8,13 @@ import FormScreen from './FormScreen';
 import ProfileScreen from './ProfileScreen';
 import ScannerScreen from './ScannerScreen';
 
+// 🔥 NUEVO: normalizador de EAN
+function normalizeEan(value) {
+  return String(value || '')
+    .replace(/\D/g, '')
+    .trim();
+}
+
 export function renderMainScreenTransientView({
   permission,
   requestPermission,
@@ -43,14 +50,16 @@ export function renderMainScreenTransientView({
     return (
       <ScannerScreen
         onScanned={(result) => {
-          const ean = result?.ean;
+          // 🔥 NORMALIZAMOS EAN
+          const ean = normalizeEan(result?.ean);
 
           if (!ean) {
             showDialog?.('Error', 'No se ha podido leer el código');
             return;
           }
 
-          const existing = allCafes.find((c) => String(c?.ean || '').trim() === ean);
+          // 🔥 COMPARACIÓN ROBUSTA
+          const existing = allCafes.find((c) => normalizeEan(c?.ean) === ean);
 
           if (existing) {
             setScanning(false);
@@ -58,8 +67,10 @@ export function renderMainScreenTransientView({
             return;
           }
 
+          // 🔥 PASAMOS EAN LIMPIO
           onScannerDone?.({
             ...result,
+            ean,
             isNew: true,
             autoCreate: true,
           });

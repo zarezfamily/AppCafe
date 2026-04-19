@@ -26,7 +26,7 @@ export default function BestValueTab({
       cargando={cargando}
       title="Mejor calidad/precio"
       subtitle="Los cafés con mejor equilibrio entre nota, votos y precio"
-      helperText="Ideal para encontrar cafés muy aprovechables sin gastar de más."
+      helperText="Ranking pensado para encontrar cafés muy aprovechables sin gastar de más."
       items={valueItems}
       categoryLabel="Value"
       CardVertical={CardVertical}

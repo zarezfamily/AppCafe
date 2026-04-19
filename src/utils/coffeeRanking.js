@@ -9,6 +9,9 @@ export function normalizeCategory(item) {
 }
 
 export function isBioCoffee(item) {
+  if (item?.isBio === true) return true;
+  if (item?.isBio === false) return false;
+
   const text = [
     item?.certificaciones,
     item?.notas,
@@ -21,7 +24,6 @@ export function isBioCoffee(item) {
     .join(' ');
 
   return (
-    item?.isBio === true ||
     text.includes('bio') ||
     text.includes('ecológico') ||
     text.includes('ecologico') ||

@@ -1,7 +1,11 @@
 const crypto = require('crypto');
 const admin = require('firebase-admin');
 const { onRequest } = require('firebase-functions/v2/https');
-const { onDocumentCreated, onDocumentUpdated } = require('firebase-functions/v2/firestore');
+const {
+  onDocumentCreated,
+  onDocumentUpdated,
+  onDocumentWritten,
+} = require('firebase-functions/v2/firestore');
 const { logger } = require('firebase-functions');
 
 admin.initializeApp();
@@ -370,6 +374,183 @@ function normalizeAiResult(parsed, cafe, job, barcodeData) {
     ean: String(parsed?.ean || barcodeData?.barcode || job?.ean || cafe?.ean || '').trim(),
   };
 }
+
+/* =========================
+   RANKING / SCORES BACKEND
+   ========================= */
+
+function normalizeScoreText(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase();
+}
+
+function normalizeCategoryForScores(data) {
+  return data?.coffeeCategory === 'daily' ? 'daily' : 'specialty';
+}
+
+function isBioCoffeeForScores(data) {
+  if (data?.isBio === true) return true;
+  if (data?.isBio === false) return false;
+
+  const text = [
+    data?.certificaciones,
+    data?.notas,
+    data?.nombre,
+    data?.marca,
+    data?.roaster,
+    data?.descripcion,
+  ]
+    .map(normalizeScoreText)
+    .join(' ');
+
+  return (
+    text.includes('bio') ||
+    text.includes('ecológico') ||
+    text.includes('ecologico') ||
+    text.includes('orgánico') ||
+    text.includes('organico') ||
+    text.includes('organic')
+  );
+}
+
+function getRankingScore(data) {
+  const puntuacion = Number(data?.puntuacion || 0);
+  const votos = Number(data?.votos || 0);
+  const isSpecialty = normalizeCategoryForScores(data) === 'specialty';
+  const isBio = isBioCoffeeForScores(data);
+
+  return Number(
+    (puntuacion * 20 + Math.min(votos, 50) * 1.5 + (isSpecialty ? 6 : 0) + (isBio ? 3 : 0)).toFixed(
+      2
+    )
+  );
+}
+
+function getTrendingScore(data) {
+  const puntuacion = Number(data?.puntuacion || 0);
+  const votos = Number(data?.votos || 0);
+
+  return Number((puntuacion * 10 + votos * 1.2).toFixed(2));
+}
+
+function getValueScore(data) {
+  const puntuacion = Number(data?.puntuacion || 0);
+  const votos = Number(data?.votos || 0);
+  const precio = Number(data?.precio || 0);
+
+  if (precio <= 0) return 0;
+
+  return Number(((puntuacion * 10 + Math.min(votos, 30)) / precio).toFixed(4));
+}
+
+function getBioScore(data) {
+  if (!isBioCoffeeForScores(data)) return 0;
+
+  const puntuacion = Number(data?.puntuacion || 0);
+  const votos = Number(data?.votos || 0);
+
+  return Number((puntuacion * 20 + Math.min(votos, 40) * 1.2 + 8).toFixed(2));
+}
+
+function buildCoffeeScores(data) {
+  return {
+    rankingScore: getRankingScore(data),
+    trendingScore: getTrendingScore(data),
+    valueScore: getValueScore(data),
+    bioScore: getBioScore(data),
+  };
+}
+
+exports.onCafeWriteRecalculateScores = onDocumentWritten(
+  {
+    document: 'cafes/{cafeId}',
+    region: 'europe-west1',
+  },
+  async (event) => {
+    const after = event.data?.after;
+    if (!after?.exists) return;
+
+    const data = after.data() || {};
+    const cafeId = String(event.params.cafeId || '');
+    if (!cafeId) return;
+
+    const nextScores = buildCoffeeScores(data);
+    const currentScores = {
+      rankingScore: Number(data?.rankingScore || 0),
+      trendingScore: Number(data?.trendingScore || 0),
+      valueScore: Number(data?.valueScore || 0),
+      bioScore: Number(data?.bioScore || 0),
+    };
+
+    const unchanged =
+      currentScores.rankingScore === nextScores.rankingScore &&
+      currentScores.trendingScore === nextScores.trendingScore &&
+      currentScores.valueScore === nextScores.valueScore &&
+      currentScores.bioScore === nextScores.bioScore;
+
+    if (unchanged) return;
+
+    await db.collection('cafes').doc(cafeId).set(nextScores, { merge: true });
+
+    logger.info('Coffee scores recalculated', {
+      cafeId,
+      ...nextScores,
+    });
+  }
+);
+
+exports.adminBackfillCoffeeScores = onRequest(
+  {
+    region: 'europe-west1',
+    cors: true,
+    timeoutSeconds: 540,
+    memory: '512MiB',
+  },
+  async (req, res) => {
+    if (req.method !== 'POST') {
+      res.status(405).json({ ok: false, error: 'METHOD_NOT_ALLOWED' });
+      return;
+    }
+
+    try {
+      const snapshot = await db.collection('cafes').get();
+
+      let updated = 0;
+      let batch = db.batch();
+      let ops = 0;
+      const batchLimit = 400;
+
+      for (const doc of snapshot.docs) {
+        const data = doc.data() || {};
+        const scores = buildCoffeeScores(data);
+
+        batch.set(doc.ref, scores, { merge: true });
+        ops += 1;
+        updated += 1;
+
+        if (ops >= batchLimit) {
+          await batch.commit();
+          batch = db.batch();
+          ops = 0;
+        }
+      }
+
+      if (ops > 0) {
+        await batch.commit();
+      }
+
+      logger.info('Coffee scores backfill completed', { updated });
+      res.status(200).json({ ok: true, updated });
+    } catch (error) {
+      logger.error('adminBackfillCoffeeScores error', error);
+      res.status(500).json({
+        ok: false,
+        error: String(error?.message || error),
+      });
+    }
+  }
+);
 
 async function lookupProductByBarcode(barcode) {
   const apiKey = process.env.BARCODE_LOOKUP_API_KEY;

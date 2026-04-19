@@ -45,6 +45,25 @@ function getBestPhoto(cafe) {
   ).trim();
 }
 
+function parsePrice(value) {
+  const raw = String(value || '')
+    .replace(',', '.')
+    .trim();
+
+  if (!raw) return null;
+
+  const num = Number(raw);
+  if (!Number.isFinite(num) || num <= 0) return null;
+
+  return Number(num.toFixed(2));
+}
+
+function isPriceInputInvalid(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return false;
+  return parsePrice(raw) === null;
+}
+
 function isCafeIncomplete(cafe) {
   if (!cafe) return true;
   return !(
@@ -75,6 +94,8 @@ function matchesSearch(cafe, term) {
     cafe.notas,
     cafe.finca,
     cafe.coffeeCategory,
+    cafe.isBio ? 'bio' : '',
+    cafe.certificaciones,
   ]
     .map(normalizeText)
     .join(' ');
@@ -145,6 +166,7 @@ function Badge({ label, kind }) {
         kind === 'danger' && styles.badgeDanger,
         kind === 'successSoft' && styles.badgeSuccessSoft,
         kind === 'dark' && styles.badgeDark,
+        kind === 'bio' && styles.badgeBio,
       ]}
     >
       <Text
@@ -155,6 +177,7 @@ function Badge({ label, kind }) {
           kind === 'danger' && styles.badgeTextDanger,
           kind === 'successSoft' && styles.badgeTextSuccessSoft,
           kind === 'dark' && styles.badgeTextDark,
+          kind === 'bio' && styles.badgeTextBio,
         ]}
       >
         {label}
@@ -192,6 +215,7 @@ function PendingCafeCard({ item, onApprove, onReject, onEdit, busy }) {
           <View style={styles.badgeRow}>
             <Badge label={badge.label} kind={badge.kind} />
             <Badge label={getCategoryLabel(coffeeCategory)} kind="dark" />
+            {item.isBio === true ? <Badge label="BIO" kind="bio" /> : null}
             {item.aiStatus === 'auto_approved' ? (
               <Badge label="Auto-IA" kind="successSoft" />
             ) : null}
@@ -215,6 +239,8 @@ function PendingCafeCard({ item, onApprove, onReject, onEdit, busy }) {
         <FieldRow label="Marca" value={marca} />
         <FieldRow label="Origen" value={origen} />
         <FieldRow label="Tipo" value={getCategoryLabel(coffeeCategory)} />
+        <FieldRow label="BIO" value={item.isBio ? 'Sí' : 'No'} />
+        {!!item.precio && <FieldRow label="Precio" value={`${item.precio} €`} />}
         {!!item.aiConfidenceScore && (
           <FieldRow label="Confianza IA" value={`${Math.round(item.aiConfidenceScore * 100)}%`} />
         )}
@@ -342,6 +368,7 @@ export default function AdminPanelScreen() {
       finca: cafe.finca || '',
       adminNotes: cafe.adminNotes || '',
       coffeeCategory: cafe.coffeeCategory || 'specialty',
+      isBio: cafe.isBio === true,
     });
   }, []);
 
@@ -422,6 +449,12 @@ export default function AdminPanelScreen() {
             ? 'specialty'
             : 'daily'
           : 'specialty'),
+      isBio:
+        prev.isBio === true ||
+        ai.isBio === true ||
+        String(ai.certificaciones || '')
+          .toLowerCase()
+          .includes('bio'),
     }));
   }, [editingCafe]);
 
@@ -481,6 +514,12 @@ export default function AdminPanelScreen() {
         prev.bestPhotoMode === 'official' || proposal.suggestedOfficialPhoto
           ? 'official'
           : prev.bestPhotoMode,
+      isBio:
+        prev.isBio === true ||
+        proposal.isBio === true ||
+        String(proposal.suggestedCertificaciones || '')
+          .toLowerCase()
+          .includes('bio'),
     }));
   }, [proposal]);
 
@@ -524,6 +563,12 @@ export default function AdminPanelScreen() {
     (approveNow = false) => {
       if (!editingCafe || !editData) return null;
 
+      const rawPrice = String(editData.precio || '').trim();
+      if (rawPrice && isPriceInputInvalid(rawPrice)) {
+        Alert.alert('Precio inválido', 'Introduce un precio válido mayor que 0. Ejemplo: 12.90');
+        return null;
+      }
+
       const userPhoto = getUserPhoto(editingCafe);
       const officialPhoto = String(editData.officialPhoto || '').trim();
       const selectedBy =
@@ -552,12 +597,13 @@ export default function AdminPanelScreen() {
         tueste: String(editData.tueste || '').trim(),
         preparacion: String(editData.preparacion || '').trim(),
         certificaciones: String(editData.certificaciones || '').trim(),
-        precio: editData.precio ? Number(editData.precio) : null,
+        precio: parsePrice(editData.precio),
         sca: editData.sca ? Number(editData.sca) : null,
         formato: String(editData.formato || '').trim(),
         finca: String(editData.finca || '').trim(),
         adminNotes: String(editData.adminNotes || '').trim(),
         coffeeCategory: editData.coffeeCategory || 'specialty',
+        isBio: editData.isBio === true,
         adminReviewedAt: new Date().toISOString(),
         appVisible: approveNow ? true : (editingCafe.appVisible ?? false),
         scannerVisible: true,
@@ -574,6 +620,8 @@ export default function AdminPanelScreen() {
       setBusyId(editingCafe.id);
 
       const payload = buildEditedPayload(false);
+      if (!payload) return;
+
       await updateDocument('cafes', editingCafe.id, payload);
 
       Alert.alert('OK', 'Ficha guardada como borrador');
@@ -592,6 +640,8 @@ export default function AdminPanelScreen() {
       setBusyId(editingCafe.id);
 
       const payload = buildEditedPayload(true);
+      if (!payload) return;
+
       await updateDocument('cafes', editingCafe.id, payload);
 
       Alert.alert('OK', 'Ficha guardada y aprobada');
@@ -684,6 +734,7 @@ export default function AdminPanelScreen() {
         : userPhoto || officialPhoto || '';
 
     const ai = editingCafe.aiSuggestion || {};
+    const priceInvalid = isPriceInputInvalid(editData.precio);
 
     return (
       <ScrollView style={styles.editorContainer} contentContainerStyle={styles.editorContent}>
@@ -769,6 +820,44 @@ export default function AdminPanelScreen() {
           <Text style={styles.categoryHelp}>
             Usa “Especialidad” para roasters o cafés curados y “Café diario” para supermercado o
             consumo habitual.
+          </Text>
+        </View>
+
+        <View style={styles.categoryCard}>
+          <Text style={styles.categoryTitle}>Certificación BIO</Text>
+
+          <View style={styles.categoryRow}>
+            <TouchableOpacity
+              style={[styles.categoryBtn, editData.isBio === true && styles.categoryBtnActive]}
+              onPress={() => setEditData((prev) => ({ ...prev, isBio: true }))}
+            >
+              <Text
+                style={[
+                  styles.categoryBtnText,
+                  editData.isBio === true && styles.categoryBtnTextActive,
+                ]}
+              >
+                🌿 BIO
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.categoryBtn, editData.isBio === false && styles.categoryBtnActive]}
+              onPress={() => setEditData((prev) => ({ ...prev, isBio: false }))}
+            >
+              <Text
+                style={[
+                  styles.categoryBtnText,
+                  editData.isBio === false && styles.categoryBtnTextActive,
+                ]}
+              >
+                No BIO
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.categoryHelp}>
+            Marca si el café es ecológico u orgánico certificado.
           </Text>
         </View>
 
@@ -878,6 +967,9 @@ export default function AdminPanelScreen() {
                 : 'Café diario'
               : '-'}
           </Text>
+          <Text style={styles.blockText}>
+            BIO sugerido: {ai.isBio === true ? 'Sí' : 'No / sin dato'}
+          </Text>
 
           {proposal ? (
             <>
@@ -960,15 +1052,20 @@ export default function AdminPanelScreen() {
           label="Certificaciones"
           value={editData.certificaciones}
           onChangeText={(t) => setEditData((prev) => ({ ...prev, certificaciones: t }))}
-          placeholder="Orgánico, Fair Trade, etc."
+          placeholder="BIO, Organic, Fair Trade, etc."
         />
         <EditorField
-          label="Precio"
+          label="Precio (€)"
           value={editData.precio}
           onChangeText={(t) => setEditData((prev) => ({ ...prev, precio: t }))}
           placeholder="Ej. 12.90"
           keyboardType="decimal-pad"
         />
+        {priceInvalid ? (
+          <Text style={styles.priceErrorText}>
+            Introduce un precio válido mayor que 0. Ejemplo: 12.90
+          </Text>
+        ) : null}
         <EditorField
           label="SCA"
           value={editData.sca}
@@ -1001,10 +1098,10 @@ export default function AdminPanelScreen() {
             style={[
               styles.editorActionBtn,
               styles.saveDraftBtn,
-              busyId === editingCafe.id && styles.actionBtnDisabled,
+              (busyId === editingCafe.id || priceInvalid) && styles.actionBtnDisabled,
             ]}
             onPress={handleSaveDraft}
-            disabled={busyId === editingCafe.id}
+            disabled={busyId === editingCafe.id || priceInvalid}
           >
             <Text style={styles.actionBtnText}>Guardar borrador</Text>
           </TouchableOpacity>
@@ -1013,10 +1110,10 @@ export default function AdminPanelScreen() {
             style={[
               styles.editorActionBtn,
               styles.approveBtn,
-              busyId === editingCafe.id && styles.actionBtnDisabled,
+              (busyId === editingCafe.id || priceInvalid) && styles.actionBtnDisabled,
             ]}
             onPress={handleSaveAndApprove}
-            disabled={busyId === editingCafe.id}
+            disabled={busyId === editingCafe.id || priceInvalid}
           >
             <Text style={styles.actionBtnText}>Guardar y aprobar</Text>
           </TouchableOpacity>
@@ -1208,12 +1305,14 @@ const styles = StyleSheet.create({
   badgeDanger: { backgroundColor: '#FEE2E2' },
   badgeSuccessSoft: { backgroundColor: '#E0F2FE' },
   badgeDark: { backgroundColor: '#E5E7EB' },
+  badgeBio: { backgroundColor: '#E7F7EC' },
   badgeText: { fontSize: 12, fontWeight: '700' },
   badgeTextWarning: { color: '#92400E' },
   badgeTextSuccess: { color: '#166534' },
   badgeTextDanger: { color: '#991B1B' },
   badgeTextSuccessSoft: { color: '#075985' },
   badgeTextDark: { color: '#111827' },
+  badgeTextBio: { color: '#1F6B42' },
 
   thumbnailWrap: { width: 82, height: 82 },
   thumbnail: { width: 82, height: 82, borderRadius: 14, backgroundColor: '#EEE' },
@@ -1446,6 +1545,13 @@ const styles = StyleSheet.create({
     minHeight: 92,
     paddingTop: 12,
     paddingBottom: 12,
+  },
+  priceErrorText: {
+    marginTop: -6,
+    marginBottom: 12,
+    fontSize: 12,
+    color: '#B91C1C',
+    fontWeight: '600',
   },
 
   editorActionsColumn: {

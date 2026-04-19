@@ -6,17 +6,19 @@ import BioTopTab from './BioTopTab';
 import DailyTopTab from './DailyTopTab';
 import TopCafesTab from './TopCafesTab';
 
-function TabButton({ label, active, onPress }) {
+function RankingModeChip({ label, active, onPress }) {
   return (
     <TouchableOpacity
       onPress={onPress}
+      activeOpacity={0.9}
       style={{
         paddingHorizontal: 14,
-        paddingVertical: 8,
+        paddingVertical: 9,
         borderRadius: 999,
         borderWidth: 1,
         borderColor: active ? '#8f5e3b' : '#e2d5c8',
         backgroundColor: active ? '#f3e7d9' : '#faf7f2',
+        marginRight: 8,
       }}
     >
       <Text
@@ -37,25 +39,25 @@ export default function RankingTab(props) {
 
   return (
     <View style={{ flex: 1 }}>
-      {/* SELECTOR */}
-      <View style={{ paddingHorizontal: 16, marginTop: 12 }}>
+      <View style={{ paddingHorizontal: 16, paddingTop: 12 }}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <View style={{ flexDirection: 'row', gap: 8 }}>
-            <TabButton
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <RankingModeChip
               label="⭐ Especialidad"
               active={mode === 'specialty'}
               onPress={() => setMode('specialty')}
             />
-
-            <TabButton
+            <RankingModeChip
               label="☕ Diario"
               active={mode === 'daily'}
               onPress={() => setMode('daily')}
             />
-
-            <TabButton label="🌿 BIO" active={mode === 'bio'} onPress={() => setMode('bio')} />
-
-            <TabButton
+            <RankingModeChip
+              label="🌿 BIO"
+              active={mode === 'bio'}
+              onPress={() => setMode('bio')}
+            />
+            <RankingModeChip
               label="💸 Value"
               active={mode === 'value'}
               onPress={() => setMode('value')}
@@ -64,7 +66,6 @@ export default function RankingTab(props) {
         </ScrollView>
       </View>
 
-      {/* CONTENIDO */}
       {mode === 'specialty' && <TopCafesTab {...props} />}
       {mode === 'daily' && <DailyTopTab {...props} />}
       {mode === 'bio' && <BioTopTab {...props} />}

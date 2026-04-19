@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import SimpleCoffeeListTab from './SimpleCoffeeListTab';
 
 export default function TopCafesTab({
@@ -14,6 +15,11 @@ export default function TopCafesTab({
 }) {
   const country = perfil?.pais || 'España';
 
+  const specialtyItems = useMemo(
+    () => (top100 || []).filter((item) => (item.coffeeCategory || 'specialty') === 'specialty'),
+    [top100]
+  );
+
   return (
     <SimpleCoffeeListTab
       s={s}
@@ -23,12 +29,13 @@ export default function TopCafesTab({
       title="Top cafés de especialidad"
       subtitle={`Los cafés mejor valorados ahora mismo en ${country}`}
       helperText="Ordenados por puntuación media de la comunidad. Aquí es donde empiezas si quieres descubrir lo mejor de ETIOVE."
-      items={top100}
+      items={specialtyItems}
+      categoryLabel="Especialidad"
       CardVertical={CardVertical}
       setCafeDetalle={setCafeDetalle}
       favs={favs}
       toggleFav={toggleFav}
-      emptyText="Aún no hay cafés puntuados en esta vista."
+      emptyText="Aún no hay cafés de especialidad puntuados en esta vista."
     />
   );
 }

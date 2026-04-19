@@ -29,6 +29,16 @@ function buildRankedOptions(items, field) {
   });
 }
 
+function normalizeCategory(item) {
+  return item?.coffeeCategory === 'daily' ? 'daily' : 'specialty';
+}
+
+function normalizeText(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase();
+}
+
 function FilterChip({ label, active, onPress, accentColor, count }) {
   return (
     <TouchableOpacity
@@ -248,23 +258,28 @@ export default function DiscoverTab({
   const [paisSeleccionado, setPaisSeleccionado] = useState(null);
   const [procesoSeleccionado, setProcesoSeleccionado] = useState(null);
   const [roasterSeleccionado, setRoasterSeleccionado] = useState(null);
+  const [categorySelected, setCategorySelected] = useState('specialty');
   const [sortBy, setSortBy] = useState('personalized');
 
-  const paises = useMemo(() => buildRankedOptions(personalizedCafes, 'pais'), [personalizedCafes]);
-  const procesos = useMemo(
-    () => buildRankedOptions(personalizedCafes, 'proceso'),
-    [personalizedCafes]
-  );
-  const roasters = useMemo(
-    () => buildRankedOptions(personalizedCafes, 'roaster'),
-    [personalizedCafes]
-  );
+  const cafesBase = useMemo(() => {
+    return (personalizedCafes || []).filter((item) => normalizeCategory(item) === categorySelected);
+  }, [personalizedCafes, categorySelected]);
+
+  const paises = useMemo(() => buildRankedOptions(cafesBase, 'pais'), [cafesBase]);
+  const procesos = useMemo(() => buildRankedOptions(cafesBase, 'proceso'), [cafesBase]);
+  const roasters = useMemo(() => buildRankedOptions(cafesBase, 'roaster'), [cafesBase]);
 
   const itemsFiltrados = useMemo(() => {
-    const base = (personalizedCafes || []).filter((item) => {
-      const okPais = !paisSeleccionado || item?.pais === paisSeleccionado;
-      const okProceso = !procesoSeleccionado || item?.proceso === procesoSeleccionado;
-      const okRoaster = !roasterSeleccionado || item?.roaster === roasterSeleccionado;
+    const base = cafesBase.filter((item) => {
+      const okPais =
+        !paisSeleccionado || normalizeText(item?.pais) === normalizeText(paisSeleccionado);
+
+      const okProceso =
+        !procesoSeleccionado || normalizeText(item?.proceso) === normalizeText(procesoSeleccionado);
+
+      const okRoaster =
+        !roasterSeleccionado || normalizeText(item?.roaster) === normalizeText(roasterSeleccionado);
+
       return okPais && okProceso && okRoaster;
     });
 
@@ -274,7 +289,7 @@ export default function DiscoverTab({
       if (sortBy === 'recent') return parseDateValue(b?.fecha) - parseDateValue(a?.fecha);
       return Number(b?.personalizedScore || 0) - Number(a?.personalizedScore || 0);
     });
-  }, [personalizedCafes, paisSeleccionado, procesoSeleccionado, roasterSeleccionado, sortBy]);
+  }, [cafesBase, paisSeleccionado, procesoSeleccionado, roasterSeleccionado, sortBy]);
 
   const filtrosActivos = [paisSeleccionado, procesoSeleccionado, roasterSeleccionado].filter(
     Boolean
@@ -283,25 +298,31 @@ export default function DiscoverTab({
   const topDestacado = itemsFiltrados?.[0] || null;
 
   const topPaisBase = useMemo(() => {
-    const first = buildRankedOptions(personalizedCafes, 'pais')[0];
+    const first = buildRankedOptions(cafesBase, 'pais')[0];
     return first?.label || null;
-  }, [personalizedCafes]);
+  }, [cafesBase]);
 
   const topProcesoBase = useMemo(() => {
-    const first = buildRankedOptions(personalizedCafes, 'proceso')[0];
+    const first = buildRankedOptions(cafesBase, 'proceso')[0];
     return first?.label || null;
-  }, [personalizedCafes]);
+  }, [cafesBase]);
 
   const topRoasterBase = useMemo(() => {
-    const first = buildRankedOptions(personalizedCafes, 'roaster')[0];
+    const first = buildRankedOptions(cafesBase, 'roaster')[0];
     return first?.label || null;
-  }, [personalizedCafes]);
+  }, [cafesBase]);
 
   const buildMatchReasons = (item) => {
     const reasons = [];
-    if (topPaisBase && item?.pais === topPaisBase) reasons.push('Match país');
-    if (topProcesoBase && item?.proceso === topProcesoBase) reasons.push('Match proceso');
-    if (topRoasterBase && item?.roaster === topRoasterBase) reasons.push('Match tostador');
+    if (topPaisBase && normalizeText(item?.pais) === normalizeText(topPaisBase)) {
+      reasons.push('Match país');
+    }
+    if (topProcesoBase && normalizeText(item?.proceso) === normalizeText(topProcesoBase)) {
+      reasons.push('Match proceso');
+    }
+    if (topRoasterBase && normalizeText(item?.roaster) === normalizeText(topRoasterBase)) {
+      reasons.push('Match tostador');
+    }
     if (Number(item?.personalizedScore || 0) >= 8) reasons.push('Alta afinidad');
     return reasons.slice(0, 3);
   };
@@ -311,6 +332,13 @@ export default function DiscoverTab({
     setProcesoSeleccionado(null);
     setRoasterSeleccionado(null);
   };
+
+  const categoryLabel = categorySelected === 'daily' ? 'Café diario' : 'Especialidad';
+
+  const helperText =
+    categorySelected === 'daily'
+      ? 'Aquí priorizamos cafés comerciales o de uso habitual que encajan con tus gustos y hábitos.'
+      : 'Aquí priorizamos lo que mejor encaja contigo: países, procesos y tostadores que más se repiten en tus gustos recientes y en tus cafés favoritos.';
 
   return (
     <View style={{ paddingTop: 20 }}>
@@ -322,8 +350,7 @@ export default function DiscoverTab({
 
         <Text style={s.pageTitle}>Descubrir para ti</Text>
         <Text style={s.sectionSub}>
-          {personalizedReason ||
-            'Selección personalizada basada en tus favoritos y afinidades dentro de ETIOVE'}
+          {personalizedReason || 'Selección personalizada basada en tus gustos dentro de ETIOVE'}
         </Text>
 
         <View
@@ -356,9 +383,35 @@ export default function DiscoverTab({
               color: '#6f5a4b',
             }}
           >
-            Aquí priorizamos lo que mejor encaja contigo: países, procesos y tostadores que más se
-            repiten en tus gustos recientes y en tus cafés favoritos.
+            {helperText}
           </Text>
+
+          <View
+            style={{
+              marginTop: 12,
+              flexDirection: 'row',
+              gap: 8,
+            }}
+          >
+            <FilterChip
+              label="Especialidad"
+              active={categorySelected === 'specialty'}
+              onPress={() => {
+                setCategorySelected('specialty');
+                clearFilters();
+              }}
+              accentColor={premiumAccent}
+            />
+            <FilterChip
+              label="Café diario"
+              active={categorySelected === 'daily'}
+              onPress={() => {
+                setCategorySelected('daily');
+                clearFilters();
+              }}
+              accentColor={premiumAccent}
+            />
+          </View>
 
           <View
             style={{
@@ -394,7 +447,7 @@ export default function DiscoverTab({
                   fontWeight: '800',
                 }}
               >
-                {filtrosActivos > 0 ? `${filtrosActivos} filtros` : 'Sin filtros'}
+                {categoryLabel}
               </Text>
             </View>
           </View>
@@ -551,9 +604,11 @@ export default function DiscoverTab({
                 {topDestacado.nombre}
               </Text>
               <Text style={{ marginTop: 4, fontSize: 13, color: '#6f5a4b' }}>
-                {topDestacado.pais || 'Origen no indicado'}
+                {topDestacado.pais || topDestacado.origen || 'Origen no indicado'}
                 {topDestacado.proceso ? ` · ${topDestacado.proceso}` : ''}
-                {topDestacado.roaster ? ` · ${topDestacado.roaster}` : ''}
+                {topDestacado.roaster || topDestacado.marca
+                  ? ` · ${topDestacado.roaster || topDestacado.marca}`
+                  : ''}
               </Text>
               <Text style={{ marginTop: 8, fontSize: 13, color: '#8f5e3b', fontWeight: '800' }}>
                 {topDestacado.puntuacion || 0}.0 ⭐ · {topDestacado.votos || 0} votos

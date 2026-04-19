@@ -29,6 +29,16 @@ function buildRankedOptions(items, field) {
   });
 }
 
+function normalizeCategory(item) {
+  return item?.coffeeCategory === 'daily' ? 'daily' : 'specialty';
+}
+
+function normalizeText(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase();
+}
+
 function FilterChip({ label, active, onPress, accentColor, count }) {
   return (
     <TouchableOpacity
@@ -241,6 +251,7 @@ export default function TrendingTab({
   const [paisSeleccionado, setPaisSeleccionado] = useState(null);
   const [procesoSeleccionado, setProcesoSeleccionado] = useState(null);
   const [roasterSeleccionado, setRoasterSeleccionado] = useState(null);
+  const [categorySelected, setCategorySelected] = useState('specialty');
   const [sortBy, setSortBy] = useState('trending');
 
   useEffect(() => {
@@ -258,15 +269,25 @@ export default function TrendingTab({
     });
   }, [paisSeleccionado, procesoSeleccionado, roasterSeleccionado, setTrendingFilters]);
 
-  const paises = useMemo(() => buildRankedOptions(trendingCafes, 'pais'), [trendingCafes]);
-  const procesos = useMemo(() => buildRankedOptions(trendingCafes, 'proceso'), [trendingCafes]);
-  const roasters = useMemo(() => buildRankedOptions(trendingCafes, 'roaster'), [trendingCafes]);
+  const cafesBase = useMemo(() => {
+    return (trendingCafes || []).filter((item) => normalizeCategory(item) === categorySelected);
+  }, [trendingCafes, categorySelected]);
+
+  const paises = useMemo(() => buildRankedOptions(cafesBase, 'pais'), [cafesBase]);
+  const procesos = useMemo(() => buildRankedOptions(cafesBase, 'proceso'), [cafesBase]);
+  const roasters = useMemo(() => buildRankedOptions(cafesBase, 'roaster'), [cafesBase]);
 
   const itemsFiltrados = useMemo(() => {
-    const base = (trendingCafes || []).filter((item) => {
-      const okPais = !paisSeleccionado || item?.pais === paisSeleccionado;
-      const okProceso = !procesoSeleccionado || item?.proceso === procesoSeleccionado;
-      const okRoaster = !roasterSeleccionado || item?.roaster === roasterSeleccionado;
+    const base = cafesBase.filter((item) => {
+      const okPais =
+        !paisSeleccionado || normalizeText(item?.pais) === normalizeText(paisSeleccionado);
+
+      const okProceso =
+        !procesoSeleccionado || normalizeText(item?.proceso) === normalizeText(procesoSeleccionado);
+
+      const okRoaster =
+        !roasterSeleccionado || normalizeText(item?.roaster) === normalizeText(roasterSeleccionado);
+
       return okPais && okProceso && okRoaster;
     });
 
@@ -276,7 +297,7 @@ export default function TrendingTab({
       if (sortBy === 'recent') return parseDateValue(b?.fecha) - parseDateValue(a?.fecha);
       return Number(b?.trendingScore || 0) - Number(a?.trendingScore || 0);
     });
-  }, [trendingCafes, paisSeleccionado, procesoSeleccionado, roasterSeleccionado, sortBy]);
+  }, [cafesBase, paisSeleccionado, procesoSeleccionado, roasterSeleccionado, sortBy]);
 
   const filtrosActivos = [paisSeleccionado, procesoSeleccionado, roasterSeleccionado].filter(
     Boolean
@@ -289,25 +310,31 @@ export default function TrendingTab({
   const rankingRest = top10.slice(1);
 
   const topPaisBase = useMemo(() => {
-    const first = buildRankedOptions(trendingCafes, 'pais')[0];
+    const first = buildRankedOptions(cafesBase, 'pais')[0];
     return first?.label || null;
-  }, [trendingCafes]);
+  }, [cafesBase]);
 
   const topProcesoBase = useMemo(() => {
-    const first = buildRankedOptions(trendingCafes, 'proceso')[0];
+    const first = buildRankedOptions(cafesBase, 'proceso')[0];
     return first?.label || null;
-  }, [trendingCafes]);
+  }, [cafesBase]);
 
   const topRoasterBase = useMemo(() => {
-    const first = buildRankedOptions(trendingCafes, 'roaster')[0];
+    const first = buildRankedOptions(cafesBase, 'roaster')[0];
     return first?.label || null;
-  }, [trendingCafes]);
+  }, [cafesBase]);
 
   const buildMatchReasons = (item) => {
     const reasons = [];
-    if (topPaisBase && item?.pais === topPaisBase) reasons.push('Top país');
-    if (topProcesoBase && item?.proceso === topProcesoBase) reasons.push('Top proceso');
-    if (topRoasterBase && item?.roaster === topRoasterBase) reasons.push('Top tostador');
+    if (topPaisBase && normalizeText(item?.pais) === normalizeText(topPaisBase)) {
+      reasons.push('Top país');
+    }
+    if (topProcesoBase && normalizeText(item?.proceso) === normalizeText(topProcesoBase)) {
+      reasons.push('Top proceso');
+    }
+    if (topRoasterBase && normalizeText(item?.roaster) === normalizeText(topRoasterBase)) {
+      reasons.push('Top tostador');
+    }
     if (Number(item?.trendingScore || 0) >= 4) reasons.push('Alta tracción');
     return reasons.slice(0, 3);
   };
@@ -317,6 +344,8 @@ export default function TrendingTab({
     setProcesoSeleccionado(null);
     setRoasterSeleccionado(null);
   };
+
+  const categoryLabel = categorySelected === 'daily' ? 'Café diario' : 'Especialidad';
 
   return (
     <View style={{ paddingTop: 20 }}>
@@ -365,6 +394,33 @@ export default function TrendingTab({
             style={{
               marginTop: 12,
               flexDirection: 'row',
+              gap: 10,
+            }}
+          >
+            <FilterChip
+              label="Especialidad"
+              active={categorySelected === 'specialty'}
+              onPress={() => {
+                setCategorySelected('specialty');
+                clearFilters();
+              }}
+              accentColor={premiumAccent}
+            />
+            <FilterChip
+              label="Café diario"
+              active={categorySelected === 'daily'}
+              onPress={() => {
+                setCategorySelected('daily');
+                clearFilters();
+              }}
+              accentColor={premiumAccent}
+            />
+          </View>
+
+          <View
+            style={{
+              marginTop: 12,
+              flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'space-between',
               gap: 12,
@@ -395,7 +451,7 @@ export default function TrendingTab({
                   fontWeight: '800',
                 }}
               >
-                {filtrosActivos > 0 ? `${filtrosActivos} filtros` : 'Sin filtros'}
+                {categoryLabel}
               </Text>
             </View>
           </View>
@@ -485,7 +541,6 @@ export default function TrendingTab({
         <SkeletonVerticalList />
       ) : (
         <View style={{ marginTop: 16 }}>
-          {/* TOP 10 APPLE STYLE */}
           {!!top10.length && (
             <View style={{ marginBottom: 22 }}>
               <Text
@@ -551,9 +606,11 @@ export default function TrendingTab({
                   </Text>
 
                   <Text style={{ marginTop: 6, fontSize: 14, color: '#6f5a4b' }}>
-                    {heroCafe.pais || 'Origen no indicado'}
+                    {heroCafe.pais || heroCafe.origen || 'Origen no indicado'}
                     {heroCafe.proceso ? ` · ${heroCafe.proceso}` : ''}
-                    {heroCafe.roaster ? ` · ${heroCafe.roaster}` : ''}
+                    {heroCafe.roaster || heroCafe.marca
+                      ? ` · ${heroCafe.roaster || heroCafe.marca}`
+                      : ''}
                   </Text>
 
                   <Text
@@ -675,9 +732,11 @@ export default function TrendingTab({
                   {topDestacado.nombre}
                 </Text>
                 <Text style={{ marginTop: 4, fontSize: 13, color: '#6f5a4b' }}>
-                  {topDestacado.pais || 'Origen no indicado'}
+                  {topDestacado.pais || topDestacado.origen || 'Origen no indicado'}
                   {topDestacado.proceso ? ` · ${topDestacado.proceso}` : ''}
-                  {topDestacado.roaster ? ` · ${topDestacado.roaster}` : ''}
+                  {topDestacado.roaster || topDestacado.marca
+                    ? ` · ${topDestacado.roaster || topDestacado.marca}`
+                    : ''}
                 </Text>
                 <Text style={{ marginTop: 8, fontSize: 13, color: '#8f5e3b', fontWeight: '800' }}>
                   {topDestacado.puntuacion || 0}.0 ⭐ · {topDestacado.votos || 0} votos

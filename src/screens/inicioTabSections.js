@@ -1,7 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import {
   ActivityIndicator,
-  Animated,
   Image,
   Linking,
   StyleSheet,
@@ -27,6 +26,10 @@ export const FEATURED_BLOG_POSTS = [
     icon: 'snow-outline',
   },
 ];
+
+function normalizeCategory(item) {
+  return item?.coffeeCategory === 'daily' ? 'daily' : 'specialty';
+}
 
 function QuickFilterChip({ label, onPress, accentColor, icon }) {
   return (
@@ -83,15 +86,7 @@ export function InicioTopBar({
         <View style={s.brandDecorTwo} />
         <View style={s.brandTopRule} />
 
-        <Animated.View
-          style={[
-            s.brandPillContent,
-            {
-              opacity: brandCardAnim,
-              transform: [{ translateY: brandCardTranslateY }, { scale: brandCardScale }],
-            },
-          ]}
-        >
+        <View style={s.brandPillContent}>
           <Text style={s.brandEyebrow}>Member Roast Card</Text>
 
           <View style={s.brandMemberRow}>
@@ -133,7 +128,7 @@ export function InicioTopBar({
           </View>
 
           <View style={s.brandProgressTrack}>
-            <Animated.View style={[s.brandProgressFill, { width: brandProgressWidth }]} />
+            <View style={[s.brandProgressFill, { width: brandProgressWidth }]} />
           </View>
 
           <View style={s.brandStatsRow}>
@@ -154,7 +149,7 @@ export function InicioTopBar({
               <Text style={s.brandStatLabel}>Favoritos</Text>
             </View>
           </View>
-        </Animated.View>
+        </View>
       </TouchableOpacity>
     </View>
   );
@@ -198,42 +193,185 @@ export function SearchResultsSection({
   );
 }
 
-export function DiscoverForYouSection({
+export function SpecialtyForYouSection({
   s,
-  personalizedCafes,
-  personalizedReason,
+  cafes,
   setCafeDetalle,
   favs,
   toggleFav,
   CardHorizontal,
 }) {
-  if (!personalizedCafes?.length) return null;
+  if (!cafes?.length) return null;
 
   return (
     <>
-      <SectionHeaderNav s={s} title="Descubrir para ti" marginTop={28} hideAction />
-      <Text style={s.sectionSub}>
-        {personalizedReason ||
-          'Una selección personalizada basada en tus favoritos y en los perfiles que más repites.'}
-      </Text>
+      <SectionHeaderNav s={s} title="Especialidad para ti" marginTop={28} hideAction />
+      <Text style={s.sectionSub}>Cafés curados y mejor valorados por la comunidad ETIOVE</Text>
 
       <HorizontalCardRow
         s={s}
         loading={false}
-        items={personalizedCafes}
-        header="Selección personalizada"
-        subheader="Ajustada a tus afinidades actuales dentro de ETIOVE"
+        items={cafes.slice(0, 10)}
+        header="Selección specialty"
+        subheader="Lo mejor de la comunidad para descubrir cafés con más trazabilidad y matices"
         renderItem={(item) => (
           <CardHorizontal
             key={item.id}
             item={item}
-            badge={`${item.puntuacion}.0`}
+            badge={`${item.puntuacion || 0}.0 ⭐`}
             onPress={setCafeDetalle}
             favs={favs}
             onToggleFav={toggleFav}
           />
         )}
       />
+    </>
+  );
+}
+
+export function DailyCoffeeSection({ s, cafes, setCafeDetalle, favs, toggleFav, CardHorizontal }) {
+  if (!cafes?.length) return null;
+
+  return (
+    <>
+      <SectionHeaderNav s={s} title="Tu café diario" marginTop={28} hideAction />
+      <Text style={s.sectionSub}>Cafés de supermercado y consumo habitual para el día a día</Text>
+
+      <HorizontalCardRow
+        s={s}
+        loading={false}
+        items={cafes.slice(0, 10)}
+        header="Selección diaria"
+        subheader="Opciones comerciales y cafés habituales que toma la comunidad"
+        renderItem={(item) => (
+          <CardHorizontal
+            key={item.id}
+            item={item}
+            badge="☕ Diario"
+            onPress={setCafeDetalle}
+            favs={favs}
+            onToggleFav={toggleFav}
+          />
+        )}
+      />
+    </>
+  );
+}
+
+export function DailyTopSection({ s, cafes, setCafeDetalle, favs, toggleFav, CardHorizontal }) {
+  if (!cafes?.length) return null;
+
+  return (
+    <>
+      <SectionHeaderNav s={s} title="Top café diario" marginTop={28} hideAction />
+      <Text style={s.sectionSub}>Los cafés diarios mejor valorados por la comunidad</Text>
+
+      <HorizontalCardRow
+        s={s}
+        loading={false}
+        items={cafes.slice(0, 10)}
+        header="Ranking diario"
+        subheader="Lo más recomendable dentro del café de supermercado o consumo habitual"
+        renderItem={(item) => (
+          <CardHorizontal
+            key={item.id}
+            item={item}
+            badge={`${item.puntuacion || 0}.0 🏆`}
+            onPress={setCafeDetalle}
+            favs={favs}
+            onToggleFav={toggleFav}
+          />
+        )}
+      />
+    </>
+  );
+}
+
+export function BestValueSection({ s, cafes, setCafeDetalle, favs, toggleFav, CardHorizontal }) {
+  if (!cafes?.length) return null;
+
+  return (
+    <>
+      <SectionHeaderNav s={s} title="Mejor calidad/precio" marginTop={28} hideAction />
+      <Text style={s.sectionSub}>
+        Cafés con muy buena relación entre lo que cuestan y lo que ofrecen
+      </Text>
+
+      <HorizontalCardRow
+        s={s}
+        loading={false}
+        items={cafes.slice(0, 10)}
+        header="Selección calidad/precio"
+        subheader="Pensado para descubrir cafés muy aprovechables sin disparar presupuesto"
+        renderItem={(item) => (
+          <CardHorizontal
+            key={item.id}
+            item={item}
+            badge="💸 Top value"
+            onPress={setCafeDetalle}
+            favs={favs}
+            onToggleFav={toggleFav}
+          />
+        )}
+      />
+    </>
+  );
+}
+
+export function StepUpSection({ s, pairs, setCafeDetalle, favs, toggleFav, CardHorizontal }) {
+  if (!pairs?.length) return null;
+
+  return (
+    <>
+      <SectionHeaderNav s={s} title="Da el salto" marginTop={28} hideAction />
+      <Text style={s.sectionSub}>
+        Si te gusta un café diario, aquí tienes un specialty parecido para subir de nivel
+      </Text>
+
+      <View style={{ paddingHorizontal: 16, gap: 14 }}>
+        {pairs.slice(0, 4).map((pair, index) => (
+          <View
+            key={`${pair.daily?.id || 'daily'}-${pair.specialty?.id || 'specialty'}-${index}`}
+            style={styles.stepUpCard}
+          >
+            <View style={styles.stepUpTop}>
+              <View style={styles.stepUpBadgeDaily}>
+                <Text style={styles.stepUpBadgeDailyText}>Café diario</Text>
+              </View>
+              <Ionicons name="arrow-forward" size={18} color="#8f5e3b" />
+              <View style={styles.stepUpBadgeSpecialty}>
+                <Text style={styles.stepUpBadgeSpecialtyText}>Especialidad</Text>
+              </View>
+            </View>
+
+            <View style={styles.stepUpColumns}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.stepUpLabel}>Empiezas con</Text>
+                <CardHorizontal
+                  item={pair.daily}
+                  badge="☕ Diario"
+                  onPress={setCafeDetalle}
+                  favs={favs}
+                  onToggleFav={toggleFav}
+                />
+              </View>
+
+              <View style={{ width: 10 }} />
+
+              <View style={{ flex: 1 }}>
+                <Text style={styles.stepUpLabel}>Prueba después</Text>
+                <CardHorizontal
+                  item={pair.specialty}
+                  badge="⭐ Specialty"
+                  onPress={setCafeDetalle}
+                  favs={favs}
+                  onToggleFav={toggleFav}
+                />
+              </View>
+            </View>
+          </View>
+        ))}
+      </View>
     </>
   );
 }
@@ -325,7 +463,11 @@ export function TrendingSection({
   toggleFav,
   CardHorizontal,
 }) {
-  if (!trendingCafes?.length) return null;
+  const specialtyTrending = (trendingCafes || []).filter(
+    (item) => normalizeCategory(item) === 'specialty'
+  );
+
+  if (!specialtyTrending.length) return null;
 
   return (
     <>
@@ -337,20 +479,20 @@ export function TrendingSection({
         actionLabel="Ver trending"
       />
       <Text style={s.sectionSub}>
-        Los cafés que mejor combinan puntuación, votos y tracción de la comunidad
+        Los cafés de especialidad que mejor combinan puntuación, votos y tracción de la comunidad
       </Text>
 
       <HorizontalCardRow
         s={s}
         loading={false}
-        items={trendingCafes.slice(0, 10)}
-        header="Trending now"
+        items={specialtyTrending.slice(0, 10)}
+        header="Trending specialty"
         subheader="Una mezcla de notas altas y movimiento real"
         renderItem={(item) => (
           <View key={item.id} style={styles.trendingItemWrap}>
             <CardHorizontal
               item={item}
-              badge={`${item.puntuacion}.0 🔥`}
+              badge={`${item.puntuacion || 0}.0 🔥`}
               onPress={setCafeDetalle}
               favs={favs}
               onToggleFav={toggleFav}
@@ -401,7 +543,7 @@ export function LatestSection({
           <CardHorizontal
             key={item.id}
             item={item}
-            badge={`${item.puntuacion}.0`}
+            badge={`${item.puntuacion || 0}.0`}
             onPress={setCafeDetalle}
             favs={favs}
             onToggleFav={toggleFav}
@@ -426,6 +568,10 @@ export function TopCountrySection({
   favs,
   toggleFav,
 }) {
+  const specialtyTop = (topCafesVista || []).filter(
+    (item) => normalizeCategory(item) === 'specialty'
+  );
+
   return (
     <>
       <SectionHeaderNav
@@ -434,18 +580,20 @@ export function TopCountrySection({
         onPress={() => setActiveTab(MAIN_TABS.TOP)}
         marginTop={28}
       />
-      <Text style={s.sectionSub}>Los mejor puntuados según tu país preferido</Text>
+      <Text style={s.sectionSub}>
+        Los cafés de especialidad mejor puntuados según tu país preferido
+      </Text>
 
       <HorizontalCardRow
         s={s}
         loading={cargando}
         loadingColor={premiumAccent}
-        items={topCafesVista.slice(0, 10)}
+        items={specialtyTop.slice(0, 10)}
         renderItem={(item) => (
           <CardHorizontal
             key={item.id}
             item={item}
-            badge={`${item.puntuacion}.0 ⭐`}
+            badge={`${item.puntuacion || 0}.0 ⭐`}
             onPress={setCafeDetalle}
             favs={favs}
             onToggleFav={toggleFav}
@@ -542,7 +690,7 @@ export function ProcessDiscoverySection({
                 <CardHorizontal
                   key={item.id}
                   item={item}
-                  badge={`${item.puntuacion}.0`}
+                  badge={`${item.puntuacion || 0}.0`}
                   onPress={setCafeDetalle}
                   favs={favs}
                   onToggleFav={toggleFav}
@@ -830,5 +978,56 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#7e6959',
     fontWeight: '700',
+  },
+
+  stepUpCard: {
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: '#eadbce',
+    backgroundColor: '#fffaf5',
+    padding: 14,
+  },
+  stepUpTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    marginBottom: 12,
+  },
+  stepUpBadgeDaily: {
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    backgroundColor: '#e7f3ff',
+    borderWidth: 1,
+    borderColor: '#c8def7',
+  },
+  stepUpBadgeDailyText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#245b91',
+  },
+  stepUpBadgeSpecialty: {
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    backgroundColor: '#f5e8d6',
+    borderWidth: 1,
+    borderColor: '#eadbce',
+  },
+  stepUpBadgeSpecialtyText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#8f5e3b',
+  },
+  stepUpColumns: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  stepUpLabel: {
+    marginBottom: 8,
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#6f5a4b',
   },
 });

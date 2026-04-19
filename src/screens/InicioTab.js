@@ -2,13 +2,18 @@ import { useMemo, useState } from 'react';
 import { View } from 'react-native';
 import MemberInfoModal from '../components/MemberInfoModal';
 import {
+  BestValueSection,
   BlogSection,
+  DailyCoffeeSection,
+  DailyTopSection,
   InicioTopBar,
   LatestSection,
   NearbyCafeteriasSection,
   ProcessDiscoverySection,
   RoasterSpotlightSection,
   SearchResultsSection,
+  SpecialtyForYouSection,
+  StepUpSection,
   TopCountrySection,
   TrendingQuickFiltersSection,
   TrendingSection,
@@ -27,6 +32,60 @@ function buildUniqueOptions(items, field, limit = 6) {
       return true;
     })
     .slice(0, limit);
+}
+
+function normalizeCategory(item) {
+  return item?.coffeeCategory === 'daily' ? 'daily' : 'specialty';
+}
+
+function sortByRating(items) {
+  return [...(items || [])].sort((a, b) => Number(b?.puntuacion || 0) - Number(a?.puntuacion || 0));
+}
+
+function sortByValue(items) {
+  return [...(items || [])].sort((a, b) => {
+    const aScore = Number(a?.puntuacion || 0);
+    const bScore = Number(b?.puntuacion || 0);
+    const aPrice = Number(a?.precio || 999999);
+    const bPrice = Number(b?.precio || 999999);
+
+    const aValue = aPrice > 0 ? aScore / aPrice : 0;
+    const bValue = bPrice > 0 ? bScore / bPrice : 0;
+
+    return bValue - aValue;
+  });
+}
+
+function buildStepUpPairs(dailyCafes, specialtyCafes) {
+  const dailySorted = sortByRating(dailyCafes).slice(0, 4);
+  const specialtySorted = sortByRating(specialtyCafes);
+
+  return dailySorted
+    .map((dailyCafe) => {
+      const target = specialtySorted.find((specialtyCafe) => {
+        const sameProcess =
+          String(specialtyCafe?.proceso || '').trim() &&
+          String(dailyCafe?.proceso || '').trim() &&
+          String(specialtyCafe?.proceso || '').toLowerCase() ===
+            String(dailyCafe?.proceso || '').toLowerCase();
+
+        const sameOrigin =
+          String(specialtyCafe?.origen || specialtyCafe?.pais || '').trim() &&
+          String(dailyCafe?.origen || dailyCafe?.pais || '').trim() &&
+          String(specialtyCafe?.origen || specialtyCafe?.pais || '').toLowerCase() ===
+            String(dailyCafe?.origen || dailyCafe?.pais || '').toLowerCase();
+
+        return sameProcess || sameOrigin;
+      });
+
+      return target
+        ? {
+            daily: dailyCafe,
+            specialty: target,
+          }
+        : null;
+    })
+    .filter(Boolean);
 }
 
 export default function InicioTab({
@@ -73,13 +132,25 @@ export default function InicioTab({
     setShowMemberInfo(true);
   };
 
+  const specialtyCafes = useMemo(() => {
+    return (allCafes || []).filter((item) => normalizeCategory(item) === 'specialty');
+  }, [allCafes]);
+
+  const dailyCafes = useMemo(() => {
+    return (allCafes || []).filter((item) => normalizeCategory(item) === 'daily');
+  }, [allCafes]);
+
+  const specialtyTrendingCafes = useMemo(() => {
+    return (trendingCafes || []).filter((item) => normalizeCategory(item) === 'specialty');
+  }, [trendingCafes]);
+
   const quickTrendingFilters = useMemo(() => {
     return {
-      paises: buildUniqueOptions(trendingCafes, 'pais', 6),
-      procesos: buildUniqueOptions(trendingCafes, 'proceso', 6),
-      roasters: buildUniqueOptions(trendingCafes, 'roaster', 6),
+      paises: buildUniqueOptions(specialtyTrendingCafes, 'pais', 6),
+      procesos: buildUniqueOptions(specialtyTrendingCafes, 'proceso', 6),
+      roasters: buildUniqueOptions(specialtyTrendingCafes, 'roaster', 6),
     };
-  }, [trendingCafes]);
+  }, [specialtyTrendingCafes]);
 
   const handleOpenTrendingFilter = ({ pais = null, proceso = null, roaster = null }) => {
     setTrendingFilters?.({
@@ -93,7 +164,7 @@ export default function InicioTab({
   const roastersDestacados = useMemo(() => {
     const grouped = {};
 
-    (allCafes || []).forEach((cafe) => {
+    specialtyCafes.forEach((cafe) => {
       const roaster = String(cafe?.roaster || '').trim();
       if (!roaster) return;
       if (!grouped[roaster]) grouped[roaster] = [];
@@ -121,13 +192,13 @@ export default function InicioTab({
         return b.total - a.total;
       })
       .slice(0, 10);
-  }, [allCafes]);
+  }, [specialtyCafes]);
 
   const cafesPorProceso = useMemo(() => {
     const preferidos = ['Lavado', 'Natural', 'Honey', 'Anaeróbico', 'Experimental'];
 
     const grouped = {};
-    (allCafes || []).forEach((cafe) => {
+    specialtyCafes.forEach((cafe) => {
       const proceso = String(cafe?.proceso || '').trim();
       if (!proceso) return;
       if (!grouped[proceso]) grouped[proceso] = [];
@@ -148,7 +219,19 @@ export default function InicioTab({
       }))
       .filter((section) => section.cafes.length > 0)
       .slice(0, 4);
+  }, [specialtyCafes]);
+
+  const topDailyCafes = useMemo(() => {
+    return sortByRating(dailyCafes);
+  }, [dailyCafes]);
+
+  const bestValueCafes = useMemo(() => {
+    return sortByValue(allCafes).filter((item) => Number(item?.precio || 0) > 0);
   }, [allCafes]);
+
+  const stepUpPairs = useMemo(() => {
+    return buildStepUpPairs(dailyCafes, specialtyCafes);
+  }, [dailyCafes, specialtyCafes]);
 
   return (
     <View>
@@ -194,9 +277,54 @@ export default function InicioTab({
         />
       ) : (
         <>
+          <SpecialtyForYouSection
+            s={s}
+            cafes={specialtyCafes}
+            setCafeDetalle={setCafeDetalle}
+            favs={favs}
+            toggleFav={toggleFav}
+            CardHorizontal={CardHorizontal}
+          />
+
+          <DailyCoffeeSection
+            s={s}
+            cafes={dailyCafes}
+            setCafeDetalle={setCafeDetalle}
+            favs={favs}
+            toggleFav={toggleFav}
+            CardHorizontal={CardHorizontal}
+          />
+
+          <DailyTopSection
+            s={s}
+            cafes={topDailyCafes}
+            setCafeDetalle={setCafeDetalle}
+            favs={favs}
+            toggleFav={toggleFav}
+            CardHorizontal={CardHorizontal}
+          />
+
+          <BestValueSection
+            s={s}
+            cafes={bestValueCafes}
+            setCafeDetalle={setCafeDetalle}
+            favs={favs}
+            toggleFav={toggleFav}
+            CardHorizontal={CardHorizontal}
+          />
+
+          <StepUpSection
+            s={s}
+            pairs={stepUpPairs}
+            setCafeDetalle={setCafeDetalle}
+            favs={favs}
+            toggleFav={toggleFav}
+            CardHorizontal={CardHorizontal}
+          />
+
           <TrendingSection
             s={s}
-            trendingCafes={trendingCafes}
+            trendingCafes={specialtyTrendingCafes}
             setActiveTab={setActiveTab}
             setCafeDetalle={setCafeDetalle}
             favs={favs}

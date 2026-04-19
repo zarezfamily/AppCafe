@@ -12,6 +12,7 @@ export default function SimpleCoffeeListTab({
   subtitle,
   helperText,
   items,
+  categoryLabel = 'Especialidad',
   CardVertical,
   setCafeDetalle,
   favs,
@@ -59,7 +60,7 @@ export default function SimpleCoffeeListTab({
               color: '#6f5a4b',
             }}
           >
-            {helperText || 'Explora esta selección de cafés de especialidad de la comunidad.'}
+            {helperText || 'Explora esta selección de cafés de la comunidad.'}
           </Text>
 
           <View
@@ -95,7 +96,7 @@ export default function SimpleCoffeeListTab({
                   fontWeight: '800',
                 }}
               >
-                Specialty Coffee
+                {categoryLabel}
               </Text>
             </View>
           </View>
@@ -117,7 +118,9 @@ export default function SimpleCoffeeListTab({
             />
           ))}
 
-          {items.length === 0 && <Text style={[s.empty, { marginTop: 14 }]}>{emptyText}</Text>}
+          {items.length === 0 ? (
+            <Text style={[s.empty, { marginTop: 14 }]}>{emptyText}</Text>
+          ) : null}
         </View>
       )}
     </View>

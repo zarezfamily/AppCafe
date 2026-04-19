@@ -35,6 +35,8 @@ export default function CafeDetailScreen({
 }) {
   if (!cafe) return null;
 
+  const coffeeCategory = cafe.coffeeCategory === 'daily' ? 'daily' : 'specialty';
+  const isDaily = coffeeCategory === 'daily';
   const isFav = favs.includes(cafe.id);
   const yaVotado = votes.includes(cafe.id);
 
@@ -46,42 +48,34 @@ export default function CafeDetailScreen({
   const [dialogConfig, setDialogConfig] = useState({ title: '', description: '', actions: [] });
 
   const fotoCafe = cafe.bestPhoto || cafe.officialPhoto || cafe.foto || cafe.image || null;
-
   const precioTexto = cafe.precio !== undefined && cafe.precio !== null ? `${cafe.precio} €` : null;
-
-  const originText = [cafe.pais, cafe.region].filter(Boolean).join(', ');
+  const originText = [cafe.pais || cafe.origen, cafe.region].filter(Boolean).join(', ');
   const votedStarsValue = miVoto || (yaVotado ? puntuacionActual : 0);
 
-  const chips = useMemo(
-    () =>
-      [
-        cafe.variedad
-          ? {
-              icon: 'leaf-outline',
-              label: cafe.variedad,
-            }
-          : null,
-        cafe.proceso
-          ? {
-              icon: 'water-outline',
-              label: cafe.proceso,
-            }
-          : null,
-        cafe.tueste
-          ? {
-              icon: 'flame-outline',
-              label: `Tueste ${cafe.tueste}`,
-            }
-          : null,
-        cafe.altura
-          ? {
-              icon: 'trending-up-outline',
-              label: `${cafe.altura} msnm`,
-            }
-          : null,
-      ].filter(Boolean),
-    [cafe.altura, cafe.proceso, cafe.tueste, cafe.variedad]
-  );
+  const chips = useMemo(() => {
+    if (isDaily) {
+      return [
+        cafe.formato ? { icon: 'bag-outline', label: cafe.formato } : null,
+        cafe.tueste ? { icon: 'flame-outline', label: `Tueste ${cafe.tueste}` } : null,
+        cafe.preparacion ? { icon: 'cafe-outline', label: cafe.preparacion } : null,
+      ].filter(Boolean);
+    }
+
+    return [
+      cafe.variedad ? { icon: 'leaf-outline', label: cafe.variedad } : null,
+      cafe.proceso ? { icon: 'water-outline', label: cafe.proceso } : null,
+      cafe.tueste ? { icon: 'flame-outline', label: `Tueste ${cafe.tueste}` } : null,
+      cafe.altura ? { icon: 'trending-up-outline', label: `${cafe.altura} msnm` } : null,
+    ].filter(Boolean);
+  }, [
+    cafe.altura,
+    cafe.formato,
+    cafe.preparacion,
+    cafe.proceso,
+    cafe.tueste,
+    cafe.variedad,
+    isDaily,
+  ]);
 
   const showDialog = (title, description, actions = [{ label: 'Cerrar' }]) => {
     setDialogConfig({ title, description, actions });
@@ -159,7 +153,7 @@ export default function CafeDetailScreen({
               <Ionicons name="chevron-back" size={24} color="#fff" />
             </TouchableOpacity>
 
-            {onToggleFav && (
+            {onToggleFav ? (
               <TouchableOpacity style={det.favBtn} onPress={() => onToggleFav(cafe)}>
                 <Ionicons
                   name={isFav ? 'star' : 'star-outline'}
@@ -167,15 +161,30 @@ export default function CafeDetailScreen({
                   color={isFav ? theme.status.favorite : '#fff'}
                 />
               </TouchableOpacity>
-            )}
+            ) : null}
 
-            {onDelete && (
+            {onDelete ? (
               <TouchableOpacity style={det.deleteBtn} onPress={() => onDelete(cafe)}>
                 <Ionicons name="trash-outline" size={20} color="#fff" />
               </TouchableOpacity>
-            )}
+            ) : null}
 
             <View style={det.scoreBox}>
+              <View
+                style={[
+                  styles.categoryHeroBadge,
+                  isDaily ? styles.categoryHeroDaily : styles.categoryHeroSpecialty,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.categoryHeroBadgeText,
+                    isDaily ? styles.categoryHeroDailyText : styles.categoryHeroSpecialtyText,
+                  ]}
+                >
+                  {isDaily ? 'Café diario' : 'Especialidad'}
+                </Text>
+              </View>
               <Text style={det.scoreNum}>{puntuacionActual}.0</Text>
               <Stars value={puntuacionActual} size={16} />
               <Text style={det.scoreVotos}>
@@ -185,27 +194,31 @@ export default function CafeDetailScreen({
           </View>
 
           <View style={det.body}>
-            {!!cafe.roaster && <Text style={det.roaster}>{cafe.roaster}</Text>}
+            {!!(cafe.roaster || cafe.marca) && (
+              <Text style={det.roaster}>
+                {isDaily ? cafe.marca || cafe.roaster : cafe.roaster || cafe.marca}
+              </Text>
+            )}
 
             <Text style={det.nombre}>{cafe.nombre}</Text>
 
-            {!!cafe.finca && <Text style={det.finca}>{cafe.finca}</Text>}
+            {!!cafe.finca && !isDaily ? <Text style={det.finca}>{cafe.finca}</Text> : null}
 
-            {!!originText && (
+            {originText ? (
               <View style={det.originRow}>
                 <Ionicons name="earth-outline" size={14} color="#8b6d57" />
                 <Text style={det.originText}>{originText}</Text>
               </View>
-            )}
+            ) : null}
 
-            {!!precioTexto && (
+            {precioTexto ? (
               <View style={det.priceHeroPill}>
                 <Text style={det.priceHeroLabel}>Precio orientativo</Text>
                 <Text style={det.priceHeroValue}>{precioTexto}</Text>
               </View>
-            )}
+            ) : null}
 
-            {!!chips.length && (
+            {chips.length ? (
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -222,7 +235,7 @@ export default function CafeDetailScreen({
                   />
                 ))}
               </ScrollView>
-            )}
+            ) : null}
 
             <View style={det.voteBox}>
               {yaVotado || miVoto > 0 ? (
@@ -257,178 +270,255 @@ export default function CafeDetailScreen({
                 })}
               </View>
 
-              {votando && <ActivityIndicator color={premiumAccent} style={styles.voteSpinner} />}
+              {votando ? (
+                <ActivityIndicator color={premiumAccent} style={styles.voteSpinner} />
+              ) : null}
             </View>
 
-            {!!cafe.sca && (
+            <View style={det.divider} />
+
+            {isDaily ? (
               <>
-                <View style={det.divider} />
-                <View style={det.scaBox}>
-                  <View style={det.scaTop}>
-                    <View style={det.scaLeft}>
-                      <Text style={det.scaScore}>{cafe.sca}</Text>
-                      <Text style={det.scaLabel}>Puntuación SCA</Text>
-                    </View>
-                    <Text style={det.scaCat}>
-                      {cafe.sca >= 90
-                        ? '☕ Excepcional'
-                        : cafe.sca >= 85
-                          ? '⭐ Excelente'
-                          : '✓ Especialidad'}
-                    </Text>
-                  </View>
+                <Text style={det.sectionTitle}>Tu café diario</Text>
 
-                  <View style={det.scaBar}>
-                    <View
-                      style={[
-                        det.scaFill,
-                        { width: `${Math.min(Math.max(((cafe.sca - 80) / 20) * 100, 0), 100)}%` },
-                      ]}
-                    />
-                  </View>
-                </View>
-              </>
-            )}
-
-            {(cafe.notas || cafe.acidez || cafe.cuerpo || cafe.regusto) && (
-              <>
-                <View style={det.divider} />
-                <Text style={det.sectionTitle}>Perfil sensorial</Text>
-
-                {!!cafe.notas && (
+                {cafe.notas ? (
                   <View style={det.notasBox}>
-                    <Text style={det.notasLabel}>Notas de cata</Text>
+                    <Text style={det.notasLabel}>Perfil esperado</Text>
                     <Text style={det.notasText}>{cafe.notas}</Text>
                   </View>
-                )}
-
-                <View style={det.sensRow}>
-                  {!!cafe.acidez && (
-                    <SensItem
-                      det={det}
-                      label="Acidez"
-                      value={cafe.acidez}
-                      icon="flash-outline"
-                      premiumAccent={premiumAccent}
-                    />
-                  )}
-                  {!!cafe.cuerpo && (
-                    <SensItem
-                      det={det}
-                      label="Cuerpo"
-                      value={cafe.cuerpo}
-                      icon="fitness-outline"
-                      premiumAccent={premiumAccent}
-                    />
-                  )}
-                  {!!cafe.regusto && (
-                    <SensItem
-                      det={det}
-                      label="Regusto"
-                      value={cafe.regusto}
-                      icon="time-outline"
-                      premiumAccent={premiumAccent}
-                    />
-                  )}
-                </View>
-              </>
-            )}
-
-            <View style={det.divider} />
-            <Text style={det.sectionTitle}>Origen y proceso</Text>
-
-            <InfoRow
-              det={det}
-              icon="location-outline"
-              label="País / Región"
-              value={originText}
-              premiumAccent={premiumAccent}
-            />
-            <InfoRow
-              det={det}
-              icon="person-outline"
-              label="Productor"
-              value={cafe.productor}
-              premiumAccent={premiumAccent}
-            />
-            <InfoRow
-              det={det}
-              icon="home-outline"
-              label="Finca"
-              value={cafe.finca}
-              premiumAccent={premiumAccent}
-            />
-            <InfoRow
-              det={det}
-              icon="trending-up-outline"
-              label="Altura"
-              value={cafe.altura ? `${cafe.altura} msnm` : null}
-              premiumAccent={premiumAccent}
-            />
-            <InfoRow
-              det={det}
-              icon="leaf-outline"
-              label="Variedad"
-              value={cafe.variedad}
-              premiumAccent={premiumAccent}
-            />
-            <InfoRow
-              det={det}
-              icon="water-outline"
-              label="Proceso"
-              value={cafe.proceso}
-              premiumAccent={premiumAccent}
-            />
-            <InfoRow
-              det={det}
-              icon="sunny-outline"
-              label="Secado"
-              value={cafe.secado}
-              premiumAccent={premiumAccent}
-            />
-
-            {(cafe.tueste || cafe.fechaTueste) && (
-              <>
-                <View style={det.divider} />
-                <Text style={det.sectionTitle}>Tueste</Text>
+                ) : null}
 
                 <InfoRow
                   det={det}
+                  icon="storefront-outline"
+                  label="Marca"
+                  value={cafe.marca || cafe.roaster}
+                  premiumAccent={premiumAccent}
+                />
+                <InfoRow
+                  det={det}
+                  icon="bag-outline"
+                  label="Formato"
+                  value={cafe.formato}
+                  premiumAccent={premiumAccent}
+                />
+                <InfoRow
+                  det={det}
+                  icon="earth-outline"
+                  label="Origen"
+                  value={cafe.origen || originText}
+                  premiumAccent={premiumAccent}
+                />
+                <InfoRow
+                  det={det}
                   icon="flame-outline"
-                  label="Nivel"
+                  label="Tueste"
                   value={cafe.tueste}
                   premiumAccent={premiumAccent}
                 />
                 <InfoRow
                   det={det}
-                  icon="calendar-outline"
-                  label="Fecha de tueste"
-                  value={cafe.fechaTueste}
+                  icon="cafe-outline"
+                  label="Preparación"
+                  value={cafe.preparacion}
                   premiumAccent={premiumAccent}
                 />
-              </>
-            )}
 
-            {!!cafe.preparacion && (
-              <>
                 <View style={det.divider} />
-                <Text style={det.sectionTitle}>Preparación recomendada</Text>
+                <Text style={det.sectionTitle}>Da el salto</Text>
                 <View style={det.prepBox}>
-                  <Ionicons name="cafe-outline" size={20} color={premiumAccent} />
-                  <Text style={det.prepText}>{cafe.preparacion}</Text>
+                  <Ionicons name="rocket-outline" size={20} color={premiumAccent} />
+                  <Text style={det.prepText}>
+                    Si te gusta este perfil, aquí puedes descubrir cafés de especialidad con mejor
+                    trazabilidad, más matices y menos amargor.
+                  </Text>
+                </View>
+              </>
+            ) : (
+              <>
+                {cafe.sca ? (
+                  <>
+                    <View style={det.scaBox}>
+                      <View style={det.scaTop}>
+                        <View style={det.scaLeft}>
+                          <Text style={det.scaScore}>{cafe.sca}</Text>
+                          <Text style={det.scaLabel}>Puntuación SCA</Text>
+                        </View>
+                        <Text style={det.scaCat}>
+                          {cafe.sca >= 90
+                            ? '☕ Excepcional'
+                            : cafe.sca >= 85
+                              ? '⭐ Excelente'
+                              : '✓ Especialidad'}
+                        </Text>
+                      </View>
+
+                      <View style={det.scaBar}>
+                        <View
+                          style={[
+                            det.scaFill,
+                            {
+                              width: `${Math.min(Math.max(((cafe.sca - 80) / 20) * 100, 0), 100)}%`,
+                            },
+                          ]}
+                        />
+                      </View>
+                    </View>
+                    <View style={det.divider} />
+                  </>
+                ) : null}
+
+                {cafe.notas || cafe.acidez || cafe.cuerpo || cafe.regusto ? (
+                  <>
+                    <Text style={det.sectionTitle}>Perfil sensorial</Text>
+
+                    {cafe.notas ? (
+                      <View style={det.notasBox}>
+                        <Text style={det.notasLabel}>Notas de cata</Text>
+                        <Text style={det.notasText}>{cafe.notas}</Text>
+                      </View>
+                    ) : null}
+
+                    <View style={det.sensRow}>
+                      {!!cafe.acidez && (
+                        <SensItem
+                          det={det}
+                          label="Acidez"
+                          value={cafe.acidez}
+                          icon="flash-outline"
+                          premiumAccent={premiumAccent}
+                        />
+                      )}
+                      {!!cafe.cuerpo && (
+                        <SensItem
+                          det={det}
+                          label="Cuerpo"
+                          value={cafe.cuerpo}
+                          icon="fitness-outline"
+                          premiumAccent={premiumAccent}
+                        />
+                      )}
+                      {!!cafe.regusto && (
+                        <SensItem
+                          det={det}
+                          label="Regusto"
+                          value={cafe.regusto}
+                          icon="time-outline"
+                          premiumAccent={premiumAccent}
+                        />
+                      )}
+                    </View>
+
+                    <View style={det.divider} />
+                  </>
+                ) : null}
+
+                <Text style={det.sectionTitle}>Origen y proceso</Text>
+
+                <InfoRow
+                  det={det}
+                  icon="location-outline"
+                  label="País / Región"
+                  value={originText}
+                  premiumAccent={premiumAccent}
+                />
+                <InfoRow
+                  det={det}
+                  icon="person-outline"
+                  label="Productor"
+                  value={cafe.productor}
+                  premiumAccent={premiumAccent}
+                />
+                <InfoRow
+                  det={det}
+                  icon="home-outline"
+                  label="Finca"
+                  value={cafe.finca}
+                  premiumAccent={premiumAccent}
+                />
+                <InfoRow
+                  det={det}
+                  icon="trending-up-outline"
+                  label="Altura"
+                  value={cafe.altura ? `${cafe.altura} msnm` : null}
+                  premiumAccent={premiumAccent}
+                />
+                <InfoRow
+                  det={det}
+                  icon="leaf-outline"
+                  label="Variedad"
+                  value={cafe.variedad}
+                  premiumAccent={premiumAccent}
+                />
+                <InfoRow
+                  det={det}
+                  icon="water-outline"
+                  label="Proceso"
+                  value={cafe.proceso}
+                  premiumAccent={premiumAccent}
+                />
+                <InfoRow
+                  det={det}
+                  icon="sunny-outline"
+                  label="Secado"
+                  value={cafe.secado}
+                  premiumAccent={premiumAccent}
+                />
+
+                {cafe.tueste || cafe.fechaTueste ? (
+                  <>
+                    <View style={det.divider} />
+                    <Text style={det.sectionTitle}>Tueste</Text>
+
+                    <InfoRow
+                      det={det}
+                      icon="flame-outline"
+                      label="Nivel"
+                      value={cafe.tueste}
+                      premiumAccent={premiumAccent}
+                    />
+                    <InfoRow
+                      det={det}
+                      icon="calendar-outline"
+                      label="Fecha de tueste"
+                      value={cafe.fechaTueste}
+                      premiumAccent={premiumAccent}
+                    />
+                  </>
+                ) : null}
+
+                {cafe.preparacion ? (
+                  <>
+                    <View style={det.divider} />
+                    <Text style={det.sectionTitle}>Preparación recomendada</Text>
+                    <View style={det.prepBox}>
+                      <Ionicons name="cafe-outline" size={20} color={premiumAccent} />
+                      <Text style={det.prepText}>{cafe.preparacion}</Text>
+                    </View>
+                  </>
+                ) : null}
+
+                {cafe.certificaciones ? (
+                  <>
+                    <View style={det.divider} />
+                    <Text style={det.sectionTitle}>Certificaciones</Text>
+                    <Text style={det.certText}>{cafe.certificaciones}</Text>
+                  </>
+                ) : null}
+
+                <View style={det.divider} />
+                <Text style={det.sectionTitle}>Puente con tu café diario</Text>
+                <View style={det.prepBox}>
+                  <Ionicons name="swap-horizontal-outline" size={20} color={premiumAccent} />
+                  <Text style={det.prepText}>
+                    Este café puede ser una buena evolución si buscas más limpieza, más dulzor
+                    natural y mejor trazabilidad.
+                  </Text>
                 </View>
               </>
             )}
 
-            {!!cafe.certificaciones && (
-              <>
-                <View style={det.divider} />
-                <Text style={det.sectionTitle}>Certificaciones</Text>
-                <Text style={det.certText}>{cafe.certificaciones}</Text>
-              </>
-            )}
-
-            {!!precioTexto && (
+            {precioTexto ? (
               <>
                 <View style={det.divider} />
                 <View style={det.priceBox}>
@@ -439,7 +529,7 @@ export default function CafeDetailScreen({
                   <Text style={det.priceBoxValue}>{precioTexto}</Text>
                 </View>
               </>
-            )}
+            ) : null}
 
             <View style={styles.bottomSpacer} />
           </View>
@@ -845,6 +935,32 @@ const styles = StyleSheet.create({
     backgroundColor: '#f7f2eb',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  categoryHeroBadge: {
+    alignSelf: 'flex-start',
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderWidth: 1,
+    marginBottom: 8,
+  },
+  categoryHeroSpecialty: {
+    backgroundColor: 'rgba(245, 232, 214, 0.96)',
+    borderColor: '#eadbce',
+  },
+  categoryHeroDaily: {
+    backgroundColor: 'rgba(231, 243, 255, 0.96)',
+    borderColor: '#c8def7',
+  },
+  categoryHeroBadgeText: {
+    fontSize: 11,
+    fontWeight: '800',
+  },
+  categoryHeroSpecialtyText: {
+    color: '#8f5e3b',
+  },
+  categoryHeroDailyText: {
+    color: '#245b91',
   },
   starsRow: {
     flexDirection: 'row',

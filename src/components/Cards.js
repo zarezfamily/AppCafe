@@ -5,20 +5,80 @@ import { shared } from '../styles/sharedStyles';
 import PackshotImage from './PackshotImage';
 import Stars from './Stars';
 
+function getCoffeeCategory(item) {
+  return item?.coffeeCategory === 'daily' ? 'daily' : 'specialty';
+}
+
+function getCategoryLabel(item) {
+  return getCoffeeCategory(item) === 'daily' ? 'Café diario' : 'Especialidad';
+}
+
+function getBrandLabel(item) {
+  if (getCoffeeCategory(item) === 'daily') {
+    return item.marca || item.roaster || 'Café diario';
+  }
+  return item.roaster || item.marca || 'Specialty Coffee';
+}
+
+function getMetaLabel(item) {
+  const category = getCoffeeCategory(item);
+
+  if (category === 'daily') {
+    const left = item.origen || item.pais || 'Café comercial';
+    const right = item.formato || item.proceso || '';
+    return [left, right].filter(Boolean).join(' · ');
+  }
+
+  const left = item.pais || item.origen || '';
+  const right = item.proceso || '';
+  return [left, right].filter(Boolean).join(' · ');
+}
+
+function getImageUri(item) {
+  return item.bestPhoto || item.officialPhoto || item.foto || item.image || null;
+}
+
+function CategoryBadge({ item }) {
+  const isDaily = getCoffeeCategory(item) === 'daily';
+
+  return (
+    <View
+      style={[
+        styles.categoryBadge,
+        isDaily ? styles.categoryBadgeDaily : styles.categoryBadgeSpecialty,
+      ]}
+    >
+      <Text
+        style={[
+          styles.categoryBadgeText,
+          isDaily ? styles.categoryBadgeTextDaily : styles.categoryBadgeTextSpecialty,
+        ]}
+      >
+        {getCategoryLabel(item)}
+      </Text>
+    </View>
+  );
+}
+
 export function CardHorizontal({ item, badge, onPress, favs = [], onToggleFav }) {
   const isFav = favs.includes(item.id);
+  const imageUri = getImageUri(item);
 
   return (
     <TouchableOpacity style={styles.cardH} onPress={() => onPress?.(item)} activeOpacity={0.9}>
       <View style={styles.cardHImg}>
         <PackshotImage
-          uri={item.foto || item.image}
+          uri={imageUri}
           frameStyle={shared.packshotCardFrame}
           imageStyle={shared.packshotCardImage}
         />
 
         <View style={shared.badgeRed}>
           <Text style={shared.badgeText}>{badge}</Text>
+        </View>
+
+        <View style={styles.categoryBadgeWrap}>
+          <CategoryBadge item={item} />
         </View>
 
         {onToggleFav && (
@@ -32,48 +92,46 @@ export function CardHorizontal({ item, badge, onPress, favs = [], onToggleFav })
         )}
       </View>
 
-      {/* 🔥 ROASTER */}
       <Text style={styles.cardHBrand} numberOfLines={1}>
-        {item.roaster || 'Specialty Coffee'}
+        {getBrandLabel(item)}
       </Text>
 
-      {/* 🔥 NOMBRE */}
       <Text style={styles.cardHName} numberOfLines={2}>
         {item.nombre}
       </Text>
 
-      {/* 🔥 INFO */}
-      <Text style={styles.cardHMeta}>
-        {item.pais} · {item.proceso}
-      </Text>
+      <Text style={styles.cardHMeta}>{getMetaLabel(item)}</Text>
 
-      {/* ⭐ RATING */}
       <View style={styles.ratingRow}>
         <Ionicons name="star" size={13} color={PREMIUM_ACCENT} />
-        <Text style={styles.cardHRating}>{item.puntuacion}.0</Text>
-        <Text style={styles.cardHVotos}>({item.votos || 1})</Text>
+        <Text style={styles.cardHRating}>{item.puntuacion || 0}.0</Text>
+        <Text style={styles.cardHVotos}>({item.votos || 0})</Text>
       </View>
 
-      {/* 💰 PRECIO */}
-      {item.precio && <Text style={styles.price}>{item.precio} €</Text>}
+      {item.precio ? <Text style={styles.price}>{item.precio} €</Text> : null}
     </TouchableOpacity>
   );
 }
 
 export function CardVertical({ item, onDelete, onPress, favs = [], onToggleFav }) {
   const isFav = favs.includes(item.id);
+  const imageUri = getImageUri(item);
 
   return (
     <TouchableOpacity style={styles.cardV} onPress={() => onPress?.(item)} activeOpacity={0.9}>
       <View style={styles.cardVImg}>
         <PackshotImage
-          uri={item.foto || item.image}
+          uri={imageUri}
           frameStyle={shared.packshotListFrame}
           imageStyle={shared.packshotListImage}
         />
 
         <View style={shared.badgeRed}>
-          <Text style={shared.badgeText}>{item.puntuacion}.0</Text>
+          <Text style={shared.badgeText}>{item.puntuacion || 0}.0</Text>
+        </View>
+
+        <View style={styles.categoryBadgeWrapVertical}>
+          <CategoryBadge item={item} />
         </View>
 
         {onToggleFav && (
@@ -91,31 +149,28 @@ export function CardVertical({ item, onDelete, onPress, favs = [], onToggleFav }
       </View>
 
       <View style={{ flex: 1 }}>
-        {/* ROASTER */}
-        <Text style={styles.cardVBrand}>{item.roaster || 'Specialty Coffee'}</Text>
+        <Text style={styles.cardVBrand}>{getBrandLabel(item)}</Text>
 
-        {/* NOMBRE */}
         <Text style={styles.cardVName}>{item.nombre}</Text>
 
-        {/* META */}
-        <Text style={styles.cardVMeta}>
-          {item.pais} · {item.proceso}
-        </Text>
+        <Text style={styles.cardVMeta}>{getMetaLabel(item)}</Text>
 
-        <Stars value={item.puntuacion} />
+        <Stars value={item.puntuacion || 0} />
 
-        {item.notas && (
+        {item.notas ? (
           <Text style={styles.cardVNotas} numberOfLines={2}>
             {item.notas}
           </Text>
-        )}
+        ) : null}
 
-        {item.precio && <Text style={styles.priceV}>{item.precio} €</Text>}
+        {item.precio ? <Text style={styles.priceV}>{item.precio} €</Text> : null}
       </View>
 
-      <TouchableOpacity onPress={() => onDelete(item)} style={{ padding: 4 }}>
-        <Ionicons name="trash-outline" size={18} color={THEME.icon.faint} />
-      </TouchableOpacity>
+      {onDelete ? (
+        <TouchableOpacity onPress={() => onDelete(item)} style={{ padding: 4 }}>
+          <Ionicons name="trash-outline" size={18} color={THEME.icon.faint} />
+        </TouchableOpacity>
+      ) : null}
     </TouchableOpacity>
   );
 }
@@ -129,6 +184,43 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     overflow: 'hidden',
     marginBottom: 8,
+  },
+
+  categoryBadgeWrap: {
+    position: 'absolute',
+    left: 8,
+    bottom: 8,
+  },
+
+  categoryBadgeWrapVertical: {
+    position: 'absolute',
+    left: 6,
+    bottom: 6,
+  },
+
+  categoryBadge: {
+    borderRadius: 999,
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    borderWidth: 1,
+  },
+  categoryBadgeSpecialty: {
+    backgroundColor: 'rgba(245, 232, 214, 0.96)',
+    borderColor: '#e4d3c2',
+  },
+  categoryBadgeDaily: {
+    backgroundColor: 'rgba(231, 243, 255, 0.96)',
+    borderColor: '#c8def7',
+  },
+  categoryBadgeText: {
+    fontSize: 10,
+    fontWeight: '800',
+  },
+  categoryBadgeTextSpecialty: {
+    color: '#8f5e3b',
+  },
+  categoryBadgeTextDaily: {
+    color: '#245b91',
   },
 
   cardHBrand: {
@@ -149,6 +241,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#777',
     marginTop: 2,
+    minHeight: 16,
   },
 
   ratingRow: {
@@ -207,6 +300,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#777',
     marginBottom: 4,
+    minHeight: 16,
   },
 
   cardVNotas: {

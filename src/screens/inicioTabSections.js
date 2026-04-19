@@ -27,10 +27,6 @@ export const FEATURED_BLOG_POSTS = [
   },
 ];
 
-function normalizeCategory(item) {
-  return item?.coffeeCategory === 'daily' ? 'daily' : 'specialty';
-}
-
 function QuickFilterChip({ label, onPress, accentColor, icon }) {
   return (
     <TouchableOpacity activeOpacity={0.88} onPress={onPress} style={styles.quickChip}>
@@ -42,20 +38,31 @@ function QuickFilterChip({ label, onPress, accentColor, icon }) {
   );
 }
 
+function ActionCard({ title, desc, icon, onPress }) {
+  return (
+    <TouchableOpacity activeOpacity={0.9} onPress={onPress} style={styles.actionCard}>
+      <View style={styles.actionIconWrap}>
+        <Ionicons name={icon} size={20} color="#8f5e3b" />
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text style={styles.actionTitle}>{title}</Text>
+        <Text style={styles.actionDesc}>{desc}</Text>
+      </View>
+      <Ionicons name="chevron-forward" size={18} color="#8f5e3b" />
+    </TouchableOpacity>
+  );
+}
+
 export function InicioTopBar({
   s,
   perfil,
   setShowProfile,
-  brandCardAnim,
-  brandCardTranslateY,
-  brandCardScale,
   profileInitial,
   profileAlias,
   profileName,
   currentLevel,
   gamification,
   nextLevel,
-  brandProgressWidth,
   onLongPressMemberCard,
 }) {
   return (
@@ -125,10 +132,6 @@ export function InicioTopBar({
               {nextLevel ? `Próximo nivel: ${nextLevel.name}` : 'Nivel máximo alcanzado'}
             </Text>
             {nextLevel && <Text style={s.brandMetaText}>{nextLevel.minXp} XP</Text>}
-          </View>
-
-          <View style={s.brandProgressTrack}>
-            <View style={[s.brandProgressFill, { width: brandProgressWidth }]} />
           </View>
 
           <View style={s.brandStatsRow}>
@@ -206,14 +209,17 @@ export function SpecialtyForYouSection({
   return (
     <>
       <SectionHeaderNav s={s} title="Especialidad para ti" marginTop={28} hideAction />
-      <Text style={s.sectionSub}>Cafés curados y mejor valorados por la comunidad ETIOVE</Text>
+      <Text style={s.sectionSub}>
+        Cafés curados y bien valorados para descubrir algo especial sin perderte entre demasiadas
+        opciones
+      </Text>
 
       <HorizontalCardRow
         s={s}
         loading={false}
-        items={cafes.slice(0, 10)}
+        items={cafes.slice(0, 8)}
         header="Selección specialty"
-        subheader="Lo mejor de la comunidad para descubrir cafés con más trazabilidad y matices"
+        subheader="Una selección corta y útil"
         renderItem={(item) => (
           <CardHorizontal
             key={item.id}
@@ -235,14 +241,16 @@ export function DailyCoffeeSection({ s, cafes, setCafeDetalle, favs, toggleFav, 
   return (
     <>
       <SectionHeaderNav s={s} title="Tu café diario" marginTop={28} hideAction />
-      <Text style={s.sectionSub}>Cafés de supermercado y consumo habitual para el día a día</Text>
+      <Text style={s.sectionSub}>
+        Cafés habituales del día a día para comparar y decidir mejor tu compra
+      </Text>
 
       <HorizontalCardRow
         s={s}
         loading={false}
-        items={cafes.slice(0, 10)}
+        items={cafes.slice(0, 8)}
         header="Selección diaria"
-        subheader="Opciones comerciales y cafés habituales que toma la comunidad"
+        subheader="Lo más útil para tu consumo habitual"
         renderItem={(item) => (
           <CardHorizontal
             key={item.id}
@@ -258,56 +266,27 @@ export function DailyCoffeeSection({ s, cafes, setCafeDetalle, favs, toggleFav, 
   );
 }
 
-export function DailyTopSection({ s, cafes, setCafeDetalle, favs, toggleFav, CardHorizontal }) {
+export function BioCoffeeSection({ s, cafes, setCafeDetalle, favs, toggleFav, CardHorizontal }) {
   if (!cafes?.length) return null;
 
   return (
     <>
-      <SectionHeaderNav s={s} title="Top café diario" marginTop={28} hideAction />
-      <Text style={s.sectionSub}>Los cafés diarios mejor valorados por la comunidad</Text>
-
-      <HorizontalCardRow
-        s={s}
-        loading={false}
-        items={cafes.slice(0, 10)}
-        header="Ranking diario"
-        subheader="Lo más recomendable dentro del café de supermercado o consumo habitual"
-        renderItem={(item) => (
-          <CardHorizontal
-            key={item.id}
-            item={item}
-            badge={`${item.puntuacion || 0}.0 🏆`}
-            onPress={setCafeDetalle}
-            favs={favs}
-            onToggleFav={toggleFav}
-          />
-        )}
-      />
-    </>
-  );
-}
-
-export function BestValueSection({ s, cafes, setCafeDetalle, favs, toggleFav, CardHorizontal }) {
-  if (!cafes?.length) return null;
-
-  return (
-    <>
-      <SectionHeaderNav s={s} title="Mejor calidad/precio" marginTop={28} hideAction />
+      <SectionHeaderNav s={s} title="Cafés BIO" marginTop={28} hideAction />
       <Text style={s.sectionSub}>
-        Cafés con muy buena relación entre lo que cuestan y lo que ofrecen
+        Una selección de cafés BIO y ecológicos, tanto diarios como de especialidad
       </Text>
 
       <HorizontalCardRow
         s={s}
         loading={false}
-        items={cafes.slice(0, 10)}
-        header="Selección calidad/precio"
-        subheader="Pensado para descubrir cafés muy aprovechables sin disparar presupuesto"
+        items={cafes.slice(0, 8)}
+        header="Selección BIO"
+        subheader="BIO, ecológico u orgánico"
         renderItem={(item) => (
           <CardHorizontal
             key={item.id}
             item={item}
-            badge="💸 Top value"
+            badge="🌿 BIO"
             onPress={setCafeDetalle}
             favs={favs}
             onToggleFav={toggleFav}
@@ -325,11 +304,11 @@ export function StepUpSection({ s, pairs, setCafeDetalle, favs, toggleFav, CardH
     <>
       <SectionHeaderNav s={s} title="Da el salto" marginTop={28} hideAction />
       <Text style={s.sectionSub}>
-        Si te gusta un café diario, aquí tienes un specialty parecido para subir de nivel
+        Si te gusta un café diario, aquí tienes una opción specialty parecida para subir de nivel
       </Text>
 
       <View style={{ paddingHorizontal: 16, gap: 14 }}>
-        {pairs.slice(0, 4).map((pair, index) => (
+        {pairs.slice(0, 3).map((pair, index) => (
           <View
             key={`${pair.daily?.id || 'daily'}-${pair.specialty?.id || 'specialty'}-${index}`}
             style={styles.stepUpCard}
@@ -376,35 +355,50 @@ export function StepUpSection({ s, pairs, setCafeDetalle, favs, toggleFav, CardH
   );
 }
 
-export function TrendingQuickFiltersSection({
+export function ExploreHomeSection({
   s,
   setActiveTab,
   premiumAccent,
-  quickTrendingFilters,
   onOpenTrendingFilter,
+  quickTrendingFilters,
 }) {
   const { paises = [], procesos = [], roasters = [] } = quickTrendingFilters || {};
 
-  if (!paises.length && !procesos.length && !roasters.length) return null;
-
   return (
     <>
-      <SectionHeaderNav
-        s={s}
-        title="Explora el trending"
-        marginTop={28}
-        onPress={() => setActiveTab(MAIN_TABS.TRENDING)}
-        actionLabel="Abrir"
-      />
+      <SectionHeaderNav s={s} title="Explora ETIOVE" marginTop={28} hideAction />
       <Text style={s.sectionSub}>
-        Atajos rápidos para descubrir qué está destacando por país, proceso o tostador
+        Accesos rápidos para explorar sin recargar la pantalla de inicio
       </Text>
+
+      <View style={{ paddingHorizontal: 16, gap: 12 }}>
+        <ActionCard
+          title="Ver trending"
+          desc="Los cafés que mejor se están moviendo ahora"
+          icon="flame-outline"
+          onPress={() => setActiveTab(MAIN_TABS.TRENDING)}
+        />
+
+        <ActionCard
+          title="Explorar cafés"
+          desc="Descubre specialty y café diario con filtros"
+          icon="compass-outline"
+          onPress={() => setActiveTab(MAIN_TABS.DISCOVER)}
+        />
+
+        <ActionCard
+          title="Ranking"
+          desc="Consulta los mejores cafés según la comunidad"
+          icon="trophy-outline"
+          onPress={() => setActiveTab(MAIN_TABS.TOP)}
+        />
+      </View>
 
       {!!paises.length && (
         <View style={styles.quickBlock}>
-          <Text style={styles.quickBlockTitle}>País</Text>
+          <Text style={styles.quickBlockTitle}>Trending por país</Text>
           <View style={styles.quickWrap}>
-            {paises.map((pais) => (
+            {paises.slice(0, 4).map((pais) => (
               <QuickFilterChip
                 key={`pais-${pais}`}
                 label={pais}
@@ -419,9 +413,9 @@ export function TrendingQuickFiltersSection({
 
       {!!procesos.length && (
         <View style={styles.quickBlock}>
-          <Text style={styles.quickBlockTitle}>Proceso</Text>
+          <Text style={styles.quickBlockTitle}>Trending por proceso</Text>
           <View style={styles.quickWrap}>
-            {procesos.map((proceso) => (
+            {procesos.slice(0, 4).map((proceso) => (
               <QuickFilterChip
                 key={`proceso-${proceso}`}
                 label={proceso}
@@ -436,9 +430,9 @@ export function TrendingQuickFiltersSection({
 
       {!!roasters.length && (
         <View style={styles.quickBlock}>
-          <Text style={styles.quickBlockTitle}>Tostador</Text>
+          <Text style={styles.quickBlockTitle}>Trending por tostador</Text>
           <View style={styles.quickWrap}>
-            {roasters.map((roaster) => (
+            {roasters.slice(0, 4).map((roaster) => (
               <QuickFilterChip
                 key={`roaster-${roaster}`}
                 label={roaster}
@@ -450,294 +444,6 @@ export function TrendingQuickFiltersSection({
           </View>
         </View>
       )}
-    </>
-  );
-}
-
-export function TrendingSection({
-  s,
-  trendingCafes,
-  setActiveTab,
-  setCafeDetalle,
-  favs,
-  toggleFav,
-  CardHorizontal,
-}) {
-  const specialtyTrending = (trendingCafes || []).filter(
-    (item) => normalizeCategory(item) === 'specialty'
-  );
-
-  if (!specialtyTrending.length) return null;
-
-  return (
-    <>
-      <SectionHeaderNav
-        s={s}
-        title="Ahora en tendencia"
-        marginTop={28}
-        onPress={() => setActiveTab(MAIN_TABS.TRENDING)}
-        actionLabel="Ver trending"
-      />
-      <Text style={s.sectionSub}>
-        Los cafés de especialidad que mejor combinan puntuación, votos y tracción de la comunidad
-      </Text>
-
-      <HorizontalCardRow
-        s={s}
-        loading={false}
-        items={specialtyTrending.slice(0, 10)}
-        header="Trending specialty"
-        subheader="Una mezcla de notas altas y movimiento real"
-        renderItem={(item) => (
-          <View key={item.id} style={styles.trendingItemWrap}>
-            <CardHorizontal
-              item={item}
-              badge={`${item.puntuacion || 0}.0 🔥`}
-              onPress={setCafeDetalle}
-              favs={favs}
-              onToggleFav={toggleFav}
-            />
-            <View style={styles.trendingMetaRow}>
-              <View style={styles.trendingMetaPill}>
-                <Text style={styles.trendingMetaText}>{item.votos || 0} votos</Text>
-              </View>
-              {item.roaster ? (
-                <Text style={styles.trendingRoaster} numberOfLines={1}>
-                  {item.roaster}
-                </Text>
-              ) : null}
-            </View>
-          </View>
-        )}
-      />
-    </>
-  );
-}
-
-export function LatestSection({
-  s,
-  setActiveTab,
-  cargando,
-  premiumAccent,
-  ultimosGlobal,
-  CardHorizontal,
-  setCafeDetalle,
-  favs,
-  toggleFav,
-}) {
-  return (
-    <>
-      <SectionHeaderNav
-        s={s}
-        title="Últimos cafés descubiertos"
-        onPress={() => setActiveTab(MAIN_TABS.LATEST)}
-      />
-      <Text style={s.sectionSub}>Las últimas incorporaciones de la comunidad ETIOVE</Text>
-
-      <HorizontalCardRow
-        s={s}
-        loading={cargando}
-        loadingColor={premiumAccent}
-        items={ultimosGlobal}
-        renderItem={(item) => (
-          <CardHorizontal
-            key={item.id}
-            item={item}
-            badge={`${item.puntuacion || 0}.0`}
-            onPress={setCafeDetalle}
-            favs={favs}
-            onToggleFav={toggleFav}
-          />
-        )}
-        emptyText="Aún no hay cafés."
-      />
-    </>
-  );
-}
-
-export function TopCountrySection({
-  s,
-  setActiveTab,
-  perfil,
-  flag,
-  cargando,
-  premiumAccent,
-  topCafesVista,
-  CardHorizontal,
-  setCafeDetalle,
-  favs,
-  toggleFav,
-}) {
-  const specialtyTop = (topCafesVista || []).filter(
-    (item) => normalizeCategory(item) === 'specialty'
-  );
-
-  return (
-    <>
-      <SectionHeaderNav
-        s={s}
-        title={`Top cafés en ${perfil.pais || 'España'} ${flag}`}
-        onPress={() => setActiveTab(MAIN_TABS.TOP)}
-        marginTop={28}
-      />
-      <Text style={s.sectionSub}>
-        Los cafés de especialidad mejor puntuados según tu país preferido
-      </Text>
-
-      <HorizontalCardRow
-        s={s}
-        loading={cargando}
-        loadingColor={premiumAccent}
-        items={specialtyTop.slice(0, 10)}
-        renderItem={(item) => (
-          <CardHorizontal
-            key={item.id}
-            item={item}
-            badge={`${item.puntuacion || 0}.0 ⭐`}
-            onPress={setCafeDetalle}
-            favs={favs}
-            onToggleFav={toggleFav}
-          />
-        )}
-        emptyText="Aún no hay cafés."
-      />
-    </>
-  );
-}
-
-export function RoasterSpotlightSection({
-  s,
-  roasters,
-  setCafeDetalle,
-  favs,
-  toggleFav,
-  CardHorizontal,
-}) {
-  if (!roasters?.length) return null;
-
-  return (
-    <>
-      <SectionHeaderNav s={s} title="Tostadores destacados" marginTop={28} hideAction />
-      <Text style={s.sectionSub}>
-        Marcas y tostadores que mejor están brillando ahora en la comunidad
-      </Text>
-
-      <HorizontalCardRow
-        s={s}
-        loading={false}
-        items={roasters}
-        renderItem={(entry) => {
-          const item = {
-            ...entry.topCafe,
-            nombre: entry.topCafe?.nombre || entry.roaster,
-            roaster: entry.roaster,
-          };
-
-          return (
-            <View key={entry.roaster} style={styles.roasterWrap}>
-              <View style={styles.roasterTop}>
-                <Text style={styles.roasterLabel} numberOfLines={1}>
-                  {entry.roaster}
-                </Text>
-                <Text style={styles.roasterCount}>{entry.total} cafés</Text>
-              </View>
-
-              <CardHorizontal
-                item={item}
-                badge={`${item?.puntuacion || 0}.0`}
-                onPress={setCafeDetalle}
-                favs={favs}
-                onToggleFav={toggleFav}
-              />
-            </View>
-          );
-        }}
-      />
-    </>
-  );
-}
-
-export function ProcessDiscoverySection({
-  s,
-  sections,
-  setCafeDetalle,
-  favs,
-  toggleFav,
-  CardHorizontal,
-}) {
-  if (!sections?.length) return null;
-
-  return (
-    <>
-      <SectionHeaderNav s={s} title="Descubre por proceso" marginTop={28} hideAction />
-      <Text style={s.sectionSub}>
-        Explora perfiles distintos según cómo ha sido procesado el café
-      </Text>
-
-      <View style={{ gap: 22 }}>
-        {sections.map((section) => (
-          <View key={section.proceso}>
-            <View style={styles.processHeader}>
-              <Text style={styles.processTitle}>{section.proceso}</Text>
-              <Text style={styles.processMeta}>{section.cafes.length} destacados</Text>
-            </View>
-
-            <HorizontalCardRow
-              s={s}
-              loading={false}
-              items={section.cafes}
-              renderItem={(item) => (
-                <CardHorizontal
-                  key={item.id}
-                  item={item}
-                  badge={`${item.puntuacion || 0}.0`}
-                  onPress={setCafeDetalle}
-                  favs={favs}
-                  onToggleFav={toggleFav}
-                />
-              )}
-            />
-          </View>
-        ))}
-      </View>
-    </>
-  );
-}
-
-export function BlogSection({ s }) {
-  return (
-    <>
-      <SectionHeaderNav
-        s={s}
-        title="Desde el blog"
-        onPress={() => Linking.openURL('https://etiove.com/blog/')}
-        marginTop={28}
-      />
-      <Text style={s.sectionSub}>
-        Guías y contenido editorial para seguir aprendiendo sobre café de especialidad
-      </Text>
-
-      <View style={{ paddingHorizontal: 16, gap: 12 }}>
-        {FEATURED_BLOG_POSTS.map((post) => (
-          <TouchableOpacity
-            key={post.url}
-            activeOpacity={0.88}
-            onPress={() => Linking.openURL(post.url)}
-            style={styles.blogCard}
-          >
-            <View style={styles.blogIconWrap}>
-              <Ionicons name={post.icon} size={20} color="#8f5e3b" />
-            </View>
-
-            <View style={{ flex: 1 }}>
-              <Text style={styles.blogTitle}>{post.title}</Text>
-              <Text style={styles.blogDesc}>{post.desc}</Text>
-            </View>
-
-            <Ionicons name="arrow-forward" size={18} color="#8f5e3b" />
-          </TouchableOpacity>
-        ))}
-      </View>
     </>
   );
 }
@@ -760,9 +466,7 @@ export function NearbyCafeteriasSection({
         onPress={() => setActiveTab(MAIN_TABS.CAFETERIAS)}
         marginTop={28}
       />
-      <Text style={s.sectionSub}>
-        Cargamos cafeterías cercanas automáticamente al entrar. Si algo falla, puedes reintentar.
-      </Text>
+      <Text style={s.sectionSub}>Cafeterías cercanas para tomar buen café fuera de casa</Text>
 
       {cargandoCafInicio ? (
         <ActivityIndicator color={premiumAccent} style={{ margin: 18 }} />
@@ -786,7 +490,7 @@ export function NearbyCafeteriasSection({
         <HorizontalCardRow
           s={s}
           loading={false}
-          items={cafeteriasInicio}
+          items={cafeteriasInicio.slice(0, 8)}
           renderItem={(cafItem) => (
             <TouchableOpacity
               key={cafItem.id}
@@ -846,12 +550,50 @@ export function NearbyCafeteriasSection({
   );
 }
 
+export function BlogSection({ s }) {
+  return (
+    <>
+      <SectionHeaderNav
+        s={s}
+        title="Desde el blog"
+        onPress={() => Linking.openURL('https://etiove.com/blog/')}
+        marginTop={28}
+      />
+      <Text style={s.sectionSub}>
+        Guías y contenido editorial para aprender más sin saturar la Home
+      </Text>
+
+      <View style={{ paddingHorizontal: 16, gap: 12 }}>
+        {FEATURED_BLOG_POSTS.map((post) => (
+          <TouchableOpacity
+            key={post.url}
+            activeOpacity={0.88}
+            onPress={() => Linking.openURL(post.url)}
+            style={styles.blogCard}
+          >
+            <View style={styles.blogIconWrap}>
+              <Ionicons name={post.icon} size={20} color="#8f5e3b" />
+            </View>
+
+            <View style={{ flex: 1 }}>
+              <Text style={styles.blogTitle}>{post.title}</Text>
+              <Text style={styles.blogDesc}>{post.desc}</Text>
+            </View>
+
+            <Ionicons name="arrow-forward" size={18} color="#8f5e3b" />
+          </TouchableOpacity>
+        ))}
+      </View>
+    </>
+  );
+}
+
 const styles = StyleSheet.create({
   absoluteFill: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 },
 
   quickBlock: {
     paddingHorizontal: 16,
-    marginTop: 10,
+    marginTop: 14,
   },
   quickBlockTitle: {
     fontSize: 11,
@@ -883,6 +625,36 @@ const styles = StyleSheet.create({
     maxWidth: 150,
   },
 
+  actionCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    backgroundColor: '#faf8f5',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#eadbce',
+    padding: 14,
+  },
+  actionIconWrap: {
+    width: 42,
+    height: 42,
+    borderRadius: 12,
+    backgroundColor: '#f4e8db',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  actionTitle: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#24160f',
+  },
+  actionDesc: {
+    marginTop: 4,
+    fontSize: 12,
+    lineHeight: 18,
+    color: '#6f5a4b',
+  },
+
   blogCard: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -911,73 +683,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 18,
     color: '#6f5a4b',
-  },
-
-  trendingItemWrap: {
-    width: 190,
-  },
-  trendingMetaRow: {
-    marginTop: 8,
-    paddingHorizontal: 2,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 8,
-  },
-  trendingMetaPill: {
-    borderRadius: 999,
-    backgroundColor: '#f3e7d9',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-  },
-  trendingMetaText: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: '#8f5e3b',
-  },
-  trendingRoaster: {
-    flex: 1,
-    textAlign: 'right',
-    fontSize: 11,
-    color: '#7e6959',
-    fontWeight: '700',
-  },
-
-  roasterWrap: {
-    width: 190,
-  },
-  roasterTop: {
-    paddingHorizontal: 2,
-    marginBottom: 8,
-  },
-  roasterLabel: {
-    fontSize: 13,
-    fontWeight: '800',
-    color: '#2a1a12',
-  },
-  roasterCount: {
-    marginTop: 2,
-    fontSize: 11,
-    color: '#7e6959',
-  },
-
-  processHeader: {
-    paddingHorizontal: 16,
-    marginBottom: 10,
-    marginTop: 2,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  processTitle: {
-    fontSize: 15,
-    fontWeight: '800',
-    color: '#24160f',
-  },
-  processMeta: {
-    fontSize: 11,
-    color: '#7e6959',
-    fontWeight: '700',
   },
 
   stepUpCard: {

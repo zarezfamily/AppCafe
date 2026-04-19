@@ -3,6 +3,31 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import { SkeletonVerticalList } from '../components/SkeletonLoader';
 import { MAIN_TABS } from './mainScreenTabs';
 
+function TopBadge({ label }) {
+  return (
+    <View
+      style={{
+        borderRadius: 999,
+        backgroundColor: '#f3e7d9',
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        alignSelf: 'flex-start',
+        marginBottom: 8,
+      }}
+    >
+      <Text
+        style={{
+          fontSize: 11,
+          color: '#8f5e3b',
+          fontWeight: '800',
+        }}
+      >
+        {label}
+      </Text>
+    </View>
+  );
+}
+
 export default function SimpleCoffeeListTab({
   s,
   setActiveTab,
@@ -18,7 +43,11 @@ export default function SimpleCoffeeListTab({
   favs,
   toggleFav,
   emptyText,
+  heroBadge = 'TOP ETIOVE',
 }) {
+  const hero = items?.[0] || null;
+  const rest = items?.slice(1) || [];
+
   return (
     <View style={{ paddingTop: 20 }}>
       <View style={{ paddingHorizontal: 16 }}>
@@ -50,7 +79,7 @@ export default function SimpleCoffeeListTab({
               marginBottom: 6,
             }}
           >
-            ETIOVE DISCOVERY
+            ETIOVE RANKING
           </Text>
 
           <Text
@@ -107,7 +136,33 @@ export default function SimpleCoffeeListTab({
         <SkeletonVerticalList />
       ) : (
         <View style={{ paddingHorizontal: 16, marginTop: 16 }}>
-          {items.map((item) => (
+          {!!hero && (
+            <TouchableOpacity
+              activeOpacity={0.9}
+              onPress={() => setCafeDetalle(hero)}
+              style={{
+                marginBottom: 16,
+                borderRadius: 22,
+                borderWidth: 1,
+                borderColor: '#eadbce',
+                backgroundColor: '#fffaf5',
+                padding: 16,
+              }}
+            >
+              <TopBadge label={heroBadge} />
+              <Text style={{ fontSize: 22, fontWeight: '900', color: '#24160f' }}>
+                {hero.nombre}
+              </Text>
+              <Text style={{ marginTop: 6, fontSize: 14, color: '#6f5a4b' }}>
+                {hero.roaster || hero.marca || 'ETIOVE'}
+              </Text>
+              <Text style={{ marginTop: 8, fontSize: 14, color: '#8f5e3b', fontWeight: '800' }}>
+                {hero.puntuacion || 0}.0 ⭐ · {hero.votos || 0} votos
+              </Text>
+            </TouchableOpacity>
+          )}
+
+          {rest.map((item) => (
             <CardVertical
               key={item.id}
               item={item}
@@ -118,9 +173,7 @@ export default function SimpleCoffeeListTab({
             />
           ))}
 
-          {items.length === 0 ? (
-            <Text style={[s.empty, { marginTop: 14 }]}>{emptyText}</Text>
-          ) : null}
+          {!items.length ? <Text style={[s.empty, { marginTop: 14 }]}>{emptyText}</Text> : null}
         </View>
       )}
     </View>

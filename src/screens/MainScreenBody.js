@@ -12,7 +12,7 @@ import MasTab from './MasTab';
 import MisCafesTab from './MisCafesTab';
 import OfertasTab from './OfertasTab';
 import PaywallModal from './PaywallModal';
-import TopCafesTab from './TopCafesTab';
+import RankingTab from './RankingTab';
 import TrendingTab from './TrendingTab';
 import UltimosAnadidosTab from './UltimosAnadidosTab';
 
@@ -83,7 +83,7 @@ export default function MainScreenBody({
             {activeTab === MAIN_TABS.HOME && <InicioTab {...inicioTabProps} />}
             {activeTab === MAIN_TABS.NOTEBOOK && <MisCafesTab {...misCafesTabProps} />}
             {activeTab === MAIN_TABS.LATEST && <UltimosAnadidosTab {...ultimosAnadidosTabProps} />}
-            {activeTab === MAIN_TABS.TOP && <TopCafesTab {...topCafesTabProps} />}
+            {activeTab === MAIN_TABS.TOP && <RankingTab {...topCafesTabProps} />}
             {activeTab === MAIN_TABS.TRENDING && <TrendingTab {...trendingTabProps} />}
             {activeTab === MAIN_TABS.OFFERS && <OfertasTab {...ofertasTabProps} />}
             {activeTab === MAIN_TABS.MORE && <MasTab {...masTabProps} />}

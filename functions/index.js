@@ -261,6 +261,23 @@ function safeJsonParse(text) {
   }
 }
 
+function tryExtractJsonObject(text) {
+  const raw = String(text || '').trim();
+  if (!raw) return null;
+
+  const direct = safeJsonParse(raw);
+  if (direct) return direct;
+
+  const start = raw.indexOf('{');
+  const end = raw.lastIndexOf('}');
+  if (start >= 0 && end > start) {
+    const candidate = raw.slice(start, end + 1);
+    return safeJsonParse(candidate);
+  }
+
+  return null;
+}
+
 function pickFirstImage(product) {
   if (!product) return '';
 
@@ -424,29 +441,8 @@ async function callOpenAIForCoffeeEnrichment({ job, cafe, barcodeData }) {
   }
 
   const prompt = `
-Analiza este producto y responde SOLO en JSON válido.
-No añadas texto extra.
-
-Devuelve este esquema exacto:
-{
-  "nombre": "string",
-  "marca": "string",
-  "origen": "string",
-  "isSpecialty": true,
-  "isCoffeePackage": true,
-  "confidence": 0.0,
-  "imageReason": "string",
-  "summary": "string",
-  "ean": "string"
-}
-
-Reglas:
-- "isCoffeePackage" debe ser false si la imagen o el contexto no parecen un paquete o producto de café.
-- "isSpecialty" debe indicar si probablemente es café de especialidad.
-- "confidence" entre 0 y 1.
-- Si no sabes un campo, devuelve cadena vacía.
-- Si el lookup por código de barras sugiere otro tipo de producto, tenlo en cuenta.
-- No inventes demasiado.
+Analiza este producto y responde siguiendo exactamente el esquema JSON requerido.
+No inventes demasiado. Si no sabes algo, usa cadena vacía o false según corresponda.
 `.trim();
 
   const content = [
@@ -491,6 +487,38 @@ Datos del lookup por barcode:
       },
     ],
     temperature: 0.2,
+    text: {
+      format: {
+        type: 'json_schema',
+        name: 'coffee_enrichment',
+        schema: {
+          type: 'object',
+          additionalProperties: false,
+          properties: {
+            nombre: { type: 'string' },
+            marca: { type: 'string' },
+            origen: { type: 'string' },
+            isSpecialty: { type: 'boolean' },
+            isCoffeePackage: { type: 'boolean' },
+            confidence: { type: 'number' },
+            imageReason: { type: 'string' },
+            summary: { type: 'string' },
+            ean: { type: 'string' },
+          },
+          required: [
+            'nombre',
+            'marca',
+            'origen',
+            'isSpecialty',
+            'isCoffeePackage',
+            'confidence',
+            'imageReason',
+            'summary',
+            'ean',
+          ],
+        },
+      },
+    },
   };
 
   let response = await performOpenAIRequest({ apiKey, body });
@@ -515,10 +543,10 @@ Datos del lookup por barcode:
   }
 
   const text = extractTextOutput(json);
-  const parsed = safeJsonParse(text);
+  const parsed = tryExtractJsonObject(text);
 
   if (!parsed) {
-    logger.error('OpenAI returned non-JSON output', { text });
+    logger.error('OpenAI returned non-JSON output', { text, json });
     throw new Error('OPENAI_INVALID_JSON');
   }
 
@@ -631,10 +659,10 @@ exports.onAiJobCreatedProcessCoffee = onDocumentCreated(
       if (cafe.aiStatus === 'auto_approved' || cafe.aiStatus === 'completed') {
         await jobRef.update({
           status: 'done',
+          error: admin.firestore.FieldValue.delete(),
           skipped: true,
           skipReason: 'already_enriched',
           updatedAt: new Date().toISOString(),
-          error: admin.firestore.FieldValue.delete(),
         });
         return;
       }
@@ -647,6 +675,7 @@ exports.onAiJobCreatedProcessCoffee = onDocumentCreated(
 
         await jobRef.update({
           status: 'done',
+          error: admin.firestore.FieldValue.delete(),
           result: {
             usedOpenAI: false,
             barcodeLookupFound: !!barcodeData,
@@ -745,6 +774,7 @@ exports.onAiJobCreatedProcessCoffee = onDocumentCreated(
 
       await jobRef.update({
         status: 'done',
+        error: admin.firestore.FieldValue.delete(),
         result: {
           usedOpenAI: true,
           aiConfidenceScore: ai.confidence,

@@ -810,3 +810,242 @@ exports.onAiJobCreatedProcessCoffee = onDocumentCreated(
     }
   }
 );
+
+async function lookupProductByBarcodeForAdmin(barcode) {
+  const apiKey = process.env.BARCODE_LOOKUP_API_KEY;
+  const normalized = String(barcode || '')
+    .replace(/\D/g, '')
+    .trim();
+
+  if (!apiKey || !normalized) return null;
+
+  try {
+    const url =
+      `${BARCODE_LOOKUP_API_URL}?barcode=${encodeURIComponent(normalized)}` +
+      `&formatted=y&key=${encodeURIComponent(apiKey)}`;
+
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: { Accept: 'application/json' },
+    });
+
+    const json = await res.json().catch(() => null);
+    if (!res.ok) return null;
+
+    const product = Array.isArray(json?.products) ? json.products[0] : null;
+    if (!product) return null;
+
+    return {
+      nombre: String(product.title || '').trim(),
+      marca: String(product.brand || product.manufacturer || '').trim(),
+      categoria: String(product.category || '').trim(),
+      descripcion: String(product.description || '').trim(),
+      imagen: pickFirstImage(product),
+      formato:
+        String(product.size || '').trim() ||
+        String(product.title || '').match(/\b(\d+\s?(g|kg|ml|l))\b/i)?.[0] ||
+        '',
+    };
+  } catch (error) {
+    logger.error('lookupProductByBarcodeForAdmin failed', {
+      barcode: normalized,
+      error: String(error?.message || error),
+    });
+    return null;
+  }
+}
+
+async function callOpenAIForAdminDraft({ ean, nombre, marca, foto, barcodeData }) {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error('OPENAI_API_KEY_NOT_CONFIGURED');
+  }
+
+  const content = [
+    {
+      type: 'input_text',
+      text: `
+Devuelve SOLO JSON válido.
+
+Esquema:
+{
+  "suggestedNombre": "string",
+  "suggestedMarca": "string",
+  "suggestedOrigen": "string",
+  "suggestedFormato": "string",
+  "suggestedNotas": "string",
+  "suggestedOfficialPhoto": "string",
+  "confidence": 0.0
+}
+
+Reglas:
+- Usa el EAN si existe.
+- Si no estás seguro, deja string vacío.
+- confidence entre 0 y 1.
+- suggestedOfficialPhoto debe ser URL si la tienes, o string vacío.
+- No inventes demasiado.
+- Si parece café comercial y no specialty, aun así devuelve la mejor ficha posible.
+- Responde solo JSON.
+      
+Datos recibidos:
+- ean: ${ean || ''}
+- nombre: ${nombre || ''}
+- marca: ${marca || ''}
+
+Datos barcode:
+- nombre lookup: ${barcodeData?.nombre || ''}
+- marca lookup: ${barcodeData?.marca || ''}
+- categoría lookup: ${barcodeData?.categoria || ''}
+- descripción lookup: ${barcodeData?.descripcion || ''}
+- imagen lookup: ${barcodeData?.imagen || ''}
+- formato lookup: ${barcodeData?.formato || ''}
+      `.trim(),
+    },
+  ];
+
+  if (foto) {
+    content.push({
+      type: 'input_image',
+      image_url: foto,
+    });
+  } else if (barcodeData?.imagen) {
+    content.push({
+      type: 'input_image',
+      image_url: barcodeData.imagen,
+    });
+  }
+
+  const body = {
+    model: OPENAI_MODEL,
+    input: [
+      {
+        role: 'user',
+        content,
+      },
+    ],
+    temperature: 0.2,
+    text: {
+      format: {
+        type: 'json_schema',
+        name: 'admin_coffee_draft',
+        schema: {
+          type: 'object',
+          additionalProperties: false,
+          properties: {
+            suggestedNombre: { type: 'string' },
+            suggestedMarca: { type: 'string' },
+            suggestedOrigen: { type: 'string' },
+            suggestedFormato: { type: 'string' },
+            suggestedNotas: { type: 'string' },
+            suggestedOfficialPhoto: { type: 'string' },
+            confidence: { type: 'number' },
+          },
+          required: [
+            'suggestedNombre',
+            'suggestedMarca',
+            'suggestedOrigen',
+            'suggestedFormato',
+            'suggestedNotas',
+            'suggestedOfficialPhoto',
+            'confidence',
+          ],
+        },
+      },
+    },
+  };
+
+  let response = await performOpenAIRequest({ apiKey, body });
+
+  if (response.status === 429) {
+    await sleep(OPENAI_RETRY_DELAY_MS);
+    response = await performOpenAIRequest({ apiKey, body });
+  }
+
+  const json = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    logger.error('callOpenAIForAdminDraft failed', {
+      status: response.status,
+      body: json,
+    });
+    throw new Error(`OPENAI_REQUEST_FAILED_${response.status}`);
+  }
+
+  const text = extractTextOutput(json);
+  const parsed = tryExtractJsonObject(text);
+
+  if (!parsed) {
+    throw new Error('OPENAI_INVALID_JSON');
+  }
+
+  return {
+    suggestedNombre: String(parsed.suggestedNombre || '').trim(),
+    suggestedMarca: String(parsed.suggestedMarca || '').trim(),
+    suggestedOrigen: String(parsed.suggestedOrigen || '').trim(),
+    suggestedFormato: String(parsed.suggestedFormato || '').trim(),
+    suggestedNotas: String(parsed.suggestedNotas || '').trim(),
+    suggestedOfficialPhoto: String(parsed.suggestedOfficialPhoto || '').trim(),
+    confidence: Number(parsed.confidence || 0),
+  };
+}
+
+exports.adminEnrichCoffeeDraft = onRequest(
+  {
+    region: 'europe-west1',
+    cors: true,
+    timeoutSeconds: 60,
+    memory: '512MiB',
+    secrets: ['OPENAI_API_KEY'],
+  },
+  async (req, res) => {
+    if (req.method !== 'POST') {
+      res.status(405).json({ error: 'METHOD_NOT_ALLOWED' });
+      return;
+    }
+
+    try {
+      const authHeader = req.headers.authorization || '';
+      const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+
+      if (!token) {
+        res.status(401).json({ error: 'UNAUTHENTICATED' });
+        return;
+      }
+
+      await admin.auth().verifyIdToken(token);
+
+      const { ean, nombre, marca, foto } = req.body || {};
+
+      const barcodeData = await lookupProductByBarcodeForAdmin(ean);
+      const ai = await callOpenAIForAdminDraft({
+        ean,
+        nombre,
+        marca,
+        foto,
+        barcodeData,
+      });
+
+      res.status(200).json({
+        ok: true,
+        proposal: {
+          suggestedNombre: ai.suggestedNombre || barcodeData?.nombre || nombre || '',
+          suggestedMarca: ai.suggestedMarca || barcodeData?.marca || marca || '',
+          suggestedOrigen: ai.suggestedOrigen || '',
+          suggestedFormato: ai.suggestedFormato || barcodeData?.formato || '',
+          suggestedNotas: ai.suggestedNotas || barcodeData?.descripcion || '',
+          suggestedOfficialPhoto: ai.suggestedOfficialPhoto || barcodeData?.imagen || '',
+          confidence: ai.confidence || 0,
+          barcodeLookupFound: !!barcodeData,
+        },
+      });
+    } catch (error) {
+      logger.error('adminEnrichCoffeeDraft error', {
+        error: String(error?.message || error),
+      });
+      res.status(500).json({
+        ok: false,
+        error: String(error?.message || error),
+      });
+    }
+  }
+);

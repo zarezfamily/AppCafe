@@ -14,6 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { getAuthToken } from '../services/firebaseCore';
 import { queryCollection, updateDocument } from '../services/firestoreService';
 import { uploadImageToStorage } from '../services/storageService';
 
@@ -25,6 +26,9 @@ const FILTERS = {
   WITHOUT_IMAGE: 'without_image',
 };
 
+const ADMIN_ENRICH_URL =
+  'https://europe-west1-miappdecafe.cloudfunctions.net/adminEnrichCoffeeDraft';
+
 function normalizeText(value) {
   return String(value || '')
     .trim()
@@ -33,10 +37,6 @@ function normalizeText(value) {
 
 function getUserPhoto(cafe) {
   return String(cafe?.foto || cafe?.imageUrl || '').trim();
-}
-
-function getOfficialPhoto(cafe) {
-  return String(cafe?.officialPhoto || '').trim();
 }
 
 function getBestPhoto(cafe) {
@@ -274,16 +274,6 @@ function EditorField({ label, value, onChangeText, placeholder, multiline = fals
   );
 }
 
-function SuggestionRow({ label, value }) {
-  if (!String(value || '').trim()) return null;
-  return (
-    <View style={styles.suggestionRow}>
-      <Text style={styles.suggestionLabel}>{label}</Text>
-      <Text style={styles.suggestionValue}>{value}</Text>
-    </View>
-  );
-}
-
 export default function AdminPanelScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -295,6 +285,8 @@ export default function AdminPanelScreen() {
   const [editingCafe, setEditingCafe] = useState(null);
   const [editData, setEditData] = useState(null);
   const [uploadingOfficialPhoto, setUploadingOfficialPhoto] = useState(false);
+  const [proposal, setProposal] = useState(null);
+  const [searchingProposal, setSearchingProposal] = useState(false);
 
   const loadCafes = useCallback(async () => {
     try {
@@ -320,6 +312,7 @@ export default function AdminPanelScreen() {
 
   const openEditor = useCallback((cafe) => {
     setEditingCafe(cafe);
+    setProposal(null);
     setEditData({
       nombre: cafe.nombre || cafe.name || '',
       marca: cafe.marca || cafe.roaster || '',
@@ -344,7 +337,9 @@ export default function AdminPanelScreen() {
   const closeEditor = useCallback(() => {
     setEditingCafe(null);
     setEditData(null);
+    setProposal(null);
     setUploadingOfficialPhoto(false);
+    setSearchingProposal(false);
   }, []);
 
   const handlePickOfficialPhoto = useCallback(async () => {
@@ -411,6 +406,65 @@ export default function AdminPanelScreen() {
         prev.bestPhotoMode === 'official' || ai.officialPhoto ? 'official' : prev.bestPhotoMode,
     }));
   }, [editingCafe]);
+
+  const handleSearchProposal = useCallback(async () => {
+    try {
+      if (!editingCafe) return;
+
+      const token = getAuthToken();
+      if (!token) {
+        Alert.alert('Sesión', 'No hay sesión activa.');
+        return;
+      }
+
+      setSearchingProposal(true);
+      setProposal(null);
+
+      const res = await fetch(ADMIN_ENRICH_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          ean: editingCafe.ean || '',
+          nombre: editData?.nombre || editingCafe.nombre || '',
+          marca: editData?.marca || editingCafe.marca || '',
+          foto: getUserPhoto(editingCafe),
+        }),
+      });
+
+      const json = await res.json().catch(() => null);
+
+      if (!res.ok || !json?.ok) {
+        throw new Error(json?.error || 'No se pudo generar propuesta');
+      }
+
+      setProposal(json.proposal || null);
+    } catch (error) {
+      Alert.alert('Error', error?.message || 'No se pudo buscar propuesta');
+    } finally {
+      setSearchingProposal(false);
+    }
+  }, [editData, editingCafe]);
+
+  const handleApplyProposal = useCallback(() => {
+    if (!proposal) return;
+
+    setEditData((prev) => ({
+      ...prev,
+      nombre: prev.nombre || proposal.suggestedNombre || '',
+      marca: prev.marca || proposal.suggestedMarca || '',
+      origen: prev.origen || proposal.suggestedOrigen || '',
+      notas: prev.notas || proposal.suggestedNotas || '',
+      formato: prev.formato || proposal.suggestedFormato || '',
+      officialPhoto: prev.officialPhoto || proposal.suggestedOfficialPhoto || '',
+      bestPhotoMode:
+        prev.bestPhotoMode === 'official' || proposal.suggestedOfficialPhoto
+          ? 'official'
+          : prev.bestPhotoMode,
+    }));
+  }, [proposal]);
 
   const handleApprove = useCallback(async (item) => {
     try {
@@ -715,6 +769,30 @@ export default function AdminPanelScreen() {
           </TouchableOpacity>
         </View>
 
+        <View style={styles.secondaryActionRow}>
+          <TouchableOpacity
+            style={[styles.secondaryActionBtn, styles.searchProposalBtn]}
+            onPress={handleSearchProposal}
+            disabled={searchingProposal}
+          >
+            <Text style={styles.secondaryActionBtnText}>
+              {searchingProposal ? 'Buscando…' : 'Buscar datos y foto'}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.secondaryActionBtn,
+              styles.applyProposalBtn,
+              !proposal && styles.actionBtnDisabled,
+            ]}
+            onPress={handleApplyProposal}
+            disabled={!proposal}
+          >
+            <Text style={styles.secondaryActionBtnText}>Aplicar propuesta</Text>
+          </TouchableOpacity>
+        </View>
+
         <View style={styles.suggestionCard}>
           <View style={styles.suggestionHeader}>
             <Text style={styles.suggestionTitle}>Sugerencia IA</Text>
@@ -723,15 +801,25 @@ export default function AdminPanelScreen() {
             </TouchableOpacity>
           </View>
 
-          <SuggestionRow label="Nombre" value={ai.nombre} />
-          <SuggestionRow label="Marca" value={ai.marca} />
-          <SuggestionRow label="Origen" value={ai.origen} />
-          <SuggestionRow label="Resumen" value={ai.summary} />
-          <SuggestionRow label="EAN" value={ai.ean} />
-          <SuggestionRow
-            label="Especialidad"
-            value={typeof ai.isSpecialty === 'boolean' ? (ai.isSpecialty ? 'Sí' : 'No') : ''}
-          />
+          <Text style={styles.blockTitle}>Sugerencia guardada</Text>
+          <Text style={styles.blockText}>Nombre: {ai.nombre || '-'}</Text>
+          <Text style={styles.blockText}>Marca: {ai.marca || '-'}</Text>
+          <Text style={styles.blockText}>Origen: {ai.origen || '-'}</Text>
+          <Text style={styles.blockText}>Resumen: {ai.summary || '-'}</Text>
+
+          {proposal ? (
+            <>
+              <Text style={[styles.blockTitle, { marginTop: 14 }]}>Propuesta encontrada</Text>
+              <Text style={styles.blockText}>Nombre: {proposal.suggestedNombre || '-'}</Text>
+              <Text style={styles.blockText}>Marca: {proposal.suggestedMarca || '-'}</Text>
+              <Text style={styles.blockText}>Origen: {proposal.suggestedOrigen || '-'}</Text>
+              <Text style={styles.blockText}>Formato: {proposal.suggestedFormato || '-'}</Text>
+              <Text style={styles.blockText}>Notas: {proposal.suggestedNotas || '-'}</Text>
+              <Text style={styles.blockText}>
+                Confianza: {Math.round((proposal.confidence || 0) * 100)}%
+              </Text>
+            </>
+          ) : null}
         </View>
 
         <EditorField
@@ -1159,6 +1247,12 @@ const styles = StyleSheet.create({
   openUrlBtn: {
     backgroundColor: '#0F766E',
   },
+  searchProposalBtn: {
+    backgroundColor: '#7C3AED',
+  },
+  applyProposalBtn: {
+    backgroundColor: '#1D4ED8',
+  },
   secondaryActionBtnText: {
     color: '#FFF',
     fontWeight: '700',
@@ -1196,18 +1290,16 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 12,
   },
-  suggestionRow: {
-    marginBottom: 8,
-  },
-  suggestionLabel: {
-    fontSize: 12,
-    fontWeight: '700',
+  blockTitle: {
+    fontSize: 13,
+    fontWeight: '800',
     color: '#2563EB',
-    marginBottom: 2,
+    marginBottom: 6,
   },
-  suggestionValue: {
+  blockText: {
     fontSize: 14,
     color: '#374151',
+    marginBottom: 4,
     lineHeight: 20,
   },
 

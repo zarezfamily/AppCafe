@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
 import { ScrollView, View } from 'react-native';
-
 import AdminPanelScreen from './AdminPanelScreen'; // 🔥 NUEVO
 import BottomBarNav from './BottomBarNav';
 import CafeteriasScreen from './CafeteriasScreen';

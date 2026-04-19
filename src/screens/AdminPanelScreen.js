@@ -74,6 +74,7 @@ function matchesSearch(cafe, term) {
     cafe.proceso,
     cafe.notas,
     cafe.finca,
+    cafe.coffeeCategory,
   ]
     .map(normalizeText)
     .join(' ');
@@ -109,6 +110,10 @@ function getStatusBadge(cafe) {
   return { label: 'Incompleto', kind: 'warning' };
 }
 
+function getCategoryLabel(value) {
+  return value === 'daily' ? 'Café diario' : 'Especialidad';
+}
+
 function FilterChip({ label, active, onPress }) {
   return (
     <TouchableOpacity
@@ -139,6 +144,7 @@ function Badge({ label, kind }) {
         kind === 'success' && styles.badgeSuccess,
         kind === 'danger' && styles.badgeDanger,
         kind === 'successSoft' && styles.badgeSuccessSoft,
+        kind === 'dark' && styles.badgeDark,
       ]}
     >
       <Text
@@ -148,6 +154,7 @@ function Badge({ label, kind }) {
           kind === 'success' && styles.badgeTextSuccess,
           kind === 'danger' && styles.badgeTextDanger,
           kind === 'successSoft' && styles.badgeTextSuccessSoft,
+          kind === 'dark' && styles.badgeTextDark,
         ]}
       >
         {label}
@@ -173,6 +180,7 @@ function PendingCafeCard({ item, onApprove, onReject, onEdit, busy }) {
   const origen = item.origen || item.origin || '';
   const foto = getBestPhoto(item);
   const badge = getStatusBadge(item);
+  const coffeeCategory = item.coffeeCategory || 'specialty';
 
   return (
     <View style={styles.card}>
@@ -183,6 +191,7 @@ function PendingCafeCard({ item, onApprove, onReject, onEdit, busy }) {
           </Text>
           <View style={styles.badgeRow}>
             <Badge label={badge.label} kind={badge.kind} />
+            <Badge label={getCategoryLabel(coffeeCategory)} kind="dark" />
             {item.aiStatus === 'auto_approved' ? (
               <Badge label="Auto-IA" kind="successSoft" />
             ) : null}
@@ -205,6 +214,7 @@ function PendingCafeCard({ item, onApprove, onReject, onEdit, busy }) {
         <FieldRow label="EAN" value={item.ean} />
         <FieldRow label="Marca" value={marca} />
         <FieldRow label="Origen" value={origen} />
+        <FieldRow label="Tipo" value={getCategoryLabel(coffeeCategory)} />
         {!!item.aiConfidenceScore && (
           <FieldRow label="Confianza IA" value={`${Math.round(item.aiConfidenceScore * 100)}%`} />
         )}
@@ -331,6 +341,7 @@ export default function AdminPanelScreen() {
       formato: cafe.formato || '',
       finca: cafe.finca || '',
       adminNotes: cafe.adminNotes || '',
+      coffeeCategory: cafe.coffeeCategory || 'specialty',
     });
   }, []);
 
@@ -404,6 +415,13 @@ export default function AdminPanelScreen() {
       officialPhoto: prev.officialPhoto || ai.officialPhoto || '',
       bestPhotoMode:
         prev.bestPhotoMode === 'official' || ai.officialPhoto ? 'official' : prev.bestPhotoMode,
+      coffeeCategory:
+        prev.coffeeCategory ||
+        (typeof ai.isSpecialty === 'boolean'
+          ? ai.isSpecialty
+            ? 'specialty'
+            : 'daily'
+          : 'specialty'),
     }));
   }, [editingCafe]);
 
@@ -539,6 +557,7 @@ export default function AdminPanelScreen() {
         formato: String(editData.formato || '').trim(),
         finca: String(editData.finca || '').trim(),
         adminNotes: String(editData.adminNotes || '').trim(),
+        coffeeCategory: editData.coffeeCategory || 'specialty',
         adminReviewedAt: new Date().toISOString(),
         appVisible: approveNow ? true : (editingCafe.appVisible ?? false),
         scannerVisible: true,
@@ -708,6 +727,51 @@ export default function AdminPanelScreen() {
           </View>
         </View>
 
+        <View style={styles.categoryCard}>
+          <Text style={styles.categoryTitle}>Tipo de café</Text>
+
+          <View style={styles.categoryRow}>
+            <TouchableOpacity
+              style={[
+                styles.categoryBtn,
+                editData.coffeeCategory === 'specialty' && styles.categoryBtnActive,
+              ]}
+              onPress={() => setEditData((prev) => ({ ...prev, coffeeCategory: 'specialty' }))}
+            >
+              <Text
+                style={[
+                  styles.categoryBtnText,
+                  editData.coffeeCategory === 'specialty' && styles.categoryBtnTextActive,
+                ]}
+              >
+                Especialidad
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.categoryBtn,
+                editData.coffeeCategory === 'daily' && styles.categoryBtnActive,
+              ]}
+              onPress={() => setEditData((prev) => ({ ...prev, coffeeCategory: 'daily' }))}
+            >
+              <Text
+                style={[
+                  styles.categoryBtnText,
+                  editData.coffeeCategory === 'daily' && styles.categoryBtnTextActive,
+                ]}
+              >
+                Café diario
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.categoryHelp}>
+            Usa “Especialidad” para roasters o cafés curados y “Café diario” para supermercado o
+            consumo habitual.
+          </Text>
+        </View>
+
         <View style={styles.toggleRow}>
           <TouchableOpacity
             style={[styles.toggleBtn, editData.bestPhotoMode === 'user' && styles.toggleBtnActive]}
@@ -806,6 +870,14 @@ export default function AdminPanelScreen() {
           <Text style={styles.blockText}>Marca: {ai.marca || '-'}</Text>
           <Text style={styles.blockText}>Origen: {ai.origen || '-'}</Text>
           <Text style={styles.blockText}>Resumen: {ai.summary || '-'}</Text>
+          <Text style={styles.blockText}>
+            Tipo sugerido:{' '}
+            {typeof ai.isSpecialty === 'boolean'
+              ? ai.isSpecialty
+                ? 'Especialidad'
+                : 'Café diario'
+              : '-'}
+          </Text>
 
           {proposal ? (
             <>
@@ -1135,11 +1207,13 @@ const styles = StyleSheet.create({
   badgeSuccess: { backgroundColor: '#DCFCE7' },
   badgeDanger: { backgroundColor: '#FEE2E2' },
   badgeSuccessSoft: { backgroundColor: '#E0F2FE' },
+  badgeDark: { backgroundColor: '#E5E7EB' },
   badgeText: { fontSize: 12, fontWeight: '700' },
   badgeTextWarning: { color: '#92400E' },
   badgeTextSuccess: { color: '#166534' },
   badgeTextDanger: { color: '#991B1B' },
   badgeTextSuccessSoft: { color: '#075985' },
+  badgeTextDark: { color: '#111827' },
 
   thumbnailWrap: { width: 82, height: 82 },
   thumbnail: { width: 82, height: 82, borderRadius: 14, backgroundColor: '#EEE' },
@@ -1201,6 +1275,52 @@ const styles = StyleSheet.create({
   previewPlaceholderText: {
     color: '#777',
     fontWeight: '700',
+  },
+
+  categoryCard: {
+    backgroundColor: '#FFF',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 16,
+  },
+  categoryTitle: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#111827',
+    marginBottom: 10,
+  },
+  categoryRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  categoryBtn: {
+    flex: 1,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    backgroundColor: '#FFF',
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  categoryBtnActive: {
+    backgroundColor: '#111827',
+    borderColor: '#111827',
+  },
+  categoryBtnText: {
+    color: '#111827',
+    fontWeight: '700',
+    fontSize: 13,
+  },
+  categoryBtnTextActive: {
+    color: '#FFF',
+  },
+  categoryHelp: {
+    marginTop: 10,
+    fontSize: 12,
+    color: '#6B7280',
+    lineHeight: 18,
   },
 
   toggleRow: {

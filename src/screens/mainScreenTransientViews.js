@@ -44,27 +44,16 @@ function getCafeMatchCopy(cafe) {
   const mode = getCafeMatchMode(cafe);
   const incomplete = isCafeIncompleteForReview(cafe);
 
-  if (mode === 'pending' && incomplete) {
+  if (mode === 'pending') {
     return {
-      title: 'Faltan datos para validarlo 📷',
-      description:
-        'Este café ya está en revisión, pero necesitamos una foto o más contexto para completarlo automáticamente con IA.',
-      primaryLabel: 'Añadir foto y completar',
+      title: incomplete ? 'Faltan datos para validarlo 📷' : 'Café en revisión ⏳',
+      description: incomplete
+        ? 'Este café ya está en revisión, pero necesitamos una foto o más contexto para completarlo automáticamente con IA.'
+        : 'Este café ya fue detectado. Puedes abrir su ficha o añadir una foto nueva para relanzar la IA.',
+      primaryLabel: 'Añadir foto nueva',
       secondaryLabel: 'Ver ficha provisional',
       autoOpen: false,
       action: 'recover',
-    };
-  }
-
-  if (mode === 'pending') {
-    return {
-      title: 'Ya está en revisión ⏳',
-      description:
-        'Este café ya fue detectado y está pendiente de validación. Puedes ver su ficha provisional.',
-      primaryLabel: 'Ver ficha provisional',
-      secondaryLabel: 'Cerrar',
-      autoOpen: false,
-      action: 'open',
     };
   }
 

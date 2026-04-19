@@ -160,37 +160,58 @@
       /* ── 1. HERO — DARK ─────────────────────────────────────────────── */
       .hero {
         position: relative;
-        background: var(--espresso);
+        background: linear-gradient(170deg, #2c1409 0%, #1a0d07 45%, #0e0603 100%);
         overflow: hidden;
-        padding: 160px 40px 130px;
+        padding: 160px 40px 140px;
         text-align: center;
       }
       .hero::before {
         content: '';
         position: absolute;
-        top: -200px;
+        top: -120px;
         left: 50%;
         transform: translateX(-50%);
-        width: 900px;
-        height: 900px;
+        width: 1200px;
+        height: 800px;
         border-radius: 50%;
-        background: radial-gradient(circle, rgba(143, 94, 59, 0.28) 0%, transparent 65%);
+        background: radial-gradient(ellipse, rgba(201, 149, 87, 0.2) 0%, rgba(143, 94, 59, 0.07) 50%, transparent 72%);
+        pointer-events: none;
+      }
+      .hero::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 200px;
+        background: linear-gradient(to top, rgba(10, 5, 3, 0.5), transparent);
         pointer-events: none;
       }
       .hero-inner {
         position: relative;
         z-index: 2;
-        max-width: 760px;
+        max-width: 800px;
         margin: 0 auto;
+      }
+      .hero-wordmark {
+        font-family: 'Playfair Display', serif;
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 6px;
+        text-transform: uppercase;
+        color: var(--gold);
+        opacity: 0.75;
+        display: block;
+        margin-bottom: 36px;
       }
       .hero-title {
         font-family: 'Playfair Display', serif;
-        font-size: clamp(48px, 8vw, 92px);
+        font-size: clamp(46px, 7.5vw, 88px);
         font-weight: 700;
         color: #fdf8f1;
-        line-height: 1.05;
+        line-height: 1.07;
         letter-spacing: -0.5px;
-        margin-bottom: 28px;
+        margin-bottom: 32px;
         margin-top: 0;
       }
       .hero-title em {
@@ -199,10 +220,10 @@
       }
       .hero-sub {
         font-size: clamp(16px, 1.8vw, 18px);
-        color: rgba(253, 248, 241, 0.58);
-        line-height: 1.8;
-        max-width: 500px;
-        margin: 0 auto 48px;
+        color: rgba(253, 248, 241, 0.55);
+        line-height: 1.85;
+        max-width: 580px;
+        margin: 0 auto 52px;
         text-align: center;
       }
       .hero-rule {
@@ -231,14 +252,14 @@
         justify-content: center;
         gap: 28px;
         flex-wrap: wrap;
-        margin-top: 52px;
+        margin-top: 56px;
         padding-top: 44px;
-        border-top: 1px solid rgba(228, 195, 164, 0.12);
+        border-top: 1px solid rgba(228, 195, 164, 0.1);
       }
       .hero-badge {
         font-size: 11px;
         letter-spacing: 0.5px;
-        color: rgba(253, 248, 241, 0.4);
+        color: rgba(253, 248, 241, 0.35);
         display: flex;
         align-items: center;
         gap: 8px;
@@ -249,7 +270,7 @@
         height: 4px;
         border-radius: 50%;
         background: var(--gold);
-        opacity: 0.6;
+        opacity: 0.5;
         flex-shrink: 0;
       }
 
@@ -727,7 +748,7 @@
 
       @media (max-width: 480px) {
         .hero-title {
-          font-size: clamp(38px, 12vw, 56px);
+          font-size: clamp(36px, 11vw, 54px);
         }
         .btn-group {
           flex-direction: column;
@@ -760,13 +781,14 @@
     <!-- ── 1. HERO — oscuro ───────────────────────────────────────────── -->
     <section class="hero" id="main-content">
       <div class="hero-inner">
-        <span class="eyebrow-light">App · iOS &amp; Android · Descarga gratuita</span>
+        <span class="hero-wordmark">Etiove</span>
+        <span class="eyebrow-light">Para los que el café importa de verdad</span>
         <h1 class="hero-title">
-          El café de especialidad<br />merece una app<br /><em>a su altura</em>
+          Hay un café perfecto<br />para ti. Aún no<br />lo has <em>encontrado</em>
         </h1>
         <p class="hero-sub">
-          Descubre, cata y colecciona los mejores cafés del mundo. Tu guía personal para encontrar
-          el café que es exactamente para ti.
+          Descubre, cata y colecciona los mejores cafés del mundo.<br />
+          Tu guía personal para encontrar el café exactamente para ti.
         </p>
         <div class="hero-rule"><div class="hero-rule-dot"></div></div>
         <div class="btn-group">
@@ -816,17 +838,17 @@
     <section class="intro">
       <div class="intro-inner">
         <h2 class="intro-heading">
-          Cada taza tiene un origen.<br />Etiove te ayuda a<br /><em>encontrarlo.</em>
+          Etiove es tu guía personal<br />del café de<br /><em>especialidad.</em>
         </h2>
         <div class="intro-body">
           <p>
-            El café de especialidad no es solo una bebida: es un sistema complejo de origen,
-            varietal, proceso y tueste. Etiove te da las herramientas para entenderlo, disfrutarlo y
-            compartirlo.
+            El café de especialidad no es solo una bebida: es un mundo de origen, varietal, proceso
+            y tueste. Etiove te da las herramientas para entenderlo, disfrutarlo y descubrir cuál es
+            exactamente el tuyo.
           </p>
           <p>
-            Diseñada para curiosos, para catadores y para los que simplemente quieren saber por qué
-            ese café les gustó tanto.
+            Para curiosos, para catadores con experiencia y para todos los que alguna vez se
+            preguntaron por qué ese café en concreto les gustó tanto.
           </p>
           <span class="intro-detail">Gratis · iOS y Android · Sin anuncios</span>
         </div>

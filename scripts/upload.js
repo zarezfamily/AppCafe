@@ -10,15 +10,14 @@ const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
 const cafes = JSON.parse(fs.readFileSync(cafesPath, 'utf8'));
 
 const projectId = serviceAccount.project_id;
-const storageBucket = `${projectId}.appspot.com`;
+const bucketCandidates = [`${projectId}.firebasestorage.app`, `${projectId}.appspot.com`];
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  storageBucket,
 });
 
 const db = admin.firestore();
-const bucket = admin.storage().bucket();
+let bucket = null;
 
 function slugify(value) {
   return String(value || '')
@@ -32,6 +31,10 @@ function slugify(value) {
 
 function buildCafeId(cafe) {
   return slugify(`${cafe.roaster || 'roaster'}-${cafe.nombre || 'cafe'}`);
+}
+
+function isSameCafe(a, b) {
+  return buildCafeId(a) === buildCafeId(b);
 }
 
 function detectExtension(contentType, imageUrl) {
@@ -76,13 +79,74 @@ async function downloadImage(imageUrl) {
   return { buffer, contentType };
 }
 
+async function resolveImageFromProductPage(pageUrl) {
+  const response = await fetch(pageUrl, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 ETIOVE/1.0',
+      Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`No se pudo abrir la ficha del producto (${response.status}) ${pageUrl}`);
+  }
+
+  const html = await response.text();
+
+  const candidates = [
+    /<meta[^>]+property=["']og:image(?::secure_url)?["'][^>]+content=["']([^"']+)["'][^>]*>/i,
+    /<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image(?::secure_url)?["'][^>]*>/i,
+    /<meta[^>]+name=["']twitter:image(?::src)?["'][^>]+content=["']([^"']+)["'][^>]*>/i,
+    /<meta[^>]+content=["']([^"']+)["'][^>]+name=["']twitter:image(?::src)?["'][^>]*>/i,
+  ];
+
+  for (const regex of candidates) {
+    const match = html.match(regex);
+    if (match?.[1]) {
+      return new URL(match[1], pageUrl).toString();
+    }
+  }
+
+  const imgMatch = html.match(/<img[^>]+src=["']([^"']+)["'][^>]*>/i);
+  if (imgMatch?.[1]) {
+    return new URL(imgMatch[1], pageUrl).toString();
+  }
+
+  throw new Error(`No se encontró imagen en la ficha del producto: ${pageUrl}`);
+}
+
+async function getWorkingBucket() {
+  if (bucket) return bucket;
+
+  const storage = admin.storage();
+
+  for (const candidate of bucketCandidates) {
+    try {
+      const testBucket = storage.bucket(candidate);
+      const [exists] = await testBucket.exists();
+      if (exists) {
+        bucket = testBucket;
+        console.log(`🪣 Bucket detectado: ${candidate}`);
+        return bucket;
+      }
+    } catch (_) {
+      // seguimos probando otros candidatos
+    }
+  }
+
+  throw new Error(
+    `No existe un bucket accesible para este proyecto. Candidatos probados: ${bucketCandidates.join(', ')}`
+  );
+}
+
 async function uploadImageToStorage(cafe, imageUrl) {
+  const activeBucket = await getWorkingBucket();
   const { buffer, contentType } = await downloadImage(imageUrl);
   const extension = detectExtension(contentType, imageUrl);
   const cafeId = buildCafeId(cafe);
   const hash = crypto.createHash('md5').update(buffer).digest('hex').slice(0, 10);
   const destination = `cafes/${cafeId}/${hash}.${extension}`;
-  const file = bucket.file(destination);
+  const file = activeBucket.file(destination);
 
   await file.save(buffer, {
     metadata: {
@@ -100,8 +164,35 @@ async function uploadImageToStorage(cafe, imageUrl) {
   return {
     storagePath: destination,
     storageUrl: signedUrl,
-    storageBucket: bucket.name,
+    storageBucket: activeBucket.name,
   };
+}
+async function markDuplicateDocsAsLegacy(cafe, keepDocId) {
+  const snapshot = await db.collection('cafes').where('nombre', '==', cafe.nombre).get();
+
+  const duplicates = snapshot.docs.filter((doc) => {
+    if (doc.id === keepDocId) return false;
+    const data = doc.data() || {};
+    return isSameCafe(data, cafe);
+  });
+
+  if (!duplicates.length) return;
+
+  const batch = db.batch();
+  for (const doc of duplicates) {
+    batch.set(
+      doc.ref,
+      {
+        legacy: true,
+        updatedAt: new Date().toISOString(),
+        duplicateOf: keepDocId,
+      },
+      { merge: true }
+    );
+  }
+
+  await batch.commit();
+  console.log(`🧹 Duplicados marcados como legacy para ${cafe.nombre}: ${duplicates.length}`);
 }
 
 async function upsertCafe(cafe) {
@@ -111,10 +202,47 @@ async function upsertCafe(cafe) {
   let fotoFinal = cafe.foto || null;
   let storageMeta = null;
 
+  const productPageUrl = cafe.fuenteUrl || cafe.urlProducto || null;
+
   if (typeof cafe.foto === 'string' && /^https?:\/\//i.test(cafe.foto)) {
-    console.log(`🖼️  Descargando foto de ${cafe.nombre}...`);
-    storageMeta = await uploadImageToStorage(cafe, cafe.foto);
-    fotoFinal = storageMeta.storageUrl;
+    try {
+      console.log(`🖼️  Descargando foto de ${cafe.nombre}...`);
+      storageMeta = await uploadImageToStorage(cafe, cafe.foto);
+      fotoFinal = storageMeta.storageUrl;
+    } catch (error) {
+      console.warn(`⚠️ Foto directa no descargada para ${cafe.nombre}: ${error.message}`);
+
+      if (productPageUrl) {
+        try {
+          console.log(`🔎 Buscando imagen real en ficha de producto para ${cafe.nombre}...`);
+          const resolvedImageUrl = await resolveImageFromProductPage(productPageUrl);
+          storageMeta = await uploadImageToStorage(cafe, resolvedImageUrl);
+          fotoFinal = storageMeta.storageUrl;
+          console.log(`🟢 Imagen resuelta desde ficha para ${cafe.nombre}`);
+        } catch (fallbackError) {
+          console.warn(
+            `⚠️ Tampoco se pudo resolver foto desde ficha para ${cafe.nombre}: ${fallbackError.message}`
+          );
+          fotoFinal = null;
+          storageMeta = null;
+        }
+      } else {
+        fotoFinal = null;
+        storageMeta = null;
+      }
+    }
+  } else if (productPageUrl) {
+    try {
+      console.log(`🔎 Buscando imagen real en ficha de producto para ${cafe.nombre}...`);
+      const resolvedImageUrl = await resolveImageFromProductPage(productPageUrl);
+      storageMeta = await uploadImageToStorage(cafe, resolvedImageUrl);
+      fotoFinal = storageMeta.storageUrl;
+      console.log(`🟢 Imagen resuelta desde ficha para ${cafe.nombre}`);
+    } catch (error) {
+      console.warn(`⚠️ No se pudo resolver foto desde ficha para ${cafe.nombre}: ${error.message}`);
+      fotoFinal = null;
+      storageMeta = null;
+    }
   }
 
   const payload = {
@@ -122,9 +250,15 @@ async function upsertCafe(cafe) {
     uid: cafe.uid || cafeId,
     foto: fotoFinal,
     fotoOriginal: cafe.foto || null,
+    fotoFuenteUrl: productPageUrl,
     fotoStoragePath: storageMeta?.storagePath || null,
     fotoStorageBucket: storageMeta?.storageBucket || null,
     fotoVerificada: Boolean(fotoFinal),
+    fotoError: fotoFinal
+      ? null
+      : typeof cafe.foto === 'string' || productPageUrl
+        ? 'download_failed_or_invalid_url'
+        : null,
     legacy: false,
     updatedAt: new Date().toISOString(),
   };
@@ -135,17 +269,30 @@ async function upsertCafe(cafe) {
   }
 
   await docRef.set(payload, { merge: true });
+  await markDuplicateDocsAsLegacy(cafe, cafeId);
   console.log(`✅ ${cafe.nombre}`);
 }
 
 async function uploadCafes() {
-  console.log(`🔥 Subiendo cafés reales a Firestore y Firebase Storage (${bucket.name})...\n`);
+  const activeBucket = await getWorkingBucket();
+  console.log(
+    `🔥 Subiendo cafés reales a Firestore y Firebase Storage (${activeBucket.name})...\n`
+  );
+
+  let ok = 0;
+  let failed = 0;
 
   for (const cafe of cafes) {
-    await upsertCafe(cafe);
+    try {
+      await upsertCafe(cafe);
+      ok += 1;
+    } catch (error) {
+      failed += 1;
+      console.error(`❌ Error procesando ${cafe.nombre}: ${error.message}`);
+    }
   }
 
-  console.log(`\n🚀 Seed completado: ${cafes.length} cafés procesados`);
+  console.log(`\n🚀 Seed completado: ${ok} cafés OK, ${failed} con error`);
 }
 
 uploadCafes().catch((error) => {

@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -50,6 +51,61 @@ function ActionCard({ title, desc, icon, onPress }) {
       </View>
       <Ionicons name="chevron-forward" size={18} color="#8f5e3b" />
     </TouchableOpacity>
+  );
+}
+
+function RankingExpander({ items, sortKey, label, setCafeDetalle }) {
+  const [expanded, setExpanded] = useState(false);
+
+  const sorted = [...(items || [])].sort(
+    (a, b) =>
+      Number(b?.[sortKey] || b?.puntuacion || 0) - Number(a?.[sortKey] || a?.puntuacion || 0)
+  );
+
+  return (
+    <View style={{ marginTop: 14 }}>
+      <TouchableOpacity
+        onPress={() => setExpanded((v) => !v)}
+        activeOpacity={0.88}
+        style={styles.rankingToggle}
+      >
+        <Ionicons name={expanded ? 'chevron-up' : 'trophy-outline'} size={14} color="#8f5e3b" />
+        <Text style={styles.rankingToggleText}>
+          {expanded ? 'Ocultar ranking' : `Ver ranking ${label} (${sorted.length})`}
+        </Text>
+        {!expanded && <Ionicons name="chevron-down" size={14} color="#8f5e3b" />}
+      </TouchableOpacity>
+
+      {expanded && (
+        <View style={{ marginTop: 10, gap: 8 }}>
+          {sorted.map((item, index) => (
+            <TouchableOpacity
+              key={item.id}
+              activeOpacity={0.88}
+              onPress={() => {
+                const cafeIndex = sorted.findIndex((c) => c.id === item.id);
+                setCafeDetalle({ cafes: sorted, cafeIndex });
+              }}
+              style={styles.rankingRow}
+            >
+              <View style={styles.rankingPos}>
+                <Text style={styles.rankingPosText}>{index + 1}</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.rankingName} numberOfLines={1}>
+                  {item.nombre}
+                </Text>
+                <Text style={styles.rankingMeta} numberOfLines={1}>
+                  {item.roaster || item.marca || 'ETIOVE'}
+                  {item.origen ? ` · ${item.origen}` : ''}
+                </Text>
+              </View>
+              <Text style={styles.rankingScore}>{Number(item.puntuacion || 0).toFixed(1)} ⭐</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
+    </View>
   );
 }
 
@@ -264,6 +320,12 @@ export function SpecialtyForYouSection({
           />
         )}
       />
+      <RankingExpander
+        items={cafes}
+        sortKey="rankingScore"
+        label="specialty"
+        setCafeDetalle={setCafeDetalle}
+      />
     </HomeSectionCard>
   );
 }
@@ -297,12 +359,24 @@ export function DailyCoffeeSection({ s, cafes, setCafeDetalle, favs, toggleFav, 
           />
         )}
       />
+      <RankingExpander
+        items={cafes}
+        sortKey="puntuacion"
+        label="diarios"
+        setCafeDetalle={setCafeDetalle}
+      />
     </HomeSectionCard>
   );
 }
 
 export function BioCoffeeSection({ s, cafes, setCafeDetalle, favs, toggleFav, CardHorizontal }) {
   if (!cafes?.length) return null;
+
+  const items = cafes.slice(0, 8);
+  const handlePress = (item) => {
+    const index = items.findIndex((c) => c.id === item.id);
+    setCafeDetalle({ cafes: items, cafeIndex: index });
+  };
 
   return (
     <HomeSectionCard>
@@ -314,17 +388,23 @@ export function BioCoffeeSection({ s, cafes, setCafeDetalle, favs, toggleFav, Ca
       <HorizontalCardRow
         s={s}
         loading={false}
-        items={cafes.slice(0, 8)}
+        items={items}
         renderItem={(item) => (
           <CardHorizontal
             key={item.id}
             item={item}
             badge="🌿 BIO"
-            onPress={setCafeDetalle}
+            onPress={() => handlePress(item)}
             favs={favs}
             onToggleFav={toggleFav}
           />
         )}
+      />
+      <RankingExpander
+        items={cafes}
+        sortKey="puntuacion"
+        label="BIO"
+        setCafeDetalle={setCafeDetalle}
       />
     </HomeSectionCard>
   );
@@ -821,5 +901,62 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '800',
     color: '#6f5a4b',
+  },
+
+  rankingToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    alignSelf: 'flex-start',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: '#eadbce',
+    backgroundColor: '#faf7f2',
+  },
+  rankingToggleText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#8f5e3b',
+  },
+  rankingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#eadbce',
+    backgroundColor: '#faf8f5',
+  },
+  rankingPos: {
+    width: 26,
+    height: 26,
+    borderRadius: 8,
+    backgroundColor: '#f3e7d9',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rankingPosText: {
+    fontSize: 11,
+    fontWeight: '900',
+    color: '#8f5e3b',
+  },
+  rankingName: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#24160f',
+  },
+  rankingMeta: {
+    marginTop: 2,
+    fontSize: 11,
+    color: '#6f5a4b',
+  },
+  rankingScore: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#8f5e3b',
   },
 });

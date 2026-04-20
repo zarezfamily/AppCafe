@@ -13,21 +13,6 @@ import {
 } from './inicioTabSections';
 import { MAIN_TABS } from './mainScreenTabs';
 
-function buildUniqueOptions(items, field, limit = 6) {
-  const seen = new Set();
-
-  return (items || [])
-    .map((item) => String(item?.[field] || '').trim())
-    .filter(Boolean)
-    .filter((value) => {
-      const normalized = value.toLowerCase();
-      if (seen.has(normalized)) return false;
-      seen.add(normalized);
-      return true;
-    })
-    .slice(0, limit);
-}
-
 function normalizeCategory(item) {
   const c = item?.coffeeCategory;
   if (c === 'daily') return 'daily';
@@ -111,58 +96,6 @@ function HomePill({ label }) {
         {label}
       </Text>
     </View>
-  );
-}
-
-function QuickHomeCard({ icon, title, subtitle, onPress }) {
-  return (
-    <TouchableOpacity
-      onPress={onPress}
-      activeOpacity={0.9}
-      style={{
-        flex: 1,
-        borderRadius: 18,
-        borderWidth: 1,
-        borderColor: '#eadbce',
-        backgroundColor: '#fffaf5',
-        padding: 14,
-      }}
-    >
-      <View
-        style={{
-          width: 38,
-          height: 38,
-          borderRadius: 12,
-          backgroundColor: '#f3e7d9',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: 10,
-        }}
-      >
-        <Text style={{ fontSize: 16 }}>{icon}</Text>
-      </View>
-
-      <Text
-        style={{
-          fontSize: 14,
-          fontWeight: '800',
-          color: '#24160f',
-        }}
-      >
-        {title}
-      </Text>
-
-      <Text
-        style={{
-          marginTop: 4,
-          fontSize: 12,
-          lineHeight: 18,
-          color: '#6f5a4b',
-        }}
-      >
-        {subtitle}
-      </Text>
-    </TouchableOpacity>
   );
 }
 
@@ -325,62 +258,6 @@ export default function InicioTab({
           placeholder="Buscar en ETIOVE... café, origen, proceso o tostador"
         />
       </View>
-
-      {!busqueda?.trim() && (
-        <View style={{ marginTop: 18, marginHorizontal: 16 }}>
-          <Text
-            style={{
-              fontSize: 18,
-              fontWeight: '900',
-              color: '#24160f',
-            }}
-          >
-            Accesos rápidos
-          </Text>
-          <Text
-            style={{
-              marginTop: 4,
-              fontSize: 13,
-              lineHeight: 19,
-              color: '#6f5a4b',
-            }}
-          >
-            Muévete rápido entre las zonas principales de ETIOVE.
-          </Text>
-
-          <View style={{ marginTop: 12, gap: 12 }}>
-            <View style={{ flexDirection: 'row', gap: 12 }}>
-              <QuickHomeCard
-                icon="🔎"
-                title="Explore"
-                subtitle="Descubre cafés con filtros premium."
-                onPress={() => setActiveTab(MAIN_TABS.DISCOVER)}
-              />
-              <QuickHomeCard
-                icon="🔥"
-                title="Trending"
-                subtitle="Lo que está subiendo ahora mismo."
-                onPress={() => setActiveTab(MAIN_TABS.TRENDING)}
-              />
-            </View>
-
-            <View style={{ flexDirection: 'row', gap: 12 }}>
-              <QuickHomeCard
-                icon="🏆"
-                title="Ranking"
-                subtitle="Los cafés mejor posicionados."
-                onPress={() => setActiveTab(MAIN_TABS.TOP)}
-              />
-              <QuickHomeCard
-                icon="📍"
-                title="Cafeterías"
-                subtitle="Busca sitios cercanos para tomar café."
-                onPress={() => setActiveTab(MAIN_TABS.CAFETERIAS)}
-              />
-            </View>
-          </View>
-        </View>
-      )}
 
       {busqueda?.trim() ? (
         <SearchResultsSection

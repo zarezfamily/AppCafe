@@ -561,8 +561,9 @@ export default function AdminPanelScreen() {
       origen: proposal.suggestedOrigen || prev.origen || '',
       notas: proposal.suggestedNotas || prev.notas || '',
       formato: proposal.suggestedFormato || prev.formato || '',
-      officialPhoto: proposal.suggestedOfficialPhoto || prev.officialPhoto || '',
-      bestPhotoMode: proposal.suggestedOfficialPhoto ? 'official' : prev.bestPhotoMode,
+      officialPhoto: prev.officialPhoto || proposal.suggestedOfficialPhoto || '',
+      bestPhotoMode:
+        prev.officialPhoto || proposal.suggestedOfficialPhoto ? 'official' : prev.bestPhotoMode,
       isBio:
         proposal.isBio === true ||
         String(proposal.suggestedCertificaciones || '')

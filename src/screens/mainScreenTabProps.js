@@ -365,6 +365,30 @@ export function buildTrendingTabProps({
   };
 }
 
+export function buildDiscoverTabProps({
+  s,
+  setActiveTab,
+  premiumAccent,
+  cargando,
+  allCafes,
+  CardVertical,
+  setCafeDetalle,
+  favs,
+  toggleFav,
+}) {
+  return {
+    s,
+    setActiveTab,
+    premiumAccent,
+    cargando,
+    personalizedCafes: allCafes,
+    CardVertical,
+    setCafeDetalle,
+    favs,
+    toggleFav,
+  };
+}
+
 export function buildOfertasTabProps({
   s,
   setActiveTab,

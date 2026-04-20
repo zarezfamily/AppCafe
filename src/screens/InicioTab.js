@@ -1,11 +1,10 @@
 import { useMemo, useState } from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import MemberInfoModal from '../components/MemberInfoModal';
 import {
   BioCoffeeSection,
   BlogSection,
   DailyCoffeeSection,
-  ExploreHomeSection,
   InicioTopBar,
   NearbyCafeteriasSection,
   SearchResultsSection,
@@ -184,7 +183,7 @@ export default function InicioTab({
   favs,
   toggleFav,
   setActiveTab,
-  setTrendingFilters,
+
   premiumAccent,
   CardHorizontal,
   trendingCafes,
@@ -215,24 +214,6 @@ export default function InicioTab({
   const specialtyTrendingCafes = useMemo(() => {
     return (trendingCafes || []).filter((item) => normalizeCategory(item) === 'specialty');
   }, [trendingCafes]);
-
-  const quickTrendingFilters = useMemo(() => {
-    return {
-      paises: buildUniqueOptions(specialtyTrendingCafes, 'pais', 4),
-      procesos: buildUniqueOptions(specialtyTrendingCafes, 'proceso', 4),
-      roasters: buildUniqueOptions(specialtyTrendingCafes, 'roaster', 4),
-    };
-  }, [specialtyTrendingCafes]);
-
-  const handleOpenTrendingFilter = ({ pais = null, proceso = null, roaster = null }) => {
-    setTrendingFilters?.((prev) => ({
-      ...(typeof prev === 'object' && prev ? prev : {}),
-      pais,
-      proceso,
-      roaster,
-    }));
-    setActiveTab(MAIN_TABS.TRENDING);
-  };
 
   const stepUpPairs = useMemo(() => {
     return buildStepUpPairs(dailyCafes, specialtyCafes);
@@ -522,14 +503,6 @@ export default function InicioTab({
             favs={favs}
             toggleFav={toggleFav}
             CardHorizontal={CardHorizontal}
-          />
-
-          <ExploreHomeSection
-            s={s}
-            setActiveTab={setActiveTab}
-            premiumAccent={premiumAccent}
-            onOpenTrendingFilter={handleOpenTrendingFilter}
-            quickTrendingFilters={quickTrendingFilters}
           />
 
           <NearbyCafeteriasSection

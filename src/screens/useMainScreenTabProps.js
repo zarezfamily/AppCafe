@@ -5,6 +5,7 @@ import {
   buildMasTabProps,
   buildMisCafesTabProps,
   buildOfertasTabProps,
+  buildDiscoverTabProps,
   buildTopCafesTabProps,
   buildTrendingTabProps,
   buildUltimosAnadidosTabProps,
@@ -348,6 +349,18 @@ function buildCollectionTabProps({
     setBusqueda,
   });
 
+  const discoverTabProps = buildDiscoverTabProps({
+    s,
+    setActiveTab,
+    premiumAccent,
+    cargando,
+    allCafes,
+    CardVertical,
+    setCafeDetalle,
+    favs,
+    toggleFav,
+  });
+
   const trendingTabProps = buildTrendingTabProps({
     s,
     setActiveTab,
@@ -428,6 +441,7 @@ function buildCollectionTabProps({
     misCafesTabProps,
     ultimosAnadidosTabProps,
     topCafesTabProps,
+    discoverTabProps,
     trendingTabProps,
     ofertasTabProps,
     masTabProps,
@@ -696,6 +710,7 @@ export default function useMainScreenTabProps({
     misCafesTabProps,
     ultimosAnadidosTabProps,
     topCafesTabProps,
+    discoverTabProps,
     trendingTabProps,
     ofertasTabProps,
     masTabProps,
@@ -773,6 +788,7 @@ export default function useMainScreenTabProps({
     misCafesTabProps,
     ultimosAnadidosTabProps,
     topCafesTabProps,
+    discoverTabProps,
     trendingTabProps,
     ofertasTabProps,
     masTabProps,

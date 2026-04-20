@@ -6,6 +6,7 @@ import CafeteriasScreen from './CafeteriasScreen';
 import CataDetailModal from './CataDetailModal';
 import CataFormModal from './CataFormModal';
 import CommunityTab from './CommunityTab';
+import DiscoverTab from './DiscoverTab';
 import InicioTab from './InicioTab';
 import MasTab from './MasTab';
 import MisCafesTab from './MisCafesTab';
@@ -24,6 +25,7 @@ export default function MainScreenBody({
   misCafesTabProps,
   ultimosAnadidosTabProps,
   topCafesTabProps,
+  discoverTabProps,
   trendingTabProps,
   ofertasTabProps,
   masTabProps,
@@ -83,6 +85,7 @@ export default function MainScreenBody({
             {activeTab === MAIN_TABS.NOTEBOOK && <MisCafesTab {...misCafesTabProps} />}
             {activeTab === MAIN_TABS.LATEST && <UltimosAnadidosTab {...ultimosAnadidosTabProps} />}
             {activeTab === MAIN_TABS.TOP && <RankingTab {...topCafesTabProps} />}
+            {activeTab === MAIN_TABS.DISCOVER && <DiscoverTab {...discoverTabProps} />}
             {activeTab === MAIN_TABS.TRENDING && <TrendingTab {...trendingTabProps} />}
             {activeTab === MAIN_TABS.OFFERS && <OfertasTab {...ofertasTabProps} />}
             {activeTab === MAIN_TABS.MORE && <MasTab {...masTabProps} />}

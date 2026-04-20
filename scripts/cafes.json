@@ -1,0 +1,203 @@
+[
+  {
+    "nombre": "Sitio Amoreira",
+    "roaster": "Ineffable Coffee",
+    "coffeeCategory": "specialty",
+    "isBio": false,
+
+    "pais": "Brasil",
+    "region": "Cerrado Mineiro",
+    "finca": "Sitio Amoreira",
+    "productor": "Familia Andrade",
+    "altura": 1100,
+    "variedad": "Yellow Catuai",
+    "proceso": "Natural",
+    "secado": "Camas africanas",
+
+    "tueste": "Ligero",
+    "formato": "250g",
+    "precio": 13.5,
+
+    "notas": "Vainilla, pera, chocolate",
+    "acidez": "Baja",
+    "cuerpo": "Denso",
+    "regusto": "Dulce y persistente",
+    "preparacion": "Filtro, V60, espresso",
+
+    "sca": 86,
+    "puntuacion": 4.3,
+    "votos": 0,
+
+    "foto": "https://ineffablecoffee.com/cdn/shop/products/sitio-amoreira.jpg",
+    "urlProducto": "https://ineffablecoffee.com/products/sitio-amoreira",
+
+    "barcode": null,
+    "eanVerificado": false,
+
+    "fuente": "web_roaster",
+    "fuenteUrl": "https://ineffablecoffee.com/products/sitio-amoreira",
+
+    "legacy": false
+  },
+
+  {
+    "nombre": "La Coipa",
+    "roaster": "Ineffable Coffee",
+    "coffeeCategory": "specialty",
+    "isBio": false,
+
+    "pais": "Perú",
+    "region": "Cajamarca",
+    "finca": "La Coipa",
+    "productor": "Productores locales",
+    "altura": 1800,
+    "variedad": "Caturra, Catuai",
+    "proceso": "Lavado",
+    "secado": "Camas africanas",
+
+    "tueste": "Ligero",
+    "formato": "250g",
+    "precio": 15,
+
+    "notas": "Albaricoque, panela, chocolate blanco",
+    "acidez": "Media",
+    "cuerpo": "Equilibrado",
+    "regusto": "Largo",
+    "preparacion": "Filtro, V60",
+
+    "sca": 87,
+    "puntuacion": 4.4,
+    "votos": 0,
+
+    "foto": "https://ineffablecoffee.com/cdn/shop/products/la-coipa.jpg",
+    "urlProducto": "https://ineffablecoffee.com/products/la-coipa",
+
+    "barcode": null,
+    "eanVerificado": false,
+
+    "fuente": "web_roaster",
+    "fuenteUrl": "https://ineffablecoffee.com/products/la-coipa",
+
+    "legacy": false
+  },
+
+  {
+    "nombre": "Friends of Tolima",
+    "roaster": "Ineffable Coffee",
+    "coffeeCategory": "specialty",
+    "isBio": false,
+
+    "pais": "Colombia",
+    "region": "Tolima",
+    "finca": "Varias fincas",
+    "productor": "Cooperativa local",
+    "altura": 1700,
+    "variedad": "Castillo, Caturra",
+    "proceso": "Lavado",
+
+    "tueste": "Ligero",
+    "formato": "250g",
+    "precio": 15,
+
+    "notas": "Manzana, chocolate, avellana",
+    "acidez": "Media",
+    "cuerpo": "Equilibrado",
+    "regusto": "Dulce",
+    "preparacion": "Filtro, espresso",
+
+    "sca": 86,
+    "puntuacion": 4.3,
+    "votos": 0,
+
+    "foto": "https://ineffablecoffee.com/cdn/shop/products/friends-of-tolima.jpg",
+    "urlProducto": "https://ineffablecoffee.com/products/friends-of-tolima",
+
+    "barcode": null,
+    "eanVerificado": false,
+
+    "fuente": "web_roaster",
+    "fuenteUrl": "https://ineffablecoffee.com/products/friends-of-tolima",
+
+    "legacy": false
+  },
+
+  {
+    "nombre": "Colombia Casa Negra",
+    "roaster": "Cafés El Magnífico",
+    "coffeeCategory": "specialty",
+    "isBio": false,
+
+    "pais": "Colombia",
+    "region": "Quindío",
+    "finca": "Casa Negra",
+    "productor": "Jairo Arcila",
+    "altura": 1400,
+    "variedad": "Caturra, Castillo",
+    "proceso": "Lavado",
+
+    "tueste": "Ligero",
+    "formato": "250g",
+    "precio": 16,
+
+    "notas": "Caramelo, nuez moscada, dulce",
+    "acidez": "Media",
+    "cuerpo": "Equilibrado",
+    "regusto": "Largo",
+    "preparacion": "Filtro, espresso",
+
+    "sca": 88,
+    "puntuacion": 4.5,
+    "votos": 0,
+
+    "foto": "https://cafeselmagnifico.com/wp-content/uploads/colombia-casa-negra.jpg",
+    "urlProducto": "https://cafeselmagnifico.com/producto/colombia-casa-negra/",
+
+    "barcode": null,
+    "eanVerificado": false,
+
+    "fuente": "web_roaster",
+    "fuenteUrl": "https://cafeselmagnifico.com/producto/colombia-casa-negra/",
+
+    "legacy": false
+  },
+
+  {
+    "nombre": "Chambakú",
+    "roaster": "Nomad Coffee",
+    "coffeeCategory": "specialty",
+    "isBio": false,
+
+    "pais": "Colombia",
+    "region": "Quindío",
+    "finca": "Chambakú",
+    "productor": "Productores locales",
+    "altura": 1600,
+    "variedad": "Castillo",
+    "proceso": "Lavado",
+
+    "tueste": "Ligero",
+    "formato": "250g",
+    "precio": 13.5,
+
+    "notas": "Chocolate, panela, frutos secos",
+    "acidez": "Media",
+    "cuerpo": "Equilibrado",
+    "regusto": "Dulce",
+    "preparacion": "Filtro, espresso",
+
+    "sca": 86,
+    "puntuacion": 4.2,
+    "votos": 0,
+
+    "foto": "https://nomadcoffee.es/cdn/shop/products/chambaku.jpg",
+    "urlProducto": "https://nomadcoffee.es/products/chambaku",
+
+    "barcode": null,
+    "eanVerificado": false,
+
+    "fuente": "web_roaster",
+    "fuenteUrl": "https://nomadcoffee.es/products/chambaku",
+
+    "legacy": false
+  }
+]

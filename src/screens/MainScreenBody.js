@@ -20,6 +20,7 @@ import { MAIN_TABS } from './mainScreenTabs';
 
 export default function MainScreenBody({
   activeTab,
+  setActiveTab,
   communityTabProps,
   inicioTabProps,
   misCafesTabProps,
@@ -61,7 +62,7 @@ export default function MainScreenBody({
     <>
       {activeTab === MAIN_TABS.CAFETERIAS && (
         <View style={{ flex: 1 }}>
-          <CafeteriasScreen />
+          <CafeteriasScreen onBack={() => setActiveTab(MAIN_TABS.HOME)} />
         </View>
       )}
 

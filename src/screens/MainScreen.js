@@ -113,6 +113,7 @@ export default function MainScreen({ onLogout }) {
 
       <MainScreenBody
         activeTab={ui.activeTab}
+        setActiveTab={ui.setActiveTab}
         communityTabProps={tabProps.communityTabProps}
         inicioTabProps={tabProps.inicioTabProps}
         misCafesTabProps={tabProps.misCafesTabProps}

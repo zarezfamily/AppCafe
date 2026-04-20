@@ -13,7 +13,7 @@ import CafeteriaCard from './cafeterias/CafeteriaCard';
 import CafeteriaDetailModal from './cafeterias/CafeteriaDetailModal';
 import useCafeteriasScreen, { RADIOS_DISPONIBLES } from './cafeterias/useCafeteriasScreen';
 
-export default function CafeteriasScreen() {
+export default function CafeteriasScreen({ onBack }) {
   const {
     abrirMaps,
     cafeterias,
@@ -63,7 +63,16 @@ export default function CafeteriasScreen() {
       />
 
       <View style={styles.headerBox}>
-        <View>
+        <View style={{ flex: 1 }}>
+          {!!onBack && (
+            <TouchableOpacity
+              onPress={onBack}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 6 }}
+            >
+              <Ionicons name="chevron-back" size={20} color={PREMIUM_ACCENT} />
+              <Text style={{ fontSize: 13, color: PREMIUM_ACCENT, fontWeight: '700' }}>Volver</Text>
+            </TouchableOpacity>
+          )}
           <Text style={styles.pageTitle}>Cafeterías ☕</Text>
           <Text style={styles.headerMeta}>
             {cafeteriasVisibles.length} cerca de ti · radio {radioKm} km · ordenadas por distancia

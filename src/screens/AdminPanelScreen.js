@@ -634,6 +634,7 @@ export default function AdminPanelScreen() {
           .trim(),
         nombre: String(editData.nombre || '').trim(),
         marca: String(editData.marca || '').trim(),
+        roaster: String(editData.marca || '').trim(),
         origen: String(editData.origen || '').trim(),
         notas: String(editData.notas || '').trim(),
         officialPhoto,

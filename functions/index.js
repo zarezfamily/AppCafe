@@ -1170,6 +1170,169 @@ Datos barcode:
   };
 }
 
+function normalizeForMatch(s) {
+  return String(s || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+}
+
+function tokenSimilarity(a, b) {
+  const na = normalizeForMatch(a);
+  const nb = normalizeForMatch(b);
+  if (!na || !nb) return 0;
+  if (na === nb) return 1;
+  if (na.includes(nb) || nb.includes(na)) return 0.75;
+  const tokA = na.split(/[\s\-_,]+/).filter(Boolean);
+  const tokB = nb.split(/[\s\-_,]+/).filter(Boolean);
+  const hits = tokA.filter((t) => tokB.some((tb) => tb === t || tb.includes(t) || t.includes(tb)));
+  return hits.length / Math.max(tokA.length, tokB.length, 1);
+}
+
+function scoreCafeMatch(extracted, cafe) {
+  const roaster = tokenSimilarity(extracted.roaster, cafe.roaster) * 40;
+  const nombre = tokenSimilarity(extracted.nombre, cafe.nombre) * 35;
+  const pais = tokenSimilarity(extracted.pais, cafe.pais || cafe.origen) * 15;
+  const proceso = tokenSimilarity(extracted.proceso, cafe.proceso) * 10;
+  return Math.round(roaster + nombre + pais + proceso);
+}
+
+async function callOpenAIForRecognition({ imageBase64 }) {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) throw new Error('OPENAI_API_KEY_NOT_CONFIGURED');
+
+  const body = {
+    model: OPENAI_MODEL,
+    input: [
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'input_text',
+            text: [
+              'Analiza la imagen de este packaging de café.',
+              'Extrae: nombre del producto, roaster/tostador, país de origen y proceso de beneficiado.',
+              'Si la imagen no muestra un café reconocible, responde con isCoffee: false.',
+              'Si no puedes leer un campo, devuelve cadena vacía para ese campo.',
+            ].join(' '),
+          },
+          {
+            type: 'input_image',
+            image_url: `data:image/jpeg;base64,${imageBase64}`,
+          },
+        ],
+      },
+    ],
+    temperature: 0.1,
+    text: {
+      format: {
+        type: 'json_schema',
+        name: 'coffee_recognition',
+        schema: {
+          type: 'object',
+          additionalProperties: false,
+          properties: {
+            isCoffee: { type: 'boolean' },
+            nombre: { type: 'string' },
+            roaster: { type: 'string' },
+            pais: { type: 'string' },
+            proceso: { type: 'string' },
+            confidence: { type: 'number' },
+          },
+          required: ['isCoffee', 'nombre', 'roaster', 'pais', 'proceso', 'confidence'],
+        },
+      },
+    },
+  };
+
+  const response = await performOpenAIRequest({ apiKey, body });
+  const json = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    logger.error('recognizeCoffee OpenAI failed', { status: response.status, body: json });
+    throw new Error(`OPENAI_REQUEST_FAILED_${response.status}`);
+  }
+
+  const text = extractTextOutput(json);
+  const parsed = tryExtractJsonObject(text);
+  if (!parsed) throw new Error('OPENAI_INVALID_JSON');
+  return parsed;
+}
+
+exports.recognizeCoffee = onRequest(
+  {
+    region: 'europe-west1',
+    cors: true,
+    timeoutSeconds: 30,
+    memory: '256MiB',
+    secrets: ['OPENAI_API_KEY'],
+  },
+  async (req, res) => {
+    if (req.method !== 'POST') {
+      res.status(405).json({ error: 'METHOD_NOT_ALLOWED' });
+      return;
+    }
+
+    try {
+      const authHeader = req.headers.authorization || '';
+      const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+      if (!token) {
+        res.status(401).json({ error: 'UNAUTHENTICATED' });
+        return;
+      }
+      await admin.auth().verifyIdToken(token);
+
+      const { imageBase64 } = req.body || {};
+      if (!imageBase64 || typeof imageBase64 !== 'string') {
+        res.status(400).json({ error: 'MISSING_IMAGE' });
+        return;
+      }
+
+      const extracted = await callOpenAIForRecognition({ imageBase64 });
+
+      if (!extracted.isCoffee) {
+        res.status(200).json({ ok: true, isCoffee: false, candidates: [] });
+        return;
+      }
+
+      const snapshot = await db.collection('cafes').get();
+      const activeCafes = snapshot.docs
+        .map((d) => ({ id: d.id, ...d.data() }))
+        .filter((c) => c.legacy !== true);
+
+      const scored = activeCafes
+        .map((cafe) => ({ cafe, score: scoreCafeMatch(extracted, cafe) }))
+        .filter((r) => r.score > 10)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 3);
+
+      const confidence =
+        scored[0]?.score >= 80 ? 'high' : scored[0]?.score >= 50 ? 'medium' : 'low';
+
+      res.status(200).json({
+        ok: true,
+        isCoffee: true,
+        extracted,
+        confidence,
+        candidates: scored.map(({ cafe, score }) => ({
+          id: cafe.id,
+          nombre: cafe.nombre,
+          roaster: cafe.roaster,
+          pais: cafe.pais,
+          proceso: cafe.proceso,
+          officialPhoto: cafe.officialPhoto || cafe.foto || null,
+          puntuacion: cafe.puntuacion,
+          score,
+        })),
+      });
+    } catch (error) {
+      logger.error('recognizeCoffee error', { error: String(error?.message || error) });
+      res.status(500).json({ ok: false, error: String(error?.message || error) });
+    }
+  }
+);
+
 exports.adminEnrichCoffeeDraft = onRequest(
   {
     region: 'europe-west1',

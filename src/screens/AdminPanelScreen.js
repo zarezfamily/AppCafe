@@ -463,35 +463,52 @@ export default function AdminPanelScreen() {
   }, [editData]);
 
   const handleCopyAiSuggestion = useCallback(() => {
-    if (!editingCafe?.aiSuggestion) {
-      Alert.alert('Sin sugerencia', 'Este café no tiene sugerencia IA disponible.');
+    const ai = editingCafe?.aiSuggestion || null;
+    const p = proposal || null;
+
+    if (!ai && !p) {
+      Alert.alert(
+        'Sin sugerencia',
+        'Este café no tiene sugerencia IA disponible. Usa "Buscar datos y foto" primero.'
+      );
       return;
     }
 
-    const ai = editingCafe.aiSuggestion;
+    const source = ai || {
+      nombre: p?.suggestedNombre,
+      marca: p?.suggestedMarca,
+      origen: p?.suggestedOrigen,
+      notas: p?.suggestedNotas,
+      officialPhoto: p?.suggestedOfficialPhoto,
+      certificaciones: p?.suggestedCertificaciones,
+      isBio: p?.isBio,
+      isSpecialty: p?.isSpecialty,
+    };
+
     setEditData((prev) => ({
       ...prev,
-      nombre: prev.nombre || ai.nombre || '',
-      marca: prev.marca || ai.marca || '',
-      origen: prev.origen || ai.origen || '',
-      officialPhoto: prev.officialPhoto || ai.officialPhoto || '',
+      nombre: prev.nombre || source.nombre || '',
+      marca: prev.marca || source.marca || '',
+      origen: prev.origen || source.origen || '',
+      notas: prev.notas || source.notas || '',
+      officialPhoto: prev.officialPhoto || source.officialPhoto || '',
       bestPhotoMode:
-        prev.bestPhotoMode === 'official' || ai.officialPhoto ? 'official' : prev.bestPhotoMode,
+        prev.bestPhotoMode === 'official' || source.officialPhoto ? 'official' : prev.bestPhotoMode,
       coffeeCategory:
         prev.coffeeCategory ||
-        (typeof ai.isSpecialty === 'boolean'
-          ? ai.isSpecialty
+        (typeof source.isSpecialty === 'boolean'
+          ? source.isSpecialty
             ? 'specialty'
             : 'daily'
           : 'specialty'),
       isBio:
         prev.isBio === true ||
-        ai.isBio === true ||
-        String(ai.certificaciones || '')
+        source.isBio === true ||
+        String(source.certificaciones || '')
           .toLowerCase()
           .includes('bio'),
     }));
-  }, [editingCafe]);
+  }, [editingCafe, proposal]);
 
   const handleSearchProposal = useCallback(async () => {
     try {

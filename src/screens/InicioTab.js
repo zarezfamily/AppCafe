@@ -29,7 +29,10 @@ function buildUniqueOptions(items, field, limit = 6) {
 }
 
 function normalizeCategory(item) {
-  return item?.coffeeCategory === 'daily' ? 'daily' : 'specialty';
+  const c = item?.coffeeCategory;
+  if (c === 'daily') return 'daily';
+  if (c === 'commercial') return 'commercial';
+  return 'specialty';
 }
 
 function sortByRating(items) {
@@ -200,7 +203,9 @@ export default function InicioTab({
   };
 
   const specialtyCafes = useMemo(() => {
-    return (allCafes || []).filter((item) => normalizeCategory(item) === 'specialty');
+    return (allCafes || []).filter(
+      (item) => item?.coffeeCategory === 'specialty' && item?.qualityLevel !== 'commercial'
+    );
   }, [allCafes]);
 
   const dailyCafes = useMemo(() => {
@@ -212,7 +217,9 @@ export default function InicioTab({
   }, [allCafes]);
 
   const specialtyTrendingCafes = useMemo(() => {
-    return (trendingCafes || []).filter((item) => normalizeCategory(item) === 'specialty');
+    return (trendingCafes || []).filter(
+      (item) => item?.coffeeCategory === 'specialty' && item?.qualityLevel !== 'commercial'
+    );
   }, [trendingCafes]);
 
   const stepUpPairs = useMemo(() => {

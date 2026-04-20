@@ -35,7 +35,8 @@ export default function CafeDetailScreen({
 }) {
   if (!cafe) return null;
 
-  const coffeeCategory = cafe.coffeeCategory === 'daily' ? 'daily' : 'specialty';
+  const c = cafe.coffeeCategory;
+  const coffeeCategory = c === 'daily' ? 'daily' : c === 'commercial' ? 'commercial' : 'specialty';
   const isDaily = coffeeCategory === 'daily';
   const isFav = favs.includes(cafe.id);
   const yaVotado = votes.includes(cafe.id);

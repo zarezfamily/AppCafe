@@ -140,7 +140,7 @@ export default function TopCafesTab({
 
   const filteredItems = useMemo(() => {
     return [...(top100 || [])]
-      .filter((item) => (item?.coffeeCategory || 'specialty') === 'specialty')
+      .filter((item) => item?.coffeeCategory === 'specialty' && item?.qualityLevel !== 'commercial')
       .filter((item) => matchesSearch(item, searchQuery))
       .sort((a, b) => Number(b?.rankingScore || 0) - Number(a?.rankingScore || 0));
   }, [top100, searchQuery]);

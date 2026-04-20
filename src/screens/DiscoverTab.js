@@ -9,7 +9,10 @@ import { MAIN_TABS } from './mainScreenTabs';
 ====================== */
 
 function normalizeCategory(item) {
-  return item?.coffeeCategory === 'daily' ? 'daily' : 'specialty';
+  const c = item?.coffeeCategory;
+  if (c === 'daily') return 'daily';
+  if (c === 'commercial') return 'commercial';
+  return 'specialty';
 }
 
 function normalizeText(value) {

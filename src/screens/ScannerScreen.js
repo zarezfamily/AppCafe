@@ -77,6 +77,11 @@ export default function ScannerScreen({
         return;
       }
 
+      if (result.confidence === 'high') {
+        onRecognized?.(result.candidates[0]);
+        return;
+      }
+
       setCandidates(result.candidates);
       setState('results');
     } catch (err) {

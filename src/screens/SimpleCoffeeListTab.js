@@ -157,7 +157,7 @@ export default function SimpleCoffeeListTab({
                 {hero.roaster || hero.marca || 'ETIOVE'}
               </Text>
               <Text style={{ marginTop: 8, fontSize: 14, color: '#8f5e3b', fontWeight: '800' }}>
-                {hero.puntuacion || 0}.0 ⭐ · {hero.votos || 0} votos
+                {Number(hero.puntuacion || 0).toFixed(1)} ⭐ · {hero.votos || 0} votos
               </Text>
             </TouchableOpacity>
           )}

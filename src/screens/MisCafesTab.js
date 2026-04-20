@@ -108,7 +108,7 @@ export default function MisCafesTab({
               <CardHorizontal
                 key={item.id}
                 item={item}
-                badge={`${item.puntuacion}.0`}
+                badge={`${Number(item.puntuacion || 0).toFixed(1)}`}
                 onPress={() => setCafeDetalle({ cafes: favCafes, cafeIndex: idx })}
                 favs={favs}
                 onToggleFav={toggleFav}
@@ -140,7 +140,7 @@ export default function MisCafesTab({
                   <CardHorizontal
                     key={`pt-${item.id}`}
                     item={item}
-                    badge={`${item.puntuacion}.0`}
+                    badge={`${Number(item.puntuacion || 0).toFixed(1)}`}
                     onPress={() => setCafeDetalle({ cafes: cafesParaTiFiltrados, cafeIndex: idx })}
                     favs={favs}
                     onToggleFav={toggleFav}
@@ -167,7 +167,7 @@ export default function MisCafesTab({
                   <CardHorizontal
                     key={`fav-${item.id}`}
                     item={item}
-                    badge={`${item.puntuacion}.0`}
+                    badge={`${Number(item.puntuacion || 0).toFixed(1)}`}
                     onPress={() => setCafeDetalle({ cafes: favoritosFiltrados, cafeIndex: idx })}
                     favs={favs}
                     onToggleFav={toggleFav}

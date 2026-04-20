@@ -311,7 +311,8 @@ export default function TopCafesTab({
                 </View>
               )}
               <Text style={{ marginTop: 10, fontSize: 14, color: '#8f5e3b', fontWeight: '800' }}>
-                {hero.puntuacion || 0}.0 ⭐ · {hero.votos || 0} votos · score {heroScore}
+                {Number(hero.puntuacion || 0).toFixed(1)} ⭐ · {hero.votos || 0} votos · score{' '}
+                {heroScore}
               </Text>
               <View style={{ flexDirection: 'row', gap: 10, marginTop: 14 }}>
                 <TouchableOpacity

@@ -740,7 +740,7 @@ export default function TrendingTab({
                   <Text
                     style={{ marginTop: 10, fontSize: 14, color: '#8f5e3b', fontWeight: '900' }}
                   >
-                    {heroCafe.puntuacion || 0}.0 ⭐ · {heroCafe.votos || 0} votos
+                    {Number(heroCafe.puntuacion || 0).toFixed(1)} ⭐ · {heroCafe.votos || 0} votos
                   </Text>
 
                   {!!buildMatchReasons(heroCafe).length && (
@@ -866,7 +866,8 @@ export default function TrendingTab({
                     : ''}
                 </Text>
                 <Text style={{ marginTop: 8, fontSize: 13, color: '#8f5e3b', fontWeight: '800' }}>
-                  {topDestacado.puntuacion || 0}.0 ⭐ · {topDestacado.votos || 0} votos
+                  {Number(topDestacado.puntuacion || 0).toFixed(1)} ⭐ · {topDestacado.votos || 0}{' '}
+                  votos
                 </Text>
                 {!!buildMatchReasons(topDestacado).length && (
                   <View

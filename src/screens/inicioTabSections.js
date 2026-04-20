@@ -257,7 +257,7 @@ export function SpecialtyForYouSection({
           <CardHorizontal
             key={item.id}
             item={item}
-            badge={`${item.puntuacion || 0}.0 ⭐`}
+            badge={`${Number(item.puntuacion || 0).toFixed(1)} ⭐`}
             onPress={() => handlePress(item)}
             favs={favs}
             onToggleFav={toggleFav}

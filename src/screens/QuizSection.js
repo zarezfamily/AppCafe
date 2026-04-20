@@ -297,7 +297,7 @@ export default function QuizSection({
             <CardHorizontal
               key={item.id}
               item={item}
-              badge={`${item.puntuacion}.0`}
+              badge={`${Number(item.puntuacion || 0).toFixed(1)}`}
               onPress={setCafeDetalle}
               favs={favs}
               onToggleFav={toggleFav}

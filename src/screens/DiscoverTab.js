@@ -1,33 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useMemo, useState } from 'react';
-import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SkeletonVerticalList } from '../components/SkeletonLoader';
 import { MAIN_TABS } from './mainScreenTabs';
 
-function buildRankedOptions(items, field) {
-  const counts = new Map();
-
-  (items || []).forEach((item) => {
-    const value = String(item?.[field] || '').trim();
-    if (!value) return;
-    const key = value.toLowerCase();
-    const existing = counts.get(key);
-
-    if (existing) {
-      existing.count += 1;
-    } else {
-      counts.set(key, {
-        label: value,
-        count: 1,
-      });
-    }
-  });
-
-  return [...counts.values()].sort((a, b) => {
-    if (b.count !== a.count) return b.count - a.count;
-    return a.label.localeCompare(b.label, 'es');
-  });
-}
+/* ======================
+   HELPERS BASE
+====================== */
 
 function normalizeCategory(item) {
   return item?.coffeeCategory === 'daily' ? 'daily' : 'specialty';
@@ -39,11 +18,91 @@ function normalizeText(value) {
     .toLowerCase();
 }
 
-function FilterChip({ label, active, onPress, accentColor, count }) {
+function parseDateValue(value) {
+  if (!value) return 0;
+  const date = new Date(value);
+  const time = date.getTime();
+  return Number.isNaN(time) ? 0 : time;
+}
+
+/* ======================
+   PRO MAX HELPERS
+====================== */
+
+function isBioCoffee(item) {
+  if (item?.isBio === true) return true;
+  if (item?.isBio === false) return false;
+
+  const text = [
+    item?.certificaciones,
+    item?.notas,
+    item?.nombre,
+    item?.marca,
+    item?.roaster,
+    item?.descripcion,
+  ]
+    .map(normalizeText)
+    .join(' ');
+
+  return (
+    text.includes('bio') ||
+    text.includes('ecológico') ||
+    text.includes('ecologico') ||
+    text.includes('orgánico') ||
+    text.includes('organico') ||
+    text.includes('organic')
+  );
+}
+
+function getStablePersonalizedScore(item) {
+  const score = Number(item?.personalizedScore || 0);
+  const votos = Number(item?.votos || 0);
+  const puntuacion = Number(item?.puntuacion || 0);
+  const bioBoost = isBioCoffee(item) ? 0.35 : 0;
+
+  return score + Math.min(votos, 20) * 0.12 + puntuacion * 0.05 + bioBoost;
+}
+
+function hasMinimumDiscoverSignals(item) {
+  return (
+    Number(item?.votos || 0) >= 2 ||
+    Number(item?.personalizedScore || 0) >= 8 ||
+    Number(item?.puntuacion || 0) >= 4
+  );
+}
+
+function matchesSearch(item, query) {
+  const q = normalizeText(query);
+  if (!q) return true;
+
+  const haystack = [
+    item?.nombre,
+    item?.marca,
+    item?.roaster,
+    item?.origen,
+    item?.pais,
+    item?.proceso,
+    item?.notas,
+    item?.descripcion,
+    item?.certificaciones,
+    item?.coffeeCategory === 'daily' ? 'diario' : 'especialidad',
+    isBioCoffee(item) ? 'bio' : '',
+  ]
+    .map(normalizeText)
+    .join(' ');
+
+  return haystack.includes(q);
+}
+
+/* ======================
+   COMPONENTES UI
+====================== */
+
+function FilterChip({ label, active, onPress, accentColor }) {
   return (
     <TouchableOpacity
       onPress={onPress}
-      activeOpacity={0.88}
+      activeOpacity={0.9}
       style={{
         paddingHorizontal: 12,
         paddingVertical: 8,
@@ -51,9 +110,6 @@ function FilterChip({ label, active, onPress, accentColor, count }) {
         borderWidth: 1,
         borderColor: active ? accentColor : '#e2d5c8',
         backgroundColor: active ? '#f3e7d9' : '#faf7f2',
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 6,
       }}
     >
       <Text
@@ -65,30 +121,6 @@ function FilterChip({ label, active, onPress, accentColor, count }) {
       >
         {label}
       </Text>
-
-      {typeof count === 'number' && (
-        <View
-          style={{
-            minWidth: 18,
-            height: 18,
-            borderRadius: 999,
-            paddingHorizontal: 5,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: active ? '#e6d1bc' : '#f1e6da',
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 10,
-              fontWeight: '900',
-              color: active ? accentColor : '#8b6d57',
-            }}
-          >
-            {count}
-          </Text>
-        </View>
-      )}
     </TouchableOpacity>
   );
 }
@@ -97,7 +129,7 @@ function ActiveFilterChip({ label, onRemove, accentColor }) {
   return (
     <TouchableOpacity
       onPress={onRemove}
-      activeOpacity={0.88}
+      activeOpacity={0.9}
       style={{
         flexDirection: 'row',
         alignItems: 'center',
@@ -110,15 +142,7 @@ function ActiveFilterChip({ label, onRemove, accentColor }) {
         backgroundColor: '#f5ebdf',
       }}
     >
-      <Text
-        style={{
-          fontSize: 12,
-          fontWeight: '800',
-          color: accentColor,
-        }}
-      >
-        {label}
-      </Text>
+      <Text style={{ fontSize: 12, fontWeight: '800', color: accentColor }}>{label}</Text>
       <Ionicons name="close" size={14} color={accentColor} />
     </TouchableOpacity>
   );
@@ -136,112 +160,173 @@ function MatchBadge({ label }) {
         borderColor: '#eadbce',
       }}
     >
-      <Text
-        style={{
-          fontSize: 10,
-          fontWeight: '800',
-          color: '#8f5e3b',
-        }}
-      >
-        {label}
-      </Text>
+      <Text style={{ fontSize: 10, fontWeight: '800', color: '#8f5e3b' }}>{label}</Text>
     </View>
   );
 }
 
-function FilterSection({ title, options, selected, onSelect, accentColor }) {
-  if (!options?.length) return null;
-
+function SortChip({ label, active, onPress, accentColor }) {
   return (
-    <View style={{ marginTop: 14 }}>
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.9}
+      style={{
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        borderRadius: 999,
+        borderWidth: 1,
+        borderColor: active ? accentColor : '#e2d5c8',
+        backgroundColor: active ? '#f3e7d9' : '#faf7f2',
+      }}
+    >
       <Text
         style={{
-          fontSize: 11,
+          fontSize: 12,
           fontWeight: '800',
-          color: '#8f5e3b',
-          letterSpacing: 0.8,
-          textTransform: 'uppercase',
-          marginBottom: 8,
+          color: active ? accentColor : '#6f5a4b',
+        }}
+      >
+        {label}
+      </Text>
+    </TouchableOpacity>
+  );
+}
+
+function ExploreShortcutCard({ icon, title, subtitle, active, onPress }) {
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.9}
+      style={{
+        width: 168,
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: active ? '#8f5e3b' : '#eadbce',
+        backgroundColor: active ? '#f7efe6' : '#fffaf5',
+        padding: 14,
+      }}
+    >
+      <View
+        style={{
+          width: 40,
+          height: 40,
+          borderRadius: 12,
+          backgroundColor: '#f3e7d9',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: 12,
+        }}
+      >
+        <Ionicons name={icon} size={18} color="#8f5e3b" />
+      </View>
+
+      <Text
+        style={{
+          fontSize: 14,
+          fontWeight: '900',
+          color: '#24160f',
+          marginBottom: 4,
         }}
       >
         {title}
       </Text>
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingRight: 8, gap: 8 }}
-      >
-        <FilterChip
-          label="Todos"
-          active={!selected}
-          onPress={() => onSelect(null)}
-          accentColor={accentColor}
-        />
-
-        {options.map((option) => (
-          <FilterChip
-            key={option.label}
-            label={option.label}
-            count={option.count}
-            active={selected === option.label}
-            onPress={() => onSelect(option.label)}
-            accentColor={accentColor}
-          />
-        ))}
-      </ScrollView>
-    </View>
-  );
-}
-
-function SortSection({ sortBy, setSortBy, accentColor }) {
-  const options = [
-    { id: 'personalized', label: 'Para ti' },
-    { id: 'rating', label: 'Puntuación' },
-    { id: 'votes', label: 'Votos' },
-    { id: 'recent', label: 'Recientes' },
-  ];
-
-  return (
-    <View style={{ marginTop: 14 }}>
       <Text
         style={{
-          fontSize: 11,
-          fontWeight: '800',
-          color: '#8f5e3b',
-          letterSpacing: 0.8,
-          textTransform: 'uppercase',
-          marginBottom: 8,
+          fontSize: 12,
+          lineHeight: 18,
+          color: '#6f5a4b',
         }}
       >
-        Ordenar por
+        {subtitle}
+      </Text>
+    </TouchableOpacity>
+  );
+}
+
+function QuickActionCard({ icon, title, subtitle, onPress, compact = false }) {
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.9}
+      style={{
+        flex: compact ? 1 : undefined,
+        borderRadius: 18,
+        borderWidth: 1,
+        borderColor: '#eadbce',
+        backgroundColor: '#faf8f5',
+        padding: 14,
+      }}
+    >
+      <View
+        style={{
+          width: 38,
+          height: 38,
+          borderRadius: 12,
+          backgroundColor: '#f3e7d9',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: 10,
+        }}
+      >
+        <Ionicons name={icon} size={18} color="#8f5e3b" />
+      </View>
+
+      <Text
+        style={{
+          fontSize: 14,
+          fontWeight: '800',
+          color: '#24160f',
+        }}
+      >
+        {title}
       </Text>
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingRight: 8, gap: 8 }}
+      <Text
+        style={{
+          marginTop: 4,
+          fontSize: 12,
+          lineHeight: 18,
+          color: '#6f5a4b',
+        }}
       >
-        {options.map((option) => (
-          <FilterChip
-            key={option.id}
-            label={option.label}
-            active={sortBy === option.id}
-            onPress={() => setSortBy(option.id)}
-            accentColor={accentColor}
-          />
-        ))}
-      </ScrollView>
+        {subtitle}
+      </Text>
+    </TouchableOpacity>
+  );
+}
+
+function SectionTitle({ title, subtitle }) {
+  return (
+    <View style={{ marginBottom: 12 }}>
+      <Text
+        style={{
+          fontSize: 18,
+          fontWeight: '900',
+          color: '#24160f',
+        }}
+      >
+        {title}
+      </Text>
+      {!!subtitle && (
+        <Text
+          style={{
+            marginTop: 4,
+            fontSize: 13,
+            lineHeight: 19,
+            color: '#6f5a4b',
+          }}
+        >
+          {subtitle}
+        </Text>
+      )}
     </View>
   );
 }
 
-function parseDateValue(value) {
-  if (!value) return 0;
-  const date = new Date(value);
-  const time = date.getTime();
-  return Number.isNaN(time) ? 0 : time;
-}
+/* ======================
+   MAIN
+====================== */
 
 export default function DiscoverTab({
   s,
@@ -249,96 +334,103 @@ export default function DiscoverTab({
   premiumAccent,
   cargando,
   personalizedCafes,
-  personalizedReason,
   CardVertical,
   setCafeDetalle,
   favs,
   toggleFav,
+  searchQuery,
+  onSearchQueryChange,
+  searchPlaceholder,
 }) {
-  const [paisSeleccionado, setPaisSeleccionado] = useState(null);
-  const [procesoSeleccionado, setProcesoSeleccionado] = useState(null);
-  const [roasterSeleccionado, setRoasterSeleccionado] = useState(null);
   const [categorySelected, setCategorySelected] = useState('specialty');
+  const [onlyBio, setOnlyBio] = useState(false);
   const [sortBy, setSortBy] = useState('personalized');
+  const [localSearchText, setLocalSearchText] = useState('');
+
+  const effectiveSearchText = typeof searchQuery === 'string' ? searchQuery : localSearchText;
+
+  const setEffectiveSearchText = (value) => {
+    if (typeof onSearchQueryChange === 'function') {
+      onSearchQueryChange(value);
+      return;
+    }
+    setLocalSearchText(value);
+  };
 
   const cafesBase = useMemo(() => {
-    return (personalizedCafes || []).filter((item) => normalizeCategory(item) === categorySelected);
-  }, [personalizedCafes, categorySelected]);
-
-  const paises = useMemo(() => buildRankedOptions(cafesBase, 'pais'), [cafesBase]);
-  const procesos = useMemo(() => buildRankedOptions(cafesBase, 'proceso'), [cafesBase]);
-  const roasters = useMemo(() => buildRankedOptions(cafesBase, 'roaster'), [cafesBase]);
+    return (personalizedCafes || [])
+      .filter((item) => normalizeCategory(item) === categorySelected)
+      .filter((item) => (onlyBio ? isBioCoffee(item) : true))
+      .filter((item) => matchesSearch(item, effectiveSearchText));
+  }, [personalizedCafes, categorySelected, onlyBio, effectiveSearchText]);
 
   const itemsFiltrados = useMemo(() => {
-    const base = cafesBase.filter((item) => {
-      const okPais =
-        !paisSeleccionado || normalizeText(item?.pais) === normalizeText(paisSeleccionado);
+    const base =
+      sortBy === 'personalized' ? cafesBase.filter(hasMinimumDiscoverSignals) : cafesBase;
 
-      const okProceso =
-        !procesoSeleccionado || normalizeText(item?.proceso) === normalizeText(procesoSeleccionado);
+    return [...base]
+      .sort((a, b) => {
+        if (sortBy === 'rating') {
+          const ratingDiff = Number(b?.puntuacion || 0) - Number(a?.puntuacion || 0);
+          if (ratingDiff !== 0) return ratingDiff;
+          return Number(b?.votos || 0) - Number(a?.votos || 0);
+        }
 
-      const okRoaster =
-        !roasterSeleccionado || normalizeText(item?.roaster) === normalizeText(roasterSeleccionado);
+        if (sortBy === 'votes') {
+          const votesDiff = Number(b?.votos || 0) - Number(a?.votos || 0);
+          if (votesDiff !== 0) return votesDiff;
+          return Number(b?.puntuacion || 0) - Number(a?.puntuacion || 0);
+        }
 
-      return okPais && okProceso && okRoaster;
-    });
+        if (sortBy === 'recent') {
+          const recentDiff = parseDateValue(b?.fecha) - parseDateValue(a?.fecha);
+          if (recentDiff !== 0) return recentDiff;
+          return Number(b?.personalizedScore || 0) - Number(a?.personalizedScore || 0);
+        }
 
-    return [...base].sort((a, b) => {
-      if (sortBy === 'rating') return Number(b?.puntuacion || 0) - Number(a?.puntuacion || 0);
-      if (sortBy === 'votes') return Number(b?.votos || 0) - Number(a?.votos || 0);
-      if (sortBy === 'recent') return parseDateValue(b?.fecha) - parseDateValue(a?.fecha);
-      return Number(b?.personalizedScore || 0) - Number(a?.personalizedScore || 0);
-    });
-  }, [cafesBase, paisSeleccionado, procesoSeleccionado, roasterSeleccionado, sortBy]);
+        const personalizedDiff = getStablePersonalizedScore(b) - getStablePersonalizedScore(a);
+        if (personalizedDiff !== 0) return personalizedDiff;
 
-  const filtrosActivos = [paisSeleccionado, procesoSeleccionado, roasterSeleccionado].filter(
-    Boolean
-  ).length;
+        const votesDiff = Number(b?.votos || 0) - Number(a?.votos || 0);
+        if (votesDiff !== 0) return votesDiff;
 
-  const topDestacado = itemsFiltrados?.[0] || null;
+        return Number(b?.puntuacion || 0) - Number(a?.puntuacion || 0);
+      })
+      .slice(0, 50);
+  }, [cafesBase, sortBy]);
 
-  const topPaisBase = useMemo(() => {
-    const first = buildRankedOptions(cafesBase, 'pais')[0];
-    return first?.label || null;
-  }, [cafesBase]);
+  const top = itemsFiltrados[0];
 
-  const topProcesoBase = useMemo(() => {
-    const first = buildRankedOptions(cafesBase, 'proceso')[0];
-    return first?.label || null;
-  }, [cafesBase]);
+  const categoryTitle = categorySelected === 'daily' ? 'Café diario' : 'Especialidad';
+  const categorySubtitle =
+    categorySelected === 'daily'
+      ? 'Opciones de uso diario con mejor encaje para ti.'
+      : 'Cafés con más carácter, trazabilidad y afinidad contigo.';
 
-  const topRoasterBase = useMemo(() => {
-    const first = buildRankedOptions(cafesBase, 'roaster')[0];
-    return first?.label || null;
-  }, [cafesBase]);
+  const hasActiveFilters =
+    onlyBio ||
+    !!effectiveSearchText ||
+    sortBy !== 'personalized' ||
+    categorySelected !== 'specialty';
+
+  const activeResultsCount = itemsFiltrados.length;
+  const topAffinity = top ? Math.round(getStablePersonalizedScore(top) * 10) / 10 : 0;
+
+  const clearSearch = () => setEffectiveSearchText('');
+  const clearAllFilters = () => {
+    setOnlyBio(false);
+    setCategorySelected('specialty');
+    setSortBy('personalized');
+    setEffectiveSearchText('');
+  };
 
   const buildMatchReasons = (item) => {
     const reasons = [];
-    if (topPaisBase && normalizeText(item?.pais) === normalizeText(topPaisBase)) {
-      reasons.push('Match país');
-    }
-    if (topProcesoBase && normalizeText(item?.proceso) === normalizeText(topProcesoBase)) {
-      reasons.push('Match proceso');
-    }
-    if (topRoasterBase && normalizeText(item?.roaster) === normalizeText(topRoasterBase)) {
-      reasons.push('Match tostador');
-    }
     if (Number(item?.personalizedScore || 0) >= 8) reasons.push('Alta afinidad');
+    if (Number(item?.votos || 0) >= 10) reasons.push('Muy votado');
+    if (isBioCoffee(item)) reasons.push('BIO');
     return reasons.slice(0, 3);
   };
-
-  const clearFilters = () => {
-    setPaisSeleccionado(null);
-    setProcesoSeleccionado(null);
-    setRoasterSeleccionado(null);
-  };
-
-  const categoryLabel = categorySelected === 'daily' ? 'Café diario' : 'Especialidad';
-
-  const helperText =
-    categorySelected === 'daily'
-      ? 'Aquí priorizamos cafés comerciales o de uso habitual que encajan con tus gustos y hábitos.'
-      : 'Aquí priorizamos lo que mejor encaja contigo: países, procesos y tostadores que más se repiten en tus gustos recientes y en tus cafés favoritos.';
 
   return (
     <View style={{ paddingTop: 20 }}>
@@ -348,107 +440,331 @@ export default function DiscoverTab({
           <Text style={s.backText}>Volver</Text>
         </TouchableOpacity>
 
-        <Text style={s.pageTitle}>Descubrir para ti</Text>
-        <Text style={s.sectionSub}>
-          {personalizedReason || 'Selección personalizada basada en tus gustos dentro de ETIOVE'}
-        </Text>
-
         <View
           style={{
-            marginTop: 14,
-            borderRadius: 18,
+            marginTop: 6,
             borderWidth: 1,
             borderColor: '#eadbce',
-            backgroundColor: '#faf7f2',
-            padding: 14,
+            backgroundColor: '#fffaf5',
+            borderRadius: 24,
+            padding: 18,
           }}
         >
           <Text
             style={{
               fontSize: 11,
-              fontWeight: '800',
+              fontWeight: '900',
               color: '#8f5e3b',
-              letterSpacing: 0.8,
-              textTransform: 'uppercase',
-              marginBottom: 6,
+              letterSpacing: 1,
+              marginBottom: 8,
             }}
           >
-            ETIOVE FOR YOU
+            ETIOVE EXPLORE
           </Text>
 
           <Text
             style={{
-              fontSize: 13,
-              lineHeight: 19,
+              fontSize: 26,
+              fontWeight: '900',
+              color: '#24160f',
+            }}
+          >
+            Explore Premium
+          </Text>
+
+          <Text
+            style={{
+              marginTop: 8,
+              fontSize: 14,
+              lineHeight: 22,
               color: '#6f5a4b',
             }}
           >
-            {helperText}
+            Descubre cafés con una experiencia más visual, filtrada y coherente con tu búsqueda
+            global.
           </Text>
 
           <View
             style={{
-              marginTop: 12,
+              marginTop: 14,
               flexDirection: 'row',
+              flexWrap: 'wrap',
               gap: 8,
             }}
           >
-            <FilterChip
-              label="Especialidad"
-              active={categorySelected === 'specialty'}
+            <MatchBadge label={categoryTitle} />
+            {onlyBio ? <MatchBadge label="BIO" /> : null}
+            <MatchBadge label={`Top ${Math.min(itemsFiltrados.length, 50)}`} />
+          </View>
+        </View>
+
+        <View
+          style={{
+            marginTop: 14,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 10,
+            borderWidth: 1,
+            borderColor: '#eadbce',
+            backgroundColor: '#faf7f2',
+            borderRadius: 16,
+            paddingHorizontal: 14,
+            paddingVertical: 12,
+          }}
+        >
+          <Ionicons name="search" size={18} color="#8f5e3b" />
+          <TextInput
+            value={effectiveSearchText}
+            onChangeText={setEffectiveSearchText}
+            placeholder={searchPlaceholder || 'Buscar café, origen, proceso, tostador...'}
+            placeholderTextColor="#9b8573"
+            style={{
+              flex: 1,
+              fontSize: 14,
+              color: '#24160f',
+              paddingVertical: 0,
+            }}
+          />
+          {!!effectiveSearchText && (
+            <TouchableOpacity onPress={clearSearch}>
+              <Ionicons name="close-circle" size={18} color="#8f5e3b" />
+            </TouchableOpacity>
+          )}
+        </View>
+
+        <View style={{ marginTop: 18 }}>
+          <SectionTitle
+            title="Explorar por estilo"
+            subtitle="Elige cómo quieres descubrir café hoy."
+          />
+
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ gap: 12, paddingRight: 8 }}
+          >
+            <ExploreShortcutCard
+              icon="cafe-outline"
+              title="Especialidad"
+              subtitle="Más carácter, origen y experiencia."
+              active={categorySelected === 'specialty' && !onlyBio}
               onPress={() => {
                 setCategorySelected('specialty');
-                clearFilters();
+                setOnlyBio(false);
               }}
-              accentColor={premiumAccent}
             />
-            <FilterChip
-              label="Café diario"
-              active={categorySelected === 'daily'}
+
+            <ExploreShortcutCard
+              icon="bag-handle-outline"
+              title="Diario"
+              subtitle="Compra práctica para tu día a día."
+              active={categorySelected === 'daily' && !onlyBio}
               onPress={() => {
                 setCategorySelected('daily');
-                clearFilters();
+                setOnlyBio(false);
               }}
+            />
+
+            <ExploreShortcutCard
+              icon="leaf-outline"
+              title="BIO"
+              subtitle="Selección ecológica y orgánica."
+              active={onlyBio}
+              onPress={() => setOnlyBio((prev) => !prev)}
+            />
+          </ScrollView>
+        </View>
+
+        <View style={{ marginTop: 18 }}>
+          <SectionTitle
+            title="Ordenar descubrimiento"
+            subtitle="Prioriza afinidad, puntuación, votos o novedades."
+          />
+
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ gap: 8, paddingRight: 8 }}
+          >
+            <SortChip
+              label="Afinidad"
+              active={sortBy === 'personalized'}
+              onPress={() => setSortBy('personalized')}
               accentColor={premiumAccent}
             />
-          </View>
+            <SortChip
+              label="Puntuación"
+              active={sortBy === 'rating'}
+              onPress={() => setSortBy('rating')}
+              accentColor={premiumAccent}
+            />
+            <SortChip
+              label="Votos"
+              active={sortBy === 'votes'}
+              onPress={() => setSortBy('votes')}
+              accentColor={premiumAccent}
+            />
+            <SortChip
+              label="Recientes"
+              active={sortBy === 'recent'}
+              onPress={() => setSortBy('recent')}
+              accentColor={premiumAccent}
+            />
+          </ScrollView>
+        </View>
 
-          <View
-            style={{
-              marginTop: 12,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: 12,
-            }}
-          >
-            <Text
+        {hasActiveFilters && (
+          <View style={{ marginTop: 18 }}>
+            <SectionTitle
+              title="Filtros activos"
+              subtitle="Quita lo que no necesites para volver a una vista más amplia."
+            />
+
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+              {categorySelected !== 'specialty' && (
+                <ActiveFilterChip
+                  label={categoryTitle}
+                  accentColor={premiumAccent}
+                  onRemove={() => setCategorySelected('specialty')}
+                />
+              )}
+
+              {onlyBio && (
+                <ActiveFilterChip
+                  label="BIO"
+                  accentColor={premiumAccent}
+                  onRemove={() => setOnlyBio(false)}
+                />
+              )}
+
+              {!!effectiveSearchText && (
+                <ActiveFilterChip
+                  label={`Buscar: ${effectiveSearchText}`}
+                  accentColor={premiumAccent}
+                  onRemove={clearSearch}
+                />
+              )}
+
+              {sortBy !== 'personalized' && (
+                <ActiveFilterChip
+                  label={`Orden: ${sortBy}`}
+                  accentColor={premiumAccent}
+                  onRemove={() => setSortBy('personalized')}
+                />
+              )}
+
+              <TouchableOpacity
+                onPress={clearAllFilters}
+                activeOpacity={0.9}
+                style={{
+                  paddingHorizontal: 12,
+                  paddingVertical: 8,
+                  borderRadius: 999,
+                  borderWidth: 1,
+                  borderColor: '#8f5e3b',
+                  backgroundColor: '#fffaf5',
+                }}
+              >
+                <Text style={{ fontSize: 12, fontWeight: '800', color: '#8f5e3b' }}>
+                  Limpiar todo
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+
+        <View style={{ marginTop: 18 }}>
+          <SectionTitle
+            title="Resumen de exploración"
+            subtitle="Lo que está viendo ahora mismo tu sesión Explore."
+          />
+
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            <View
               style={{
-                fontSize: 12,
-                color: '#7d6a5a',
-                fontWeight: '700',
+                flex: 1,
+                borderWidth: 1,
+                borderColor: '#eadbce',
+                backgroundColor: '#fffaf5',
+                borderRadius: 18,
+                padding: 14,
               }}
             >
-              {itemsFiltrados.length} cafés visibles
-            </Text>
+              <Text style={{ fontSize: 11, fontWeight: '900', color: '#8f5e3b', marginBottom: 6 }}>
+                RESULTADOS
+              </Text>
+              <Text style={{ fontSize: 22, fontWeight: '900', color: '#24160f' }}>
+                {activeResultsCount}
+              </Text>
+              <Text style={{ marginTop: 4, fontSize: 12, color: '#6f5a4b', lineHeight: 18 }}>
+                Cafés visibles en esta vista.
+              </Text>
+            </View>
 
             <View
               style={{
-                borderRadius: 999,
-                backgroundColor: '#f3e7d9',
-                paddingHorizontal: 10,
-                paddingVertical: 6,
+                flex: 1,
+                borderWidth: 1,
+                borderColor: '#eadbce',
+                backgroundColor: '#fffaf5',
+                borderRadius: 18,
+                padding: 14,
               }}
             >
-              <Text
-                style={{
-                  fontSize: 11,
-                  color: '#8f5e3b',
-                  fontWeight: '800',
-                }}
-              >
-                {categoryLabel}
+              <Text style={{ fontSize: 11, fontWeight: '900', color: '#8f5e3b', marginBottom: 6 }}>
+                TOP AFINIDAD
               </Text>
+              <Text style={{ fontSize: 22, fontWeight: '900', color: '#24160f' }}>
+                {topAffinity}
+              </Text>
+              <Text style={{ marginTop: 4, fontSize: 12, color: '#6f5a4b', lineHeight: 18 }}>
+                Afinidad del mejor café actual.
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={{ marginTop: 18 }}>
+          <SectionTitle
+            title="Accesos rápidos"
+            subtitle="Salta a las zonas más útiles de ETIOVE."
+          />
+
+          <View style={{ gap: 12 }}>
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              <QuickActionCard
+                compact
+                icon="flame-outline"
+                title="Trending"
+                subtitle="Qué está subiendo ahora."
+                onPress={() => setActiveTab(MAIN_TABS.TRENDING)}
+              />
+
+              <QuickActionCard
+                compact
+                icon="trophy-outline"
+                title="Ranking"
+                subtitle="Los mejores posicionados."
+                onPress={() => setActiveTab(MAIN_TABS.TOP)}
+              />
+            </View>
+
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              <QuickActionCard
+                compact
+                icon="time-outline"
+                title="Últimos"
+                subtitle="Lo más reciente en ETIOVE."
+                onPress={() => setActiveTab(MAIN_TABS.LATEST)}
+              />
+
+              <QuickActionCard
+                compact
+                icon="home-outline"
+                title="Inicio"
+                subtitle="Volver a la home principal."
+                onPress={() => setActiveTab(MAIN_TABS.HOME)}
+              />
             </View>
           </View>
         </View>
@@ -456,200 +772,152 @@ export default function DiscoverTab({
         <View
           style={{
             marginTop: 14,
-            borderRadius: 18,
             borderWidth: 1,
             borderColor: '#eadbce',
             backgroundColor: '#fffaf5',
-            padding: 14,
+            borderRadius: 14,
+            paddingHorizontal: 12,
+            paddingVertical: 10,
           }}
         >
-          <View
+          <Text
             style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: 12,
+              fontSize: 12,
+              lineHeight: 18,
+              color: '#6f5a4b',
+              fontWeight: '600',
             }}
           >
-            <Text
-              style={{
-                fontSize: 15,
-                fontWeight: '800',
-                color: '#24160f',
-              }}
-            >
-              Filtrar recomendaciones
-            </Text>
-
-            {filtrosActivos > 0 && (
-              <TouchableOpacity onPress={clearFilters} activeOpacity={0.85}>
-                <Text
-                  style={{
-                    fontSize: 12,
-                    fontWeight: '800',
-                    color: premiumAccent,
-                  }}
-                >
-                  Limpiar filtros
-                </Text>
-              </TouchableOpacity>
-            )}
-          </View>
-
-          <SortSection sortBy={sortBy} setSortBy={setSortBy} accentColor={premiumAccent} />
-
-          <FilterSection
-            title="País"
-            options={paises}
-            selected={paisSeleccionado}
-            onSelect={setPaisSeleccionado}
-            accentColor={premiumAccent}
-          />
-
-          <FilterSection
-            title="Proceso"
-            options={procesos}
-            selected={procesoSeleccionado}
-            onSelect={setProcesoSeleccionado}
-            accentColor={premiumAccent}
-          />
-
-          <FilterSection
-            title="Tostador"
-            options={roasters}
-            selected={roasterSeleccionado}
-            onSelect={setRoasterSeleccionado}
-            accentColor={premiumAccent}
-          />
+            Search PRO: busca por café, origen, proceso, tostador y BIO. Esta pantalla ya queda
+            preparada para compartir búsqueda global con Home y Ranking.
+          </Text>
         </View>
-
-        {filtrosActivos > 0 && (
-          <View style={{ marginTop: 14 }}>
-            <Text
-              style={{
-                fontSize: 11,
-                fontWeight: '800',
-                color: '#8f5e3b',
-                letterSpacing: 0.8,
-                textTransform: 'uppercase',
-                marginBottom: 8,
-              }}
-            >
-              Filtros activos
-            </Text>
-
-            <View
-              style={{
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-                gap: 8,
-              }}
-            >
-              {!!paisSeleccionado && (
-                <ActiveFilterChip
-                  label={`País: ${paisSeleccionado}`}
-                  accentColor={premiumAccent}
-                  onRemove={() => setPaisSeleccionado(null)}
-                />
-              )}
-
-              {!!procesoSeleccionado && (
-                <ActiveFilterChip
-                  label={`Proceso: ${procesoSeleccionado}`}
-                  accentColor={premiumAccent}
-                  onRemove={() => setProcesoSeleccionado(null)}
-                />
-              )}
-
-              {!!roasterSeleccionado && (
-                <ActiveFilterChip
-                  label={`Tostador: ${roasterSeleccionado}`}
-                  accentColor={premiumAccent}
-                  onRemove={() => setRoasterSeleccionado(null)}
-                />
-              )}
-            </View>
-          </View>
-        )}
       </View>
 
       {cargando ? (
         <SkeletonVerticalList />
       ) : (
-        <View style={{ paddingHorizontal: 16, marginTop: 16 }}>
-          {!!topDestacado && (
+        <View style={{ paddingHorizontal: 16, marginTop: 18 }}>
+          {!!top && (
             <View
               style={{
-                marginBottom: 14,
-                borderRadius: 18,
+                marginBottom: 18,
                 borderWidth: 1,
                 borderColor: '#eadbce',
                 backgroundColor: '#fffaf5',
-                padding: 14,
+                borderRadius: 22,
+                padding: 16,
               }}
             >
               <Text
                 style={{
                   fontSize: 11,
-                  fontWeight: '800',
+                  fontWeight: '900',
                   color: '#8f5e3b',
-                  marginBottom: 6,
-                  letterSpacing: 0.8,
-                  textTransform: 'uppercase',
+                  letterSpacing: 1,
+                  marginBottom: 8,
                 }}
               >
-                TOP RECOMENDADO
+                RECOMENDACIÓN PRO
               </Text>
-              <Text style={{ fontSize: 18, fontWeight: '900', color: '#24160f' }}>
-                {topDestacado.nombre}
+
+              <Text
+                style={{
+                  fontSize: 24,
+                  fontWeight: '900',
+                  color: '#24160f',
+                }}
+              >
+                {top.nombre}
               </Text>
-              <Text style={{ marginTop: 4, fontSize: 13, color: '#6f5a4b' }}>
-                {topDestacado.pais || topDestacado.origen || 'Origen no indicado'}
-                {topDestacado.proceso ? ` · ${topDestacado.proceso}` : ''}
-                {topDestacado.roaster || topDestacado.marca
-                  ? ` · ${topDestacado.roaster || topDestacado.marca}`
-                  : ''}
+
+              <Text
+                style={{
+                  marginTop: 6,
+                  fontSize: 14,
+                  lineHeight: 21,
+                  color: '#6f5a4b',
+                }}
+              >
+                {categorySubtitle}
               </Text>
-              <Text style={{ marginTop: 8, fontSize: 13, color: '#8f5e3b', fontWeight: '800' }}>
-                {topDestacado.puntuacion || 0}.0 ⭐ · {topDestacado.votos || 0} votos
+
+              <Text
+                style={{
+                  marginTop: 10,
+                  fontSize: 14,
+                  fontWeight: '800',
+                  color: '#8f5e3b',
+                }}
+              >
+                {top.puntuacion} ⭐ · {top.votos} votos · afinidad{' '}
+                {Math.round(getStablePersonalizedScore(top) * 10) / 10}
               </Text>
-              {!!buildMatchReasons(topDestacado).length && (
-                <View
+
+              <View
+                style={{
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                  gap: 8,
+                  marginTop: 12,
+                }}
+              >
+                {buildMatchReasons(top).map((reason) => (
+                  <MatchBadge key={reason} label={reason} />
+                ))}
+              </View>
+
+              <View style={{ flexDirection: 'row', gap: 10, marginTop: 14 }}>
+                <TouchableOpacity
+                  onPress={() => setCafeDetalle(top)}
+                  activeOpacity={0.9}
                   style={{
-                    marginTop: 10,
-                    flexDirection: 'row',
-                    flexWrap: 'wrap',
-                    gap: 8,
+                    flex: 1,
+                    borderRadius: 14,
+                    backgroundColor: '#111827',
+                    paddingVertical: 12,
+                    alignItems: 'center',
                   }}
                 >
-                  {buildMatchReasons(topDestacado).map((reason) => (
-                    <MatchBadge key={reason} label={reason} />
-                  ))}
-                </View>
-              )}
+                  <Text style={{ color: '#fff', fontSize: 13, fontWeight: '800' }}>Ver ficha</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => setActiveTab(MAIN_TABS.TOP)}
+                  activeOpacity={0.9}
+                  style={{
+                    flex: 1,
+                    borderRadius: 14,
+                    backgroundColor: '#f3e7d9',
+                    borderWidth: 1,
+                    borderColor: '#eadbce',
+                    paddingVertical: 12,
+                    alignItems: 'center',
+                  }}
+                >
+                  <Text style={{ color: '#8f5e3b', fontSize: 13, fontWeight: '800' }}>
+                    Ir a ranking
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
           )}
 
+          <SectionTitle
+            title={`Selección ${categoryTitle}`}
+            subtitle="Una vista más cuidada, útil y filtrada para descubrir mejor. Pulsa cualquier café para abrir su ficha completa."
+          />
+
           {itemsFiltrados.map((item) => (
-            <View key={item.id} style={{ marginBottom: 10 }}>
-              {!!buildMatchReasons(item).length && (
-                <View
-                  style={{
-                    marginBottom: 8,
-                    flexDirection: 'row',
-                    flexWrap: 'wrap',
-                    gap: 8,
-                  }}
-                >
-                  {buildMatchReasons(item).map((reason) => (
-                    <MatchBadge key={`${item.id}-${reason}`} label={reason} />
-                  ))}
-                </View>
-              )}
+            <View key={item.id} style={{ marginBottom: 12 }}>
+              <View style={{ flexDirection: 'row', gap: 6, marginBottom: 6, flexWrap: 'wrap' }}>
+                {buildMatchReasons(item).map((r) => (
+                  <MatchBadge key={r} label={r} />
+                ))}
+              </View>
 
               <CardVertical
                 item={item}
-                onDelete={() => {}}
                 onPress={setCafeDetalle}
                 favs={favs}
                 onToggleFav={toggleFav}
@@ -660,16 +928,27 @@ export default function DiscoverTab({
           {itemsFiltrados.length === 0 && (
             <View
               style={{
-                marginTop: 14,
-                borderRadius: 16,
+                marginTop: 12,
                 borderWidth: 1,
                 borderColor: '#eadbce',
-                backgroundColor: '#faf7f2',
+                backgroundColor: '#fffaf5',
+                borderRadius: 18,
                 padding: 16,
               }}
             >
-              <Text style={[s.empty, { marginTop: 0 }]}>
-                No hay recomendaciones con esa combinación de filtros.
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: '800',
+                  color: '#24160f',
+                  marginBottom: 6,
+                }}
+              >
+                No hay resultados ahora mismo
+              </Text>
+              <Text style={s.empty}>
+                No hay resultados con suficiente señal para esta búsqueda global o combinación de
+                filtros.
               </Text>
             </View>
           )}

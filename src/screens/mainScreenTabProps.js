@@ -282,6 +282,8 @@ export function buildUltimosAnadidosTabProps({
   setCafeDetalle,
   favs,
   toggleFav,
+  busqueda,
+  setBusqueda,
 }) {
   return {
     s,
@@ -293,6 +295,8 @@ export function buildUltimosAnadidosTabProps({
     setCafeDetalle,
     favs,
     toggleFav,
+    searchQuery: busqueda,
+    onSearchQueryChange: setBusqueda,
   };
 }
 
@@ -307,6 +311,8 @@ export function buildTopCafesTabProps({
   setCafeDetalle,
   favs,
   toggleFav,
+  busqueda,
+  setBusqueda,
 }) {
   return {
     s,
@@ -319,6 +325,8 @@ export function buildTopCafesTabProps({
     setCafeDetalle,
     favs,
     toggleFav,
+    searchQuery: busqueda,
+    onSearchQueryChange: setBusqueda,
   };
 }
 
@@ -347,6 +355,16 @@ export function buildTrendingTabProps({
     setCafeDetalle,
     favs,
     toggleFav,
+
+    // 🔥 GLOBAL SEARCH
+    searchQuery: trendingFilters?.searchQuery,
+    onSearchQueryChange: setTrendingFilters
+      ? (value) =>
+          setTrendingFilters((prev) => ({
+            ...prev,
+            searchQuery: value,
+          }))
+      : undefined,
   };
 }
 

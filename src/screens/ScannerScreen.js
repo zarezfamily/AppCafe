@@ -79,8 +79,9 @@ export default function ScannerScreen({
 
       setCandidates(result.candidates);
       setState('results');
-    } catch {
-      setErrorMsg('Error al procesar la imagen. Vuelve a intentarlo.');
+    } catch (err) {
+      console.error('[ScannerScreen] recognize error:', err?.message || err);
+      setErrorMsg(`Error: ${err?.message || 'desconocido'}. Vuelve a intentarlo.`);
       setState('error');
     }
   }, [state]);

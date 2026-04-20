@@ -68,6 +68,14 @@ export default function ScannerScreen({
       });
       setState('recognizing');
       const result = await recognizePhoto(photo.base64);
+      console.log(
+        '[Scanner] resultado:',
+        JSON.stringify({
+          confidence: result.confidence,
+          extracted: result.extracted,
+          scores: result.candidates?.map((c) => ({ nombre: c.nombre, score: c.score })),
+        })
+      );
 
       if (!result.isCoffee || !result.candidates?.length) {
         setErrorMsg(

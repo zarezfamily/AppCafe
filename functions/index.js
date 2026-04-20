@@ -1291,6 +1291,14 @@ exports.recognizeCoffee = onRequest(
 
       const extracted = await callOpenAIForRecognition({ imageBase64 });
 
+      logger.info('recognizeCoffee extracted', {
+        isCoffee: extracted.isCoffee,
+        nombre: extracted.nombre,
+        roaster: extracted.roaster,
+        pais: extracted.pais,
+        proceso: extracted.proceso,
+      });
+
       if (!extracted.isCoffee) {
         res.status(200).json({ ok: true, isCoffee: false, candidates: [] });
         return;
@@ -1301,14 +1309,26 @@ exports.recognizeCoffee = onRequest(
         .map((d) => ({ id: d.id, ...d.data() }))
         .filter((c) => c.legacy !== true);
 
-      const scored = activeCafes
-        .map((cafe) => ({ cafe, score: scoreCafeMatch(extracted, cafe) }))
+      const allScored = activeCafes
+        .map((cafe) => ({
+          id: cafe.id,
+          nombre: cafe.nombre,
+          score: scoreCafeMatch(extracted, cafe),
+        }))
+        .sort((a, b) => b.score - a.score);
+
+      logger.info('recognizeCoffee top scores', { top5: allScored.slice(0, 5) });
+
+      const scored = allScored
         .filter((r) => r.score > 10)
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 3);
+        .slice(0, 3)
+        .map(({ id, score }) => ({
+          cafe: activeCafes.find((c) => c.id === id),
+          score,
+        }));
 
       const confidence =
-        scored[0]?.score >= 80 ? 'high' : scored[0]?.score >= 50 ? 'medium' : 'low';
+        scored[0]?.score >= 70 ? 'high' : scored[0]?.score >= 45 ? 'medium' : 'low';
 
       res.status(200).json({
         ok: true,

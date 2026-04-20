@@ -513,12 +513,12 @@
     "puntuacion": 4.6,
     "votos": 0,
     "foto": null,
-    "urlProducto": "https://cafeselmagnifico.com/producto/etiopia-raro-nansebo/",
+    "urlProducto": "https://cafeselmagnifico.com/en/producto/etiopia-raro-nansebo/",
     "barcode": null,
     "eanVerificado": false,
     "fuente": "web_roaster",
-    "fuenteUrl": "https://cafeselmagnifico.com/producto/etiopia-raro-nansebo/",
-    "legacy": false
+    "fuenteUrl": "https://cafeselmagnifico.com/en/producto/etiopia-raro-nansebo/",
+    "legacy": true
   },
   {
     "nombre": "Finca El Paraíso Lychee",

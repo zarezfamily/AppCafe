@@ -69,6 +69,11 @@ async function downloadImage(imageUrl) {
   }
 
   const contentType = response.headers.get('content-type') || 'image/jpeg';
+
+  if (!contentType.toLowerCase().startsWith('image/')) {
+    throw new Error(`La URL no devuelve una imagen válida (${contentType}) ${imageUrl}`);
+  }
+
   const arrayBuffer = await response.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
 
@@ -167,6 +172,7 @@ async function uploadImageToStorage(cafe, imageUrl) {
     storageBucket: activeBucket.name,
   };
 }
+
 async function markDuplicateDocsAsLegacy(cafe, keepDocId) {
   const snapshot = await db.collection('cafes').where('nombre', '==', cafe.nombre).get();
 
@@ -249,17 +255,19 @@ async function upsertCafe(cafe) {
     ...cafe,
     uid: cafe.uid || cafeId,
     foto: fotoFinal,
+    officialPhoto: fotoFinal,
     fotoOriginal: cafe.foto || null,
     fotoFuenteUrl: productPageUrl,
     fotoStoragePath: storageMeta?.storagePath || null,
     fotoStorageBucket: storageMeta?.storageBucket || null,
     fotoVerificada: Boolean(fotoFinal),
+    fotoPendiente: !fotoFinal,
     fotoError: fotoFinal
       ? null
       : typeof cafe.foto === 'string' || productPageUrl
         ? 'download_failed_or_invalid_url'
         : null,
-    legacy: false,
+    legacy: cafe.legacy === true,
     updatedAt: new Date().toISOString(),
   };
 
@@ -270,7 +278,9 @@ async function upsertCafe(cafe) {
 
   await docRef.set(payload, { merge: true });
   await markDuplicateDocsAsLegacy(cafe, cafeId);
-  console.log(`✅ ${cafe.nombre}`);
+  console.log(
+    `✅ ${cafe.nombre}${payload.legacy ? ' (legacy)' : ''}${payload.fotoVerificada ? '' : ' [sin foto]'}`
+  );
 }
 
 async function uploadCafes() {

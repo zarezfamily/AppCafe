@@ -382,35 +382,67 @@ export default function AdminPanelScreen() {
     setSearchingProposal(false);
   }, []);
 
-  const handlePickOfficialPhoto = useCallback(async () => {
-    try {
-      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (permission.status !== 'granted') {
-        Alert.alert('Permiso denegado', 'Necesitas permitir acceso a fotos.');
-        return;
-      }
-
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ['images'],
-        allowsEditing: true,
-        quality: 0.8,
-      });
-
-      if (result.canceled || !result.assets?.length) return;
-
-      setUploadingOfficialPhoto(true);
-      const uploadedUrl = await uploadImageToStorage(result.assets[0].uri, 'cafes');
-
-      setEditData((prev) => ({
-        ...prev,
-        officialPhoto: uploadedUrl,
-        bestPhotoMode: 'official',
-      }));
-    } catch (error) {
-      Alert.alert('Error', error?.message || 'No se pudo subir la foto oficial');
-    } finally {
-      setUploadingOfficialPhoto(false);
-    }
+  const handlePickOfficialPhoto = useCallback(() => {
+    Alert.alert('Subir foto', 'Elige la fuente', [
+      {
+        text: 'Cámara',
+        onPress: async () => {
+          try {
+            const perm = await ImagePicker.requestCameraPermissionsAsync();
+            if (perm.status !== 'granted') {
+              Alert.alert('Permiso denegado', 'Necesitas permitir acceso a la cámara.');
+              return;
+            }
+            const result = await ImagePicker.launchCameraAsync({
+              allowsEditing: true,
+              quality: 0.85,
+            });
+            if (result.canceled || !result.assets?.length) return;
+            setUploadingOfficialPhoto(true);
+            const uploadedUrl = await uploadImageToStorage(result.assets[0].uri, 'cafes');
+            setEditData((prev) => ({
+              ...prev,
+              officialPhoto: uploadedUrl,
+              bestPhotoMode: 'official',
+            }));
+          } catch (error) {
+            Alert.alert('Error', error?.message || 'No se pudo subir la foto');
+          } finally {
+            setUploadingOfficialPhoto(false);
+          }
+        },
+      },
+      {
+        text: 'Galería',
+        onPress: async () => {
+          try {
+            const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (perm.status !== 'granted') {
+              Alert.alert('Permiso denegado', 'Necesitas permitir acceso a fotos.');
+              return;
+            }
+            const result = await ImagePicker.launchImageLibraryAsync({
+              mediaTypes: ['images'],
+              allowsEditing: true,
+              quality: 0.85,
+            });
+            if (result.canceled || !result.assets?.length) return;
+            setUploadingOfficialPhoto(true);
+            const uploadedUrl = await uploadImageToStorage(result.assets[0].uri, 'cafes');
+            setEditData((prev) => ({
+              ...prev,
+              officialPhoto: uploadedUrl,
+              bestPhotoMode: 'official',
+            }));
+          } catch (error) {
+            Alert.alert('Error', error?.message || 'No se pudo subir la foto');
+          } finally {
+            setUploadingOfficialPhoto(false);
+          }
+        },
+      },
+      { text: 'Cancelar', style: 'cancel' },
+    ]);
   }, []);
 
   const handleOpenOfficialPhoto = useCallback(async () => {
@@ -587,6 +619,7 @@ export default function AdminPanelScreen() {
         notas: String(editData.notas || '').trim(),
         officialPhoto,
         bestPhoto,
+        foto: bestPhoto || userPhoto || '',
         photoSources: {
           userPhoto,
           officialPhoto,
@@ -914,7 +947,7 @@ export default function AdminPanelScreen() {
             disabled={uploadingOfficialPhoto}
           >
             <Text style={styles.secondaryActionBtnText}>
-              {uploadingOfficialPhoto ? 'Subiendo foto…' : 'Subir foto oficial'}
+              {uploadingOfficialPhoto ? 'Subiendo a Storage…' : '📷 Subir foto (cámara / galería)'}
             </Text>
           </TouchableOpacity>
 

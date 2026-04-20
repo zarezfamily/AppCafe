@@ -243,18 +243,10 @@ export function SpecialtyForYouSection({
         opciones
       </Text>
 
-      <SectionIntro
-        title="Selección specialty"
-        subtitle="Una selección corta, cuidada y útil para descubrir cafés con más carácter."
-        pills={['Curado', 'Specialty', 'Comunidad']}
-      />
-
       <HorizontalCardRow
         s={s}
         loading={false}
         items={cafes.slice(0, 8)}
-        header="Selección specialty"
-        subheader="Una selección corta y útil"
         renderItem={(item) => (
           <CardHorizontal
             key={item.id}
@@ -280,18 +272,10 @@ export function DailyCoffeeSection({ s, cafes, setCafeDetalle, favs, toggleFav, 
         Cafés habituales del día a día para comparar y decidir mejor tu compra
       </Text>
 
-      <SectionIntro
-        title="Selección diaria"
-        subtitle="Lo más útil para tu consumo habitual, sin saturar la Home con demasiadas opciones."
-        pills={['Diario', 'Práctico', 'Comparar']}
-      />
-
       <HorizontalCardRow
         s={s}
         loading={false}
         items={cafes.slice(0, 8)}
-        header="Selección diaria"
-        subheader="Lo más útil para tu consumo habitual"
         renderItem={(item) => (
           <CardHorizontal
             key={item.id}
@@ -317,18 +301,10 @@ export function BioCoffeeSection({ s, cafes, setCafeDetalle, favs, toggleFav, Ca
         Una selección de cafés BIO y ecológicos, tanto diarios como de especialidad
       </Text>
 
-      <SectionIntro
-        title="Selección BIO"
-        subtitle="Una vista rápida de cafés bio, ecológicos y orgánicos dentro de ETIOVE."
-        pills={['BIO', 'Orgánico', 'Ecológico']}
-      />
-
       <HorizontalCardRow
         s={s}
         loading={false}
         items={cafes.slice(0, 8)}
-        header="Selección BIO"
-        subheader="BIO, ecológico u orgánico"
         renderItem={(item) => (
           <CardHorizontal
             key={item.id}

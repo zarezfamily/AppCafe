@@ -16,19 +16,31 @@ import { getAuthToken } from '../services/firebaseCore';
 
 const BARCODE_TYPES = ['ean13', 'ean8', 'upc_a', 'upc_e'];
 const RECOGNIZE_URL = 'https://europe-west1-miappdecafe.cloudfunctions.net/recognizeCoffee';
+const CONFIRM_URL = 'https://europe-west1-miappdecafe.cloudfunctions.net/confirmRecognition';
 
 async function recognizePhoto(base64) {
-  const token = await getAuthToken();
+  const token = getAuthToken();
   const res = await fetch(RECOGNIZE_URL, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     body: JSON.stringify({ imageBase64: base64 }),
   });
   if (!res.ok) throw new Error(`HTTP_${res.status}`);
   return res.json();
+}
+
+async function confirmRecognition(extracted, cafeId) {
+  if (!extracted?.roaster && !extracted?.nombre) return;
+  const token = getAuthToken();
+  fetch(CONFIRM_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({
+      extractedRoaster: extracted.roaster || '',
+      extractedNombre: extracted.nombre || '',
+      confirmedCafeId: cafeId,
+    }),
+  }).catch(() => {});
 }
 
 export default function ScannerScreen({
@@ -45,6 +57,7 @@ export default function ScannerScreen({
   const [barcodeActive, setBarcodeActive] = useState(true);
   const [state, setState] = useState('idle'); // idle | capturing | recognizing | results | error
   const [candidates, setCandidates] = useState([]);
+  const [lastExtracted, setLastExtracted] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
 
   const handleBarcodeScanned = useCallback(
@@ -85,7 +98,10 @@ export default function ScannerScreen({
         return;
       }
 
+      setLastExtracted(result.extracted || null);
+
       if (result.confidence === 'high') {
+        confirmRecognition(result.extracted, result.candidates[0].id);
         onRecognized?.(result.candidates[0]);
         return;
       }
@@ -102,6 +118,7 @@ export default function ScannerScreen({
   const handleReset = () => {
     setState('idle');
     setCandidates([]);
+    setLastExtracted(null);
     setErrorMsg('');
     barcodeLockRef.current = false;
     setBarcodeActive(true);
@@ -196,7 +213,10 @@ export default function ScannerScreen({
                 <TouchableOpacity
                   key={c.id}
                   style={styles.candidateRow}
-                  onPress={() => onRecognized?.(c)}
+                  onPress={() => {
+                    confirmRecognition(lastExtracted, c.id);
+                    onRecognized?.(c);
+                  }}
                   activeOpacity={0.8}
                 >
                   {c.officialPhoto ? (

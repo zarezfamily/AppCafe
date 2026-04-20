@@ -1170,12 +1170,56 @@ Datos barcode:
   };
 }
 
+const RECOGNITION_MEMORY_THRESHOLD = 3;
+
 function normalizeForMatch(s) {
   return String(s || '')
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .trim();
+}
+
+function buildMemoryKey(roaster, nombre) {
+  const r = normalizeForMatch(roaster).replace(/\s+/g, '-');
+  const n = normalizeForMatch(nombre).replace(/\s+/g, '-');
+  return `${r}__${n}`.slice(0, 200);
+}
+
+async function lookupRecognitionMemory(roaster, nombre) {
+  const key = buildMemoryKey(roaster, nombre);
+  if (!key || key === '__') return null;
+  const snap = await db.collection('recognition_memory').doc(key).get();
+  if (!snap.exists) return null;
+  const data = snap.data() || {};
+  if (Number(data.count || 0) >= RECOGNITION_MEMORY_THRESHOLD) {
+    return { cafeId: data.cafeId, count: data.count };
+  }
+  return null;
+}
+
+async function incrementRecognitionMemory(roaster, nombre, cafeId) {
+  const key = buildMemoryKey(roaster, nombre);
+  if (!key || key === '__' || !cafeId) return;
+  const ref = db.collection('recognition_memory').doc(key);
+  await db.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    if (snap.exists) {
+      const data = snap.data() || {};
+      if (data.cafeId === cafeId) {
+        tx.update(ref, { count: (data.count || 0) + 1, updatedAt: new Date().toISOString() });
+      } else if ((data.count || 0) <= 1) {
+        tx.set(ref, { cafeId, count: 1, updatedAt: new Date().toISOString() });
+      }
+    } else {
+      tx.set(ref, {
+        cafeId,
+        count: 1,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+    }
+  });
 }
 
 function tokenSimilarity(a, b) {
@@ -1304,10 +1348,44 @@ exports.recognizeCoffee = onRequest(
         return;
       }
 
-      const snapshot = await db.collection('cafes').get();
+      const [snapshot, memoryMatch] = await Promise.all([
+        db.collection('cafes').get(),
+        lookupRecognitionMemory(extracted.roaster, extracted.nombre),
+      ]);
+
       const activeCafes = snapshot.docs
         .map((d) => ({ id: d.id, ...d.data() }))
         .filter((c) => c.legacy !== true);
+
+      if (memoryMatch) {
+        const remembered = activeCafes.find((c) => c.id === memoryMatch.cafeId);
+        if (remembered) {
+          logger.info('recognizeCoffee memory hit', {
+            cafeId: memoryMatch.cafeId,
+            count: memoryMatch.count,
+          });
+          res.status(200).json({
+            ok: true,
+            isCoffee: true,
+            extracted,
+            confidence: 'high',
+            fromMemory: true,
+            candidates: [
+              {
+                id: remembered.id,
+                nombre: remembered.nombre,
+                roaster: remembered.roaster,
+                pais: remembered.pais,
+                proceso: remembered.proceso,
+                officialPhoto: remembered.officialPhoto || remembered.foto || null,
+                puntuacion: remembered.puntuacion,
+                score: 100,
+              },
+            ],
+          });
+          return;
+        }
+      }
 
       const allScored = activeCafes
         .map((cafe) => ({
@@ -1348,6 +1426,37 @@ exports.recognizeCoffee = onRequest(
       });
     } catch (error) {
       logger.error('recognizeCoffee error', { error: String(error?.message || error) });
+      res.status(500).json({ ok: false, error: String(error?.message || error) });
+    }
+  }
+);
+
+exports.confirmRecognition = onRequest(
+  { region: 'europe-west1', cors: true, timeoutSeconds: 15, memory: '128MiB' },
+  async (req, res) => {
+    if (req.method !== 'POST') {
+      res.status(405).json({ error: 'METHOD_NOT_ALLOWED' });
+      return;
+    }
+    try {
+      const authHeader = req.headers.authorization || '';
+      const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+      if (!token) {
+        res.status(401).json({ error: 'UNAUTHENTICATED' });
+        return;
+      }
+      await admin.auth().verifyIdToken(token);
+
+      const { extractedRoaster, extractedNombre, confirmedCafeId } = req.body || {};
+      if (!extractedRoaster || !extractedNombre || !confirmedCafeId) {
+        res.status(400).json({ error: 'MISSING_FIELDS' });
+        return;
+      }
+
+      await incrementRecognitionMemory(extractedRoaster, extractedNombre, confirmedCafeId);
+      res.status(200).json({ ok: true });
+    } catch (error) {
+      logger.error('confirmRecognition error', { error: String(error?.message || error) });
       res.status(500).json({ ok: false, error: String(error?.message || error) });
     }
   }

@@ -15,15 +15,17 @@ import {
   View,
 } from 'react-native';
 import { getAuthToken } from '../services/firebaseCore';
-import { queryCollection, updateDocument } from '../services/firestoreService';
+import { getCollection, updateDocument } from '../services/firestoreService';
 import { uploadImageToStorage } from '../services/storageService';
 
 const FILTERS = {
   ALL: 'all',
+  WITHOUT_IMAGE: 'without_image',
+  WITHOUT_PRICE: 'without_price',
+  WITHOUT_NOTAS: 'without_notas',
+  WITHOUT_EAN: 'without_ean',
   INCOMPLETE: 'incomplete',
   READY: 'ready',
-  WITH_IMAGE: 'with_image',
-  WITHOUT_IMAGE: 'without_image',
 };
 
 const ADMIN_ENRICH_URL =
@@ -326,11 +328,11 @@ export default function AdminPanelScreen() {
 
   const loadCafes = useCallback(async () => {
     try {
-      const rows = await queryCollection('cafes', 'reviewStatus', 'pending');
-      setPendingCafes(rows || []);
+      const rows = await getCollection('cafes', 'updatedAt', 500);
+      setPendingCafes((rows || []).filter((c) => !c.legacy));
     } catch (error) {
-      console.error('Error cargando pendientes:', error);
-      Alert.alert('Error', 'No se pudieron cargar los cafés pendientes');
+      console.error('Error cargando cafés:', error);
+      Alert.alert('Error', 'No se pudieron cargar los cafés');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -678,26 +680,33 @@ export default function AdminPanelScreen() {
 
   const stats = useMemo(() => {
     const total = pendingCafes.length;
-    const incomplete = pendingCafes.filter(isCafeIncomplete).length;
-    const ready = pendingCafes.filter(canBeApproved).length;
-    const withImage = pendingCafes.filter((c) => Boolean(getBestPhoto(c))).length;
-    return { total, incomplete, ready, withImage };
+    const sinFoto = pendingCafes.filter((c) => !getBestPhoto(c)).length;
+    const sinPrecio = pendingCafes.filter((c) => !c.precio).length;
+    const sinNotas = pendingCafes.filter((c) => !String(c.notas || '').trim()).length;
+    const sinEan = pendingCafes.filter((c) => !String(c.ean || c.barcode || '').trim()).length;
+    return { total, sinFoto, sinPrecio, sinNotas, sinEan };
   }, [pendingCafes]);
 
   const filteredCafes = useMemo(() => {
     let rows = pendingCafes.filter((cafe) => matchesSearch(cafe, searchText));
     switch (activeFilter) {
+      case FILTERS.WITHOUT_IMAGE:
+        rows = rows.filter((c) => !getBestPhoto(c));
+        break;
+      case FILTERS.WITHOUT_PRICE:
+        rows = rows.filter((c) => !c.precio);
+        break;
+      case FILTERS.WITHOUT_NOTAS:
+        rows = rows.filter((c) => !String(c.notas || '').trim());
+        break;
+      case FILTERS.WITHOUT_EAN:
+        rows = rows.filter((c) => !String(c.ean || c.barcode || '').trim());
+        break;
       case FILTERS.INCOMPLETE:
         rows = rows.filter(isCafeIncomplete);
         break;
       case FILTERS.READY:
         rows = rows.filter(canBeApproved);
-        break;
-      case FILTERS.WITH_IMAGE:
-        rows = rows.filter((c) => Boolean(getBestPhoto(c)));
-        break;
-      case FILTERS.WITHOUT_IMAGE:
-        rows = rows.filter((c) => !getBestPhoto(c));
         break;
       default:
         break;
@@ -1143,8 +1152,8 @@ export default function AdminPanelScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Admin · Validación de cafés</Text>
-      <Text style={styles.subtitle}>Gestiona cafés pendientes y completa fichas desde aquí.</Text>
+      <Text style={styles.title}>Admin · Catálogo</Text>
+      <Text style={styles.subtitle}>Gestiona y enriquece fichas. Filtra por datos faltantes.</Text>
 
       <View style={styles.searchBox}>
         <TextInput
@@ -1167,32 +1176,38 @@ export default function AdminPanelScreen() {
           onPress={() => setActiveFilter(FILTERS.ALL)}
         />
         <FilterChip
+          label="Sin foto"
+          active={activeFilter === FILTERS.WITHOUT_IMAGE}
+          onPress={() => setActiveFilter(FILTERS.WITHOUT_IMAGE)}
+        />
+        <FilterChip
+          label="Sin precio"
+          active={activeFilter === FILTERS.WITHOUT_PRICE}
+          onPress={() => setActiveFilter(FILTERS.WITHOUT_PRICE)}
+        />
+        <FilterChip
+          label="Sin notas"
+          active={activeFilter === FILTERS.WITHOUT_NOTAS}
+          onPress={() => setActiveFilter(FILTERS.WITHOUT_NOTAS)}
+        />
+        <FilterChip
+          label="Sin EAN"
+          active={activeFilter === FILTERS.WITHOUT_EAN}
+          onPress={() => setActiveFilter(FILTERS.WITHOUT_EAN)}
+        />
+        <FilterChip
           label="Incompletos"
           active={activeFilter === FILTERS.INCOMPLETE}
           onPress={() => setActiveFilter(FILTERS.INCOMPLETE)}
         />
-        <FilterChip
-          label="Listos"
-          active={activeFilter === FILTERS.READY}
-          onPress={() => setActiveFilter(FILTERS.READY)}
-        />
-        <FilterChip
-          label="Con imagen"
-          active={activeFilter === FILTERS.WITH_IMAGE}
-          onPress={() => setActiveFilter(FILTERS.WITH_IMAGE)}
-        />
-        <FilterChip
-          label="Sin imagen"
-          active={activeFilter === FILTERS.WITHOUT_IMAGE}
-          onPress={() => setActiveFilter(FILTERS.WITHOUT_IMAGE)}
-        />
       </ScrollView>
 
       <View style={styles.statsRow}>
-        <InfoPill label="Pendientes" value={stats.total} />
-        <InfoPill label="Incompletos" value={stats.incomplete} />
-        <InfoPill label="Listos" value={stats.ready} />
-        <InfoPill label="Con imagen" value={stats.withImage} />
+        <InfoPill label="Total" value={stats.total} />
+        <InfoPill label="Sin foto" value={stats.sinFoto} />
+        <InfoPill label="Sin precio" value={stats.sinPrecio} />
+        <InfoPill label="Sin notas" value={stats.sinNotas} />
+        <InfoPill label="Sin EAN" value={stats.sinEan} />
       </View>
 
       <Text style={styles.resultsText}>

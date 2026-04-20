@@ -53,6 +53,10 @@ function ActionCard({ title, desc, icon, onPress }) {
   );
 }
 
+function HomeSectionCard({ children }) {
+  return <View style={styles.homeSectionCard}>{children}</View>;
+}
+
 export function InicioTopBar({
   s,
   perfil,
@@ -171,28 +175,29 @@ export function SearchResultsSection({
   const resultados = filtrar(allCafes, busqueda);
 
   return (
-    <>
+    <HomeSectionCard>
       <View style={s.sectionHeader}>
         <Text style={s.sectionTitle}>Resultados ({resultados.length})</Text>
       </View>
 
-      <Text style={[s.sectionSub, { paddingHorizontal: 16 }]}>
+      <Text style={[s.sectionSub, { paddingHorizontal: 0 }]}>
         Cafés encontrados en la comunidad según tu búsqueda
       </Text>
 
-      <View style={{ paddingHorizontal: 16, marginTop: 8 }}>
+      <View style={{ marginTop: 10 }}>
         {resultados.map((item) => (
-          <CardVertical
-            key={item.id}
-            item={item}
-            onDelete={() => {}}
-            onPress={setCafeDetalle}
-            favs={favs}
-            onToggleFav={toggleFav}
-          />
+          <View key={item.id} style={{ marginBottom: 10 }}>
+            <CardVertical
+              item={item}
+              onDelete={() => {}}
+              onPress={setCafeDetalle}
+              favs={favs}
+              onToggleFav={toggleFav}
+            />
+          </View>
         ))}
       </View>
-    </>
+    </HomeSectionCard>
   );
 }
 
@@ -207,9 +212,9 @@ export function SpecialtyForYouSection({
   if (!cafes?.length) return null;
 
   return (
-    <>
-      <SectionHeaderNav s={s} title="Especialidad para ti" marginTop={28} hideAction />
-      <Text style={s.sectionSub}>
+    <HomeSectionCard>
+      <SectionHeaderNav s={s} title="Especialidad para ti" marginTop={0} hideAction />
+      <Text style={[s.sectionSub, { paddingHorizontal: 0 }]}>
         Cafés curados y bien valorados para descubrir algo especial sin perderte entre demasiadas
         opciones
       </Text>
@@ -231,7 +236,7 @@ export function SpecialtyForYouSection({
           />
         )}
       />
-    </>
+    </HomeSectionCard>
   );
 }
 
@@ -239,9 +244,9 @@ export function DailyCoffeeSection({ s, cafes, setCafeDetalle, favs, toggleFav, 
   if (!cafes?.length) return null;
 
   return (
-    <>
-      <SectionHeaderNav s={s} title="Tu café diario" marginTop={28} hideAction />
-      <Text style={s.sectionSub}>
+    <HomeSectionCard>
+      <SectionHeaderNav s={s} title="Tu café diario" marginTop={0} hideAction />
+      <Text style={[s.sectionSub, { paddingHorizontal: 0 }]}>
         Cafés habituales del día a día para comparar y decidir mejor tu compra
       </Text>
 
@@ -262,7 +267,7 @@ export function DailyCoffeeSection({ s, cafes, setCafeDetalle, favs, toggleFav, 
           />
         )}
       />
-    </>
+    </HomeSectionCard>
   );
 }
 
@@ -270,9 +275,9 @@ export function BioCoffeeSection({ s, cafes, setCafeDetalle, favs, toggleFav, Ca
   if (!cafes?.length) return null;
 
   return (
-    <>
-      <SectionHeaderNav s={s} title="Cafés BIO" marginTop={28} hideAction />
-      <Text style={s.sectionSub}>
+    <HomeSectionCard>
+      <SectionHeaderNav s={s} title="Cafés BIO" marginTop={0} hideAction />
+      <Text style={[s.sectionSub, { paddingHorizontal: 0 }]}>
         Una selección de cafés BIO y ecológicos, tanto diarios como de especialidad
       </Text>
 
@@ -293,7 +298,7 @@ export function BioCoffeeSection({ s, cafes, setCafeDetalle, favs, toggleFav, Ca
           />
         )}
       />
-    </>
+    </HomeSectionCard>
   );
 }
 
@@ -301,13 +306,13 @@ export function StepUpSection({ s, pairs, setCafeDetalle, favs, toggleFav, CardH
   if (!pairs?.length) return null;
 
   return (
-    <>
-      <SectionHeaderNav s={s} title="Da el salto" marginTop={28} hideAction />
-      <Text style={s.sectionSub}>
+    <HomeSectionCard>
+      <SectionHeaderNav s={s} title="Da el salto" marginTop={0} hideAction />
+      <Text style={[s.sectionSub, { paddingHorizontal: 0 }]}>
         Si te gusta un café diario, aquí tienes una opción specialty parecida para subir de nivel
       </Text>
 
-      <View style={{ paddingHorizontal: 16, gap: 14 }}>
+      <View style={{ marginTop: 10, gap: 14 }}>
         {pairs.slice(0, 3).map((pair, index) => (
           <View
             key={`${pair.daily?.id || 'daily'}-${pair.specialty?.id || 'specialty'}-${index}`}
@@ -351,7 +356,7 @@ export function StepUpSection({ s, pairs, setCafeDetalle, favs, toggleFav, CardH
           </View>
         ))}
       </View>
-    </>
+    </HomeSectionCard>
   );
 }
 
@@ -365,13 +370,13 @@ export function ExploreHomeSection({
   const { paises = [], procesos = [], roasters = [] } = quickTrendingFilters || {};
 
   return (
-    <>
-      <SectionHeaderNav s={s} title="Explora ETIOVE" marginTop={28} hideAction />
-      <Text style={s.sectionSub}>
+    <HomeSectionCard>
+      <SectionHeaderNav s={s} title="Explora ETIOVE" marginTop={0} hideAction />
+      <Text style={[s.sectionSub, { paddingHorizontal: 0 }]}>
         Accesos rápidos para explorar sin recargar la pantalla de inicio
       </Text>
 
-      <View style={{ paddingHorizontal: 16, gap: 12 }}>
+      <View style={{ marginTop: 10, gap: 12 }}>
         <ActionCard
           title="Ver trending"
           desc="Los cafés que mejor se están moviendo ahora"
@@ -444,7 +449,7 @@ export function ExploreHomeSection({
           </View>
         </View>
       )}
-    </>
+    </HomeSectionCard>
   );
 }
 
@@ -459,26 +464,28 @@ export function NearbyCafeteriasSection({
   theme,
 }) {
   return (
-    <>
+    <HomeSectionCard>
       <SectionHeaderNav
         s={s}
         title="Cafeterías cerca de ti"
         onPress={() => setActiveTab(MAIN_TABS.CAFETERIAS)}
-        marginTop={28}
+        marginTop={0}
       />
-      <Text style={s.sectionSub}>Cafeterías cercanas para tomar buen café fuera de casa</Text>
+      <Text style={[s.sectionSub, { paddingHorizontal: 0 }]}>
+        Cafeterías cercanas para tomar buen café fuera de casa
+      </Text>
 
       {cargandoCafInicio ? (
         <ActivityIndicator color={premiumAccent} style={{ margin: 18 }} />
       ) : errorCafInicio ? (
-        <View style={{ paddingHorizontal: 16 }}>
+        <View style={{ marginTop: 10 }}>
           <Text style={[s.empty, { marginTop: 6 }]}>{errorCafInicio}</Text>
           <TouchableOpacity style={[s.redBtn, { marginTop: 12 }]} onPress={cargarCafeteriasInicio}>
             <Text style={s.redBtnText}>Reintentar cafeterías</Text>
           </TouchableOpacity>
         </View>
       ) : cafeteriasInicio.length === 0 ? (
-        <View style={{ paddingHorizontal: 16 }}>
+        <View style={{ marginTop: 10 }}>
           <Text style={[s.empty, { marginTop: 6 }]}>
             Todavía no hemos cargado cafeterías cercanas en esta sesión.
           </Text>
@@ -546,24 +553,24 @@ export function NearbyCafeteriasSection({
           )}
         />
       )}
-    </>
+    </HomeSectionCard>
   );
 }
 
 export function BlogSection({ s }) {
   return (
-    <>
+    <HomeSectionCard>
       <SectionHeaderNav
         s={s}
         title="Desde el blog"
         onPress={() => Linking.openURL('https://etiove.com/blog/')}
-        marginTop={28}
+        marginTop={0}
       />
-      <Text style={s.sectionSub}>
+      <Text style={[s.sectionSub, { paddingHorizontal: 0 }]}>
         Guías y contenido editorial para aprender más sin saturar la Home
       </Text>
 
-      <View style={{ paddingHorizontal: 16, gap: 12 }}>
+      <View style={{ marginTop: 10, gap: 12 }}>
         {FEATURED_BLOG_POSTS.map((post) => (
           <TouchableOpacity
             key={post.url}
@@ -584,15 +591,24 @@ export function BlogSection({ s }) {
           </TouchableOpacity>
         ))}
       </View>
-    </>
+    </HomeSectionCard>
   );
 }
 
 const styles = StyleSheet.create({
   absoluteFill: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 },
 
+  homeSectionCard: {
+    marginTop: 24,
+    marginHorizontal: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#eadbce',
+    backgroundColor: '#fffaf5',
+    padding: 16,
+  },
+
   quickBlock: {
-    paddingHorizontal: 16,
     marginTop: 14,
   },
   quickBlockTitle: {

@@ -262,6 +262,8 @@ function buildCollectionTabProps({
   allCafes,
   favs,
   toggleFav,
+  busqueda,
+  setBusqueda,
   busquedaMis,
   setBusquedaMis,
   favCafes,
@@ -342,6 +344,8 @@ function buildCollectionTabProps({
     setCafeDetalle,
     favs,
     toggleFav,
+    busqueda,
+    setBusqueda,
   });
 
   const trendingTabProps = buildTrendingTabProps({
@@ -356,6 +360,8 @@ function buildCollectionTabProps({
     setCafeDetalle,
     favs,
     toggleFav,
+    busqueda,
+    setBusqueda,
   });
 
   const ofertasTabProps = buildOfertasTabProps({
@@ -725,6 +731,8 @@ export default function useMainScreenTabProps({
     allCafes,
     favs,
     toggleFav,
+    busqueda,
+    setBusqueda,
     busquedaMis,
     setBusquedaMis,
     favCafes,

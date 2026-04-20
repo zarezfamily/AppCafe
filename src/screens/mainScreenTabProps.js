@@ -190,6 +190,9 @@ export function buildInicioTabProps({
     brandProgressWidth,
     busqueda,
     setBusqueda,
+    searchQuery: busqueda,
+    onSearchQueryChange: setBusqueda,
+    searchPlaceholder: 'Buscar en ETIOVE... café, origen, proceso o tostador',
     SearchInput,
     allCafes,
     filtrar,
@@ -282,8 +285,6 @@ export function buildUltimosAnadidosTabProps({
   setCafeDetalle,
   favs,
   toggleFav,
-  busqueda,
-  setBusqueda,
 }) {
   return {
     s,
@@ -295,8 +296,8 @@ export function buildUltimosAnadidosTabProps({
     setCafeDetalle,
     favs,
     toggleFav,
-    searchQuery: busqueda,
-    onSearchQueryChange: setBusqueda,
+    searchQuery: undefined,
+    onSearchQueryChange: undefined,
   };
 }
 
@@ -327,6 +328,7 @@ export function buildTopCafesTabProps({
     toggleFav,
     searchQuery: busqueda,
     onSearchQueryChange: setBusqueda,
+    searchPlaceholder: 'Buscar en ranking: café, origen, tostador...',
   };
 }
 
@@ -342,6 +344,8 @@ export function buildTrendingTabProps({
   setCafeDetalle,
   favs,
   toggleFav,
+  busqueda,
+  setBusqueda,
 }) {
   return {
     s,
@@ -355,16 +359,9 @@ export function buildTrendingTabProps({
     setCafeDetalle,
     favs,
     toggleFav,
-
-    // 🔥 GLOBAL SEARCH
-    searchQuery: trendingFilters?.searchQuery,
-    onSearchQueryChange: setTrendingFilters
-      ? (value) =>
-          setTrendingFilters((prev) => ({
-            ...prev,
-            searchQuery: value,
-          }))
-      : undefined,
+    searchQuery: busqueda,
+    onSearchQueryChange: setBusqueda,
+    searchPlaceholder: 'Buscar en trending: café, proceso, origen...',
   };
 }
 

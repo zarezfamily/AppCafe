@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useMemo, useState } from 'react';
-import { Dimensions, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SkeletonVerticalList } from '../components/SkeletonLoader';
 import { MAIN_TABS } from './mainScreenTabs';
 
@@ -37,6 +37,29 @@ function normalizeText(value) {
   return String(value || '')
     .trim()
     .toLowerCase();
+}
+
+function matchesSearch(item, query) {
+  const q = normalizeText(query);
+  if (!q) return true;
+
+  const haystack = [
+    item?.nombre,
+    item?.marca,
+    item?.roaster,
+    item?.origen,
+    item?.pais,
+    item?.proceso,
+    item?.notas,
+    item?.descripcion,
+    item?.certificaciones,
+    item?.coffeeCategory === 'daily' ? 'diario' : 'especialidad',
+    item?.isBio ? 'bio' : '',
+  ]
+    .map(normalizeText)
+    .join(' ');
+
+  return haystack.includes(q);
 }
 
 function FilterChip({ label, active, onPress, accentColor, count }) {
@@ -90,6 +113,44 @@ function FilterChip({ label, active, onPress, accentColor, count }) {
         </View>
       )}
     </TouchableOpacity>
+  );
+}
+
+function SearchBox({ value, onChangeText, onClear, placeholder }) {
+  return (
+    <View
+      style={{
+        marginTop: 14,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        borderWidth: 1,
+        borderColor: '#eadbce',
+        backgroundColor: '#faf7f2',
+        borderRadius: 16,
+        paddingHorizontal: 14,
+        paddingVertical: 12,
+      }}
+    >
+      <Ionicons name="search" size={18} color="#8f5e3b" />
+      <TextInput
+        value={value}
+        onChangeText={onChangeText}
+        placeholder={placeholder}
+        placeholderTextColor="#9b8573"
+        style={{
+          flex: 1,
+          fontSize: 14,
+          color: '#24160f',
+          paddingVertical: 0,
+        }}
+      />
+      {!!value && (
+        <TouchableOpacity onPress={onClear}>
+          <Ionicons name="close-circle" size={18} color="#8f5e3b" />
+        </TouchableOpacity>
+      )}
+    </View>
   );
 }
 
@@ -259,6 +320,9 @@ export default function TrendingTab({
   setCafeDetalle,
   favs,
   toggleFav,
+  searchQuery,
+  onSearchQueryChange,
+  searchPlaceholder,
 }) {
   const [paisSeleccionado, setPaisSeleccionado] = useState(null);
   const [procesoSeleccionado, setProcesoSeleccionado] = useState(null);
@@ -282,8 +346,10 @@ export default function TrendingTab({
   }, [paisSeleccionado, procesoSeleccionado, roasterSeleccionado, setTrendingFilters]);
 
   const cafesBase = useMemo(() => {
-    return (trendingCafes || []).filter((item) => normalizeCategory(item) === categorySelected);
-  }, [trendingCafes, categorySelected]);
+    return (trendingCafes || [])
+      .filter((item) => normalizeCategory(item) === categorySelected)
+      .filter((item) => matchesSearch(item, searchQuery));
+  }, [trendingCafes, categorySelected, searchQuery]);
 
   const paises = useMemo(() => buildRankedOptions(cafesBase, 'pais'), [cafesBase]);
   const procesos = useMemo(() => buildRankedOptions(cafesBase, 'proceso'), [cafesBase]);
@@ -385,6 +451,11 @@ export default function TrendingTab({
   };
 
   const categoryLabel = categorySelected === 'daily' ? 'Café diario' : 'Especialidad';
+  const clearSearch = () => {
+    if (typeof onSearchQueryChange === 'function') {
+      onSearchQueryChange('');
+    }
+  };
 
   return (
     <View style={{ paddingTop: 20 }}>
@@ -429,6 +500,13 @@ export default function TrendingTab({
             Los cafés que mejor combinan tracción real, votos y valoración, evitando tops falsos con
             muy poca base.
           </Text>
+
+          <SearchBox
+            value={searchQuery || ''}
+            onChangeText={onSearchQueryChange}
+            onClear={clearSearch}
+            placeholder={searchPlaceholder || 'Buscar en trending...'}
+          />
 
           <View
             style={{

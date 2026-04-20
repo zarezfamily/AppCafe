@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import MemberInfoModal from '../components/MemberInfoModal';
 import {
   BioCoffeeSection,
@@ -37,6 +37,9 @@ function sortByRating(items) {
 }
 
 function hasBioTag(item) {
+  if (item?.isBio === true) return true;
+  if (item?.isBio === false) return false;
+
   const text = [item?.certificaciones, item?.notas, item?.nombre, item?.marca, item?.roaster]
     .map((v) => String(v || '').toLowerCase())
     .join(' ');
@@ -46,7 +49,8 @@ function hasBioTag(item) {
     text.includes('ecológico') ||
     text.includes('ecologico') ||
     text.includes('orgánico') ||
-    text.includes('organico')
+    text.includes('organico') ||
+    text.includes('organic')
   );
 }
 
@@ -80,6 +84,83 @@ function buildStepUpPairs(dailyCafes, specialtyCafes) {
         : null;
     })
     .filter(Boolean);
+}
+
+function HomePill({ label }) {
+  return (
+    <View
+      style={{
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        borderRadius: 999,
+        backgroundColor: '#f3e7d9',
+        borderWidth: 1,
+        borderColor: '#eadbce',
+      }}
+    >
+      <Text
+        style={{
+          fontSize: 11,
+          fontWeight: '800',
+          color: '#8f5e3b',
+        }}
+      >
+        {label}
+      </Text>
+    </View>
+  );
+}
+
+function QuickHomeCard({ icon, title, subtitle, onPress }) {
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.9}
+      style={{
+        flex: 1,
+        borderRadius: 18,
+        borderWidth: 1,
+        borderColor: '#eadbce',
+        backgroundColor: '#fffaf5',
+        padding: 14,
+      }}
+    >
+      <View
+        style={{
+          width: 38,
+          height: 38,
+          borderRadius: 12,
+          backgroundColor: '#f3e7d9',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: 10,
+        }}
+      >
+        <Text style={{ fontSize: 16 }}>{icon}</Text>
+      </View>
+
+      <Text
+        style={{
+          fontSize: 14,
+          fontWeight: '800',
+          color: '#24160f',
+        }}
+      >
+        {title}
+      </Text>
+
+      <Text
+        style={{
+          marginTop: 4,
+          fontSize: 12,
+          lineHeight: 18,
+          color: '#6f5a4b',
+        }}
+      >
+        {subtitle}
+      </Text>
+    </TouchableOpacity>
+  );
 }
 
 export default function InicioTab({
@@ -143,17 +224,29 @@ export default function InicioTab({
   }, [specialtyTrendingCafes]);
 
   const handleOpenTrendingFilter = ({ pais = null, proceso = null, roaster = null }) => {
-    setTrendingFilters?.({
+    setTrendingFilters?.((prev) => ({
+      ...(typeof prev === 'object' && prev ? prev : {}),
       pais,
       proceso,
       roaster,
-    });
+    }));
     setActiveTab('Trending');
   };
 
   const stepUpPairs = useMemo(() => {
     return buildStepUpPairs(dailyCafes, specialtyCafes);
   }, [dailyCafes, specialtyCafes]);
+
+  const homeStats = useMemo(() => {
+    return {
+      specialty: specialtyCafes.length,
+      daily: dailyCafes.length,
+      bio: bioCafes.length,
+      trending: specialtyTrendingCafes.length,
+    };
+  }, [specialtyCafes, dailyCafes, bioCafes, specialtyTrendingCafes]);
+
+  const topSpecialty = specialtyCafes?.[0] || null;
 
   return (
     <View>
@@ -172,15 +265,133 @@ export default function InicioTab({
         onLongPressMemberCard={handleMemberRoastLongPress}
       />
 
-      <SearchInput
-        value={busqueda}
-        onChangeText={setBusqueda}
-        onSearch={(q) => {
-          setBusqueda(q);
+      <View
+        style={{
+          marginTop: 10,
+          marginHorizontal: 16,
+          borderWidth: 1,
+          borderColor: '#eadbce',
+          backgroundColor: '#fffaf5',
+          borderRadius: 22,
+          padding: 16,
         }}
-        allCafes={allCafes}
-        placeholder="Buscar café, origen, proceso o tostador..."
-      />
+      >
+        <Text
+          style={{
+            fontSize: 11,
+            fontWeight: '900',
+            color: '#8f5e3b',
+            letterSpacing: 1,
+            marginBottom: 8,
+          }}
+        >
+          ETIOVE HOME
+        </Text>
+
+        <Text
+          style={{
+            fontSize: 24,
+            fontWeight: '900',
+            color: '#24160f',
+          }}
+        >
+          Inicio Premium
+        </Text>
+
+        <Text
+          style={{
+            marginTop: 8,
+            fontSize: 14,
+            lineHeight: 22,
+            color: '#6f5a4b',
+          }}
+        >
+          Tu punto de entrada a ETIOVE: specialty, diario, BIO, descubrimiento y cafeterías cercanas
+          en una home más limpia.
+        </Text>
+
+        <View
+          style={{
+            marginTop: 14,
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            gap: 8,
+          }}
+        >
+          <HomePill label={`${homeStats.specialty} specialty`} />
+          <HomePill label={`${homeStats.daily} diario`} />
+          <HomePill label={`${homeStats.bio} BIO`} />
+          <HomePill label={`${homeStats.trending} trending`} />
+        </View>
+      </View>
+
+      <View style={{ marginTop: 14, marginHorizontal: 16 }}>
+        <SearchInput
+          value={busqueda}
+          onChangeText={setBusqueda}
+          onSearch={(q) => {
+            setBusqueda(q);
+          }}
+          allCafes={allCafes}
+          placeholder="Buscar en ETIOVE... café, origen, proceso o tostador"
+        />
+      </View>
+
+      {!busqueda?.trim() && (
+        <View style={{ marginTop: 18, marginHorizontal: 16 }}>
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: '900',
+              color: '#24160f',
+            }}
+          >
+            Accesos rápidos
+          </Text>
+          <Text
+            style={{
+              marginTop: 4,
+              fontSize: 13,
+              lineHeight: 19,
+              color: '#6f5a4b',
+            }}
+          >
+            Muévete rápido entre las zonas principales de ETIOVE.
+          </Text>
+
+          <View style={{ marginTop: 12, gap: 12 }}>
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              <QuickHomeCard
+                icon="🔎"
+                title="Explore"
+                subtitle="Descubre cafés con filtros premium."
+                onPress={() => setActiveTab('Discover')}
+              />
+              <QuickHomeCard
+                icon="🔥"
+                title="Trending"
+                subtitle="Lo que está subiendo ahora mismo."
+                onPress={() => setActiveTab('Trending')}
+              />
+            </View>
+
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              <QuickHomeCard
+                icon="🏆"
+                title="Ranking"
+                subtitle="Los cafés mejor posicionados."
+                onPress={() => setActiveTab('Top')}
+              />
+              <QuickHomeCard
+                icon="📍"
+                title="Cafeterías"
+                subtitle="Busca sitios cercanos para tomar café."
+                onPress={() => setActiveTab('Inicio')}
+              />
+            </View>
+          </View>
+        </View>
+      )}
 
       {busqueda?.trim() ? (
         <SearchResultsSection
@@ -195,6 +406,87 @@ export default function InicioTab({
         />
       ) : (
         <>
+          {!!topSpecialty && (
+            <View
+              style={{
+                marginTop: 18,
+                marginHorizontal: 16,
+                borderWidth: 1,
+                borderColor: '#eadbce',
+                backgroundColor: '#fffaf5',
+                borderRadius: 20,
+                padding: 16,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 11,
+                  fontWeight: '900',
+                  color: '#8f5e3b',
+                  letterSpacing: 1,
+                  marginBottom: 8,
+                }}
+              >
+                RECOMENDACIÓN HOME
+              </Text>
+
+              <Text
+                style={{
+                  fontSize: 22,
+                  fontWeight: '900',
+                  color: '#24160f',
+                }}
+              >
+                {topSpecialty.nombre}
+              </Text>
+
+              <Text
+                style={{
+                  marginTop: 6,
+                  fontSize: 14,
+                  lineHeight: 20,
+                  color: '#6f5a4b',
+                }}
+              >
+                {topSpecialty.roaster || topSpecialty.marca || 'ETIOVE'}
+              </Text>
+
+              <View style={{ flexDirection: 'row', gap: 10, marginTop: 14 }}>
+                <TouchableOpacity
+                  onPress={() => setCafeDetalle(topSpecialty)}
+                  activeOpacity={0.9}
+                  style={{
+                    flex: 1,
+                    borderRadius: 14,
+                    backgroundColor: '#111827',
+                    paddingVertical: 12,
+                    alignItems: 'center',
+                  }}
+                >
+                  <Text style={{ color: '#fff', fontSize: 13, fontWeight: '800' }}>Ver ficha</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => setActiveTab('Top')}
+                  activeOpacity={0.9}
+                  style={{
+                    flex: 1,
+                    borderRadius: 14,
+                    backgroundColor: '#f3e7d9',
+                    borderWidth: 1,
+                    borderColor: '#eadbce',
+                    paddingVertical: 12,
+                    alignItems: 'center',
+                  }}
+                >
+                  <Text style={{ color: '#8f5e3b', fontSize: 13, fontWeight: '800' }}>
+                    Ir a ranking
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+
           <SpecialtyForYouSection
             s={s}
             cafes={specialtyCafes}

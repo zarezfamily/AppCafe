@@ -352,6 +352,7 @@ export default function AdminPanelScreen() {
     setEditingCafe(cafe);
     setProposal(null);
     setEditData({
+      ean: cafe.ean || cafe.barcode || '',
       nombre: cafe.nombre || cafe.name || '',
       marca: cafe.marca || cafe.roaster || '',
       origen: cafe.origen || cafe.origin || '',
@@ -613,6 +614,9 @@ export default function AdminPanelScreen() {
           : userPhoto || officialPhoto || '';
 
       return {
+        ean: String(editData.ean || '')
+          .replace(/\D/g, '')
+          .trim(),
         nombre: String(editData.nombre || '').trim(),
         marca: String(editData.marca || '').trim(),
         origen: String(editData.origen || '').trim(),
@@ -1028,6 +1032,13 @@ export default function AdminPanelScreen() {
           ) : null}
         </View>
 
+        <EditorField
+          label="EAN / Código de barras"
+          value={editData.ean}
+          onChangeText={(t) => setEditData((prev) => ({ ...prev, ean: t }))}
+          placeholder="Ej. 8480000103529"
+          keyboardType="number-pad"
+        />
         <EditorField
           label="Nombre"
           value={editData.nombre}

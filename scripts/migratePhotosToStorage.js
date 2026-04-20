@@ -196,9 +196,23 @@ async function migrate() {
       console.log(`✅ Ya en Storage     — ${nombre}`);
       yaEnStorage++;
 
-      // Aseguramos que el flag fotoEnStorage esté marcado aunque ya esté subida
-      if (!data.fotoEnStorage && !DRY_RUN) {
-        await docSnap.ref.update({ fotoEnStorage: true, updatedAt: new Date().toISOString() });
+      // Sincroniza bestPhoto si apunta a URL externa (stale) y foto/officialPhoto ya son Storage
+      const storageUrl = [data.foto, data.officialPhoto].find(isStorageUrl) || photoUrl;
+      const needsSync =
+        !data.fotoEnStorage ||
+        (data.bestPhoto && !isStorageUrl(data.bestPhoto)) ||
+        (data.foto && !isStorageUrl(data.foto)) ||
+        (data.officialPhoto && !isStorageUrl(data.officialPhoto));
+
+      if (needsSync && !DRY_RUN) {
+        await docSnap.ref.update({
+          foto: storageUrl,
+          officialPhoto: storageUrl,
+          bestPhoto: storageUrl,
+          fotoEnStorage: true,
+          updatedAt: new Date().toISOString(),
+        });
+        console.log(`   🔧 bestPhoto/foto sincronizados con Storage`);
       }
       continue;
     }

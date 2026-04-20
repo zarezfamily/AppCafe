@@ -1,7 +1,11 @@
 // IMPORTS IGUAL QUE LOS TUYOS
 import * as Haptics from 'expo-haptics';
+import * as Location from 'expo-location';
 import * as SecureStore from 'expo-secure-store';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
+import { fetchNearbyPlaces, isGooglePlacesConfigured } from '../core/places';
+import { mapPlacesToCafeterias } from '../screens/cafeterias/cafeteriasPlaceMapper';
 
 import { loadCollectionOfflineCache, saveCollectionOfflineCache } from '../core/offlineCache';
 import { filterCoffeeList, selectTopCoffeesForCountry } from '../domain/coffee/coffeeFilters';
@@ -139,6 +143,45 @@ export default function useCoffeeData({ ...props }) {
   };
 
   // ================================
+  // 🔥 CAFETERÍAS CERCANAS (INICIO)
+  // ================================
+
+  const cargarCafeteriasInicio = useCallback(async () => {
+    if (!isGooglePlacesConfigured(googlePlacesKey)) return;
+    setCargandoCafInicio(true);
+    setErrorCafInicio(null);
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorCafInicio('Activa la ubicación para ver cafeterías cerca de ti');
+        return;
+      }
+      const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+      const { latitude: lat, longitude: lon } = loc.coords;
+      const places = await fetchNearbyPlaces({
+        apiKey: googlePlacesKey,
+        lat,
+        lon,
+        maxResultCount: 8,
+        radiusMeters: 3000,
+        rankPreference: 'DISTANCE',
+        fieldMask:
+          'places.id,places.displayName,places.formattedAddress,places.location,places.rating,places.userRatingCount,places.currentOpeningHours,places.photos',
+      });
+      const result = mapPlacesToCafeterias({ places, lat, lon, apiKey: googlePlacesKey });
+      setCafeteriasInicio(result);
+    } catch (e) {
+      setErrorCafInicio('No se pudieron cargar cafeterías cercanas');
+    } finally {
+      setCargandoCafInicio(false);
+    }
+  }, [googlePlacesKey]);
+
+  useEffect(() => {
+    if (user?.uid) cargarCafeteriasInicio();
+  }, [user?.uid, cargarCafeteriasInicio]);
+
+  // ================================
   // 🔥 DELETE
   // ================================
 
@@ -167,6 +210,7 @@ export default function useCoffeeData({ ...props }) {
     cafeteriasInicio,
     cargandoCafInicio,
     errorCafInicio,
+    cargarCafeteriasInicio,
 
     cargarDatos,
 

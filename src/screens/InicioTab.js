@@ -74,31 +74,6 @@ function buildStepUpPairs(dailyCafes, specialtyCafes) {
     .filter(Boolean);
 }
 
-function HomePill({ label }) {
-  return (
-    <View
-      style={{
-        paddingHorizontal: 10,
-        paddingVertical: 6,
-        borderRadius: 999,
-        backgroundColor: '#f3e7d9',
-        borderWidth: 1,
-        borderColor: '#eadbce',
-      }}
-    >
-      <Text
-        style={{
-          fontSize: 11,
-          fontWeight: '800',
-          color: '#8f5e3b',
-        }}
-      >
-        {label}
-      </Text>
-    </View>
-  );
-}
-
 export default function InicioTab({
   s,
   perfil,
@@ -159,15 +134,6 @@ export default function InicioTab({
     return buildStepUpPairs(dailyCafes, specialtyCafes);
   }, [dailyCafes, specialtyCafes]);
 
-  const homeStats = useMemo(() => {
-    return {
-      specialty: specialtyCafes.length,
-      daily: dailyCafes.length,
-      bio: bioCafes.length,
-      trending: specialtyTrendingCafes.length,
-    };
-  }, [specialtyCafes, dailyCafes, bioCafes, specialtyTrendingCafes]);
-
   const topSpecialty = specialtyCafes?.[0] || null;
 
   return (
@@ -186,66 +152,6 @@ export default function InicioTab({
         nextLevel={nextLevel}
         onLongPressMemberCard={handleMemberRoastLongPress}
       />
-
-      <View
-        style={{
-          marginTop: 10,
-          marginHorizontal: 16,
-          borderWidth: 1,
-          borderColor: '#eadbce',
-          backgroundColor: '#fffaf5',
-          borderRadius: 22,
-          padding: 16,
-        }}
-      >
-        <Text
-          style={{
-            fontSize: 11,
-            fontWeight: '900',
-            color: '#8f5e3b',
-            letterSpacing: 1,
-            marginBottom: 8,
-          }}
-        >
-          ETIOVE HOME
-        </Text>
-
-        <Text
-          style={{
-            fontSize: 24,
-            fontWeight: '900',
-            color: '#24160f',
-          }}
-        >
-          Inicio Premium
-        </Text>
-
-        <Text
-          style={{
-            marginTop: 8,
-            fontSize: 14,
-            lineHeight: 22,
-            color: '#6f5a4b',
-          }}
-        >
-          Tu punto de entrada a ETIOVE: specialty, diario, BIO, descubrimiento y cafeterías cercanas
-          en una home más limpia.
-        </Text>
-
-        <View
-          style={{
-            marginTop: 14,
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            gap: 8,
-          }}
-        >
-          <HomePill label={`${homeStats.specialty} specialty`} />
-          <HomePill label={`${homeStats.daily} diario`} />
-          <HomePill label={`${homeStats.bio} BIO`} />
-          <HomePill label={`${homeStats.trending} trending`} />
-        </View>
-      </View>
 
       <View style={{ marginTop: 14, marginHorizontal: 16 }}>
         <SearchInput

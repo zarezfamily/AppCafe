@@ -49,7 +49,7 @@ export default function useMainScreenPremium({ user, premium, showDialog }) {
     return () => {
       cancelled = true;
     };
-  }, [premium, user?.uid]);
+  }, [user?.uid]);
 
   const handlePremiumPurchase = async (plan) => {
     if (!purchasesReady) {

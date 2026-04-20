@@ -48,8 +48,8 @@ export default function useCoffeeData({ ...props }) {
     const cached = await loadCollectionOfflineCache(user.uid);
     if (cached) {
       setMisCafes(cached.misCafes || []);
-      setTopCafes(cached.topCafes || []);
-      setAllCafes(cached.allCafes || []);
+      setTopCafes((cached.topCafes || []).filter((c) => !c.legacy));
+      setAllCafes((cached.allCafes || []).filter((c) => !c.legacy));
     }
 
     try {
@@ -59,14 +59,17 @@ export default function useCoffeeData({ ...props }) {
 
       const cafesOrdenados = [...cafes].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
+      const rankingFiltrado = ranking.filter((c) => !c.legacy);
+      const todosFiltrados = todos.filter((c) => !c.legacy);
+
       setMisCafes(cafesOrdenados);
-      setTopCafes(ranking);
-      setAllCafes(todos);
+      setTopCafes(rankingFiltrado);
+      setAllCafes(todosFiltrados);
 
       await saveCollectionOfflineCache(user.uid, {
         misCafes: cafesOrdenados,
-        topCafes: ranking,
-        allCafes: todos,
+        topCafes: rankingFiltrado,
+        allCafes: todosFiltrados,
       });
     } catch (e) {
       setErrorCargaDatos('Error cargando datos');

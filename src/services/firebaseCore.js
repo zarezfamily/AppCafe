@@ -37,7 +37,6 @@ export const clientHeaders = () => {
 
 export const setAuthToken = (token) => {
   authToken = token;
-  console.log('[Firebase] Token completo:', token || 'NULL');
 };
 
 export const clearAuthToken = () => {

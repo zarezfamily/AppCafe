@@ -872,7 +872,10 @@ export default function DiscoverTab({
 
               <View style={{ flexDirection: 'row', gap: 10, marginTop: 14 }}>
                 <TouchableOpacity
-                  onPress={() => setCafeDetalle(top)}
+                  onPress={() => {
+                    const index = itemsFiltrados.findIndex((c) => c.id === top.id);
+                    setCafeDetalle({ cafes: itemsFiltrados, cafeIndex: index });
+                  }}
                   activeOpacity={0.9}
                   style={{
                     flex: 1,
@@ -911,7 +914,7 @@ export default function DiscoverTab({
             subtitle="Una vista más cuidada, útil y filtrada para descubrir mejor. Pulsa cualquier café para abrir su ficha completa."
           />
 
-          {itemsFiltrados.map((item) => (
+          {itemsFiltrados.map((item, idx) => (
             <View key={item.id} style={{ marginBottom: 12 }}>
               <View style={{ flexDirection: 'row', gap: 6, marginBottom: 6, flexWrap: 'wrap' }}>
                 {buildMatchReasons(item).map((r) => (
@@ -921,7 +924,7 @@ export default function DiscoverTab({
 
               <CardVertical
                 item={item}
-                onPress={setCafeDetalle}
+                onPress={() => setCafeDetalle({ cafes: itemsFiltrados, cafeIndex: idx })}
                 favs={favs}
                 onToggleFav={toggleFav}
               />

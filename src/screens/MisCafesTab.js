@@ -104,12 +104,12 @@ export default function MisCafesTab({
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ paddingLeft: 16, paddingRight: 8, gap: 12 }}
           >
-            {favCafes.map((item) => (
+            {favCafes.map((item, idx) => (
               <CardHorizontal
                 key={item.id}
                 item={item}
                 badge={`${item.puntuacion}.0`}
-                onPress={setCafeDetalle}
+                onPress={() => setCafeDetalle({ cafes: favCafes, cafeIndex: idx })}
                 favs={favs}
                 onToggleFav={toggleFav}
               />
@@ -136,12 +136,12 @@ export default function MisCafesTab({
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={{ paddingLeft: 16, paddingRight: 8, gap: 12 }}
               >
-                {cafesParaTiFiltrados.map((item) => (
+                {cafesParaTiFiltrados.map((item, idx) => (
                   <CardHorizontal
                     key={`pt-${item.id}`}
                     item={item}
                     badge={`${item.puntuacion}.0`}
-                    onPress={setCafeDetalle}
+                    onPress={() => setCafeDetalle({ cafes: cafesParaTiFiltrados, cafeIndex: idx })}
                     favs={favs}
                     onToggleFav={toggleFav}
                   />
@@ -163,12 +163,12 @@ export default function MisCafesTab({
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={{ paddingLeft: 16, paddingRight: 8, gap: 12 }}
               >
-                {favoritosFiltrados.map((item) => (
+                {favoritosFiltrados.map((item, idx) => (
                   <CardHorizontal
                     key={`fav-${item.id}`}
                     item={item}
                     badge={`${item.puntuacion}.0`}
-                    onPress={setCafeDetalle}
+                    onPress={() => setCafeDetalle({ cafes: favoritosFiltrados, cafeIndex: idx })}
                     favs={favs}
                     onToggleFav={toggleFav}
                   />
@@ -191,12 +191,12 @@ export default function MisCafesTab({
           <ActivityIndicator color={premiumAccent} style={{ margin: 30 }} />
         ) : (
           <View style={{ paddingHorizontal: 16 }}>
-            {cafesFiltrados.map((item) => (
+            {cafesFiltrados.map((item, idx) => (
               <CardVertical
                 key={item.id}
                 item={item}
                 onDelete={eliminarCafe}
-                onPress={setCafeDetalle}
+                onPress={() => setCafeDetalle({ cafes: cafesFiltrados, cafeIndex: idx })}
                 favs={favs}
                 onToggleFav={toggleFav}
               />

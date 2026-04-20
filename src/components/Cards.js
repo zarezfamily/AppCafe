@@ -107,7 +107,7 @@ export function CardHorizontal({ item, badge, onPress, favs = [], onToggleFav })
 
       <View style={styles.ratingRow}>
         <Ionicons name="star" size={13} color={PREMIUM_ACCENT} />
-        <Text style={styles.cardHRating}>{item.puntuacion || 0}.0</Text>
+        <Text style={styles.cardHRating}>{Number(item.puntuacion || 0).toFixed(1)}</Text>
         <Text style={styles.cardHVotos}>({item.votos || 0})</Text>
       </View>
 
@@ -130,7 +130,7 @@ export function CardVertical({ item, onDelete, onPress, favs = [], onToggleFav }
         />
 
         <View style={shared.badgeRed}>
-          <Text style={shared.badgeText}>{item.puntuacion || 0}.0</Text>
+          <Text style={shared.badgeText}>{Number(item.puntuacion || 0).toFixed(1)}</Text>
         </View>
 
         <View style={styles.categoryBadgeWrapVertical}>

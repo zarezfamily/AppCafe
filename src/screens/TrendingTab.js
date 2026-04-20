@@ -680,7 +680,10 @@ export default function TrendingTab({
               {!!heroCafe && (
                 <TouchableOpacity
                   activeOpacity={0.9}
-                  onPress={() => setCafeDetalle(heroCafe)}
+                  onPress={() => {
+                    const index = top10.findIndex((c) => c.id === heroCafe.id);
+                    setCafeDetalle({ cafes: top10, cafeIndex: index });
+                  }}
                   style={{
                     marginHorizontal: 16,
                     marginBottom: 14,
@@ -816,7 +819,10 @@ export default function TrendingTab({
                       <CardVertical
                         item={cafe}
                         onDelete={() => {}}
-                        onPress={setCafeDetalle}
+                        onPress={() => {
+                          const index = top10.findIndex((c) => c.id === cafe.id);
+                          setCafeDetalle({ cafes: top10, cafeIndex: index });
+                        }}
                         favs={favs}
                         onToggleFav={toggleFav}
                       />

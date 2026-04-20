@@ -276,7 +276,10 @@ export default function TopCafesTab({
           {!!hero && (
             <TouchableOpacity
               activeOpacity={0.9}
-              onPress={() => setCafeDetalle(hero)}
+              onPress={() => {
+                const index = filteredItems.findIndex((c) => c.id === hero.id);
+                setCafeDetalle({ cafes: filteredItems, cafeIndex: index });
+              }}
               style={{
                 marginBottom: 16,
                 borderRadius: 22,
@@ -312,7 +315,10 @@ export default function TopCafesTab({
               </Text>
               <View style={{ flexDirection: 'row', gap: 10, marginTop: 14 }}>
                 <TouchableOpacity
-                  onPress={() => setCafeDetalle(hero)}
+                  onPress={() => {
+                    const index = filteredItems.findIndex((c) => c.id === hero.id);
+                    setCafeDetalle({ cafes: filteredItems, cafeIndex: index });
+                  }}
                   activeOpacity={0.9}
                   style={{
                     flex: 1,

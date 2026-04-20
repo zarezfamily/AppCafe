@@ -198,23 +198,25 @@ export function SearchResultsSection({
 }) {
   const resultados = filtrar(allCafes, busqueda);
 
+  const handlePress = (item) => {
+    const index = resultados.findIndex((c) => c.id === item.id);
+    setCafeDetalle({ cafes: resultados, cafeIndex: index });
+  };
   return (
     <HomeSectionCard>
       <View style={s.sectionHeader}>
         <Text style={s.sectionTitle}>Resultados ({resultados.length})</Text>
       </View>
-
       <Text style={[s.sectionSub, { paddingHorizontal: 0 }]}>
         Cafés encontrados en la comunidad según tu búsqueda
       </Text>
-
       <View style={{ marginTop: 10 }}>
         {resultados.map((item) => (
           <View key={item.id} style={{ marginBottom: 10 }}>
             <CardVertical
               item={item}
               onDelete={() => {}}
-              onPress={setCafeDetalle}
+              onPress={() => handlePress(item)}
               favs={favs}
               onToggleFav={toggleFav}
             />
@@ -235,6 +237,11 @@ export function SpecialtyForYouSection({
 }) {
   if (!cafes?.length) return null;
 
+  const items = cafes.slice(0, 8);
+  const handlePress = (item) => {
+    const index = items.findIndex((c) => c.id === item.id);
+    setCafeDetalle({ cafes: items, cafeIndex: index });
+  };
   return (
     <HomeSectionCard>
       <SectionHeaderNav s={s} title="Especialidad para ti" marginTop={0} hideAction />
@@ -242,17 +249,16 @@ export function SpecialtyForYouSection({
         Cafés curados y bien valorados para descubrir algo especial sin perderte entre demasiadas
         opciones
       </Text>
-
       <HorizontalCardRow
         s={s}
         loading={false}
-        items={cafes.slice(0, 8)}
+        items={items}
         renderItem={(item) => (
           <CardHorizontal
             key={item.id}
             item={item}
             badge={`${item.puntuacion || 0}.0 ⭐`}
-            onPress={setCafeDetalle}
+            onPress={() => handlePress(item)}
             favs={favs}
             onToggleFav={toggleFav}
           />
@@ -265,23 +271,27 @@ export function SpecialtyForYouSection({
 export function DailyCoffeeSection({ s, cafes, setCafeDetalle, favs, toggleFav, CardHorizontal }) {
   if (!cafes?.length) return null;
 
+  const items = cafes.slice(0, 8);
+  const handlePress = (item) => {
+    const index = items.findIndex((c) => c.id === item.id);
+    setCafeDetalle({ cafes: items, cafeIndex: index });
+  };
   return (
     <HomeSectionCard>
       <SectionHeaderNav s={s} title="Tu café diario" marginTop={0} hideAction />
       <Text style={[s.sectionSub, { paddingHorizontal: 0 }]}>
         Cafés habituales del día a día para comparar y decidir mejor tu compra
       </Text>
-
       <HorizontalCardRow
         s={s}
         loading={false}
-        items={cafes.slice(0, 8)}
+        items={items}
         renderItem={(item) => (
           <CardHorizontal
             key={item.id}
             item={item}
             badge="☕ Diario"
-            onPress={setCafeDetalle}
+            onPress={() => handlePress(item)}
             favs={favs}
             onToggleFav={toggleFav}
           />

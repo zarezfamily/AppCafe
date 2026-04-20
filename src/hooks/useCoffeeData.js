@@ -48,7 +48,7 @@ export default function useCoffeeData({ ...props }) {
     const cached = await loadCollectionOfflineCache(user.uid);
     if (cached) {
       setMisCafes(cached.misCafes || []);
-      const hasPhoto = (c) => !!(c.officialPhoto || c.foto);
+      const hasPhoto = (c) => !!(c.bestPhoto || c.officialPhoto || c.foto || c.image || c.imageUrl);
       setTopCafes((cached.topCafes || []).filter((c) => !c.legacy && hasPhoto(c)));
       setAllCafes((cached.allCafes || []).filter((c) => !c.legacy && hasPhoto(c)));
     }
@@ -60,7 +60,7 @@ export default function useCoffeeData({ ...props }) {
 
       const cafesOrdenados = [...cafes].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
-      const hasPhoto = (c) => !!(c.officialPhoto || c.foto);
+      const hasPhoto = (c) => !!(c.bestPhoto || c.officialPhoto || c.foto || c.image || c.imageUrl);
       const rankingFiltrado = ranking.filter((c) => !c.legacy && hasPhoto(c));
       const todosFiltrados = todos.filter((c) => !c.legacy && hasPhoto(c));
 

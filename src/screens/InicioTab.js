@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import MemberInfoModal from '../components/MemberInfoModal';
 import {
   BioCoffeeSection,
@@ -12,6 +12,7 @@ import {
   SpecialtyForYouSection,
   StepUpSection,
 } from './inicioTabSections';
+import { MAIN_TABS } from './mainScreenTabs';
 
 function buildUniqueOptions(items, field, limit = 6) {
   const seen = new Set();
@@ -230,7 +231,7 @@ export default function InicioTab({
       proceso,
       roaster,
     }));
-    setActiveTab('Trending');
+    setActiveTab(MAIN_TABS.TRENDING);
   };
 
   const stepUpPairs = useMemo(() => {
@@ -365,13 +366,13 @@ export default function InicioTab({
                 icon="🔎"
                 title="Explore"
                 subtitle="Descubre cafés con filtros premium."
-                onPress={() => setActiveTab('Discover')}
+                onPress={() => setActiveTab(MAIN_TABS.DISCOVER)}
               />
               <QuickHomeCard
                 icon="🔥"
                 title="Trending"
                 subtitle="Lo que está subiendo ahora mismo."
-                onPress={() => setActiveTab('Trending')}
+                onPress={() => setActiveTab(MAIN_TABS.TRENDING)}
               />
             </View>
 
@@ -380,13 +381,13 @@ export default function InicioTab({
                 icon="🏆"
                 title="Ranking"
                 subtitle="Los cafés mejor posicionados."
-                onPress={() => setActiveTab('Top')}
+                onPress={() => setActiveTab(MAIN_TABS.TOP)}
               />
               <QuickHomeCard
                 icon="📍"
                 title="Cafeterías"
                 subtitle="Busca sitios cercanos para tomar café."
-                onPress={() => setActiveTab('Inicio')}
+                onPress={() => setActiveTab(MAIN_TABS.CAFETERIAS)}
               />
             </View>
           </View>
@@ -467,7 +468,7 @@ export default function InicioTab({
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  onPress={() => setActiveTab('Top')}
+                  onPress={() => setActiveTab(MAIN_TABS.TOP)}
                   activeOpacity={0.9}
                   style={{
                     flex: 1,

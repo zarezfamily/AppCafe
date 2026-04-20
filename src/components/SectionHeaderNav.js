@@ -17,14 +17,14 @@ export default function SectionHeaderNav({
       activeOpacity={onPress ? 0.82 : 1}
       style={{
         marginTop,
-        marginBottom: 8,
-        paddingHorizontal: 16,
+        marginBottom: 10,
+        paddingHorizontal: 0,
       }}
     >
       <View
         style={{
           flexDirection: 'row',
-          alignItems: 'flex-end',
+          alignItems: 'center',
           justifyContent: 'space-between',
           gap: 12,
         }}
@@ -55,6 +55,8 @@ export default function SectionHeaderNav({
               paddingVertical: 6,
               borderRadius: 999,
               backgroundColor: '#f3e7d9',
+              borderWidth: 1,
+              borderColor: '#eadbce',
             }}
           >
             <Text

@@ -57,6 +57,30 @@ function HomeSectionCard({ children }) {
   return <View style={styles.homeSectionCard}>{children}</View>;
 }
 
+function SectionPill({ label }) {
+  return (
+    <View style={styles.sectionPill}>
+      <Text style={styles.sectionPillText}>{label}</Text>
+    </View>
+  );
+}
+
+function SectionIntro({ title, subtitle, pills = [] }) {
+  return (
+    <View style={{ marginBottom: 12 }}>
+      <Text style={styles.sectionIntroTitle}>{title}</Text>
+      {!!subtitle && <Text style={styles.sectionIntroSubtitle}>{subtitle}</Text>}
+      {!!pills.length && (
+        <View style={styles.sectionPillRow}>
+          {pills.map((pill) => (
+            <SectionPill key={pill} label={pill} />
+          ))}
+        </View>
+      )}
+    </View>
+  );
+}
+
 export function InicioTopBar({
   s,
   perfil,
@@ -219,6 +243,12 @@ export function SpecialtyForYouSection({
         opciones
       </Text>
 
+      <SectionIntro
+        title="Selección specialty"
+        subtitle="Una selección corta, cuidada y útil para descubrir cafés con más carácter."
+        pills={['Curado', 'Specialty', 'Comunidad']}
+      />
+
       <HorizontalCardRow
         s={s}
         loading={false}
@@ -250,6 +280,12 @@ export function DailyCoffeeSection({ s, cafes, setCafeDetalle, favs, toggleFav, 
         Cafés habituales del día a día para comparar y decidir mejor tu compra
       </Text>
 
+      <SectionIntro
+        title="Selección diaria"
+        subtitle="Lo más útil para tu consumo habitual, sin saturar la Home con demasiadas opciones."
+        pills={['Diario', 'Práctico', 'Comparar']}
+      />
+
       <HorizontalCardRow
         s={s}
         loading={false}
@@ -280,6 +316,12 @@ export function BioCoffeeSection({ s, cafes, setCafeDetalle, favs, toggleFav, Ca
       <Text style={[s.sectionSub, { paddingHorizontal: 0 }]}>
         Una selección de cafés BIO y ecológicos, tanto diarios como de especialidad
       </Text>
+
+      <SectionIntro
+        title="Selección BIO"
+        subtitle="Una vista rápida de cafés bio, ecológicos y orgánicos dentro de ETIOVE."
+        pills={['BIO', 'Orgánico', 'Ecológico']}
+      />
 
       <HorizontalCardRow
         s={s}
@@ -375,6 +417,12 @@ export function ExploreHomeSection({
       <Text style={[s.sectionSub, { paddingHorizontal: 0 }]}>
         Accesos rápidos para explorar sin recargar la pantalla de inicio
       </Text>
+
+      <SectionIntro
+        title="Rutas rápidas"
+        subtitle="Accesos pensados para descubrir mejor sin perderte entre bloques largos."
+        pills={['Trending', 'Explore', 'Ranking']}
+      />
 
       <View style={{ marginTop: 10, gap: 12 }}>
         <ActionCard
@@ -570,6 +618,12 @@ export function BlogSection({ s }) {
         Guías y contenido editorial para aprender más sin saturar la Home
       </Text>
 
+      <SectionIntro
+        title="Lecturas recomendadas"
+        subtitle="Contenido editorial útil para aprender más sobre café, métodos y preparación."
+        pills={['Guías', 'Métodos', 'Aprender']}
+      />
+
       <View style={{ marginTop: 10, gap: 12 }}>
         {FEATURED_BLOG_POSTS.map((post) => (
           <TouchableOpacity
@@ -606,6 +660,37 @@ const styles = StyleSheet.create({
     borderColor: '#eadbce',
     backgroundColor: '#fffaf5',
     padding: 16,
+  },
+
+  sectionIntroTitle: {
+    fontSize: 16,
+    fontWeight: '900',
+    color: '#24160f',
+  },
+  sectionIntroSubtitle: {
+    marginTop: 4,
+    fontSize: 13,
+    lineHeight: 19,
+    color: '#6f5a4b',
+  },
+  sectionPillRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 10,
+  },
+  sectionPill: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: '#eadbce',
+    backgroundColor: '#faf7f2',
+  },
+  sectionPillText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#8f5e3b',
   },
 
   quickBlock: {

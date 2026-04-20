@@ -20,7 +20,7 @@ export default function HorizontalCardRow({
   return (
     <View style={{ marginTop: 8 }}>
       {!!header && (
-        <View style={{ paddingHorizontal: 16, marginBottom: 4 }}>
+        <View style={{ paddingHorizontal: 0, marginBottom: 8 }}>
           <Text
             style={{
               fontSize: 15,
@@ -54,8 +54,8 @@ export default function HorizontalCardRow({
           snapToAlignment="start"
           contentContainerStyle={[
             {
-              paddingLeft: 16,
-              paddingRight: 12,
+              paddingLeft: 0,
+              paddingRight: 4,
               gap: 14,
             },
             contentContainerStyle,
@@ -66,7 +66,7 @@ export default function HorizontalCardRow({
       ) : (
         <View
           style={{
-            marginHorizontal: 16,
+            marginHorizontal: 0,
             marginTop: 2,
             borderRadius: 16,
             borderWidth: 1,

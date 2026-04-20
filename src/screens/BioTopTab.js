@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { isBioCoffee, sortByBioScore } from '../utils/coffeeRanking';
 import SimpleCoffeeListTab from './SimpleCoffeeListTab';
 
 export default function BioTopTab({
@@ -14,8 +13,9 @@ export default function BioTopTab({
   toggleFav,
 }) {
   const bioItems = useMemo(() => {
-    const filtered = (top100 || []).filter((item) => isBioCoffee(item));
-    return sortByBioScore(filtered);
+    return [...(top100 || [])]
+      .filter((item) => item?.isBio === true)
+      .sort((a, b) => Number(b?.bioScore || 0) - Number(a?.bioScore || 0));
   }, [top100]);
 
   return (
@@ -26,7 +26,7 @@ export default function BioTopTab({
       cargando={cargando}
       title="Top cafés BIO"
       subtitle="Los cafés BIO y ecológicos mejor posicionados"
-      helperText="Selección BIO basada en calidad, votos y relevancia dentro de ETIOVE."
+      helperText="Selección BIO basada en score persistido en backend para mantener consistencia."
       items={bioItems}
       categoryLabel="BIO"
       CardVertical={CardVertical}

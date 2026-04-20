@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { normalizeCategory, sortByRankingScore } from '../utils/coffeeRanking';
 import SimpleCoffeeListTab from './SimpleCoffeeListTab';
 
 export default function TopCafesTab({
@@ -17,8 +16,9 @@ export default function TopCafesTab({
   const country = perfil?.pais || 'España';
 
   const specialtyItems = useMemo(() => {
-    const filtered = (top100 || []).filter((item) => normalizeCategory(item) === 'specialty');
-    return sortByRankingScore(filtered);
+    return [...(top100 || [])]
+      .filter((item) => (item?.coffeeCategory || 'specialty') === 'specialty')
+      .sort((a, b) => Number(b?.rankingScore || 0) - Number(a?.rankingScore || 0));
   }, [top100]);
 
   return (
@@ -29,7 +29,7 @@ export default function TopCafesTab({
       cargando={cargando}
       title="Top cafés de especialidad"
       subtitle={`Los cafés mejor posicionados ahora mismo en ${country}`}
-      helperText="Ranking inteligente ETIOVE: combina puntuación, volumen de votos y calidad general del café."
+      helperText="Ranking ETIOVE calculado en backend según calidad, puntuación y confianza."
       items={specialtyItems}
       categoryLabel="Especialidad"
       CardVertical={CardVertical}

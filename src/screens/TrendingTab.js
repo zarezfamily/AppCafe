@@ -235,6 +235,18 @@ function parseDateValue(value) {
   return Number.isNaN(time) ? 0 : time;
 }
 
+function getStableTrendingScore(item) {
+  const score = Number(item?.trendingScore || 0);
+  const votos = Number(item?.votos || 0);
+  const puntuacion = Number(item?.puntuacion || 0);
+
+  return score + Math.min(votos, 20) * 0.15 + puntuacion * 0.05;
+}
+
+function hasMinimumTrendingSignals(item) {
+  return Number(item?.votos || 0) >= 2 || Number(item?.trendingScore || 0) >= 8;
+}
+
 export default function TrendingTab({
   s,
   setActiveTab,
@@ -291,12 +303,38 @@ export default function TrendingTab({
       return okPais && okProceso && okRoaster;
     });
 
-    return [...base].sort((a, b) => {
-      if (sortBy === 'rating') return Number(b?.puntuacion || 0) - Number(a?.puntuacion || 0);
-      if (sortBy === 'votes') return Number(b?.votos || 0) - Number(a?.votos || 0);
-      if (sortBy === 'recent') return parseDateValue(b?.fecha) - parseDateValue(a?.fecha);
-      return Number(b?.trendingScore || 0) - Number(a?.trendingScore || 0);
-    });
+    const filteredBase =
+      sortBy === 'trending' ? base.filter((item) => hasMinimumTrendingSignals(item)) : base;
+
+    return [...filteredBase]
+      .sort((a, b) => {
+        if (sortBy === 'rating') {
+          const ratingDiff = Number(b?.puntuacion || 0) - Number(a?.puntuacion || 0);
+          if (ratingDiff !== 0) return ratingDiff;
+          return Number(b?.votos || 0) - Number(a?.votos || 0);
+        }
+
+        if (sortBy === 'votes') {
+          const votesDiff = Number(b?.votos || 0) - Number(a?.votos || 0);
+          if (votesDiff !== 0) return votesDiff;
+          return Number(b?.puntuacion || 0) - Number(a?.puntuacion || 0);
+        }
+
+        if (sortBy === 'recent') {
+          const recentDiff = parseDateValue(b?.fecha) - parseDateValue(a?.fecha);
+          if (recentDiff !== 0) return recentDiff;
+          return Number(b?.trendingScore || 0) - Number(a?.trendingScore || 0);
+        }
+
+        const trendingDiff = getStableTrendingScore(b) - getStableTrendingScore(a);
+        if (trendingDiff !== 0) return trendingDiff;
+
+        const votesDiff = Number(b?.votos || 0) - Number(a?.votos || 0);
+        if (votesDiff !== 0) return votesDiff;
+
+        return Number(b?.puntuacion || 0) - Number(a?.puntuacion || 0);
+      })
+      .slice(0, 50);
   }, [cafesBase, paisSeleccionado, procesoSeleccionado, roasterSeleccionado, sortBy]);
 
   const filtrosActivos = [paisSeleccionado, procesoSeleccionado, roasterSeleccionado].filter(
@@ -335,7 +373,8 @@ export default function TrendingTab({
     if (topRoasterBase && normalizeText(item?.roaster) === normalizeText(topRoasterBase)) {
       reasons.push('Top tostador');
     }
-    if (Number(item?.trendingScore || 0) >= 4) reasons.push('Alta tracción');
+    if (Number(item?.trendingScore || 0) >= 8) reasons.push('Alta tracción');
+    if (Number(item?.votos || 0) >= 10) reasons.push('Muy votado');
     return reasons.slice(0, 3);
   };
 
@@ -387,7 +426,8 @@ export default function TrendingTab({
               color: '#6f5a4b',
             }}
           >
-            Los cafés que mejor combinan valoración, votos y movimiento real dentro de la comunidad.
+            Los cafés que mejor combinan tracción real, votos y valoración, evitando tops falsos con
+            muy poca base.
           </Text>
 
           <View
@@ -596,7 +636,7 @@ export default function TrendingTab({
                       marginBottom: 8,
                     }}
                   >
-                    HERO COFFEE
+                    TRENDING HERO
                   </Text>
 
                   <Text
@@ -726,7 +766,7 @@ export default function TrendingTab({
                     marginBottom: 6,
                   }}
                 >
-                  TOP DESTACADO
+                  DESTACADO EN TENDENCIA
                 </Text>
                 <Text style={{ fontSize: 18, fontWeight: '900', color: '#24160f' }}>
                   {topDestacado.nombre}
@@ -796,7 +836,9 @@ export default function TrendingTab({
                   padding: 16,
                 }}
               >
-                <Text style={[s.empty, { marginTop: 0 }]}>No hay cafés con esos filtros.</Text>
+                <Text style={[s.empty, { marginTop: 0 }]}>
+                  No hay cafés con suficiente señal para esa combinación de filtros.
+                </Text>
               </View>
             )}
           </View>

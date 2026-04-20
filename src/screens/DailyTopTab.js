@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { normalizeCategory, sortByRankingScore } from '../utils/coffeeRanking';
 import SimpleCoffeeListTab from './SimpleCoffeeListTab';
 
 export default function DailyTopTab({
@@ -14,8 +13,9 @@ export default function DailyTopTab({
   toggleFav,
 }) {
   const dailyItems = useMemo(() => {
-    const filtered = (top100 || []).filter((item) => normalizeCategory(item) === 'daily');
-    return sortByRankingScore(filtered);
+    return [...(top100 || [])]
+      .filter((item) => item?.coffeeCategory === 'daily')
+      .sort((a, b) => Number(b?.rankingScore || 0) - Number(a?.rankingScore || 0));
   }, [top100]);
 
   return (
@@ -25,8 +25,8 @@ export default function DailyTopTab({
       premiumAccent={premiumAccent}
       cargando={cargando}
       title="Top café diario"
-      subtitle="Los cafés diarios mejor valorados por la comunidad"
-      helperText="Ranking pensado para café de supermercado o consumo habitual, dando peso a nota y confianza de votos."
+      subtitle="Los cafés diarios mejor posicionados por la comunidad"
+      helperText="Ranking para café de supermercado o consumo habitual, calculado en backend."
       items={dailyItems}
       categoryLabel="Café diario"
       CardVertical={CardVertical}

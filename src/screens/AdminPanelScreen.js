@@ -556,22 +556,19 @@ export default function AdminPanelScreen() {
 
     setEditData((prev) => ({
       ...prev,
-      nombre: prev.nombre || proposal.suggestedNombre || '',
-      marca: prev.marca || proposal.suggestedMarca || '',
-      origen: prev.origen || proposal.suggestedOrigen || '',
-      notas: prev.notas || proposal.suggestedNotas || '',
-      formato: prev.formato || proposal.suggestedFormato || '',
-      officialPhoto: prev.officialPhoto || proposal.suggestedOfficialPhoto || '',
-      bestPhotoMode:
-        prev.bestPhotoMode === 'official' || proposal.suggestedOfficialPhoto
-          ? 'official'
-          : prev.bestPhotoMode,
+      nombre: proposal.suggestedNombre || prev.nombre || '',
+      marca: proposal.suggestedMarca || prev.marca || '',
+      origen: proposal.suggestedOrigen || prev.origen || '',
+      notas: proposal.suggestedNotas || prev.notas || '',
+      formato: proposal.suggestedFormato || prev.formato || '',
+      officialPhoto: proposal.suggestedOfficialPhoto || prev.officialPhoto || '',
+      bestPhotoMode: proposal.suggestedOfficialPhoto ? 'official' : prev.bestPhotoMode,
       isBio:
-        prev.isBio === true ||
         proposal.isBio === true ||
         String(proposal.suggestedCertificaciones || '')
           .toLowerCase()
-          .includes('bio'),
+          .includes('bio') ||
+        prev.isBio === true,
     }));
   }, [proposal]);
 

@@ -460,6 +460,9 @@ function ScannerMatchFlow({
           autoCreate: true,
         });
       }}
+      onRecognized={(cafe) => {
+        setMatchedCafe(cafe);
+      }}
       onSkip={() => onScannerDone?.({ skip: true })}
       onBack={onScannerBack}
       premiumAccent={premiumAccent}

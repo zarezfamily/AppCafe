@@ -1,37 +1,27 @@
-const admin = require('firebase-admin');
-const fs = require('fs');
-const path = require('path');
+import admin from 'firebase-admin';
+import fs from 'fs';
 
-const serviceAccount = require('../serviceAccountKey.json.json');
+const serviceAccount = JSON.parse(fs.readFileSync('./serviceAccountKey.json', 'utf8'));
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: 'https://miappdecafe-default-rtdb.europe-west1.firebasedatabase.app',
 });
 
-const db = admin.database();
+const db = admin.firestore();
 
-async function backup() {
-  console.log("📦 Descargando colección 'cafes'...");
-  const snapshot = await db.ref('cafes').once('value');
-  const data = snapshot.val();
+async function backupCafes() {
+  const snapshot = await db.collection('cafes').get();
 
-  if (!data) {
-    console.log("⚠️  La colección 'cafes' está vacía o no existe.");
-    process.exit(0);
-  }
+  const cafes = snapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
 
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const filename = path.join(__dirname, `../data/backup_cafes_${timestamp}.json`);
-  fs.writeFileSync(filename, JSON.stringify(data, null, 2), 'utf-8');
+  fs.writeFileSync('./cafes-backup.json', JSON.stringify(cafes, null, 2), 'utf8');
 
-  const count = Object.keys(data).length;
-  console.log(`✅ Backup completado: ${count} cafés guardados en`);
-  console.log(`   ${filename}`);
-  process.exit(0);
+  console.log(`Backup completado: ${cafes.length} cafés exportados a cafes-backup.json`);
 }
 
-backup().catch((err) => {
-  console.error('❌ Error durante el backup:', err);
-  process.exit(1);
+backupCafes().catch((error) => {
+  console.error('Error haciendo backup:', error);
 });

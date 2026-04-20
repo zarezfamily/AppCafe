@@ -24,7 +24,7 @@
     "cuerpo": "Denso",
     "regusto": "Dulce y persistente",
     "preparacion": "Filtro, V60, espresso",
-    "intensidad": null,
+    "intensidad": 7,
     "descripcion": null,
     "certificaciones": null,
     "sca": 86,
@@ -39,7 +39,8 @@
     "searchText": null,
     "fuente": "web_roaster",
     "fuenteUrl": "https://ineffablecoffee.com/products/sitio-amoreira",
-    "legacy": true
+    "legacy": true,
+    "peso": 250
   },
   {
     "nombre": "La Coipa",
@@ -66,7 +67,7 @@
     "cuerpo": "Equilibrado",
     "regusto": "Largo",
     "preparacion": "Filtro, V60",
-    "intensidad": null,
+    "intensidad": 7,
     "descripcion": null,
     "certificaciones": null,
     "sca": 87,
@@ -81,7 +82,8 @@
     "searchText": null,
     "fuente": "web_roaster",
     "fuenteUrl": "https://ineffablecoffee.com/products/la-coipa",
-    "legacy": false
+    "legacy": false,
+    "peso": 250
   },
   {
     "nombre": "Friends of Tolima",
@@ -108,7 +110,7 @@
     "cuerpo": "Equilibrado",
     "regusto": "Dulce",
     "preparacion": "Filtro, espresso",
-    "intensidad": null,
+    "intensidad": 7,
     "descripcion": null,
     "certificaciones": null,
     "sca": 86,
@@ -123,7 +125,8 @@
     "searchText": null,
     "fuente": "web_roaster",
     "fuenteUrl": "https://ineffablecoffee.com/products/friends-of-tolima",
-    "legacy": false
+    "legacy": false,
+    "peso": 250
   },
   {
     "nombre": "Colombia Casa Negra",
@@ -150,7 +153,7 @@
     "cuerpo": "Equilibrado",
     "regusto": "Largo",
     "preparacion": "Filtro, espresso",
-    "intensidad": null,
+    "intensidad": 7,
     "descripcion": null,
     "certificaciones": null,
     "sca": 88,
@@ -165,7 +168,8 @@
     "searchText": null,
     "fuente": "web_roaster",
     "fuenteUrl": "https://cafeselmagnifico.com/producto/colombia-casa-negra/",
-    "legacy": false
+    "legacy": false,
+    "peso": 250
   },
   {
     "nombre": "Chambakú",
@@ -192,7 +196,7 @@
     "cuerpo": "Equilibrado",
     "regusto": "Dulce",
     "preparacion": "Filtro, espresso",
-    "intensidad": null,
+    "intensidad": 7,
     "descripcion": null,
     "certificaciones": null,
     "sca": 86,
@@ -207,7 +211,8 @@
     "searchText": null,
     "fuente": "web_roaster",
     "fuenteUrl": "https://nomadcoffee.es/products/chambaku",
-    "legacy": false
+    "legacy": false,
+    "peso": 250
   },
   {
     "nombre": "Sasaba",
@@ -276,7 +281,7 @@
     "cuerpo": "Jugoso",
     "regusto": "Dulce y afrutado",
     "preparacion": "Filtro, espresso",
-    "intensidad": null,
+    "intensidad": 7,
     "descripcion": null,
     "certificaciones": null,
     "sca": 89,
@@ -291,7 +296,8 @@
     "searchText": null,
     "fuente": "web_roaster",
     "fuenteUrl": "https://ineffablecoffee.com/en/products/gigante-cherry",
-    "legacy": false
+    "legacy": false,
+    "peso": 250
   },
   {
     "nombre": "Gahahe",
@@ -318,7 +324,7 @@
     "cuerpo": "Equilibrado",
     "regusto": "Fresco y afrutado",
     "preparacion": "Filtro",
-    "intensidad": null,
+    "intensidad": 7,
     "descripcion": null,
     "certificaciones": null,
     "sca": null,
@@ -333,7 +339,8 @@
     "searchText": null,
     "fuente": "web_roaster",
     "fuenteUrl": "https://nomadcoffee.es/en/products/gahahe",
-    "legacy": false
+    "legacy": false,
+    "peso": 250
   },
   {
     "nombre": "KII#1",
@@ -360,7 +367,7 @@
     "cuerpo": "Jugoso",
     "regusto": "Muy dulce",
     "preparacion": "Espresso",
-    "intensidad": null,
+    "intensidad": 7,
     "descripcion": null,
     "certificaciones": null,
     "sca": null,
@@ -375,7 +382,8 @@
     "searchText": null,
     "fuente": "web_roaster",
     "fuenteUrl": "https://nomadcoffee.es/en/products/kii1",
-    "legacy": false
+    "legacy": false,
+    "peso": 250
   },
   {
     "nombre": "Timbuyacu Filter",
@@ -402,7 +410,7 @@
     "cuerpo": "Medio",
     "regusto": "Limpio y dulce",
     "preparacion": "Filtro",
-    "intensidad": null,
+    "intensidad": 7,
     "descripcion": null,
     "certificaciones": null,
     "sca": null,
@@ -417,7 +425,8 @@
     "searchText": null,
     "fuente": "web_roaster",
     "fuenteUrl": "https://nomadcoffee.es/en/products/timbuyacu-filtro",
-    "legacy": false
+    "legacy": false,
+    "peso": 250
   },
   {
     "nombre": "Lucero Blend",
@@ -439,12 +448,12 @@
     "sistemaCapsula": null,
     "formato": "250g",
     "precio": null,
-    "notas": null,
+    "notas": ["dulce", "equilibrado"],
     "acidez": "Baja",
     "cuerpo": "Dulce",
     "regusto": "Redondo",
     "preparacion": "Espresso, filtro",
-    "intensidad": null,
+    "intensidad": 7,
     "descripcion": null,
     "certificaciones": null,
     "sca": null,
@@ -459,7 +468,8 @@
     "searchText": null,
     "fuente": "web_roaster",
     "fuenteUrl": "https://hola.coffee/en/products/luceroblend",
-    "legacy": false
+    "legacy": false,
+    "peso": 250
   },
   {
     "nombre": "Colombia Cold Washed",
@@ -486,7 +496,7 @@
     "cuerpo": "Sedoso",
     "regusto": "Largo y floral",
     "preparacion": "Filtro, espresso",
-    "intensidad": null,
+    "intensidad": 7,
     "descripcion": null,
     "certificaciones": null,
     "sca": null,
@@ -501,7 +511,8 @@
     "searchText": null,
     "fuente": "web_roaster",
     "fuenteUrl": "https://hola.coffee/en/products/colombia-cold-washed",
-    "legacy": false
+    "legacy": false,
+    "peso": 250
   },
   {
     "nombre": "Brazil - Fazenda Serra",
@@ -528,7 +539,7 @@
     "cuerpo": "Medio",
     "regusto": "Dulce",
     "preparacion": "Espresso, filtro",
-    "intensidad": null,
+    "intensidad": 7,
     "descripcion": null,
     "certificaciones": null,
     "sca": null,
@@ -543,7 +554,8 @@
     "searchText": null,
     "fuente": "web_roaster",
     "fuenteUrl": "https://hola.coffee/en/products/brasil-seasonal",
-    "legacy": false
+    "legacy": false,
+    "peso": 250
   },
   {
     "nombre": "Costa Rica Brumas del Zurquí",
@@ -570,7 +582,7 @@
     "cuerpo": "Redondo",
     "regusto": "Dulce",
     "preparacion": "Filtro, omni, espresso",
-    "intensidad": null,
+    "intensidad": 7,
     "descripcion": null,
     "certificaciones": null,
     "sca": null,
@@ -585,7 +597,8 @@
     "searchText": null,
     "fuente": "web_roaster",
     "fuenteUrl": "https://cafeselmagnifico.com/producto/costa-rica-brumas-del-zurqui/",
-    "legacy": false
+    "legacy": false,
+    "peso": 250
   },
   {
     "nombre": "Etiopía Raro Nansebo",
@@ -612,7 +625,7 @@
     "cuerpo": "Medio",
     "regusto": "Floral",
     "preparacion": "Filtro, espresso",
-    "intensidad": null,
+    "intensidad": 7,
     "descripcion": null,
     "certificaciones": null,
     "sca": null,
@@ -627,7 +640,8 @@
     "searchText": null,
     "fuente": "web_roaster",
     "fuenteUrl": "https://cafeselmagnifico.com/en/producto/etiopia-raro-nansebo/",
-    "legacy": true
+    "legacy": true,
+    "peso": 250
   },
   {
     "nombre": "Finca El Paraíso Lychee",
@@ -654,7 +668,7 @@
     "cuerpo": "Sedoso",
     "regusto": "Muy aromático",
     "preparacion": "Filtro",
-    "intensidad": null,
+    "intensidad": 7,
     "descripcion": null,
     "certificaciones": null,
     "sca": null,
@@ -669,7 +683,8 @@
     "searchText": null,
     "fuente": "web_roaster",
     "fuenteUrl": "https://nomadcoffee.es/en/products/el-paraiso-lychee",
-    "legacy": true
+    "legacy": true,
+    "peso": 250
   },
   {
     "nombre": "Kenya Thiriku AA",
@@ -696,7 +711,7 @@
     "cuerpo": "Jugoso",
     "regusto": "Largo",
     "preparacion": "Filtro",
-    "intensidad": null,
+    "intensidad": 7,
     "descripcion": null,
     "certificaciones": null,
     "sca": null,
@@ -711,7 +726,8 @@
     "searchText": null,
     "fuente": "web_roaster",
     "fuenteUrl": "https://ineffablecoffee.com/en/products/kenya-thiriku",
-    "legacy": true
+    "legacy": true,
+    "peso": 250
   },
   {
     "nombre": "El Diviso Pink Bourbon",
@@ -738,7 +754,7 @@
     "cuerpo": "Sedoso",
     "regusto": "Floral",
     "preparacion": "Filtro",
-    "intensidad": null,
+    "intensidad": 7,
     "descripcion": null,
     "certificaciones": null,
     "sca": null,
@@ -753,7 +769,8 @@
     "searchText": null,
     "fuente": "web_roaster",
     "fuenteUrl": "https://hola.coffee/en/products/el-diviso",
-    "legacy": true
+    "legacy": true,
+    "peso": 250
   },
   {
     "nombre": "Guatemala Huehuetenango",
@@ -780,7 +797,7 @@
     "cuerpo": "Equilibrado",
     "regusto": "Dulce",
     "preparacion": "Filtro, espresso",
-    "intensidad": null,
+    "intensidad": 7,
     "descripcion": null,
     "certificaciones": null,
     "sca": null,
@@ -795,7 +812,8 @@
     "searchText": null,
     "fuente": "web_roaster",
     "fuenteUrl": "https://cafeselmagnifico.com/producto/guatemala-huehuetenango/",
-    "legacy": true
+    "legacy": true,
+    "peso": 250
   },
   {
     "nombre": "Ethiopia Yirgacheffe",
@@ -822,7 +840,7 @@
     "cuerpo": "Ligero",
     "regusto": "Floral",
     "preparacion": "Filtro",
-    "intensidad": null,
+    "intensidad": 7,
     "descripcion": null,
     "certificaciones": null,
     "sca": null,
@@ -837,7 +855,8 @@
     "searchText": null,
     "fuente": "web_roaster",
     "fuenteUrl": "https://nomadcoffee.es/en/products/yirgacheffe",
-    "legacy": true
+    "legacy": true,
+    "peso": 250
   },
   {
     "nombre": "Peru Cajamarca Organic",
@@ -864,7 +883,7 @@
     "cuerpo": "Redondo",
     "regusto": "Dulce",
     "preparacion": "Filtro",
-    "intensidad": null,
+    "intensidad": 7,
     "descripcion": null,
     "certificaciones": null,
     "sca": null,
@@ -879,7 +898,8 @@
     "searchText": null,
     "fuente": "web_roaster",
     "fuenteUrl": "https://hola.coffee/en/products/peru-organic",
-    "legacy": true
+    "legacy": true,
+    "peso": 250
   },
   {
     "nombre": "Costa Rica Tarrazú",

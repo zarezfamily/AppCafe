@@ -1,0 +1,72 @@
+[
+  {
+    "nombre": "Chambakú",
+    "peso": 250,
+    "intensidad": 7,
+    "officialPhoto": "",
+    "ean": ""
+  },
+  {
+    "nombre": "Lucero Blend",
+    "peso": 250,
+    "intensidad": 7,
+    "notas": ["dulce", "equilibrado"],
+    "ean": ""
+  },
+  {
+    "nombre": "Brazil - Fazenda Serra",
+    "peso": 250,
+    "intensidad": 7,
+    "officialPhoto": "",
+    "ean": ""
+  },
+  {
+    "nombre": "Etiopía Raro Nansebo",
+    "peso": 250,
+    "intensidad": 7,
+    "officialPhoto": "",
+    "ean": ""
+  },
+  {
+    "nombre": "Finca El Paraíso Lychee",
+    "peso": 250,
+    "intensidad": 7,
+    "officialPhoto": "",
+    "ean": ""
+  },
+  {
+    "nombre": "Kenya Thiriku AA",
+    "peso": 250,
+    "intensidad": 7,
+    "officialPhoto": "",
+    "ean": ""
+  },
+  {
+    "nombre": "El Diviso Pink Bourbon",
+    "peso": 250,
+    "intensidad": 7,
+    "officialPhoto": "",
+    "ean": ""
+  },
+  {
+    "nombre": "Guatemala Huehuetenango",
+    "peso": 250,
+    "intensidad": 7,
+    "officialPhoto": "",
+    "ean": ""
+  },
+  {
+    "nombre": "Ethiopia Yirgacheffe",
+    "peso": 250,
+    "intensidad": 7,
+    "officialPhoto": "",
+    "ean": ""
+  },
+  {
+    "nombre": "Peru Cajamarca Organic",
+    "peso": 250,
+    "intensidad": 7,
+    "officialPhoto": "",
+    "ean": ""
+  }
+]

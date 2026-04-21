@@ -411,58 +411,83 @@ export function BioCoffeeSection({ s, cafes, setCafeDetalle, favs, toggleFav, Ca
 }
 
 export function StepUpSection({ s, pairs, setCafeDetalle, favs, toggleFav, CardHorizontal }) {
+  const [activeIndex, setActiveIndex] = useState(() => {
+    if (!pairs?.length) return 0;
+    const favIdx = pairs.findIndex(
+      (p) => favs?.includes(p.daily?.id) || favs?.includes(p.daily?.uid)
+    );
+    return favIdx >= 0 ? favIdx : 0;
+  });
+
   if (!pairs?.length) return null;
+
+  const total = pairs.length;
+  const pair = pairs[activeIndex] || pairs[0];
+
+  const cycleNext = () => setActiveIndex((prev) => (prev + 1) % total);
 
   return (
     <HomeSectionCard>
-      <SectionHeaderNav s={s} title="Da el salto" marginTop={0} hideAction />
-      <Text style={[s.sectionSub, { paddingHorizontal: 0 }]}>
-        Si te gusta un café diario, aquí tienes una opción specialty parecida para subir de nivel
-      </Text>
+      <View style={styles.stepUpHeader}>
+        <View style={{ flex: 1 }}>
+          <SectionHeaderNav s={s} title="Da el salto" marginTop={0} hideAction />
+          <Text style={[s.sectionSub, { paddingHorizontal: 0 }]}>
+            Si te gusta un café diario, aquí tienes una opción specialty parecida para subir de
+            nivel
+          </Text>
+        </View>
 
-      <View style={{ marginTop: 10, gap: 14 }}>
-        {pairs.slice(0, 3).map((pair, index) => (
-          <View
-            key={`${pair.daily?.id || 'daily'}-${pair.specialty?.id || 'specialty'}-${index}`}
-            style={styles.stepUpCard}
-          >
-            <View style={styles.stepUpTop}>
-              <View style={styles.stepUpBadgeDaily}>
-                <Text style={styles.stepUpBadgeDailyText}>Café diario</Text>
-              </View>
-              <Ionicons name="arrow-forward" size={18} color="#8f5e3b" />
-              <View style={styles.stepUpBadgeSpecialty}>
-                <Text style={styles.stepUpBadgeSpecialtyText}>Especialidad</Text>
-              </View>
+        {total > 1 && (
+          <TouchableOpacity onPress={cycleNext} activeOpacity={0.8} style={styles.stepUpCycleBtn}>
+            <Text style={styles.stepUpCycleBtnText}>
+              {activeIndex + 1}/{total}
+            </Text>
+            <Ionicons name="chevron-forward" size={13} color="#8f5e3b" />
+          </TouchableOpacity>
+        )}
+      </View>
+
+      <View style={{ marginTop: 10 }}>
+        <View
+          key={`${pair.daily?.id || 'daily'}-${pair.specialty?.id || 'specialty'}`}
+          style={styles.stepUpCard}
+        >
+          <View style={styles.stepUpTop}>
+            <View style={styles.stepUpBadgeDaily}>
+              <Text style={styles.stepUpBadgeDailyText}>Café diario</Text>
             </View>
-
-            <View style={styles.stepUpColumns}>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.stepUpLabel}>Empiezas con</Text>
-                <CardHorizontal
-                  item={pair.daily}
-                  badge="☕ Diario"
-                  onPress={setCafeDetalle}
-                  favs={favs}
-                  onToggleFav={toggleFav}
-                />
-              </View>
-
-              <View style={{ width: 10 }} />
-
-              <View style={{ flex: 1 }}>
-                <Text style={styles.stepUpLabel}>Prueba después</Text>
-                <CardHorizontal
-                  item={pair.specialty}
-                  badge="⭐ Specialty"
-                  onPress={setCafeDetalle}
-                  favs={favs}
-                  onToggleFav={toggleFav}
-                />
-              </View>
+            <Ionicons name="arrow-forward" size={18} color="#8f5e3b" />
+            <View style={styles.stepUpBadgeSpecialty}>
+              <Text style={styles.stepUpBadgeSpecialtyText}>Especialidad</Text>
             </View>
           </View>
-        ))}
+
+          <View style={styles.stepUpColumns}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.stepUpLabel}>Empiezas con</Text>
+              <CardHorizontal
+                item={pair.daily}
+                badge="☕ Diario"
+                onPress={setCafeDetalle}
+                favs={favs}
+                onToggleFav={toggleFav}
+              />
+            </View>
+
+            <View style={{ width: 10 }} />
+
+            <View style={{ flex: 1 }}>
+              <Text style={styles.stepUpLabel}>Prueba después</Text>
+              <CardHorizontal
+                item={pair.specialty}
+                badge="⭐ Specialty"
+                onPress={setCafeDetalle}
+                favs={favs}
+                onToggleFav={toggleFav}
+              />
+            </View>
+          </View>
+        </View>
       </View>
     </HomeSectionCard>
   );
@@ -852,6 +877,28 @@ const styles = StyleSheet.create({
     color: '#6f5a4b',
   },
 
+  stepUpHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+  },
+  stepUpCycleBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    marginTop: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: '#eadbce',
+    backgroundColor: '#fffaf5',
+  },
+  stepUpCycleBtnText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#8f5e3b',
+  },
   stepUpCard: {
     borderRadius: 18,
     borderWidth: 1,

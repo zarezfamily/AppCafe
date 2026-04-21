@@ -1,3 +1,4 @@
+import * as ImageManipulator from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
@@ -30,6 +31,14 @@ const FILTERS = {
 
 const ADMIN_ENRICH_URL =
   'https://europe-west1-miappdecafe.cloudfunctions.net/adminEnrichCoffeeDraft';
+
+async function resizeForApp(uri) {
+  const manipulated = await ImageManipulator.manipulateAsync(uri, [{ resize: { width: 800 } }], {
+    compress: 0.88,
+    format: ImageManipulator.SaveFormat.JPEG,
+  });
+  return manipulated.uri;
+}
 
 function normalizeText(value) {
   return String(value || '')
@@ -396,11 +405,12 @@ export default function AdminPanelScreen() {
             }
             const result = await ImagePicker.launchCameraAsync({
               allowsEditing: true,
-              quality: 0.85,
+              quality: 1,
             });
             if (result.canceled || !result.assets?.length) return;
             setUploadingOfficialPhoto(true);
-            const uploadedUrl = await uploadImageToStorage(result.assets[0].uri, 'cafes');
+            const resizedUri = await resizeForApp(result.assets[0].uri);
+            const uploadedUrl = await uploadImageToStorage(resizedUri, 'cafes');
             setEditData((prev) => ({
               ...prev,
               officialPhoto: uploadedUrl,
@@ -425,11 +435,12 @@ export default function AdminPanelScreen() {
             const result = await ImagePicker.launchImageLibraryAsync({
               mediaTypes: ['images'],
               allowsEditing: true,
-              quality: 0.85,
+              quality: 1,
             });
             if (result.canceled || !result.assets?.length) return;
             setUploadingOfficialPhoto(true);
-            const uploadedUrl = await uploadImageToStorage(result.assets[0].uri, 'cafes');
+            const resizedUri = await resizeForApp(result.assets[0].uri);
+            const uploadedUrl = await uploadImageToStorage(resizedUri, 'cafes');
             setEditData((prev) => ({
               ...prev,
               officialPhoto: uploadedUrl,

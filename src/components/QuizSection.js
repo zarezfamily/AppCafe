@@ -229,6 +229,7 @@ export default function QuizSection({ allCafes, onGamifyEvent }) {
       {cafeDetalle && (
         <CafeDetailScreen
           cafe={cafeDetalle}
+          allCafes={allCafes}
           onClose={() => setCafeDetalle(null)}
           favs={favs}
           onToggleFav={toggleFav}

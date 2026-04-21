@@ -423,12 +423,7 @@ function parseScaNotesList(value) {
 function getScaValue(data = {}, keys = []) {
   for (const key of keys) {
     const value = data?.[key];
-    if (
-      value !== undefined &&
-      value !== null &&
-      typeof value !== 'object' &&
-      String(value || '').trim() !== ''
-    ) {
+    if (value !== undefined && value !== null && String(value).trim() !== '') {
       return value;
     }
   }
@@ -771,19 +766,7 @@ exports.onCafeWriteRecalculateSca = onDocumentWritten(
     if (!cafeId) return;
 
     const nextSca = buildAutomaticSca(data);
-    const currentSca =
-      data?.sca && typeof data.sca === 'object'
-        ? data.sca
-        : Number.isFinite(Number(data?.sca))
-          ? {
-              score: Number(data.sca),
-              type: 'official',
-              confidence: 1,
-              officialScore: Number(data.sca),
-              reasons: [],
-              signals: {},
-            }
-          : {};
+    const currentSca = data?.sca || {};
 
     if (areScaObjectsEqual(currentSca, nextSca)) {
       return;
@@ -802,64 +785,6 @@ exports.onCafeWriteRecalculateSca = onDocumentWritten(
       scaType: nextSca.type,
       scaConfidence: nextSca.confidence,
     });
-  }
-);
-
-exports.adminBackfillCoffeeSca = onRequest(
-  {
-    region: 'europe-west1',
-    cors: true,
-    timeoutSeconds: 540,
-    memory: '512MiB',
-  },
-  async (req, res) => {
-    if (req.method !== 'POST') {
-      res.status(405).json({ ok: false, error: 'METHOD_NOT_ALLOWED' });
-      return;
-    }
-
-    try {
-      const snapshot = await db.collection('cafes').get();
-
-      let updated = 0;
-      let batch = db.batch();
-      let ops = 0;
-      const batchLimit = 400;
-
-      for (const doc of snapshot.docs) {
-        const data = doc.data() || {};
-        const sca = buildAutomaticSca(data);
-
-        batch.set(
-          doc.ref,
-          {
-            sca,
-          },
-          { merge: true }
-        );
-        ops += 1;
-        updated += 1;
-
-        if (ops >= batchLimit) {
-          await batch.commit();
-          batch = db.batch();
-          ops = 0;
-        }
-      }
-
-      if (ops > 0) {
-        await batch.commit();
-      }
-
-      logger.info('Coffee SCA backfill completed', { updated });
-      res.status(200).json({ ok: true, updated });
-    } catch (error) {
-      logger.error('adminBackfillCoffeeSca error', error);
-      res.status(500).json({
-        ok: false,
-        error: String(error?.message || error),
-      });
-    }
   }
 );
 
@@ -915,8 +840,68 @@ exports.adminBackfillCoffeeScores = onRequest(
   }
 );
 
+exports.adminBackfillCoffeeSca = onRequest(
+  {
+    region: 'europe-west1',
+    cors: true,
+    timeoutSeconds: 540,
+    memory: '512MiB',
+  },
+  async (req, res) => {
+    if (req.method !== 'POST') {
+      res.status(405).json({ ok: false, error: 'METHOD_NOT_ALLOWED' });
+      return;
+    }
+
+    try {
+      const snapshot = await db.collection('cafes').get();
+
+      let updated = 0;
+      let batch = db.batch();
+      let ops = 0;
+      const batchLimit = 400;
+
+      for (const docSnap of snapshot.docs) {
+        const data = docSnap.data() || {};
+        const sca = buildAutomaticSca(data);
+
+        batch.set(
+          docSnap.ref,
+          {
+            sca,
+          },
+          { merge: true }
+        );
+
+        ops += 1;
+        updated += 1;
+
+        if (ops >= batchLimit) {
+          await batch.commit();
+          batch = db.batch();
+          ops = 0;
+        }
+      }
+
+      if (ops > 0) {
+        await batch.commit();
+      }
+
+      logger.info('Coffee SCA backfill completed', { updated });
+      res.status(200).json({ ok: true, updated });
+    } catch (error) {
+      logger.error('adminBackfillCoffeeSca error', error);
+      res.status(500).json({
+        ok: false,
+        error: String(error?.message || error),
+      });
+    }
+  }
+);
+
 async function lookupProductByBarcode(barcode) {
   const apiKey = process.env.BARCODE_LOOKUP_API_KEY;
+
   const normalized = String(barcode || '')
     .replace(/\D/g, '')
     .trim();

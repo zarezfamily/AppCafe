@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Animated,
   Image,
@@ -12,6 +12,7 @@ import {
 
 import AppDialogModal from '../components/AppDialogModal';
 import OnboardingModal from '../components/OnboardingModal';
+import { getUpgradeForScannedCafe } from '../domain/coffee/scanUpgrade';
 import CafeDetailScreen from './CafeDetailScreen';
 import FormScreen from './FormScreen';
 import ProfileScreen from './ProfileScreen';
@@ -79,7 +80,15 @@ function getCafeMatchCopy(cafe) {
   };
 }
 
-function ExistingCafeMatchScreen({ cafe, premiumAccent, onOpenNow, onClose, onRecover }) {
+function ExistingCafeMatchScreen({
+  cafe,
+  premiumAccent,
+  upgrade,
+  onOpenNow,
+  onOpenUpgrade,
+  onClose,
+  onRecover,
+}) {
   const [progress, setProgress] = useState(0);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.96)).current;
@@ -304,6 +313,147 @@ function ExistingCafeMatchScreen({ cafe, premiumAccent, onOpenNow, onClose, onRe
               <Text style={{ color: '#737373', fontSize: 12, marginTop: 10 }}>EAN: {cafe.ean}</Text>
             )}
           </View>
+
+          {!!upgrade?.cafe && (
+            <View
+              style={{
+                width: '100%',
+                borderRadius: 22,
+                backgroundColor: '#13100d',
+                borderWidth: 1,
+                borderColor: 'rgba(200,169,124,0.28)',
+                padding: 18,
+                marginTop: 14,
+              }}
+            >
+              <View
+                style={{
+                  alignSelf: 'flex-start',
+                  paddingHorizontal: 10,
+                  paddingVertical: 6,
+                  borderRadius: 999,
+                  backgroundColor: 'rgba(200,169,124,0.14)',
+                  borderWidth: 1,
+                  borderColor: 'rgba(200,169,124,0.28)',
+                  marginBottom: 12,
+                }}
+              >
+                <Text style={{ color: '#f0d7b4', fontSize: 11, fontWeight: '800' }}>
+                  {upgrade.badge}
+                </Text>
+              </View>
+
+              <Text style={{ color: '#fff', fontSize: 18, fontWeight: '800', marginBottom: 8 }}>
+                {upgrade.title}
+              </Text>
+
+              <Text
+                style={{
+                  color: '#d0c7bc',
+                  fontSize: 14,
+                  lineHeight: 21,
+                  marginBottom: 14,
+                }}
+              >
+                {upgrade.editorial}
+              </Text>
+
+              <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
+                <Image
+                  source={{
+                    uri:
+                      upgrade.cafe.bestPhoto ||
+                      upgrade.cafe.officialPhoto ||
+                      upgrade.cafe.foto ||
+                      undefined,
+                  }}
+                  style={{ width: 68, height: 68, borderRadius: 16, backgroundColor: '#1a1a1a' }}
+                />
+                <View style={{ flex: 1 }}>
+                  <Text
+                    style={{ color: '#fff', fontSize: 16, fontWeight: '800' }}
+                    numberOfLines={2}
+                  >
+                    {upgrade.cafe.nombre}
+                  </Text>
+                  <Text style={{ color: '#bda996', fontSize: 13, marginTop: 4 }} numberOfLines={1}>
+                    {upgrade.cafe.roaster || upgrade.cafe.marca || upgrade.cafe.brand}
+                  </Text>
+                  <Text style={{ color: '#9c9389', fontSize: 12, marginTop: 6 }} numberOfLines={2}>
+                    {upgrade.reason}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 14 }}>
+                {!!upgrade.cafe?.puntuacion && (
+                  <View
+                    style={{
+                      paddingHorizontal: 10,
+                      paddingVertical: 6,
+                      borderRadius: 999,
+                      backgroundColor: 'rgba(255,255,255,0.06)',
+                      borderWidth: 1,
+                      borderColor: 'rgba(255,255,255,0.10)',
+                    }}
+                  >
+                    <Text style={{ color: '#eee7df', fontSize: 12, fontWeight: '800' }}>
+                      {Number(upgrade.cafe.puntuacion).toFixed(1)} ★
+                    </Text>
+                  </View>
+                )}
+
+                {!!upgrade.cafe?.precio && (
+                  <View
+                    style={{
+                      paddingHorizontal: 10,
+                      paddingVertical: 6,
+                      borderRadius: 999,
+                      backgroundColor: 'rgba(255,255,255,0.06)',
+                      borderWidth: 1,
+                      borderColor: 'rgba(255,255,255,0.10)',
+                    }}
+                  >
+                    <Text style={{ color: '#eee7df', fontSize: 12, fontWeight: '800' }}>
+                      {Number(upgrade.cafe.precio).toFixed(2)} €
+                    </Text>
+                  </View>
+                )}
+
+                {typeof upgrade.priceDelta === 'number' && upgrade.priceDelta > 0 ? (
+                  <View
+                    style={{
+                      paddingHorizontal: 10,
+                      paddingVertical: 6,
+                      borderRadius: 999,
+                      backgroundColor: 'rgba(200,169,124,0.14)',
+                      borderWidth: 1,
+                      borderColor: 'rgba(200,169,124,0.28)',
+                    }}
+                  >
+                    <Text style={{ color: '#f0d7b4', fontSize: 12, fontWeight: '800' }}>
+                      +{upgrade.priceDelta.toFixed(2)} €
+                    </Text>
+                  </View>
+                ) : null}
+              </View>
+
+              <TouchableOpacity
+                onPress={onOpenUpgrade}
+                style={{
+                  borderRadius: 16,
+                  backgroundColor: '#fff',
+                  paddingVertical: 14,
+                  alignItems: 'center',
+                  marginTop: 16,
+                }}
+              >
+                <Text style={{ color: '#111', fontWeight: '800', fontSize: 14 }}>
+                  Ver recomendacion
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
 
         <View>
@@ -391,6 +541,10 @@ function ScannerMatchFlow({
   showDialog,
 }) {
   const [matchedCafe, setMatchedCafe] = useState(null);
+  const scanUpgrade = useMemo(
+    () => getUpgradeForScannedCafe(matchedCafe, allCafes),
+    [allCafes, matchedCafe]
+  );
 
   useEffect(() => {
     if (!matchedCafe) return undefined;
@@ -412,9 +566,16 @@ function ScannerMatchFlow({
       <ExistingCafeMatchScreen
         cafe={matchedCafe}
         premiumAccent={premiumAccent}
+        upgrade={scanUpgrade}
         onOpenNow={() => {
           setScanning(false);
           setCafeDetalle?.(matchedCafe);
+          setMatchedCafe(null);
+        }}
+        onOpenUpgrade={() => {
+          if (!scanUpgrade?.cafe) return;
+          setScanning(false);
+          setCafeDetalle?.(scanUpgrade.cafe);
           setMatchedCafe(null);
         }}
         onRecover={() => {
@@ -543,6 +704,7 @@ export function MainScreenOverlayLayer({
   achievementToastOpacity,
   achievementToastTranslateY,
   s,
+  allCafes = [],
   cafeDetalle,
   userId,
   closeCafeDetail,
@@ -613,6 +775,7 @@ export function MainScreenOverlayLayer({
         <CafeDetailScreen
           cafe={cafeDetalle?.cafes ? null : cafeDetalle}
           cafes={cafeDetalle?.cafes || null}
+          allCafes={allCafes}
           cafeIndex={cafeDetalle?.cafeIndex || 0}
           onClose={() => closeCafeDetail(cargarDatos)}
           onDelete={

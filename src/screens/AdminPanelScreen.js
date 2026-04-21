@@ -16,6 +16,7 @@ import {
   View,
 } from 'react-native';
 import { getAuthToken } from '../services/firebaseCore';
+import { buildScaPayload } from '../services/cafeService';
 import { getCollection, updateDocument } from '../services/firestoreService';
 import { uploadImageToStorage } from '../services/storageService';
 
@@ -206,6 +207,16 @@ function FieldRow({ label, value }) {
   );
 }
 
+function ReviewCheckPill({ label, ok }) {
+  return (
+    <View style={[styles.reviewCheckPill, ok && styles.reviewCheckPillOk]}>
+      <Text style={[styles.reviewCheckPillText, ok && styles.reviewCheckPillTextOk]}>
+        {ok ? 'OK' : 'Falta'} · {label}
+      </Text>
+    </View>
+  );
+}
+
 function PendingCafeCard({ item, onApprove, onReject, onEdit, busy }) {
   const allowApprove = canBeApproved(item);
   const incomplete = isCafeIncomplete(item);
@@ -215,14 +226,40 @@ function PendingCafeCard({ item, onApprove, onReject, onEdit, busy }) {
   const foto = getBestPhoto(item);
   const badge = getStatusBadge(item);
   const coffeeCategory = item.coffeeCategory || 'specialty';
+  const missingName = !String(nombre || '').trim() || nombre === 'Sin nombre';
+  const missingBrand = !String(marca || '').trim();
+  const missingEan = !String(item.ean || item.barcode || '').trim();
+  const missingPrice = !item.precio;
+  const cardToneStyle = allowApprove
+    ? styles.cardReady
+    : !foto
+      ? styles.cardUrgent
+      : styles.cardNeedsWork;
+  const priorityLabel = allowApprove ? 'Lista para publicar' : !foto ? 'Urgente' : 'En revision';
+  const priorityStyle = allowApprove
+    ? styles.priorityPillReady
+    : !foto
+      ? styles.priorityPillUrgent
+      : styles.priorityPillReview;
+  const priorityTextStyle = allowApprove
+    ? styles.priorityPillTextReady
+    : !foto
+      ? styles.priorityPillTextUrgent
+      : styles.priorityPillTextReview;
 
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, cardToneStyle]}>
       <View style={styles.cardHeader}>
         <View style={{ flex: 1, paddingRight: 12 }}>
+          <View style={styles.cardPriorityRow}>
+            <View style={[styles.priorityPill, priorityStyle]}>
+              <Text style={[styles.priorityPillText, priorityTextStyle]}>{priorityLabel}</Text>
+            </View>
+          </View>
           <Text style={styles.cardTitle} numberOfLines={2}>
             {nombre}
           </Text>
+          {!!marca && <Text style={styles.cardBrand}>{marca}</Text>}
           <View style={styles.badgeRow}>
             <Badge label={badge.label} kind={badge.kind} />
             <Badge label={getCategoryLabel(coffeeCategory)} kind="dark" />
@@ -245,9 +282,16 @@ function PendingCafeCard({ item, onApprove, onReject, onEdit, busy }) {
         </View>
       </View>
 
+      <View style={styles.reviewChecksRow}>
+        <ReviewCheckPill label="EAN" ok={!missingEan} />
+        <ReviewCheckPill label="Nombre" ok={!missingName} />
+        <ReviewCheckPill label="Marca" ok={!missingBrand} />
+        <ReviewCheckPill label="Foto" ok={!!foto} />
+        <ReviewCheckPill label="Precio" ok={!missingPrice} />
+      </View>
+
       <View style={styles.cardBody}>
         <FieldRow label="EAN" value={item.ean} />
-        <FieldRow label="Marca" value={marca} />
         <FieldRow label="Origen" value={origen} />
         <FieldRow label="Tipo" value={getCategoryLabel(coffeeCategory)} />
         <FieldRow label="BIO" value={item.isBio ? 'Sí' : 'No'} />
@@ -321,6 +365,50 @@ function EditorField({ label, value, onChangeText, placeholder, multiline = fals
   );
 }
 
+function AdminSectionCard({ title, subtitle = '', children, tone = 'default' }) {
+  return (
+    <View
+      style={[
+        styles.adminSectionCard,
+        tone === 'accent' && styles.adminSectionCardAccent,
+        tone === 'success' && styles.adminSectionCardSuccess,
+      ]}
+    >
+      <Text style={styles.adminSectionTitle}>{title}</Text>
+      {!!subtitle && <Text style={styles.adminSectionSubtitle}>{subtitle}</Text>}
+      <View style={styles.adminSectionBody}>{children}</View>
+    </View>
+  );
+}
+
+function EditorStat({ label, value, tone = 'default' }) {
+  return (
+    <View style={[styles.editorStatCard, tone === 'success' && styles.editorStatCardSuccess]}>
+      <Text style={styles.editorStatLabel}>{label}</Text>
+      <Text style={[styles.editorStatValue, tone === 'success' && styles.editorStatValueSuccess]}>
+        {value}
+      </Text>
+    </View>
+  );
+}
+
+function CollapsibleAdminSection({ title, subtitle = '', open, onToggle, children }) {
+  return (
+    <View style={styles.collapsibleWrap}>
+      <TouchableOpacity activeOpacity={0.88} onPress={onToggle} style={styles.collapsibleHeader}>
+        <View style={{ flex: 1, paddingRight: 10 }}>
+          <Text style={styles.collapsibleTitle}>{title}</Text>
+          {!!subtitle && <Text style={styles.collapsibleSubtitle}>{subtitle}</Text>}
+        </View>
+        <View style={styles.collapsibleIconWrap}>
+          <Text style={styles.collapsibleIcon}>{open ? '−' : '+'}</Text>
+        </View>
+      </TouchableOpacity>
+      {open ? <View style={styles.collapsibleBody}>{children}</View> : null}
+    </View>
+  );
+}
+
 export default function AdminPanelScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -334,6 +422,12 @@ export default function AdminPanelScreen() {
   const [uploadingOfficialPhoto, setUploadingOfficialPhoto] = useState(false);
   const [proposal, setProposal] = useState(null);
   const [searchingProposal, setSearchingProposal] = useState(false);
+  const [editorSections, setEditorSections] = useState({
+    photos: true,
+    classification: true,
+    ai: false,
+    details: true,
+  });
 
   const loadCafes = useCallback(async () => {
     try {
@@ -360,6 +454,12 @@ export default function AdminPanelScreen() {
   const openEditor = useCallback((cafe) => {
     setEditingCafe(cafe);
     setProposal(null);
+    setEditorSections({
+      photos: true,
+      classification: true,
+      ai: false,
+      details: true,
+    });
     setEditData({
       ean: cafe.ean || cafe.barcode || '',
       nombre: cafe.nombre || cafe.name || '',
@@ -595,9 +695,14 @@ export default function AdminPanelScreen() {
     try {
       setBusyId(item.id);
       await updateDocument('cafes', item.id, {
+        status: 'approved',
+        completionStatus: 'complete',
+        provisional: false,
         reviewStatus: 'approved',
         appVisible: true,
         scannerVisible: true,
+        approvedAt: new Date().toISOString(),
+        adminReviewedAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       });
       setPendingCafes((prev) => prev.filter((c) => c.id !== item.id));
@@ -613,9 +718,12 @@ export default function AdminPanelScreen() {
     try {
       setBusyId(item.id);
       await updateDocument('cafes', item.id, {
+        status: 'rejected',
+        provisional: false,
         reviewStatus: 'rejected',
         appVisible: false,
         scannerVisible: false,
+        adminReviewedAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       });
       setPendingCafes((prev) => prev.filter((c) => c.id !== item.id));
@@ -625,6 +733,30 @@ export default function AdminPanelScreen() {
     } finally {
       setBusyId(null);
     }
+  }, []);
+
+  const getScaPreviewPayload = useCallback((data) => {
+    if (!data) return null;
+
+    return buildScaPayload({
+      nombre: String(data.nombre || '').trim(),
+      name: String(data.nombre || '').trim(),
+      marca: String(data.marca || '').trim(),
+      roaster: String(data.marca || '').trim(),
+      origen: String(data.origen || '').trim(),
+      origin: String(data.origen || '').trim(),
+      pais: String(data.origen || '').trim(),
+      notas: String(data.notas || '').trim(),
+      notes: String(data.notas || '').trim(),
+      variedad: String(data.variedad || '').trim(),
+      proceso: String(data.proceso || '').trim(),
+      altura: data.altura ? Number(data.altura) : null,
+      tueste: String(data.tueste || '').trim(),
+      formato: String(data.formato || '').trim(),
+      coffeeCategory: data.coffeeCategory || 'specialty',
+      scaScoreOfficial: data.scaScoreOfficial ? Number(data.scaScoreOfficial) : null,
+      isBio: data.isBio === true,
+    });
   }, []);
 
   const buildEditedPayload = useCallback(
@@ -646,16 +778,21 @@ export default function AdminPanelScreen() {
           ? officialPhoto || userPhoto || ''
           : userPhoto || officialPhoto || '';
 
-      return {
+      const draftPayload = {
         ean: String(editData.ean || '')
           .replace(/\D/g, '')
           .trim(),
         nombre: String(editData.nombre || '').trim(),
+        name: String(editData.nombre || '').trim(),
         marca: String(editData.marca || '').trim(),
         roaster: String(editData.marca || '').trim(),
         origen: String(editData.origen || '').trim(),
+        origin: String(editData.origen || '').trim(),
+        pais: String(editData.origen || '').trim(),
         notas: String(editData.notas || '').trim(),
+        notes: String(editData.notas || '').trim(),
         officialPhoto,
+        imageUrl: bestPhoto || userPhoto || '',
         bestPhoto,
         foto: bestPhoto || userPhoto || '',
         photoSources: {
@@ -665,26 +802,41 @@ export default function AdminPanelScreen() {
           selectedBy,
         },
         variedad: String(editData.variedad || '').trim(),
+        variety: String(editData.variedad || '').trim(),
         proceso: String(editData.proceso || '').trim(),
+        process: String(editData.proceso || '').trim(),
         altura: editData.altura ? Number(editData.altura) : null,
+        altitude: editData.altura ? Number(editData.altura) : null,
         tueste: String(editData.tueste || '').trim(),
+        roastLevel: String(editData.tueste || '').trim(),
         preparacion: String(editData.preparacion || '').trim(),
         certificaciones: String(editData.certificaciones || '').trim(),
         precio: parsePrice(editData.precio),
         scaScoreOfficial: editData.scaScoreOfficial ? Number(editData.scaScoreOfficial) : null,
         formato: String(editData.formato || '').trim(),
+        format: String(editData.formato || '').trim(),
         finca: String(editData.finca || '').trim(),
         adminNotes: String(editData.adminNotes || '').trim(),
         coffeeCategory: editData.coffeeCategory || 'specialty',
+        category: editData.coffeeCategory === 'daily' ? 'supermarket' : 'specialty',
         isBio: editData.isBio === true,
         adminReviewedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      return {
+        ...draftPayload,
+        sca: getScaPreviewPayload(editData),
+        completionStatus: canBeApproved(draftPayload) ? 'complete' : 'incomplete',
+        provisional: !approveNow,
+        status: approveNow ? 'approved' : 'pending',
         appVisible: approveNow ? true : (editingCafe.appVisible ?? false),
         scannerVisible: true,
         reviewStatus: approveNow ? 'approved' : 'pending',
-        updatedAt: new Date().toISOString(),
+        approvedAt: approveNow ? new Date().toISOString() : (editingCafe.approvedAt ?? null),
       };
     },
-    [editingCafe, editData]
+    [editingCafe, editData, getScaPreviewPayload]
   );
 
   const handleSaveDraft = useCallback(async () => {
@@ -733,9 +885,12 @@ export default function AdminPanelScreen() {
       setBusyId(editingCafe.id);
 
       await updateDocument('cafes', editingCafe.id, {
+        status: 'rejected',
+        provisional: false,
         reviewStatus: 'rejected',
         appVisible: false,
         scannerVisible: false,
+        adminReviewedAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       });
 
@@ -755,7 +910,8 @@ export default function AdminPanelScreen() {
     const sinPrecio = pendingCafes.filter((c) => !c.precio).length;
     const sinNotas = pendingCafes.filter((c) => !String(c.notas || '').trim()).length;
     const sinEan = pendingCafes.filter((c) => !String(c.ean || c.barcode || '').trim()).length;
-    return { total, sinFoto, sinPrecio, sinNotas, sinEan };
+    const listos = pendingCafes.filter((c) => canBeApproved(c)).length;
+    return { total, sinFoto, sinPrecio, sinNotas, sinEan, listos };
   }, [pendingCafes]);
 
   const filteredCafes = useMemo(() => {
@@ -815,6 +971,33 @@ export default function AdminPanelScreen() {
 
     const ai = editingCafe.aiSuggestion || {};
     const priceInvalid = isPriceInputInvalid(editData.precio);
+    const editorPreviewPayload = {
+      nombre: String(editData.nombre || '').trim(),
+      marca: String(editData.marca || '').trim(),
+      bestPhoto: String(previewBestPhoto || '').trim(),
+      foto: String(previewBestPhoto || '').trim(),
+      imageUrl: String(previewBestPhoto || '').trim(),
+      ean: String(editData.ean || '')
+        .replace(/\D/g, '')
+        .trim(),
+      precio: parsePrice(editData.precio),
+      notas: String(editData.notas || '').trim(),
+    };
+    const editorReady = canBeApproved(editorPreviewPayload);
+    const editorSca = getScaPreviewPayload(editData);
+    const completionItems = [
+      {
+        label: 'EAN',
+        ok: !!String(editData.ean || '')
+          .replace(/\D/g, '')
+          .trim(),
+      },
+      { label: 'Nombre', ok: !!String(editData.nombre || '').trim() },
+      { label: 'Marca', ok: !!String(editData.marca || '').trim() },
+      { label: 'Foto final', ok: !!String(previewBestPhoto || '').trim() },
+      { label: 'Precio', ok: !!parsePrice(editData.precio) },
+      { label: 'Notas', ok: !!String(editData.notas || '').trim() },
+    ];
 
     return (
       <ScrollView style={styles.editorContainer} contentContainerStyle={styles.editorContent}>
@@ -823,362 +1006,467 @@ export default function AdminPanelScreen() {
           Completa la ficha final, elige la portada y publícala desde aquí.
         </Text>
 
-        <View style={styles.previewSection}>
-          <View style={styles.previewBlock}>
-            <Text style={styles.previewTitle}>Foto usuario</Text>
-            {userPhoto ? (
-              <Image source={{ uri: userPhoto }} style={styles.previewImage} />
-            ) : (
-              <View style={[styles.previewImage, styles.previewPlaceholder]}>
-                <Text style={styles.previewPlaceholderText}>Sin foto</Text>
-              </View>
-            )}
-          </View>
-
-          <View style={styles.previewBlock}>
-            <Text style={styles.previewTitle}>Foto oficial</Text>
-            {officialPhoto ? (
-              <Image source={{ uri: officialPhoto }} style={styles.previewImage} />
-            ) : (
-              <View style={[styles.previewImage, styles.previewPlaceholder]}>
-                <Text style={styles.previewPlaceholderText}>Sin oficial</Text>
-              </View>
-            )}
-          </View>
-
-          <View style={styles.previewBlock}>
-            <Text style={styles.previewTitle}>Foto final</Text>
-            {previewBestPhoto ? (
-              <Image source={{ uri: previewBestPhoto }} style={styles.previewImage} />
-            ) : (
-              <View style={[styles.previewImage, styles.previewPlaceholder]}>
-                <Text style={styles.previewPlaceholderText}>Sin final</Text>
-              </View>
-            )}
-          </View>
-        </View>
-
-        <View style={styles.categoryCard}>
-          <Text style={styles.categoryTitle}>Tipo de café</Text>
-
-          <View style={styles.categoryRow}>
-            <TouchableOpacity
-              style={[
-                styles.categoryBtn,
-                editData.coffeeCategory === 'specialty' && styles.categoryBtnActive,
-              ]}
-              onPress={() => setEditData((prev) => ({ ...prev, coffeeCategory: 'specialty' }))}
-            >
-              <Text
-                style={[
-                  styles.categoryBtnText,
-                  editData.coffeeCategory === 'specialty' && styles.categoryBtnTextActive,
-                ]}
-              >
-                Especialidad
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[
-                styles.categoryBtn,
-                editData.coffeeCategory === 'daily' && styles.categoryBtnActive,
-              ]}
-              onPress={() => setEditData((prev) => ({ ...prev, coffeeCategory: 'daily' }))}
-            >
-              <Text
-                style={[
-                  styles.categoryBtnText,
-                  editData.coffeeCategory === 'daily' && styles.categoryBtnTextActive,
-                ]}
-              >
-                Café diario
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <Text style={styles.categoryHelp}>
-            Usa “Especialidad” para roasters o cafés curados y “Café diario” para supermercado o
-            consumo habitual.
-          </Text>
-        </View>
-
-        <View style={styles.categoryCard}>
-          <Text style={styles.categoryTitle}>Certificación BIO</Text>
-
-          <View style={styles.categoryRow}>
-            <TouchableOpacity
-              style={[styles.categoryBtn, editData.isBio === true && styles.categoryBtnActive]}
-              onPress={() => setEditData((prev) => ({ ...prev, isBio: true }))}
-            >
-              <Text
-                style={[
-                  styles.categoryBtnText,
-                  editData.isBio === true && styles.categoryBtnTextActive,
-                ]}
-              >
-                🌿 BIO
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.categoryBtn, editData.isBio === false && styles.categoryBtnActive]}
-              onPress={() => setEditData((prev) => ({ ...prev, isBio: false }))}
-            >
-              <Text
-                style={[
-                  styles.categoryBtnText,
-                  editData.isBio === false && styles.categoryBtnTextActive,
-                ]}
-              >
-                No BIO
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <Text style={styles.categoryHelp}>
-            Marca si el café es ecológico u orgánico certificado.
-          </Text>
-        </View>
-
-        <View style={styles.toggleRow}>
+        <View style={styles.editorTopActions}>
           <TouchableOpacity
-            style={[styles.toggleBtn, editData.bestPhotoMode === 'user' && styles.toggleBtnActive]}
-            onPress={() => setEditData((prev) => ({ ...prev, bestPhotoMode: 'user' }))}
+            style={[
+              styles.editorTopActionPrimary,
+              (busyId === editingCafe.id || priceInvalid) && styles.actionBtnDisabled,
+            ]}
+            onPress={handleSaveDraft}
+            disabled={busyId === editingCafe.id || priceInvalid}
           >
-            <Text
-              style={[
-                styles.toggleBtnText,
-                editData.bestPhotoMode === 'user' && styles.toggleBtnTextActive,
-              ]}
-            >
-              Usar foto usuario
-            </Text>
+            <Text style={styles.editorTopActionPrimaryText}>Guardar</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[
-              styles.toggleBtn,
-              editData.bestPhotoMode === 'official' && styles.toggleBtnActive,
-              !officialPhoto && styles.actionBtnDisabled,
+              styles.editorTopActionApprove,
+              (busyId === editingCafe.id || priceInvalid) && styles.actionBtnDisabled,
             ]}
-            onPress={() =>
-              officialPhoto && setEditData((prev) => ({ ...prev, bestPhotoMode: 'official' }))
-            }
-            disabled={!officialPhoto}
+            onPress={handleSaveAndApprove}
+            disabled={busyId === editingCafe.id || priceInvalid}
           >
-            <Text
+            <Text style={styles.editorTopActionApproveText}>Aprobar</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.editorTopActionGhost,
+              busyId === editingCafe.id && styles.actionBtnDisabled,
+            ]}
+            onPress={handleRejectFromEditor}
+            disabled={busyId === editingCafe.id}
+          >
+            <Text style={styles.editorTopActionGhostText}>Rechazar</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.editorTopActionGhost} onPress={closeEditor}>
+            <Text style={styles.editorTopActionGhostText}>Cerrar</Text>
+          </TouchableOpacity>
+        </View>
+
+        <AdminSectionCard
+          title="Resumen rapido"
+          subtitle="Lectura visual de lo que falta antes de guardar o aprobar."
+          tone={editorReady ? 'success' : 'accent'}
+        >
+          <View style={styles.editorStatsRow}>
+            <EditorStat
+              label="Estado"
+              value={editorReady ? 'Lista para aprobar' : 'Falta revisar'}
+              tone={editorReady ? 'success' : 'default'}
+            />
+            <EditorStat
+              label="Categoria"
+              value={editData.coffeeCategory === 'daily' ? 'Cafe diario' : 'Especialidad'}
+            />
+            <EditorStat
+              label="SCA"
+              value={editorSca ? Number(editorSca.score || 0).toFixed(1) : '-'}
+            />
+          </View>
+          <View style={styles.checkGrid}>
+            {completionItems.map((item) => (
+              <View key={item.label} style={[styles.checkPill, item.ok && styles.checkPillOk]}>
+                <Text style={[styles.checkPillText, item.ok && styles.checkPillTextOk]}>
+                  {item.ok ? 'OK' : 'Pendiente'} · {item.label}
+                </Text>
+              </View>
+            ))}
+          </View>
+        </AdminSectionCard>
+
+        <CollapsibleAdminSection
+          title="Fotos"
+          subtitle="Usuario, oficial y portada final."
+          open={editorSections.photos}
+          onToggle={() => setEditorSections((prev) => ({ ...prev, photos: !prev.photos }))}
+        >
+          <View style={styles.previewSection}>
+            <View style={styles.previewBlock}>
+              <Text style={styles.previewTitle}>Foto usuario</Text>
+              {userPhoto ? (
+                <Image source={{ uri: userPhoto }} style={styles.previewImage} />
+              ) : (
+                <View style={[styles.previewImage, styles.previewPlaceholder]}>
+                  <Text style={styles.previewPlaceholderText}>Sin foto</Text>
+                </View>
+              )}
+            </View>
+
+            <View style={styles.previewBlock}>
+              <Text style={styles.previewTitle}>Foto oficial</Text>
+              {officialPhoto ? (
+                <Image source={{ uri: officialPhoto }} style={styles.previewImage} />
+              ) : (
+                <View style={[styles.previewImage, styles.previewPlaceholder]}>
+                  <Text style={styles.previewPlaceholderText}>Sin oficial</Text>
+                </View>
+              )}
+            </View>
+
+            <View style={styles.previewBlock}>
+              <Text style={styles.previewTitle}>Foto final</Text>
+              {previewBestPhoto ? (
+                <Image source={{ uri: previewBestPhoto }} style={styles.previewImage} />
+              ) : (
+                <View style={[styles.previewImage, styles.previewPlaceholder]}>
+                  <Text style={styles.previewPlaceholderText}>Sin final</Text>
+                </View>
+              )}
+            </View>
+          </View>
+        </CollapsibleAdminSection>
+
+        <CollapsibleAdminSection
+          title="Clasificacion y portada"
+          subtitle="Tipo de cafe, BIO, foto activa y acciones rapidas."
+          open={editorSections.classification}
+          onToggle={() =>
+            setEditorSections((prev) => ({ ...prev, classification: !prev.classification }))
+          }
+        >
+          <View style={styles.categoryCard}>
+            <Text style={styles.categoryTitle}>Tipo de café</Text>
+
+            <View style={styles.categoryRow}>
+              <TouchableOpacity
+                style={[
+                  styles.categoryBtn,
+                  editData.coffeeCategory === 'specialty' && styles.categoryBtnActive,
+                ]}
+                onPress={() => setEditData((prev) => ({ ...prev, coffeeCategory: 'specialty' }))}
+              >
+                <Text
+                  style={[
+                    styles.categoryBtnText,
+                    editData.coffeeCategory === 'specialty' && styles.categoryBtnTextActive,
+                  ]}
+                >
+                  Especialidad
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.categoryBtn,
+                  editData.coffeeCategory === 'daily' && styles.categoryBtnActive,
+                ]}
+                onPress={() => setEditData((prev) => ({ ...prev, coffeeCategory: 'daily' }))}
+              >
+                <Text
+                  style={[
+                    styles.categoryBtnText,
+                    editData.coffeeCategory === 'daily' && styles.categoryBtnTextActive,
+                  ]}
+                >
+                  Café diario
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.categoryHelp}>
+              Usa “Especialidad” para roasters o cafés curados y “Café diario” para supermercado o
+              consumo habitual.
+            </Text>
+          </View>
+
+          <View style={styles.categoryCard}>
+            <Text style={styles.categoryTitle}>Certificación BIO</Text>
+
+            <View style={styles.categoryRow}>
+              <TouchableOpacity
+                style={[styles.categoryBtn, editData.isBio === true && styles.categoryBtnActive]}
+                onPress={() => setEditData((prev) => ({ ...prev, isBio: true }))}
+              >
+                <Text
+                  style={[
+                    styles.categoryBtnText,
+                    editData.isBio === true && styles.categoryBtnTextActive,
+                  ]}
+                >
+                  🌿 BIO
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.categoryBtn, editData.isBio === false && styles.categoryBtnActive]}
+                onPress={() => setEditData((prev) => ({ ...prev, isBio: false }))}
+              >
+                <Text
+                  style={[
+                    styles.categoryBtnText,
+                    editData.isBio === false && styles.categoryBtnTextActive,
+                  ]}
+                >
+                  No BIO
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.categoryHelp}>
+              Marca si el café es ecológico u orgánico certificado.
+            </Text>
+          </View>
+
+          <View style={styles.toggleRow}>
+            <TouchableOpacity
               style={[
-                styles.toggleBtnText,
-                editData.bestPhotoMode === 'official' && styles.toggleBtnTextActive,
+                styles.toggleBtn,
+                editData.bestPhotoMode === 'user' && styles.toggleBtnActive,
               ]}
+              onPress={() => setEditData((prev) => ({ ...prev, bestPhotoMode: 'user' }))}
             >
-              Usar foto oficial
-            </Text>
-          </TouchableOpacity>
-        </View>
+              <Text
+                style={[
+                  styles.toggleBtnText,
+                  editData.bestPhotoMode === 'user' && styles.toggleBtnTextActive,
+                ]}
+              >
+                Usar foto usuario
+              </Text>
+            </TouchableOpacity>
 
-        <View style={styles.secondaryActionRow}>
-          <TouchableOpacity
-            style={[styles.secondaryActionBtn, styles.uploadPhotoBtn]}
-            onPress={handlePickOfficialPhoto}
-            disabled={uploadingOfficialPhoto}
-          >
-            <Text style={styles.secondaryActionBtnText}>
-              {uploadingOfficialPhoto ? 'Subiendo a Storage…' : '📷 Subir foto (cámara / galería)'}
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.secondaryActionBtn,
-              styles.openUrlBtn,
-              !officialPhoto && styles.actionBtnDisabled,
-            ]}
-            onPress={handleOpenOfficialPhoto}
-            disabled={!officialPhoto}
-          >
-            <Text style={styles.secondaryActionBtnText}>Abrir URL oficial</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.secondaryActionRow}>
-          <TouchableOpacity
-            style={[styles.secondaryActionBtn, styles.searchProposalBtn]}
-            onPress={handleSearchProposal}
-            disabled={searchingProposal}
-          >
-            <Text style={styles.secondaryActionBtnText}>
-              {searchingProposal ? 'Buscando…' : 'Buscar datos y foto'}
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.secondaryActionBtn,
-              styles.applyProposalBtn,
-              !proposal && styles.actionBtnDisabled,
-            ]}
-            onPress={handleApplyProposal}
-            disabled={!proposal}
-          >
-            <Text style={styles.secondaryActionBtnText}>Aplicar propuesta</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.suggestionCard}>
-          <View style={styles.suggestionHeader}>
-            <Text style={styles.suggestionTitle}>Sugerencia IA</Text>
-            <TouchableOpacity style={styles.copyAiBtn} onPress={handleCopyAiSuggestion}>
-              <Text style={styles.copyAiBtnText}>Copiar sugerencia IA</Text>
+            <TouchableOpacity
+              style={[
+                styles.toggleBtn,
+                editData.bestPhotoMode === 'official' && styles.toggleBtnActive,
+                !officialPhoto && styles.actionBtnDisabled,
+              ]}
+              onPress={() =>
+                officialPhoto && setEditData((prev) => ({ ...prev, bestPhotoMode: 'official' }))
+              }
+              disabled={!officialPhoto}
+            >
+              <Text
+                style={[
+                  styles.toggleBtnText,
+                  editData.bestPhotoMode === 'official' && styles.toggleBtnTextActive,
+                ]}
+              >
+                Usar foto oficial
+              </Text>
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.blockTitle}>Sugerencia guardada</Text>
-          <Text style={styles.blockText}>Nombre: {ai.nombre || '-'}</Text>
-          <Text style={styles.blockText}>Marca: {ai.marca || '-'}</Text>
-          <Text style={styles.blockText}>Origen: {ai.origen || '-'}</Text>
-          <Text style={styles.blockText}>Resumen: {ai.summary || '-'}</Text>
-          <Text style={styles.blockText}>
-            Tipo sugerido:{' '}
-            {typeof ai.isSpecialty === 'boolean'
-              ? ai.isSpecialty
-                ? 'Especialidad'
-                : 'Café diario'
-              : '-'}
-          </Text>
-          <Text style={styles.blockText}>
-            BIO sugerido: {ai.isBio === true ? 'Sí' : 'No / sin dato'}
-          </Text>
-
-          {proposal ? (
-            <>
-              <Text style={[styles.blockTitle, { marginTop: 14 }]}>Propuesta encontrada</Text>
-              <Text style={styles.blockText}>Nombre: {proposal.suggestedNombre || '-'}</Text>
-              <Text style={styles.blockText}>Marca: {proposal.suggestedMarca || '-'}</Text>
-              <Text style={styles.blockText}>Origen: {proposal.suggestedOrigen || '-'}</Text>
-              <Text style={styles.blockText}>Formato: {proposal.suggestedFormato || '-'}</Text>
-              <Text style={styles.blockText}>Notas: {proposal.suggestedNotas || '-'}</Text>
-              <Text style={styles.blockText}>
-                Confianza: {Math.round((proposal.confidence || 0) * 100)}%
+          <View style={styles.secondaryActionRow}>
+            <TouchableOpacity
+              style={[styles.secondaryActionBtn, styles.uploadPhotoBtn]}
+              onPress={handlePickOfficialPhoto}
+              disabled={uploadingOfficialPhoto}
+            >
+              <Text style={styles.secondaryActionBtnText}>
+                {uploadingOfficialPhoto
+                  ? 'Subiendo a Storage…'
+                  : '📷 Subir foto (cámara / galería)'}
               </Text>
-            </>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.secondaryActionBtn,
+                styles.openUrlBtn,
+                !officialPhoto && styles.actionBtnDisabled,
+              ]}
+              onPress={handleOpenOfficialPhoto}
+              disabled={!officialPhoto}
+            >
+              <Text style={styles.secondaryActionBtnText}>Abrir URL oficial</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.secondaryActionRow}>
+            <TouchableOpacity
+              style={[styles.secondaryActionBtn, styles.searchProposalBtn]}
+              onPress={handleSearchProposal}
+              disabled={searchingProposal}
+            >
+              <Text style={styles.secondaryActionBtnText}>
+                {searchingProposal ? 'Buscando…' : 'Buscar datos y foto'}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.secondaryActionBtn,
+                styles.applyProposalBtn,
+                !proposal && styles.actionBtnDisabled,
+              ]}
+              onPress={handleApplyProposal}
+              disabled={!proposal}
+            >
+              <Text style={styles.secondaryActionBtnText}>Aplicar propuesta</Text>
+            </TouchableOpacity>
+          </View>
+        </CollapsibleAdminSection>
+
+        <CollapsibleAdminSection
+          title="Asistencia IA"
+          subtitle="Sugerencia guardada y propuesta externa."
+          open={editorSections.ai}
+          onToggle={() => setEditorSections((prev) => ({ ...prev, ai: !prev.ai }))}
+        >
+          <View style={styles.suggestionCard}>
+            <View style={styles.suggestionHeader}>
+              <Text style={styles.suggestionTitle}>Sugerencia IA</Text>
+              <TouchableOpacity style={styles.copyAiBtn} onPress={handleCopyAiSuggestion}>
+                <Text style={styles.copyAiBtnText}>Copiar sugerencia IA</Text>
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.blockTitle}>Sugerencia guardada</Text>
+            <Text style={styles.blockText}>Nombre: {ai.nombre || '-'}</Text>
+            <Text style={styles.blockText}>Marca: {ai.marca || '-'}</Text>
+            <Text style={styles.blockText}>Origen: {ai.origen || '-'}</Text>
+            <Text style={styles.blockText}>Resumen: {ai.summary || '-'}</Text>
+            <Text style={styles.blockText}>
+              Tipo sugerido:{' '}
+              {typeof ai.isSpecialty === 'boolean'
+                ? ai.isSpecialty
+                  ? 'Especialidad'
+                  : 'Café diario'
+                : '-'}
+            </Text>
+            <Text style={styles.blockText}>
+              BIO sugerido: {ai.isBio === true ? 'Sí' : 'No / sin dato'}
+            </Text>
+
+            {proposal ? (
+              <>
+                <Text style={[styles.blockTitle, { marginTop: 14 }]}>Propuesta encontrada</Text>
+                <Text style={styles.blockText}>Nombre: {proposal.suggestedNombre || '-'}</Text>
+                <Text style={styles.blockText}>Marca: {proposal.suggestedMarca || '-'}</Text>
+                <Text style={styles.blockText}>Origen: {proposal.suggestedOrigen || '-'}</Text>
+                <Text style={styles.blockText}>Formato: {proposal.suggestedFormato || '-'}</Text>
+                <Text style={styles.blockText}>Notas: {proposal.suggestedNotas || '-'}</Text>
+                <Text style={styles.blockText}>
+                  Confianza: {Math.round((proposal.confidence || 0) * 100)}%
+                </Text>
+              </>
+            ) : null}
+          </View>
+        </CollapsibleAdminSection>
+
+        <CollapsibleAdminSection
+          title="Ficha editable"
+          subtitle="Datos finales que acabaran en la base de datos y en la app."
+          open={editorSections.details}
+          onToggle={() => setEditorSections((prev) => ({ ...prev, details: !prev.details }))}
+        >
+          <EditorField
+            label="EAN / Código de barras"
+            value={editData.ean}
+            onChangeText={(t) => setEditData((prev) => ({ ...prev, ean: t }))}
+            placeholder="Ej. 8480000103529"
+            keyboardType="number-pad"
+          />
+          <EditorField
+            label="Nombre"
+            value={editData.nombre}
+            onChangeText={(t) => setEditData((prev) => ({ ...prev, nombre: t }))}
+            placeholder="Ej. Nomad Kenya Karimikui"
+          />
+          <EditorField
+            label="Marca / Roaster"
+            value={editData.marca}
+            onChangeText={(t) => setEditData((prev) => ({ ...prev, marca: t }))}
+            placeholder="Ej. Nomad Coffee"
+          />
+          <EditorField
+            label="Origen"
+            value={editData.origen}
+            onChangeText={(t) => setEditData((prev) => ({ ...prev, origen: t }))}
+            placeholder="Ej. Kenya / Etiopía / Colombia"
+          />
+          <EditorField
+            label="Notas"
+            value={editData.notas}
+            onChangeText={(t) => setEditData((prev) => ({ ...prev, notas: t }))}
+            placeholder="Notas sensoriales"
+            multiline
+          />
+          <EditorField
+            label="URL foto oficial"
+            value={editData.officialPhoto}
+            onChangeText={(t) => setEditData((prev) => ({ ...prev, officialPhoto: t }))}
+            placeholder="Pega aquí la URL de la foto oficial"
+          />
+          <EditorField
+            label="Variedad"
+            value={editData.variedad}
+            onChangeText={(t) => setEditData((prev) => ({ ...prev, variedad: t }))}
+            placeholder="Ej. Caturra, Bourbon"
+          />
+          <EditorField
+            label="Proceso"
+            value={editData.proceso}
+            onChangeText={(t) => setEditData((prev) => ({ ...prev, proceso: t }))}
+            placeholder="Ej. Lavado, Natural"
+          />
+          <EditorField
+            label="Altura"
+            value={editData.altura}
+            onChangeText={(t) => setEditData((prev) => ({ ...prev, altura: t }))}
+            placeholder="Ej. 1850"
+            keyboardType="numeric"
+          />
+          <EditorField
+            label="Tueste"
+            value={editData.tueste}
+            onChangeText={(t) => setEditData((prev) => ({ ...prev, tueste: t }))}
+            placeholder="Ligero / Medio / Espresso"
+          />
+          <EditorField
+            label="Preparación"
+            value={editData.preparacion}
+            onChangeText={(t) => setEditData((prev) => ({ ...prev, preparacion: t }))}
+            placeholder="V60 / Espresso / Filtro"
+          />
+          <EditorField
+            label="Certificaciones"
+            value={editData.certificaciones}
+            onChangeText={(t) => setEditData((prev) => ({ ...prev, certificaciones: t }))}
+            placeholder="BIO, Organic, Fair Trade, etc."
+          />
+          <EditorField
+            label="Precio (€)"
+            value={editData.precio}
+            onChangeText={(t) => setEditData((prev) => ({ ...prev, precio: t }))}
+            placeholder="Ej. 12.90"
+            keyboardType="decimal-pad"
+          />
+          {priceInvalid ? (
+            <Text style={styles.priceErrorText}>
+              Introduce un precio válido mayor que 0. Ejemplo: 12.90
+            </Text>
           ) : null}
-        </View>
-
-        <EditorField
-          label="EAN / Código de barras"
-          value={editData.ean}
-          onChangeText={(t) => setEditData((prev) => ({ ...prev, ean: t }))}
-          placeholder="Ej. 8480000103529"
-          keyboardType="number-pad"
-        />
-        <EditorField
-          label="Nombre"
-          value={editData.nombre}
-          onChangeText={(t) => setEditData((prev) => ({ ...prev, nombre: t }))}
-          placeholder="Ej. Nomad Kenya Karimikui"
-        />
-        <EditorField
-          label="Marca / Roaster"
-          value={editData.marca}
-          onChangeText={(t) => setEditData((prev) => ({ ...prev, marca: t }))}
-          placeholder="Ej. Nomad Coffee"
-        />
-        <EditorField
-          label="Origen"
-          value={editData.origen}
-          onChangeText={(t) => setEditData((prev) => ({ ...prev, origen: t }))}
-          placeholder="Ej. Kenya / Etiopía / Colombia"
-        />
-        <EditorField
-          label="Notas"
-          value={editData.notas}
-          onChangeText={(t) => setEditData((prev) => ({ ...prev, notas: t }))}
-          placeholder="Notas sensoriales"
-          multiline
-        />
-        <EditorField
-          label="URL foto oficial"
-          value={editData.officialPhoto}
-          onChangeText={(t) => setEditData((prev) => ({ ...prev, officialPhoto: t }))}
-          placeholder="Pega aquí la URL de la foto oficial"
-        />
-        <EditorField
-          label="Variedad"
-          value={editData.variedad}
-          onChangeText={(t) => setEditData((prev) => ({ ...prev, variedad: t }))}
-          placeholder="Ej. Caturra, Bourbon"
-        />
-        <EditorField
-          label="Proceso"
-          value={editData.proceso}
-          onChangeText={(t) => setEditData((prev) => ({ ...prev, proceso: t }))}
-          placeholder="Ej. Lavado, Natural"
-        />
-        <EditorField
-          label="Altura"
-          value={editData.altura}
-          onChangeText={(t) => setEditData((prev) => ({ ...prev, altura: t }))}
-          placeholder="Ej. 1850"
-          keyboardType="numeric"
-        />
-        <EditorField
-          label="Tueste"
-          value={editData.tueste}
-          onChangeText={(t) => setEditData((prev) => ({ ...prev, tueste: t }))}
-          placeholder="Ligero / Medio / Espresso"
-        />
-        <EditorField
-          label="Preparación"
-          value={editData.preparacion}
-          onChangeText={(t) => setEditData((prev) => ({ ...prev, preparacion: t }))}
-          placeholder="V60 / Espresso / Filtro"
-        />
-        <EditorField
-          label="Certificaciones"
-          value={editData.certificaciones}
-          onChangeText={(t) => setEditData((prev) => ({ ...prev, certificaciones: t }))}
-          placeholder="BIO, Organic, Fair Trade, etc."
-        />
-        <EditorField
-          label="Precio (€)"
-          value={editData.precio}
-          onChangeText={(t) => setEditData((prev) => ({ ...prev, precio: t }))}
-          placeholder="Ej. 12.90"
-          keyboardType="decimal-pad"
-        />
-        {priceInvalid ? (
-          <Text style={styles.priceErrorText}>
-            Introduce un precio válido mayor que 0. Ejemplo: 12.90
-          </Text>
-        ) : null}
-        <EditorField
-          label="SCA"
-          value={editData.scaScoreOfficial}
-          onChangeText={(t) => setEditData((prev) => ({ ...prev, scaScoreOfficial: t }))}
-          placeholder="Ej. 86"
-          keyboardType="numeric"
-        />
-        <EditorField
-          label="Formato"
-          value={editData.formato}
-          onChangeText={(t) => setEditData((prev) => ({ ...prev, formato: t }))}
-          placeholder="Ej. 250g"
-        />
-        <EditorField
-          label="Finca"
-          value={editData.finca}
-          onChangeText={(t) => setEditData((prev) => ({ ...prev, finca: t }))}
-          placeholder="Ej. Finca El Paraíso"
-        />
-        <EditorField
-          label="Notas admin"
-          value={editData.adminNotes}
-          onChangeText={(t) => setEditData((prev) => ({ ...prev, adminNotes: t }))}
-          placeholder="Notas internas para revisión"
-          multiline
-        />
+          <EditorField
+            label="SCA"
+            value={editData.scaScoreOfficial}
+            onChangeText={(t) => setEditData((prev) => ({ ...prev, scaScoreOfficial: t }))}
+            placeholder="Ej. 86"
+            keyboardType="numeric"
+          />
+          <EditorField
+            label="Formato"
+            value={editData.formato}
+            onChangeText={(t) => setEditData((prev) => ({ ...prev, formato: t }))}
+            placeholder="Ej. 250g"
+          />
+          <EditorField
+            label="Finca"
+            value={editData.finca}
+            onChangeText={(t) => setEditData((prev) => ({ ...prev, finca: t }))}
+            placeholder="Ej. Finca El Paraíso"
+          />
+          <EditorField
+            label="Notas admin"
+            value={editData.adminNotes}
+            onChangeText={(t) => setEditData((prev) => ({ ...prev, adminNotes: t }))}
+            placeholder="Notas internas para revisión"
+            multiline
+          />
+        </CollapsibleAdminSection>
 
         <View style={styles.editorActionsColumn}>
           <TouchableOpacity
@@ -1278,10 +1566,16 @@ export default function AdminPanelScreen() {
           active={activeFilter === FILTERS.INCOMPLETE}
           onPress={() => setActiveFilter(FILTERS.INCOMPLETE)}
         />
+        <FilterChip
+          label="Listos"
+          active={activeFilter === FILTERS.READY}
+          onPress={() => setActiveFilter(FILTERS.READY)}
+        />
       </ScrollView>
 
       <View style={styles.statsRow}>
         <InfoPill label="Total" value={stats.total} />
+        <InfoPill label="Listos" value={stats.listos} />
         <InfoPill label="Sin foto" value={stats.sinFoto} />
         <InfoPill label="Sin precio" value={stats.sinPrecio} />
         <InfoPill label="Sin notas" value={stats.sinNotas} />
@@ -1337,6 +1631,58 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#111',
   },
+  editorTopActions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginBottom: 16,
+    padding: 12,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    backgroundColor: '#FFF',
+  },
+  editorTopActionPrimary: {
+    flex: 1,
+    minWidth: 110,
+    borderRadius: 12,
+    backgroundColor: '#2563EB',
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  editorTopActionPrimaryText: {
+    color: '#FFF',
+    fontWeight: '800',
+    fontSize: 13,
+  },
+  editorTopActionApprove: {
+    flex: 1,
+    minWidth: 110,
+    borderRadius: 12,
+    backgroundColor: '#166534',
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  editorTopActionApproveText: {
+    color: '#FFF',
+    fontWeight: '800',
+    fontSize: 13,
+  },
+  editorTopActionGhost: {
+    minWidth: 110,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    backgroundColor: '#FFF',
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    alignItems: 'center',
+  },
+  editorTopActionGhostText: {
+    color: '#111827',
+    fontWeight: '700',
+    fontSize: 13,
+  },
 
   filtersRow: { paddingBottom: 8, gap: 8 },
   filterChip: {
@@ -1382,8 +1728,57 @@ const styles = StyleSheet.create({
     padding: 14,
     marginBottom: 12,
   },
+  cardReady: {
+    borderColor: '#BBF7D0',
+    backgroundColor: '#FBFFFC',
+  },
+  cardUrgent: {
+    borderColor: '#FECACA',
+    backgroundColor: '#FFF9F9',
+  },
+  cardNeedsWork: {
+    borderColor: '#E8D8C7',
+    backgroundColor: '#FFFCF8',
+  },
   cardHeader: { flexDirection: 'row', alignItems: 'flex-start' },
+  cardPriorityRow: {
+    marginBottom: 8,
+  },
+  priorityPill: {
+    alignSelf: 'flex-start',
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  priorityPillReady: {
+    backgroundColor: '#E7F7EC',
+  },
+  priorityPillUrgent: {
+    backgroundColor: '#FEE2E2',
+  },
+  priorityPillReview: {
+    backgroundColor: '#FDF1E4',
+  },
+  priorityPillText: {
+    fontSize: 11,
+    fontWeight: '800',
+  },
+  priorityPillTextReady: {
+    color: '#166534',
+  },
+  priorityPillTextUrgent: {
+    color: '#991B1B',
+  },
+  priorityPillTextReview: {
+    color: '#9A3412',
+  },
   cardTitle: { fontSize: 18, fontWeight: '800', color: '#111827', marginBottom: 8 },
+  cardBrand: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#6B4F3A',
+    marginBottom: 8,
+  },
   badgeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
 
   badge: {
@@ -1412,6 +1807,30 @@ const styles = StyleSheet.create({
   thumbnailPlaceholder: { alignItems: 'center', justifyContent: 'center' },
   thumbnailPlaceholderText: { color: '#888', fontWeight: '700', fontSize: 12 },
 
+  reviewChecksRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 12,
+    marginBottom: 10,
+  },
+  reviewCheckPill: {
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    backgroundColor: '#F3F4F6',
+  },
+  reviewCheckPillOk: {
+    backgroundColor: '#E7F7EC',
+  },
+  reviewCheckPillText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#6B7280',
+  },
+  reviewCheckPillTextOk: {
+    color: '#1F6B42',
+  },
   cardBody: { marginTop: 12 },
   cardLine: { fontSize: 14, color: '#374151', marginBottom: 5 },
   cardLineLabel: { fontWeight: '700', color: '#111827' },
@@ -1440,6 +1859,134 @@ const styles = StyleSheet.create({
   previewSection: {
     gap: 12,
     marginBottom: 18,
+  },
+  adminSectionCard: {
+    backgroundColor: '#FFF',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 18,
+    padding: 14,
+    marginBottom: 16,
+  },
+  adminSectionCardAccent: {
+    backgroundColor: '#FFFCF8',
+    borderColor: '#E8D8C7',
+  },
+  adminSectionCardSuccess: {
+    backgroundColor: '#F7FFF9',
+    borderColor: '#BBF7D0',
+  },
+  adminSectionTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#111827',
+  },
+  adminSectionSubtitle: {
+    marginTop: 4,
+    fontSize: 13,
+    lineHeight: 18,
+    color: '#6B7280',
+  },
+  adminSectionBody: {
+    marginTop: 12,
+  },
+  editorStatsRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 12,
+  },
+  editorStatCard: {
+    flex: 1,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    backgroundColor: '#F8FAFC',
+    padding: 12,
+  },
+  editorStatCardSuccess: {
+    backgroundColor: '#ECFDF5',
+    borderColor: '#BBF7D0',
+  },
+  editorStatLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#6B7280',
+    textTransform: 'uppercase',
+  },
+  editorStatValue: {
+    marginTop: 6,
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#111827',
+  },
+  editorStatValueSuccess: {
+    color: '#166534',
+  },
+  checkGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  checkPill: {
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    backgroundColor: '#F3F4F6',
+  },
+  checkPillOk: {
+    backgroundColor: '#E7F7EC',
+  },
+  checkPillText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#6B7280',
+  },
+  checkPillTextOk: {
+    color: '#1F6B42',
+  },
+  collapsibleWrap: {
+    marginBottom: 14,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    backgroundColor: '#FFF',
+    overflow: 'hidden',
+  },
+  collapsibleHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    backgroundColor: '#FCFCFD',
+  },
+  collapsibleTitle: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#111827',
+  },
+  collapsibleSubtitle: {
+    marginTop: 4,
+    fontSize: 12,
+    lineHeight: 17,
+    color: '#6B7280',
+  },
+  collapsibleIconWrap: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F3F4F6',
+  },
+  collapsibleIcon: {
+    fontSize: 18,
+    lineHeight: 20,
+    fontWeight: '800',
+    color: '#374151',
+  },
+  collapsibleBody: {
+    padding: 14,
+    paddingTop: 10,
   },
   previewBlock: {
     backgroundColor: '#FFF',

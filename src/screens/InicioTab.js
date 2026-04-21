@@ -1,12 +1,19 @@
 import { useMemo, useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { View } from 'react-native';
+import HeroCafeCard from '../components/HeroCafeCard';
 import MemberInfoModal from '../components/MemberInfoModal';
+import { HeroCafeSkeleton } from '../components/SkeletonLoader';
+import { getHeroCafe } from '../domain/coffee/heroCoffee';
+import { getLiveRankingBuckets } from '../domain/coffee/liveRankings';
+import { getPersonalizedCoffeeFeed } from '../domain/coffee/personalizedCoffee';
 import {
   BioCoffeeSection,
   BlogSection,
   DailyCoffeeSection,
   InicioTopBar,
+  LiveRankingSection,
   NearbyCafeteriasSection,
+  PersonalizedForYouSection,
   SearchResultsSection,
   SpecialtyForYouSection,
   StepUpSection,
@@ -34,10 +41,10 @@ function hasBioTag(item) {
 
   return (
     text.includes('bio') ||
-    text.includes('ecológico') ||
     text.includes('ecologico') ||
-    text.includes('orgánico') ||
+    text.includes('ecológico') ||
     text.includes('organico') ||
+    text.includes('orgánico') ||
     text.includes('organic')
   );
 }
@@ -94,7 +101,6 @@ export default function InicioTab({
   favs,
   toggleFav,
   setActiveTab,
-
   premiumAccent,
   CardHorizontal,
   trendingCafes,
@@ -134,7 +140,16 @@ export default function InicioTab({
     return buildStepUpPairs(dailyCafes, specialtyCafes);
   }, [dailyCafes, specialtyCafes]);
 
-  const topSpecialty = specialtyCafes?.[0] || null;
+  const heroEntry = useMemo(
+    () => getHeroCafe(allCafes, { userSeedKey: profileAlias || perfil?.uid || '' }),
+    [allCafes, perfil?.uid, profileAlias]
+  );
+  const personalizedFeed = useMemo(
+    () => getPersonalizedCoffeeFeed(allCafes, favs),
+    [allCafes, favs]
+  );
+  const liveRankingBuckets = useMemo(() => getLiveRankingBuckets(allCafes), [allCafes]);
+  const showHeroSkeleton = !busqueda?.trim() && (!Array.isArray(allCafes) || allCafes.length === 0);
 
   return (
     <View>
@@ -178,90 +193,52 @@ export default function InicioTab({
         />
       ) : (
         <>
-          {!!topSpecialty && (
-            <View
-              style={{
-                marginTop: 18,
-                marginHorizontal: 16,
-                borderWidth: 1,
-                borderColor: '#eadbce',
-                backgroundColor: '#fffaf5',
-                borderRadius: 20,
-                padding: 16,
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 11,
-                  fontWeight: '900',
-                  color: '#8f5e3b',
-                  letterSpacing: 1,
-                  marginBottom: 8,
-                }}
-              >
-                RECOMENDACIÓN HOME
-              </Text>
+          {showHeroSkeleton ? <HeroCafeSkeleton /> : null}
 
-              <Text
-                style={{
-                  fontSize: 22,
-                  fontWeight: '900',
-                  color: '#24160f',
-                }}
-              >
-                {topSpecialty.nombre}
-              </Text>
-
-              <Text
-                style={{
-                  marginTop: 6,
-                  fontSize: 14,
-                  lineHeight: 20,
-                  color: '#6f5a4b',
-                }}
-              >
-                {topSpecialty.roaster || topSpecialty.marca || 'ETIOVE'}
-              </Text>
-
-              <View style={{ flexDirection: 'row', gap: 10, marginTop: 14 }}>
-                <TouchableOpacity
-                  onPress={() => setCafeDetalle(topSpecialty)}
-                  activeOpacity={0.9}
-                  style={{
-                    flex: 1,
-                    borderRadius: 14,
-                    backgroundColor: '#111827',
-                    paddingVertical: 12,
-                    alignItems: 'center',
-                  }}
-                >
-                  <Text style={{ color: '#fff', fontSize: 13, fontWeight: '800' }}>Ver ficha</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => setActiveTab(MAIN_TABS.TOP)}
-                  activeOpacity={0.9}
-                  style={{
-                    flex: 1,
-                    borderRadius: 14,
-                    backgroundColor: '#f3e7d9',
-                    borderWidth: 1,
-                    borderColor: '#eadbce',
-                    paddingVertical: 12,
-                    alignItems: 'center',
-                  }}
-                >
-                  <Text style={{ color: '#8f5e3b', fontSize: 13, fontWeight: '800' }}>
-                    Ir a ranking
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
+          {!!heroEntry?.cafe && (
+            <HeroCafeCard
+              item={heroEntry.cafe}
+              variant={heroEntry.variant}
+              premiumAccent={premiumAccent}
+              onOpenCafe={(item) => setCafeDetalle(item)}
+              onOpenRanking={() => setActiveTab(MAIN_TABS.TOP)}
+            />
           )}
+
+          <PersonalizedForYouSection
+            s={s}
+            title={personalizedFeed?.title}
+            subtitle={personalizedFeed?.subtitle}
+            cafes={personalizedFeed?.items || []}
+            setCafeDetalle={setCafeDetalle}
+            favs={favs}
+            toggleFav={toggleFav}
+            CardHorizontal={CardHorizontal}
+          />
+
+          <PersonalizedForYouSection
+            s={s}
+            title={personalizedFeed?.dailyUpgrade?.title}
+            subtitle={personalizedFeed?.dailyUpgrade?.subtitle}
+            cafes={personalizedFeed?.dailyUpgrade?.items || []}
+            setCafeDetalle={setCafeDetalle}
+            favs={favs}
+            toggleFav={toggleFav}
+            CardHorizontal={CardHorizontal}
+          />
+
+          <LiveRankingSection
+            s={s}
+            rankingBuckets={liveRankingBuckets}
+            setCafeDetalle={setCafeDetalle}
+            favs={favs}
+            toggleFav={toggleFav}
+            CardHorizontal={CardHorizontal}
+          />
 
           <SpecialtyForYouSection
             s={s}
-            cafes={specialtyCafes}
+            cafes={specialtyTrendingCafes.length ? specialtyTrendingCafes : specialtyCafes}
             setCafeDetalle={setCafeDetalle}
             favs={favs}
             toggleFav={toggleFav}

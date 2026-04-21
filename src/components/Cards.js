@@ -63,9 +63,19 @@ function CategoryBadge({ item }) {
   );
 }
 
-export function CardHorizontal({ item, badge, onPress, favs = [], onToggleFav }) {
+export function CardHorizontal({
+  item,
+  badge,
+  onPress,
+  favs = [],
+  onToggleFav,
+  metaOverride = '',
+  recommendationText = '',
+  secondaryText = '',
+}) {
   const isFav = favs.includes(item.id);
   const imageUri = getImageUri(item);
+  const metaText = metaOverride || getMetaLabel(item);
 
   return (
     <TouchableOpacity style={styles.cardH} onPress={() => onPress?.(item)} activeOpacity={0.9}>
@@ -103,7 +113,19 @@ export function CardHorizontal({ item, badge, onPress, favs = [], onToggleFav })
         {item.nombre}
       </Text>
 
-      <Text style={styles.cardHMeta}>{getMetaLabel(item)}</Text>
+      <Text style={styles.cardHMeta}>{metaText}</Text>
+
+      {recommendationText ? (
+        <Text style={styles.cardHReason} numberOfLines={2}>
+          {recommendationText}
+        </Text>
+      ) : null}
+
+      {secondaryText ? (
+        <Text style={styles.cardHSecondary} numberOfLines={1}>
+          {secondaryText}
+        </Text>
+      ) : null}
 
       <View style={styles.ratingRow}>
         <Ionicons name="star" size={13} color={PREMIUM_ACCENT} />
@@ -245,6 +267,21 @@ const styles = StyleSheet.create({
     color: '#777',
     marginTop: 2,
     minHeight: 16,
+  },
+  cardHReason: {
+    fontSize: 11,
+    color: '#8f5e3b',
+    marginTop: 4,
+    lineHeight: 15,
+    minHeight: 30,
+    fontWeight: '600',
+  },
+  cardHSecondary: {
+    fontSize: 10,
+    color: '#7a6a5d',
+    marginTop: 4,
+    lineHeight: 14,
+    fontWeight: '700',
   },
 
   ratingRow: {

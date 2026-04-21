@@ -263,6 +263,7 @@ export default function QuizSection({
       {cafeDetalle && (
         <CafeDetailScreen
           cafe={cafeDetalle}
+          allCafes={allCafes}
           onClose={() => setCafeDetalle(null)}
           favs={favs}
           onToggleFav={toggleFav}

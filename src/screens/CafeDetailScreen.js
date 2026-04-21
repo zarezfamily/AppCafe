@@ -17,6 +17,7 @@ import {
 import AppDialogModal from '../components/AppDialogModal';
 import PackshotImage from '../components/PackshotImage';
 import Stars from '../components/Stars';
+import { getComparableCafes } from '../domain/coffee/compareCoffee';
 import { updateDocument } from '../services/firestoreService';
 
 function normalizeCoffeeCategory(cafeToShow) {
@@ -70,6 +71,7 @@ function formatScaCategory(score) {
 export default function CafeDetailScreen({
   cafe,
   cafes = null,
+  allCafes = [],
   cafeIndex = 0,
   onChangeCafe,
   onClose,
@@ -98,6 +100,8 @@ export default function CafeDetailScreen({
   const [puntuacionActual, setPuntuacionActual] = useState(Number(cafeToShow.puntuacion || 0));
   const [dialogVisible, setDialogVisible] = useState(false);
   const [dialogConfig, setDialogConfig] = useState({ title: '', description: '', actions: [] });
+  const [compareVisible, setCompareVisible] = useState(false);
+  const [selectedComparisonId, setSelectedComparisonId] = useState(null);
 
   const fotoCafe =
     cafeToShow.bestPhoto ||
@@ -116,6 +120,23 @@ export default function CafeDetailScreen({
 
   const votedStarsValue = miVoto || (yaVotado ? puntuacionActual : 0);
   const scaInfo = getScaInfo(cafeToShow);
+  const comparisonPool = useMemo(() => {
+    if (Array.isArray(allCafes) && allCafes.length) return allCafes;
+    if (Array.isArray(cafes) && cafes.length) return cafes;
+    return [];
+  }, [allCafes, cafes]);
+
+  const comparableCafes = useMemo(
+    () => getComparableCafes(cafeToShow, comparisonPool, 3),
+    [cafeToShow, comparisonPool]
+  );
+
+  const selectedComparison = useMemo(() => {
+    if (!comparableCafes.length) return null;
+    return (
+      comparableCafes.find((item) => item.id === selectedComparisonId) || comparableCafes[0] || null
+    );
+  }, [comparableCafes, selectedComparisonId]);
 
   const chips = useMemo(() => {
     if (isDaily) {
@@ -214,6 +235,19 @@ export default function CafeDetailScreen({
     }
   };
 
+  const openComparison = () => {
+    if (!comparableCafes.length) {
+      showDialog(
+        'Sin comparables',
+        'Todavia no hay suficientes cafes comparables para esta ficha.'
+      );
+      return;
+    }
+
+    setSelectedComparisonId(comparableCafes[0].id);
+    setCompareVisible(true);
+  };
+
   return (
     <Modal visible animationType="slide" onRequestClose={onClose}>
       <AppDialogModal
@@ -222,6 +256,15 @@ export default function CafeDetailScreen({
         title={dialogConfig.title}
         description={dialogConfig.description}
         actions={dialogConfig.actions}
+      />
+      <CompareCoffeeModal
+        visible={compareVisible}
+        currentCafe={cafeToShow}
+        comparedCafe={selectedComparison}
+        options={comparableCafes}
+        premiumAccent={premiumAccent}
+        onClose={() => setCompareVisible(false)}
+        onSelectCafe={(nextCafe) => setSelectedComparisonId(nextCafe?.id || null)}
       />
 
       <SafeAreaView style={styles.safe}>
@@ -330,6 +373,19 @@ export default function CafeDetailScreen({
                 ))}
               </ScrollView>
             ) : null}
+
+            <TouchableOpacity style={det.compareBtn} onPress={openComparison} activeOpacity={0.9}>
+              <View style={det.compareBtnIcon}>
+                <Ionicons name="git-compare-outline" size={18} color={premiumAccent} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={det.compareBtnTitle}>Comparar con...</Text>
+                <Text style={det.compareBtnSub}>
+                  Precio, SCA, notas y valoracion frente a otra alternativa real.
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color="#8b6d57" />
+            </TouchableOpacity>
 
             <View style={det.voteBox}>
               {yaVotado || miVoto > 0 ? (
@@ -647,6 +703,152 @@ export default function CafeDetailScreen({
   );
 }
 
+function CompareCoffeeModal({
+  visible,
+  currentCafe,
+  comparedCafe,
+  options = [],
+  premiumAccent,
+  onClose,
+  onSelectCafe,
+}) {
+  const currentSca = getScaInfo(currentCafe);
+  const comparedSca = getScaInfo(comparedCafe);
+  const currentNotes = String(currentCafe?.notas || currentCafe?.notes || '').trim();
+  const comparedNotes = String(comparedCafe?.notas || comparedCafe?.notes || '').trim();
+
+  return (
+    <Modal visible={!!visible} transparent animationType="fade" onRequestClose={onClose}>
+      <View style={compare.backdrop}>
+        <TouchableOpacity
+          style={StyleSheet.absoluteFillObject}
+          activeOpacity={1}
+          onPress={onClose}
+        />
+        <View style={compare.sheet}>
+          <View style={compare.header}>
+            <View style={{ flex: 1 }}>
+              <Text style={compare.kicker}>COMPARADOR</Text>
+              <Text style={compare.title}>Comparar cafes</Text>
+            </View>
+            <TouchableOpacity onPress={onClose} style={compare.closeBtn}>
+              <Ionicons name="close" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
+
+          <Text style={compare.subtitle}>
+            Mira de un vistazo que cambia entre este cafe y una alternativa afinada.
+          </Text>
+
+          {options.length ? (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={compare.chipsWrap}
+              contentContainerStyle={{ paddingRight: 8 }}
+            >
+              {options.map((option) => {
+                const active = option.id === comparedCafe?.id;
+                return (
+                  <TouchableOpacity
+                    key={option.id}
+                    onPress={() => onSelectCafe?.(option)}
+                    style={[compare.optionChip, active && compare.optionChipActive]}
+                  >
+                    <Text style={[compare.optionChipText, active && compare.optionChipTextActive]}>
+                      {option.nombre || option.name}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          ) : null}
+
+          {comparedCafe ? (
+            <>
+              <View style={compare.columnsHeader}>
+                <View style={compare.cafeHead}>
+                  <Text style={compare.cafeHeadKicker}>Actual</Text>
+                  <Text style={compare.cafeHeadName} numberOfLines={2}>
+                    {currentCafe?.nombre || currentCafe?.name}
+                  </Text>
+                  <Text style={compare.cafeHeadMeta} numberOfLines={1}>
+                    {currentCafe?.roaster || currentCafe?.marca || currentCafe?.brand || '-'}
+                  </Text>
+                </View>
+                <View style={compare.cafeHead}>
+                  <Text style={[compare.cafeHeadKicker, { color: premiumAccent }]}>Comparado</Text>
+                  <Text style={compare.cafeHeadName} numberOfLines={2}>
+                    {comparedCafe?.nombre || comparedCafe?.name}
+                  </Text>
+                  <Text style={compare.cafeHeadMeta} numberOfLines={1}>
+                    {comparedCafe?.roaster || comparedCafe?.marca || comparedCafe?.brand || '-'}
+                  </Text>
+                </View>
+              </View>
+
+              <CompareRow
+                label="Precio"
+                leftValue={formatComparePrice(currentCafe)}
+                rightValue={formatComparePrice(comparedCafe)}
+              />
+              <CompareRow
+                label="SCA"
+                leftValue={currentSca ? Number(currentSca.score).toFixed(1) : '-'}
+                rightValue={comparedSca ? Number(comparedSca.score).toFixed(1) : '-'}
+              />
+              <CompareRow
+                label="Notas"
+                leftValue={currentNotes || '-'}
+                rightValue={comparedNotes || '-'}
+                multiline
+              />
+              <CompareRow
+                label="Valoracion"
+                leftValue={formatRatingValue(currentCafe)}
+                rightValue={formatRatingValue(comparedCafe)}
+              />
+
+              <View style={compare.reasonBox}>
+                <Ionicons name="sparkles-outline" size={16} color={premiumAccent} />
+                <Text style={compare.reasonText}>
+                  {comparedCafe.comparisonReason || 'Alternativa seleccionada por afinidad real.'}
+                </Text>
+              </View>
+            </>
+          ) : (
+            <View style={compare.emptyBox}>
+              <Text style={compare.emptyText}>No hay otra alternativa lista para comparar.</Text>
+            </View>
+          )}
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+function CompareRow({ label, leftValue, rightValue, multiline = false }) {
+  return (
+    <View style={[compare.row, multiline && compare.rowTall]}>
+      <Text style={compare.rowLabel}>{label}</Text>
+      <Text style={[compare.rowValue, multiline && compare.rowValueMulti]}>{leftValue}</Text>
+      <Text style={[compare.rowValue, multiline && compare.rowValueMulti]}>{rightValue}</Text>
+    </View>
+  );
+}
+
+function formatComparePrice(cafe) {
+  const price = Number(cafe?.precio || 0);
+  return Number.isFinite(price) && price > 0 ? `${price.toFixed(2)} EUR` : '-';
+}
+
+function formatRatingValue(cafe) {
+  const rating = Number(cafe?.puntuacion || 0);
+  const votes = Number(cafe?.votos || 0);
+  if (!Number.isFinite(rating) || rating <= 0) return '-';
+  return `${rating.toFixed(1)} (${votes})`;
+}
+
 function Chip({ det, label, icon, premiumAccent }) {
   return (
     <View style={det.chip}>
@@ -816,6 +1018,37 @@ const det = StyleSheet.create({
   chipsWrap: {
     marginTop: 16,
     marginBottom: 8,
+  },
+  compareBtn: {
+    marginTop: 10,
+    marginBottom: 2,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: '#eadbce',
+    backgroundColor: '#fbf5ee',
+    padding: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  compareBtnIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: '#f2e5d7',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  compareBtnTitle: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#1f140f',
+  },
+  compareBtnSub: {
+    marginTop: 2,
+    fontSize: 12,
+    color: '#7e6959',
+    lineHeight: 18,
   },
   chip: {
     flexDirection: 'row',
@@ -1112,5 +1345,164 @@ const styles = StyleSheet.create({
   },
   bottomSpacer: {
     height: 40,
+  },
+});
+
+const compare = StyleSheet.create({
+  backdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(16, 10, 7, 0.6)',
+    justifyContent: 'center',
+    padding: 18,
+  },
+  sheet: {
+    backgroundColor: '#fffaf5',
+    borderRadius: 24,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: '#eadbce',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  kicker: {
+    fontSize: 11,
+    fontWeight: '900',
+    letterSpacing: 1,
+    color: '#8f5e3b',
+  },
+  title: {
+    marginTop: 4,
+    fontSize: 24,
+    fontWeight: '900',
+    color: '#1a130e',
+  },
+  closeBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: '#2b2019',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  subtitle: {
+    marginTop: 10,
+    fontSize: 13,
+    lineHeight: 20,
+    color: '#6f5a4b',
+  },
+  chipsWrap: {
+    marginTop: 16,
+    marginBottom: 16,
+  },
+  optionChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: '#e4d3c2',
+    backgroundColor: '#fff',
+    marginRight: 8,
+  },
+  optionChipActive: {
+    backgroundColor: '#2b2019',
+    borderColor: '#2b2019',
+  },
+  optionChipText: {
+    fontSize: 12,
+    color: '#6f5a4b',
+    fontWeight: '700',
+  },
+  optionChipTextActive: {
+    color: '#fff3e8',
+  },
+  columnsHeader: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 10,
+  },
+  cafeHead: {
+    flex: 1,
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#eee2d5',
+  },
+  cafeHeadKicker: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#8b7665',
+    textTransform: 'uppercase',
+  },
+  cafeHeadName: {
+    marginTop: 6,
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#1f140f',
+    lineHeight: 20,
+  },
+  cafeHeadMeta: {
+    marginTop: 4,
+    fontSize: 12,
+    color: '#7e6959',
+  },
+  row: {
+    flexDirection: 'row',
+    gap: 12,
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#efe6dd',
+    alignItems: 'center',
+  },
+  rowTall: {
+    alignItems: 'flex-start',
+  },
+  rowLabel: {
+    width: 78,
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#8b7665',
+    textTransform: 'uppercase',
+  },
+  rowValue: {
+    flex: 1,
+    fontSize: 13,
+    color: '#2f241d',
+    fontWeight: '600',
+    lineHeight: 18,
+  },
+  rowValueMulti: {
+    lineHeight: 20,
+  },
+  reasonBox: {
+    marginTop: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#eadbce',
+    backgroundColor: '#f7efe7',
+    padding: 14,
+    flexDirection: 'row',
+    gap: 10,
+  },
+  reasonText: {
+    flex: 1,
+    fontSize: 13,
+    lineHeight: 19,
+    color: '#5f493b',
+    fontWeight: '600',
+  },
+  emptyBox: {
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#eadbce',
+    backgroundColor: '#fff',
+    padding: 16,
+  },
+  emptyText: {
+    fontSize: 13,
+    color: '#7e6959',
   },
 });

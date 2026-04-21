@@ -375,7 +375,14 @@ export default function AdminPanelScreen() {
       preparacion: cafe.preparacion || '',
       certificaciones: cafe.certificaciones || '',
       precio: cafe.precio !== undefined && cafe.precio !== null ? String(cafe.precio) : '',
-      sca: cafe.sca !== undefined && cafe.sca !== null ? String(cafe.sca) : '',
+      scaScoreOfficial:
+        cafe?.sca && typeof cafe.sca === 'object'
+          ? cafe.sca.score !== undefined && cafe.sca.score !== null
+            ? String(cafe.sca.score)
+            : ''
+          : cafe.sca !== undefined && cafe.sca !== null
+            ? String(cafe.sca)
+            : '',
       formato: cafe.formato || '',
       finca: cafe.finca || '',
       adminNotes: cafe.adminNotes || '',
@@ -664,7 +671,7 @@ export default function AdminPanelScreen() {
         preparacion: String(editData.preparacion || '').trim(),
         certificaciones: String(editData.certificaciones || '').trim(),
         precio: parsePrice(editData.precio),
-        sca: editData.sca ? Number(editData.sca) : null,
+        scaScoreOfficial: editData.scaScoreOfficial ? Number(editData.scaScoreOfficial) : null,
         formato: String(editData.formato || '').trim(),
         finca: String(editData.finca || '').trim(),
         adminNotes: String(editData.adminNotes || '').trim(),
@@ -1148,8 +1155,8 @@ export default function AdminPanelScreen() {
         ) : null}
         <EditorField
           label="SCA"
-          value={editData.sca}
-          onChangeText={(t) => setEditData((prev) => ({ ...prev, sca: t }))}
+          value={editData.scaScoreOfficial}
+          onChangeText={(t) => setEditData((prev) => ({ ...prev, scaScoreOfficial: t }))}
           placeholder="Ej. 86"
           keyboardType="numeric"
         />

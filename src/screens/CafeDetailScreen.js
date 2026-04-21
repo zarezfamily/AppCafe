@@ -19,6 +19,54 @@ import PackshotImage from '../components/PackshotImage';
 import Stars from '../components/Stars';
 import { updateDocument } from '../services/firestoreService';
 
+function normalizeCoffeeCategory(cafeToShow) {
+  if (cafeToShow.category === 'supermarket') return 'daily';
+  if (cafeToShow.category === 'bio') return 'specialty';
+  if (cafeToShow.category === 'specialty') return 'specialty';
+
+  const c = cafeToShow.coffeeCategory;
+  return c === 'daily' ? 'daily' : c === 'commercial' ? 'commercial' : 'specialty';
+}
+
+function getScaInfo(cafeToShow) {
+  if (cafeToShow?.sca && typeof cafeToShow.sca === 'object') {
+    const score = Number(cafeToShow.sca.score || 0);
+    if (Number.isFinite(score) && score > 0) {
+      return {
+        score,
+        type: cafeToShow.sca.type || 'estimated',
+        confidence: Number(cafeToShow.sca.confidence || 0),
+        reasons: Array.isArray(cafeToShow.sca.reasons) ? cafeToShow.sca.reasons : [],
+      };
+    }
+  }
+
+  const legacyScore = Number(cafeToShow?.sca || 0);
+  if (Number.isFinite(legacyScore) && legacyScore > 0) {
+    return {
+      score: legacyScore,
+      type: 'official',
+      confidence: 1,
+      reasons: [],
+    };
+  }
+
+  return null;
+}
+
+function formatCategoryBadgeLabel(isDaily, cafeToShow) {
+  if (isDaily) return 'Café diario';
+  if (cafeToShow.category === 'bio') return 'Café bio';
+  return 'Especialidad';
+}
+
+function formatScaCategory(score) {
+  if (score >= 90) return '☕ Excepcional';
+  if (score >= 85) return '⭐ Excelente';
+  if (score >= 80) return '✓ Especialidad';
+  return '◎ Correcto';
+}
+
 export default function CafeDetailScreen({
   cafe,
   cafes = null,
@@ -39,8 +87,7 @@ export default function CafeDetailScreen({
   const cafeToShow = cafes && cafes.length > 0 ? cafes[cafeIndex] : cafe;
   if (!cafeToShow) return null;
 
-  const c = cafeToShow.coffeeCategory;
-  const coffeeCategory = c === 'daily' ? 'daily' : c === 'commercial' ? 'commercial' : 'specialty';
+  const coffeeCategory = normalizeCoffeeCategory(cafeToShow);
   const isDaily = coffeeCategory === 'daily';
   const isFav = favs.includes(cafeToShow.id);
   const yaVotado = votes.includes(cafeToShow.id);
@@ -53,36 +100,70 @@ export default function CafeDetailScreen({
   const [dialogConfig, setDialogConfig] = useState({ title: '', description: '', actions: [] });
 
   const fotoCafe =
-    cafeToShow.bestPhoto || cafeToShow.officialPhoto || cafeToShow.foto || cafeToShow.image || null;
+    cafeToShow.bestPhoto ||
+    cafeToShow.officialPhoto ||
+    cafeToShow.imageUrl ||
+    cafeToShow.foto ||
+    cafeToShow.image ||
+    null;
+
   const precioTexto =
     cafeToShow.precio !== undefined && cafeToShow.precio !== null ? `${cafeToShow.precio} €` : null;
-  const originText = [cafeToShow.pais || cafeToShow.origen, cafeToShow.region]
+
+  const originText = [cafeToShow.pais || cafeToShow.origin || cafeToShow.origen, cafeToShow.region]
     .filter(Boolean)
     .join(', ');
+
   const votedStarsValue = miVoto || (yaVotado ? puntuacionActual : 0);
+  const scaInfo = getScaInfo(cafeToShow);
 
   const chips = useMemo(() => {
     if (isDaily) {
       return [
-        cafeToShow.formato ? { icon: 'bag-outline', label: cafeToShow.formato } : null,
-        cafeToShow.tueste ? { icon: 'flame-outline', label: `Tueste ${cafeToShow.tueste}` } : null,
+        cafeToShow.formato || cafeToShow.format
+          ? { icon: 'bag-outline', label: cafeToShow.formato || cafeToShow.format }
+          : null,
+        cafeToShow.tueste || cafeToShow.roastLevel
+          ? {
+              icon: 'flame-outline',
+              label: `Tueste ${cafeToShow.tueste || cafeToShow.roastLevel}`,
+            }
+          : null,
         cafeToShow.preparacion ? { icon: 'cafe-outline', label: cafeToShow.preparacion } : null,
       ].filter(Boolean);
     }
+
     return [
-      cafeToShow.variedad ? { icon: 'leaf-outline', label: cafeToShow.variedad } : null,
-      cafeToShow.proceso ? { icon: 'water-outline', label: cafeToShow.proceso } : null,
-      cafeToShow.tueste ? { icon: 'flame-outline', label: `Tueste ${cafeToShow.tueste}` } : null,
-      cafeToShow.altura
-        ? { icon: 'trending-up-outline', label: `${cafeToShow.altura} msnm` }
+      cafeToShow.variedad || cafeToShow.variety
+        ? { icon: 'leaf-outline', label: cafeToShow.variedad || cafeToShow.variety }
+        : null,
+      cafeToShow.proceso || cafeToShow.process
+        ? { icon: 'water-outline', label: cafeToShow.proceso || cafeToShow.process }
+        : null,
+      cafeToShow.tueste || cafeToShow.roastLevel
+        ? {
+            icon: 'flame-outline',
+            label: `Tueste ${cafeToShow.tueste || cafeToShow.roastLevel}`,
+          }
+        : null,
+      cafeToShow.altura || cafeToShow.altitude
+        ? {
+            icon: 'trending-up-outline',
+            label: `${cafeToShow.altura || cafeToShow.altitude} msnm`,
+          }
         : null,
     ].filter(Boolean);
   }, [
+    cafeToShow.altitude,
     cafeToShow.altura,
+    cafeToShow.format,
     cafeToShow.formato,
     cafeToShow.preparacion,
+    cafeToShow.process,
     cafeToShow.proceso,
+    cafeToShow.roastLevel,
     cafeToShow.tueste,
+    cafeToShow.variety,
     cafeToShow.variedad,
     isDaily,
   ]);
@@ -106,7 +187,7 @@ export default function CafeDetailScreen({
         (puntuacionActual * votosActuales + estrellas) / nuevosVotos
       );
 
-      await updateDocument('cafes', cafe.id, {
+      await updateDocument('cafes', cafeToShow.id, {
         votos: nuevosVotos,
         puntuacion: nuevaPuntuacion,
       });
@@ -114,11 +195,11 @@ export default function CafeDetailScreen({
       setVotosActuales(nuevosVotos);
       setPuntuacionActual(nuevaPuntuacion);
 
-      const newVotes = [...votes, cafe.id];
+      const newVotes = [...votes, cafeToShow.id];
       setVotes?.(newVotes);
       await SecureStore.setItemAsync(keyVotes, JSON.stringify(newVotes)).catch(() => {});
 
-      onVote?.(cafe);
+      onVote?.(cafeToShow);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
 
       showDialog(
@@ -133,7 +214,6 @@ export default function CafeDetailScreen({
     }
   };
 
-  // Si hay lista de cafés, renderizamos FlatList horizontal paginada
   return (
     <Modal visible animationType="slide" onRequestClose={onClose}>
       <AppDialogModal
@@ -168,7 +248,7 @@ export default function CafeDetailScreen({
                 <Ionicons
                   name={isFav ? 'star' : 'star-outline'}
                   size={22}
-                  color={isFav ? theme.status.favorite : '#fff'}
+                  color={isFav ? theme?.status?.favorite || premiumAccent : '#fff'}
                 />
               </TouchableOpacity>
             ) : null}
@@ -192,7 +272,7 @@ export default function CafeDetailScreen({
                     isDaily ? styles.categoryHeroDailyText : styles.categoryHeroSpecialtyText,
                   ]}
                 >
-                  {isDaily ? 'Café diario' : 'Especialidad'}
+                  {formatCategoryBadgeLabel(isDaily, cafeToShow)}
                 </Text>
               </View>
               <Text style={det.scoreNum}>{Number(puntuacionActual).toFixed(1)}</Text>
@@ -212,7 +292,7 @@ export default function CafeDetailScreen({
               </Text>
             )}
 
-            <Text style={det.nombre}>{cafeToShow.nombre}</Text>
+            <Text style={det.nombre}>{cafeToShow.nombre || cafeToShow.name}</Text>
 
             {!!cafeToShow.finca && !isDaily ? (
               <Text style={det.finca}>{cafeToShow.finca}</Text>
@@ -293,10 +373,10 @@ export default function CafeDetailScreen({
               <>
                 <Text style={det.sectionTitle}>Tu café diario</Text>
 
-                {cafeToShow.notas ? (
+                {cafeToShow.notas || cafeToShow.notes ? (
                   <View style={det.notasBox}>
                     <Text style={det.notasLabel}>Perfil esperado</Text>
-                    <Text style={det.notasText}>{cafeToShow.notas}</Text>
+                    <Text style={det.notasText}>{cafeToShow.notas || cafeToShow.notes}</Text>
                   </View>
                 ) : null}
 
@@ -311,21 +391,21 @@ export default function CafeDetailScreen({
                   det={det}
                   icon="bag-outline"
                   label="Formato"
-                  value={cafeToShow.formato}
+                  value={cafeToShow.formato || cafeToShow.format}
                   premiumAccent={premiumAccent}
                 />
                 <InfoRow
                   det={det}
                   icon="earth-outline"
                   label="Origen"
-                  value={cafeToShow.origen || originText}
+                  value={cafeToShow.origen || cafeToShow.origin || originText}
                   premiumAccent={premiumAccent}
                 />
                 <InfoRow
                   det={det}
                   icon="flame-outline"
                   label="Tueste"
-                  value={cafeToShow.tueste}
+                  value={cafeToShow.tueste || cafeToShow.roastLevel}
                   premiumAccent={premiumAccent}
                 />
                 <InfoRow
@@ -338,21 +418,26 @@ export default function CafeDetailScreen({
               </>
             ) : (
               <>
-                {cafeToShow.sca ? (
+                {scaInfo ? (
                   <>
                     <View style={det.scaBox}>
                       <View style={det.scaTop}>
-                        <View style={det.scaLeft}>
-                          <Text style={det.scaScore}>{cafeToShow.sca}</Text>
-                          <Text style={det.scaLabel}>Puntuación SCA</Text>
+                        <View style={det.scaLeftBlock}>
+                          <View style={det.scaLeft}>
+                            <Text style={det.scaScore}>{Number(scaInfo.score).toFixed(1)}</Text>
+                            <Text style={det.scaLabel}>
+                              {scaInfo.type === 'official' ? 'SCA oficial' : 'SCA estimado'}
+                            </Text>
+                          </View>
+
+                          {scaInfo.type === 'estimated' ? (
+                            <Text style={det.scaConfidence}>
+                              Confianza {Math.round(Number(scaInfo.confidence || 0) * 100)}%
+                            </Text>
+                          ) : null}
                         </View>
-                        <Text style={det.scaCat}>
-                          {cafeToShow.sca >= 90
-                            ? '☕ Excepcional'
-                            : cafeToShow.sca >= 85
-                              ? '⭐ Excelente'
-                              : '✓ Especialidad'}
-                        </Text>
+
+                        <Text style={det.scaCat}>{formatScaCategory(scaInfo.score)}</Text>
                       </View>
 
                       <View style={det.scaBar}>
@@ -360,24 +445,41 @@ export default function CafeDetailScreen({
                           style={[
                             det.scaFill,
                             {
-                              width: `${Math.min(Math.max(((cafeToShow.sca - 80) / 20) * 100, 0), 100)}%`,
+                              width: `${Math.min(
+                                Math.max(((Number(scaInfo.score) - 80) / 20) * 100, 0),
+                                100
+                              )}%`,
                             },
                           ]}
                         />
                       </View>
+
+                      {Array.isArray(scaInfo.reasons) && scaInfo.reasons.length ? (
+                        <View style={det.scaReasonsWrap}>
+                          {scaInfo.reasons.map((reason) => (
+                            <View key={reason} style={det.scaReasonPill}>
+                              <Text style={det.scaReasonText}>{reason}</Text>
+                            </View>
+                          ))}
+                        </View>
+                      ) : null}
                     </View>
                     <View style={det.divider} />
                   </>
                 ) : null}
 
-                {cafe.notas || cafe.acidez || cafe.cuerpo || cafe.regusto ? (
+                {cafeToShow.notas ||
+                cafeToShow.notes ||
+                cafeToShow.acidez ||
+                cafeToShow.cuerpo ||
+                cafeToShow.regusto ? (
                   <>
                     <Text style={det.sectionTitle}>Perfil sensorial</Text>
 
-                    {cafeToShow.notas ? (
+                    {cafeToShow.notas || cafeToShow.notes ? (
                       <View style={det.notasBox}>
                         <Text style={det.notasLabel}>Notas de cata</Text>
-                        <Text style={det.notasText}>{cafeToShow.notas}</Text>
+                        <Text style={det.notasText}>{cafeToShow.notas || cafeToShow.notes}</Text>
                       </View>
                     ) : null}
 
@@ -442,21 +544,25 @@ export default function CafeDetailScreen({
                   det={det}
                   icon="trending-up-outline"
                   label="Altura"
-                  value={cafeToShow.altura ? `${cafeToShow.altura} msnm` : null}
+                  value={
+                    cafeToShow.altura || cafeToShow.altitude
+                      ? `${cafeToShow.altura || cafeToShow.altitude} msnm`
+                      : null
+                  }
                   premiumAccent={premiumAccent}
                 />
                 <InfoRow
                   det={det}
                   icon="leaf-outline"
                   label="Variedad"
-                  value={cafeToShow.variedad}
+                  value={cafeToShow.variedad || cafeToShow.variety}
                   premiumAccent={premiumAccent}
                 />
                 <InfoRow
                   det={det}
                   icon="water-outline"
                   label="Proceso"
-                  value={cafeToShow.proceso}
+                  value={cafeToShow.proceso || cafeToShow.process}
                   premiumAccent={premiumAccent}
                 />
                 <InfoRow
@@ -467,7 +573,7 @@ export default function CafeDetailScreen({
                   premiumAccent={premiumAccent}
                 />
 
-                {cafeToShow.tueste || cafeToShow.fechaTueste ? (
+                {cafeToShow.tueste || cafeToShow.roastLevel || cafeToShow.fechaTueste ? (
                   <>
                     <View style={det.divider} />
                     <Text style={det.sectionTitle}>Tueste</Text>
@@ -476,7 +582,7 @@ export default function CafeDetailScreen({
                       det={det}
                       icon="flame-outline"
                       label="Nivel"
-                      value={cafeToShow.tueste}
+                      value={cafeToShow.tueste || cafeToShow.roastLevel}
                       premiumAccent={premiumAccent}
                     />
                     <InfoRow
@@ -764,6 +870,10 @@ const det = StyleSheet.create({
     alignItems: 'flex-end',
     gap: 12,
   },
+  scaLeftBlock: {
+    flex: 1,
+    gap: 6,
+  },
   scaLeft: {
     flexDirection: 'row',
     alignItems: 'baseline',
@@ -777,6 +887,11 @@ const det = StyleSheet.create({
   scaLabel: {
     fontSize: 13,
     color: '#7d6a5a',
+  },
+  scaConfidence: {
+    fontSize: 12,
+    color: '#8b7665',
+    fontWeight: '700',
   },
   scaBar: {
     height: 9,
@@ -792,6 +907,23 @@ const det = StyleSheet.create({
   scaCat: {
     fontSize: 13,
     color: '#5d4030',
+    fontWeight: '700',
+  },
+  scaReasonsWrap: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 4,
+  },
+  scaReasonPill: {
+    backgroundColor: '#F3ECE4',
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  scaReasonText: {
+    fontSize: 12,
+    color: '#6A5140',
     fontWeight: '700',
   },
 

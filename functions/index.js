@@ -375,6 +375,263 @@ function normalizeAiResult(parsed, cafe, job, barcodeData) {
   };
 }
 
+const SCA_CATEGORY_VALUES = ['specialty', 'supermarket', 'bio'];
+const SCA_FORMAT_VALUES = ['beans', 'ground', 'capsules'];
+const SCA_ROAST_LEVEL_VALUES = ['light', 'medium', 'dark'];
+const SCA_SPECIES_VALUES = ['arabica', 'robusta', 'blend'];
+
+function normalizeScaEnum(value, allowedValues = []) {
+  const normalized = String(value || '')
+    .trim()
+    .toLowerCase();
+  return allowedValues.includes(normalized) ? normalized : '';
+}
+
+function normalizeScaNumber(value) {
+  if (value === null || value === undefined || value === '') return null;
+  const parsed = Number(String(value).replace(',', '.').trim());
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function normalizeScaBoolean(value) {
+  if (value === true || value === false) return value;
+
+  const normalized = String(value || '')
+    .trim()
+    .toLowerCase();
+
+  if (['true', '1', 'yes', 'si', 'sí'].includes(normalized)) return true;
+  if (['false', '0', 'no'].includes(normalized)) return false;
+
+  return null;
+}
+
+function clampSca(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function parseScaNotesList(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return [];
+
+  return raw
+    .split(/[,;|·/]+/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function getScaValue(data = {}, keys = []) {
+  for (const key of keys) {
+    const value = data?.[key];
+    if (
+      value !== undefined &&
+      value !== null &&
+      typeof value !== 'object' &&
+      String(value || '').trim() !== ''
+    ) {
+      return value;
+    }
+  }
+  return '';
+}
+
+function sanitizeCoffeeForSca(data = {}) {
+  const category =
+    normalizeScaEnum(data.category, SCA_CATEGORY_VALUES) ||
+    (() => {
+      const legacy = String(data.coffeeCategory || '')
+        .trim()
+        .toLowerCase();
+      if (legacy === 'daily' || legacy === 'commercial') return 'supermarket';
+      if (legacy === 'specialty') return 'specialty';
+      return '';
+    })();
+
+  return {
+    category,
+    format: normalizeScaEnum(getScaValue(data, ['format', 'formato']), SCA_FORMAT_VALUES),
+    roastLevel: normalizeScaEnum(
+      getScaValue(data, ['roastLevel', 'tueste']),
+      SCA_ROAST_LEVEL_VALUES
+    ),
+    species: normalizeScaEnum(getScaValue(data, ['species', 'especie']), SCA_SPECIES_VALUES),
+    origin: String(getScaValue(data, ['origin', 'origen', 'pais']) || '').trim(),
+    process: String(getScaValue(data, ['process', 'proceso']) || '').trim(),
+    variety: String(getScaValue(data, ['variety', 'variedad']) || '').trim(),
+    notes: String(getScaValue(data, ['notes', 'notas']) || '').trim(),
+    roaster: String(getScaValue(data, ['roaster', 'marca']) || '').trim(),
+    altitude: normalizeScaNumber(getScaValue(data, ['altitude', 'altura'])),
+    scaScoreOfficial: normalizeScaNumber(getScaValue(data, ['scaScoreOfficial'])),
+    decaf: normalizeScaBoolean(getScaValue(data, ['decaf', 'descafeinado'])),
+  };
+}
+
+function buildAutomaticSca(data = {}) {
+  const coffee = sanitizeCoffeeForSca(data);
+
+  const officialScore = coffee.scaScoreOfficial;
+  if (Number.isFinite(officialScore) && officialScore >= 60 && officialScore <= 100) {
+    return {
+      score: Number(clampSca(officialScore, 60, 100).toFixed(1)),
+      type: 'official',
+      confidence: 1,
+      officialScore: Number(clampSca(officialScore, 60, 100).toFixed(1)),
+      reasons: ['SCA oficial indicado manualmente'],
+      signals: {
+        category: coffee.category || '',
+        format: coffee.format || '',
+        roastLevel: coffee.roastLevel || '',
+        origin: !!coffee.origin,
+        process: !!coffee.process,
+        variety: !!coffee.variety,
+        altitude: !!coffee.altitude,
+        notesCount: parseScaNotesList(coffee.notes).length,
+      },
+      lastCalculatedAt: new Date().toISOString(),
+    };
+  }
+
+  let score = 70;
+  let confidence = 0.3;
+  const reasons = [];
+  const notesList = parseScaNotesList(coffee.notes);
+
+  if (coffee.category === 'specialty') {
+    score += 8;
+    confidence += 0.15;
+    reasons.push('Café de especialidad');
+  }
+
+  if (coffee.category === 'bio') {
+    score += 3;
+    confidence += 0.08;
+    reasons.push('Café bio');
+  }
+
+  if (coffee.category === 'supermarket') {
+    score -= 1;
+    reasons.push('Café de supermercado');
+  }
+
+  if (coffee.origin) {
+    score += 2;
+    confidence += 0.08;
+    reasons.push('Origen definido');
+  }
+
+  if (coffee.process) {
+    score += 2;
+    confidence += 0.08;
+    reasons.push('Proceso conocido');
+  }
+
+  if (coffee.variety) {
+    score += 2;
+    confidence += 0.08;
+    reasons.push('Variedad identificada');
+  }
+
+  if (coffee.altitude && coffee.altitude >= 1000) {
+    score += 2;
+    confidence += 0.08;
+    reasons.push('Altitud elevada');
+  } else if (coffee.altitude && coffee.altitude > 0) {
+    score += 1;
+    confidence += 0.04;
+    reasons.push('Altitud disponible');
+  }
+
+  if (notesList.length >= 2) {
+    score += 2;
+    confidence += 0.06;
+    reasons.push('Notas de cata definidas');
+  } else if (notesList.length === 1) {
+    score += 1;
+    confidence += 0.03;
+    reasons.push('Perfil sensorial básico');
+  }
+
+  if (coffee.roaster) {
+    score += 1;
+    confidence += 0.04;
+    reasons.push('Tostador identificado');
+  }
+
+  if (coffee.roastLevel === 'light') {
+    score += 1.5;
+    reasons.push('Tueste claro');
+  } else if (coffee.roastLevel === 'medium') {
+    score += 1;
+    reasons.push('Tueste medio');
+  } else if (coffee.roastLevel === 'dark') {
+    score -= 1;
+    reasons.push('Tueste oscuro');
+  }
+
+  if (coffee.format === 'beans') {
+    score += 1;
+    reasons.push('Formato grano');
+  } else if (coffee.format === 'ground') {
+    score -= 0.5;
+    reasons.push('Formato molido');
+  } else if (coffee.format === 'capsules') {
+    score -= 2;
+    reasons.push('Formato cápsulas');
+  }
+
+  if (coffee.species === 'arabica') {
+    score += 1;
+    reasons.push('Especie arábica');
+  } else if (coffee.species === 'blend') {
+    score += 0.3;
+    reasons.push('Blend');
+  } else if (coffee.species === 'robusta') {
+    score -= 1.5;
+    reasons.push('Presencia de robusta');
+  }
+
+  if (coffee.decaf === true) {
+    score -= 0.5;
+    reasons.push('Descafeinado');
+  }
+
+  score = clampSca(score, 60, 89);
+  confidence = clampSca(confidence, 0.2, 0.95);
+
+  return {
+    score: Number(score.toFixed(1)),
+    type: 'estimated',
+    confidence: Number(confidence.toFixed(2)),
+    officialScore: null,
+    reasons,
+    signals: {
+      category: coffee.category || '',
+      format: coffee.format || '',
+      roastLevel: coffee.roastLevel || '',
+      origin: !!coffee.origin,
+      process: !!coffee.process,
+      variety: !!coffee.variety,
+      altitude: !!coffee.altitude,
+      notesCount: notesList.length,
+      species: coffee.species || '',
+      decaf: coffee.decaf,
+    },
+    lastCalculatedAt: new Date().toISOString(),
+  };
+}
+
+function areScaObjectsEqual(a = {}, b = {}) {
+  return (
+    Number(a?.score || 0) === Number(b?.score || 0) &&
+    String(a?.type || '') === String(b?.type || '') &&
+    Number(a?.confidence || 0) === Number(b?.confidence || 0) &&
+    Number(a?.officialScore || 0) === Number(b?.officialScore || 0) &&
+    JSON.stringify(Array.isArray(a?.reasons) ? a.reasons : []) ===
+      JSON.stringify(Array.isArray(b?.reasons) ? b.reasons : []) &&
+    JSON.stringify(a?.signals || {}) === JSON.stringify(b?.signals || {})
+  );
+}
+
 /* =========================
    RANKING / SCORES BACKEND
    ========================= */
@@ -497,6 +754,112 @@ exports.onCafeWriteRecalculateScores = onDocumentWritten(
       cafeId,
       ...nextScores,
     });
+  }
+);
+
+exports.onCafeWriteRecalculateSca = onDocumentWritten(
+  {
+    document: 'cafes/{cafeId}',
+    region: 'europe-west1',
+  },
+  async (event) => {
+    const after = event.data?.after;
+    if (!after?.exists) return;
+
+    const data = after.data() || {};
+    const cafeId = String(event.params.cafeId || '');
+    if (!cafeId) return;
+
+    const nextSca = buildAutomaticSca(data);
+    const currentSca =
+      data?.sca && typeof data.sca === 'object'
+        ? data.sca
+        : Number.isFinite(Number(data?.sca))
+          ? {
+              score: Number(data.sca),
+              type: 'official',
+              confidence: 1,
+              officialScore: Number(data.sca),
+              reasons: [],
+              signals: {},
+            }
+          : {};
+
+    if (areScaObjectsEqual(currentSca, nextSca)) {
+      return;
+    }
+
+    await db.collection('cafes').doc(cafeId).set(
+      {
+        sca: nextSca,
+      },
+      { merge: true }
+    );
+
+    logger.info('Coffee SCA recalculated', {
+      cafeId,
+      scaScore: nextSca.score,
+      scaType: nextSca.type,
+      scaConfidence: nextSca.confidence,
+    });
+  }
+);
+
+exports.adminBackfillCoffeeSca = onRequest(
+  {
+    region: 'europe-west1',
+    cors: true,
+    timeoutSeconds: 540,
+    memory: '512MiB',
+  },
+  async (req, res) => {
+    if (req.method !== 'POST') {
+      res.status(405).json({ ok: false, error: 'METHOD_NOT_ALLOWED' });
+      return;
+    }
+
+    try {
+      const snapshot = await db.collection('cafes').get();
+
+      let updated = 0;
+      let batch = db.batch();
+      let ops = 0;
+      const batchLimit = 400;
+
+      for (const doc of snapshot.docs) {
+        const data = doc.data() || {};
+        const sca = buildAutomaticSca(data);
+
+        batch.set(
+          doc.ref,
+          {
+            sca,
+          },
+          { merge: true }
+        );
+        ops += 1;
+        updated += 1;
+
+        if (ops >= batchLimit) {
+          await batch.commit();
+          batch = db.batch();
+          ops = 0;
+        }
+      }
+
+      if (ops > 0) {
+        await batch.commit();
+      }
+
+      logger.info('Coffee SCA backfill completed', { updated });
+      res.status(200).json({ ok: true, updated });
+    } catch (error) {
+      logger.error('adminBackfillCoffeeSca error', error);
+      res.status(500).json({
+        ok: false,
+        error: String(error?.message || error),
+      });
+    }
   }
 );
 

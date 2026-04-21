@@ -611,9 +611,16 @@ export function MainScreenOverlayLayer({
 
       {cafeDetalle && (
         <CafeDetailScreen
-          cafe={cafeDetalle}
+          cafe={cafeDetalle?.cafes ? null : cafeDetalle}
+          cafes={cafeDetalle?.cafes || null}
+          cafeIndex={cafeDetalle?.cafeIndex || 0}
           onClose={() => closeCafeDetail(cargarDatos)}
-          onDelete={cafeDetalle.uid === userId ? eliminarCafe : null}
+          onDelete={
+            (cafeDetalle?.cafes ? cafeDetalle.cafes[cafeDetalle.cafeIndex || 0] : cafeDetalle)
+              ?.uid === userId
+              ? eliminarCafe
+              : null
+          }
           favs={favs}
           onToggleFav={toggleFav}
           votes={votes}

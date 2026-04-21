@@ -23,6 +23,8 @@
     "screenshots:ios:auto": "AUTO_CAPTURE=1 ./scripts/capture_screenshots_ios.sh",
     "import:es:coffee:dry": "npm run env:check:import-dry && DRY_RUN=true node --env-file=.env scripts/import_top_es_real.js",
     "import:es:coffee": "npm run env:check:import-write && node --env-file=.env scripts/import_top_es_real.js",
+    "cafes:sca:dry": "DRY_RUN=true node --env-file=.env scripts/backfill_sca_firestore.js",
+    "cafes:sca:backfill": "node --env-file=.env scripts/backfill_sca_firestore.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier . --write",

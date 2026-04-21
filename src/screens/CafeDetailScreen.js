@@ -139,22 +139,10 @@ export default function CafeDetailScreen({
   }, [comparableCafes, selectedComparisonId]);
 
   const chips = useMemo(() => {
-    if (isDaily) {
-      return [
-        cafeToShow.formato || cafeToShow.format
-          ? { icon: 'bag-outline', label: cafeToShow.formato || cafeToShow.format }
-          : null,
-        cafeToShow.tueste || cafeToShow.roastLevel
-          ? {
-              icon: 'flame-outline',
-              label: `Tueste ${cafeToShow.tueste || cafeToShow.roastLevel}`,
-            }
-          : null,
-        cafeToShow.preparacion ? { icon: 'cafe-outline', label: cafeToShow.preparacion } : null,
-      ].filter(Boolean);
-    }
-
     return [
+      cafeToShow.formato || cafeToShow.format
+        ? { icon: 'bag-outline', label: cafeToShow.formato || cafeToShow.format }
+        : null,
       cafeToShow.variedad || cafeToShow.variety
         ? { icon: 'leaf-outline', label: cafeToShow.variedad || cafeToShow.variety }
         : null,
@@ -173,6 +161,7 @@ export default function CafeDetailScreen({
             label: `${cafeToShow.altura || cafeToShow.altitude} msnm`,
           }
         : null,
+      cafeToShow.preparacion ? { icon: 'cafe-outline', label: cafeToShow.preparacion } : null,
     ].filter(Boolean);
   }, [
     cafeToShow.altitude,
@@ -328,18 +317,12 @@ export default function CafeDetailScreen({
 
           <View style={det.body}>
             {!!(cafeToShow.roaster || cafeToShow.marca) && (
-              <Text style={det.roaster}>
-                {isDaily
-                  ? cafeToShow.marca || cafeToShow.roaster
-                  : cafeToShow.roaster || cafeToShow.marca}
-              </Text>
+              <Text style={det.roaster}>{cafeToShow.roaster || cafeToShow.marca}</Text>
             )}
 
             <Text style={det.nombre}>{cafeToShow.nombre || cafeToShow.name}</Text>
 
-            {!!cafeToShow.finca && !isDaily ? (
-              <Text style={det.finca}>{cafeToShow.finca}</Text>
-            ) : null}
+            {cafeToShow.finca ? <Text style={det.finca}>{cafeToShow.finca}</Text> : null}
 
             {originText ? (
               <View style={det.originRow}>
@@ -425,105 +408,100 @@ export default function CafeDetailScreen({
 
             <View style={det.divider} />
 
-            {isDaily ? (
-              <>
-                <Text style={det.sectionTitle}>Tu café diario</Text>
-
-                {cafeToShow.notas || cafeToShow.notes ? (
-                  <View style={det.notasBox}>
-                    <Text style={det.notasLabel}>Perfil esperado</Text>
-                    <Text style={det.notasText}>{cafeToShow.notas || cafeToShow.notes}</Text>
-                  </View>
-                ) : null}
-
-                <InfoRow
-                  det={det}
-                  icon="storefront-outline"
-                  label="Marca"
-                  value={cafeToShow.marca || cafeToShow.roaster}
-                  premiumAccent={premiumAccent}
-                />
-                <InfoRow
-                  det={det}
-                  icon="bag-outline"
-                  label="Formato"
-                  value={cafeToShow.formato || cafeToShow.format}
-                  premiumAccent={premiumAccent}
-                />
-                <InfoRow
-                  det={det}
-                  icon="earth-outline"
-                  label="Origen"
-                  value={cafeToShow.origen || cafeToShow.origin || originText}
-                  premiumAccent={premiumAccent}
-                />
-                <InfoRow
-                  det={det}
-                  icon="flame-outline"
-                  label="Tueste"
-                  value={cafeToShow.tueste || cafeToShow.roastLevel}
-                  premiumAccent={premiumAccent}
-                />
-                <InfoRow
-                  det={det}
-                  icon="cafe-outline"
-                  label="Preparación"
-                  value={cafeToShow.preparacion}
-                  premiumAccent={premiumAccent}
-                />
-              </>
-            ) : (
-              <>
-                {scaInfo ? (
-                  <>
-                    <View style={det.scaBox}>
-                      <View style={det.scaTop}>
-                        <View style={det.scaLeftBlock}>
-                          <View style={det.scaLeft}>
-                            <Text style={det.scaScore}>{Number(scaInfo.score).toFixed(1)}</Text>
-                            <Text style={det.scaLabel}>
-                              {scaInfo.type === 'official' ? 'SCA oficial' : 'SCA estimado'}
-                            </Text>
-                          </View>
-
-                          {scaInfo.type === 'estimated' ? (
-                            <Text style={det.scaConfidence}>
-                              Confianza {Math.round(Number(scaInfo.confidence || 0) * 100)}%
-                            </Text>
-                          ) : null}
-                        </View>
-
-                        <Text style={det.scaCat}>{formatScaCategory(scaInfo.score)}</Text>
+            <>
+              <TouchableOpacity
+                activeOpacity={0.92}
+                delayLongPress={250}
+                onLongPress={() =>
+                  showDialog(
+                    'Escala SCA',
+                    [
+                      'Guía rápida para interpretar la puntuación:',
+                      '',
+                      '0–69 · Malo',
+                      '70–79 · Correcto',
+                      '80–84 · Bueno (especialidad)',
+                      '85–89 · Excelente',
+                      '90–100 · Excepcional',
+                    ].join('\n')
+                  )
+                }
+              >
+                <View style={det.scaBox}>
+                  <View style={det.scaTop}>
+                    <View style={det.scaLeftBlock}>
+                      <View style={det.scaLeft}>
+                        <Text style={det.scaScore}>
+                          {scaInfo ? Number(scaInfo.score).toFixed(1) : '—'}
+                        </Text>
+                        <Text style={det.scaLabel}>
+                          {scaInfo?.type === 'official' ? 'SCA oficial' : 'SCA estimado'}
+                        </Text>
                       </View>
 
-                      <View style={det.scaBar}>
-                        <View
-                          style={[
-                            det.scaFill,
-                            {
-                              width: `${Math.min(
-                                Math.max(((Number(scaInfo.score) - 80) / 20) * 100, 0),
-                                100
-                              )}%`,
-                            },
-                          ]}
-                        />
-                      </View>
-
-                      {Array.isArray(scaInfo.reasons) && scaInfo.reasons.length ? (
-                        <View style={det.scaReasonsWrap}>
-                          {scaInfo.reasons.map((reason) => (
-                            <View key={reason} style={det.scaReasonPill}>
-                              <Text style={det.scaReasonText}>{reason}</Text>
-                            </View>
-                          ))}
-                        </View>
+                      {scaInfo?.type === 'estimated' ? (
+                        <Text style={det.scaConfidence}>
+                          Confianza {Math.round(Number(scaInfo.confidence || 0) * 100)}%
+                        </Text>
                       ) : null}
                     </View>
-                    <View style={det.divider} />
-                  </>
-                ) : null}
 
+                    <Text style={det.scaCat}>
+                      {scaInfo ? formatScaCategory(Number(scaInfo.score) || 0) : ''}
+                    </Text>
+                  </View>
+
+                  <View style={det.scaBar}>
+                    <View
+                      style={[
+                        det.scaFill,
+                        {
+                          width: `${
+                            scaInfo
+                              ? Math.min(
+                                  Math.max(((Number(scaInfo.score) - 80) / 20) * 100, 0),
+                                  100
+                                )
+                              : 0
+                          }%`,
+                        },
+                      ]}
+                    />
+                  </View>
+
+                  {Array.isArray(scaInfo?.reasons) && scaInfo.reasons.length ? (
+                    <View style={det.scaReasonsWrap}>
+                      {scaInfo.reasons.map((reason) => (
+                        <View key={reason} style={det.scaReasonPill}>
+                          <Text style={det.scaReasonText}>{reason}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  ) : null}
+                </View>
+              </TouchableOpacity>
+
+              <View style={det.divider} />
+              <Text style={det.sectionTitle}>Producto</Text>
+
+              <InfoRow
+                det={det}
+                icon="storefront-outline"
+                label="Marca"
+                value={cafeToShow.marca || cafeToShow.roaster}
+                premiumAccent={premiumAccent}
+              />
+              <InfoRow
+                det={det}
+                icon="bag-outline"
+                label="Formato"
+                value={cafeToShow.formato || cafeToShow.format}
+                premiumAccent={premiumAccent}
+              />
+
+              <View style={det.divider} />
+
+              <>
                 {cafeToShow.notas ||
                 cafeToShow.notes ||
                 cafeToShow.acidez ||
@@ -680,7 +658,7 @@ export default function CafeDetailScreen({
                   </Text>
                 </View>
               </>
-            )}
+            </>
 
             {precioTexto ? (
               <>

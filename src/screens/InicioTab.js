@@ -5,7 +5,6 @@ import MemberInfoModal from '../components/MemberInfoModal';
 import { HeroCafeSkeleton } from '../components/SkeletonLoader';
 import { getHeroCafe } from '../domain/coffee/heroCoffee';
 import { getLiveRankingBuckets } from '../domain/coffee/liveRankings';
-import { getPersonalizedCoffeeFeed } from '../domain/coffee/personalizedCoffee';
 import {
   BioCoffeeSection,
   BlogSection,
@@ -13,7 +12,6 @@ import {
   InicioTopBar,
   LiveRankingSection,
   NearbyCafeteriasSection,
-  PersonalizedForYouSection,
   SearchResultsSection,
   SpecialtyForYouSection,
   StepUpSection,
@@ -103,7 +101,6 @@ export default function InicioTab({
   setActiveTab,
   premiumAccent,
   CardHorizontal,
-  trendingCafes,
   cargandoCafInicio,
   errorCafInicio,
   cafeteriasInicio,
@@ -118,7 +115,7 @@ export default function InicioTab({
 
   const specialtyCafes = useMemo(() => {
     return (allCafes || []).filter(
-      (item) => item?.coffeeCategory === 'specialty' && item?.qualityLevel !== 'commercial'
+      (item) => normalizeCategory(item) === 'specialty' && item?.qualityLevel !== 'commercial'
     );
   }, [allCafes]);
 
@@ -130,12 +127,6 @@ export default function InicioTab({
     return (allCafes || []).filter((item) => hasBioTag(item));
   }, [allCafes]);
 
-  const specialtyTrendingCafes = useMemo(() => {
-    return (trendingCafes || []).filter(
-      (item) => item?.coffeeCategory === 'specialty' && item?.qualityLevel !== 'commercial'
-    );
-  }, [trendingCafes]);
-
   const stepUpPairs = useMemo(() => {
     return buildStepUpPairs(dailyCafes, specialtyCafes);
   }, [dailyCafes, specialtyCafes]);
@@ -143,10 +134,6 @@ export default function InicioTab({
   const heroEntry = useMemo(
     () => getHeroCafe(allCafes, { userSeedKey: profileAlias || perfil?.uid || '' }),
     [allCafes, perfil?.uid, profileAlias]
-  );
-  const personalizedFeed = useMemo(
-    () => getPersonalizedCoffeeFeed(allCafes, favs),
-    [allCafes, favs]
   );
   const liveRankingBuckets = useMemo(() => getLiveRankingBuckets(allCafes), [allCafes]);
   const showHeroSkeleton = !busqueda?.trim() && (!Array.isArray(allCafes) || allCafes.length === 0);
@@ -205,28 +192,6 @@ export default function InicioTab({
             />
           )}
 
-          <PersonalizedForYouSection
-            s={s}
-            title={personalizedFeed?.title}
-            subtitle={personalizedFeed?.subtitle}
-            cafes={personalizedFeed?.items || []}
-            setCafeDetalle={setCafeDetalle}
-            favs={favs}
-            toggleFav={toggleFav}
-            CardHorizontal={CardHorizontal}
-          />
-
-          <PersonalizedForYouSection
-            s={s}
-            title={personalizedFeed?.dailyUpgrade?.title}
-            subtitle={personalizedFeed?.dailyUpgrade?.subtitle}
-            cafes={personalizedFeed?.dailyUpgrade?.items || []}
-            setCafeDetalle={setCafeDetalle}
-            favs={favs}
-            toggleFav={toggleFav}
-            CardHorizontal={CardHorizontal}
-          />
-
           <LiveRankingSection
             s={s}
             rankingBuckets={liveRankingBuckets}
@@ -238,7 +203,7 @@ export default function InicioTab({
 
           <SpecialtyForYouSection
             s={s}
-            cafes={specialtyTrendingCafes.length ? specialtyTrendingCafes : specialtyCafes}
+            cafes={specialtyCafes}
             setCafeDetalle={setCafeDetalle}
             favs={favs}
             toggleFav={toggleFav}

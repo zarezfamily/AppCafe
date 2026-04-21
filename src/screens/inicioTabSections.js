@@ -54,61 +54,6 @@ function ActionCard({ title, desc, icon, onPress }) {
   );
 }
 
-function RankingExpander({ items, sortKey, label, setCafeDetalle }) {
-  const [expanded, setExpanded] = useState(false);
-
-  const sorted = [...(items || [])].sort(
-    (a, b) =>
-      Number(b?.[sortKey] || b?.puntuacion || 0) - Number(a?.[sortKey] || a?.puntuacion || 0)
-  );
-
-  return (
-    <View style={{ marginTop: 14 }}>
-      <TouchableOpacity
-        onPress={() => setExpanded((v) => !v)}
-        activeOpacity={0.88}
-        style={styles.rankingToggle}
-      >
-        <Ionicons name={expanded ? 'chevron-up' : 'trophy-outline'} size={14} color="#8f5e3b" />
-        <Text style={styles.rankingToggleText}>
-          {expanded ? 'Ocultar ranking' : `Ver ranking ${label} (${sorted.length})`}
-        </Text>
-        {!expanded && <Ionicons name="chevron-down" size={14} color="#8f5e3b" />}
-      </TouchableOpacity>
-
-      {expanded && (
-        <View style={{ marginTop: 10, gap: 8 }}>
-          {sorted.map((item, index) => (
-            <TouchableOpacity
-              key={item.id}
-              activeOpacity={0.88}
-              onPress={() => {
-                const cafeIndex = sorted.findIndex((c) => c.id === item.id);
-                setCafeDetalle({ cafes: sorted, cafeIndex });
-              }}
-              style={styles.rankingRow}
-            >
-              <View style={styles.rankingPos}>
-                <Text style={styles.rankingPosText}>{index + 1}</Text>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.rankingName} numberOfLines={1}>
-                  {item.nombre}
-                </Text>
-                <Text style={styles.rankingMeta} numberOfLines={1}>
-                  {item.roaster || item.marca || 'ETIOVE'}
-                  {item.origen ? ` · ${item.origen}` : ''}
-                </Text>
-              </View>
-              <Text style={styles.rankingScore}>{Number(item.puntuacion || 0).toFixed(1)} ⭐</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      )}
-    </View>
-  );
-}
-
 function HomeSectionCard({ children }) {
   return <View style={styles.homeSectionCard}>{children}</View>;
 }
@@ -293,10 +238,15 @@ export function SpecialtyForYouSection({
 }) {
   if (!cafes?.length) return null;
 
-  const items = cafes.slice(0, 8);
+  const sorted = [...cafes].sort(
+    (a, b) =>
+      Number(b?.rankingScore || b?.puntuacion || 0) - Number(a?.rankingScore || a?.puntuacion || 0)
+  );
+  const top = sorted.slice(0, 25);
+  const items = top;
   const handlePress = (item) => {
-    const index = items.findIndex((c) => c.id === item.id);
-    setCafeDetalle({ cafes: items, cafeIndex: index });
+    const index = top.findIndex((c) => c.id === item.id);
+    setCafeDetalle({ cafes: top, cafeIndex: index });
   };
   return (
     <HomeSectionCard>
@@ -309,22 +259,16 @@ export function SpecialtyForYouSection({
         s={s}
         loading={false}
         items={items}
-        renderItem={(item) => (
+        renderItem={(item, index) => (
           <CardHorizontal
             key={item.id}
             item={item}
-            badge={`${Number(item.puntuacion || 0).toFixed(1)} ⭐`}
+            badge={`#${index + 1} Especialidad`}
             onPress={() => handlePress(item)}
             favs={favs}
             onToggleFav={toggleFav}
           />
         )}
-      />
-      <RankingExpander
-        items={cafes}
-        sortKey="rankingScore"
-        label="specialty"
-        setCafeDetalle={setCafeDetalle}
       />
     </HomeSectionCard>
   );
@@ -513,10 +457,12 @@ export function LiveRankingSection({
 export function DailyCoffeeSection({ s, cafes, setCafeDetalle, favs, toggleFav, CardHorizontal }) {
   if (!cafes?.length) return null;
 
-  const items = cafes.slice(0, 8);
+  const sorted = [...cafes].sort((a, b) => Number(b?.puntuacion || 0) - Number(a?.puntuacion || 0));
+  const top = sorted.slice(0, 25);
+  const items = top;
   const handlePress = (item) => {
-    const index = items.findIndex((c) => c.id === item.id);
-    setCafeDetalle({ cafes: items, cafeIndex: index });
+    const index = top.findIndex((c) => c.id === item.id);
+    setCafeDetalle({ cafes: top, cafeIndex: index });
   };
   return (
     <HomeSectionCard>
@@ -528,22 +474,16 @@ export function DailyCoffeeSection({ s, cafes, setCafeDetalle, favs, toggleFav, 
         s={s}
         loading={false}
         items={items}
-        renderItem={(item) => (
+        renderItem={(item, index) => (
           <CardHorizontal
             key={item.id}
             item={item}
-            badge="☕ Diario"
+            badge={`#${index + 1} Diario`}
             onPress={() => handlePress(item)}
             favs={favs}
             onToggleFav={toggleFav}
           />
         )}
-      />
-      <RankingExpander
-        items={cafes}
-        sortKey="puntuacion"
-        label="diarios"
-        setCafeDetalle={setCafeDetalle}
       />
     </HomeSectionCard>
   );
@@ -552,10 +492,12 @@ export function DailyCoffeeSection({ s, cafes, setCafeDetalle, favs, toggleFav, 
 export function BioCoffeeSection({ s, cafes, setCafeDetalle, favs, toggleFav, CardHorizontal }) {
   if (!cafes?.length) return null;
 
-  const items = cafes.slice(0, 8);
+  const sorted = [...cafes].sort((a, b) => Number(b?.puntuacion || 0) - Number(a?.puntuacion || 0));
+  const top = sorted.slice(0, 25);
+  const items = top;
   const handlePress = (item) => {
-    const index = items.findIndex((c) => c.id === item.id);
-    setCafeDetalle({ cafes: items, cafeIndex: index });
+    const index = top.findIndex((c) => c.id === item.id);
+    setCafeDetalle({ cafes: top, cafeIndex: index });
   };
 
   return (
@@ -569,22 +511,16 @@ export function BioCoffeeSection({ s, cafes, setCafeDetalle, favs, toggleFav, Ca
         s={s}
         loading={false}
         items={items}
-        renderItem={(item) => (
+        renderItem={(item, index) => (
           <CardHorizontal
             key={item.id}
             item={item}
-            badge="🌿 BIO"
+            badge={`#${index + 1} BIO`}
             onPress={() => handlePress(item)}
             favs={favs}
             onToggleFav={toggleFav}
           />
         )}
-      />
-      <RankingExpander
-        items={cafes}
-        sortKey="puntuacion"
-        label="BIO"
-        setCafeDetalle={setCafeDetalle}
       />
     </HomeSectionCard>
   );

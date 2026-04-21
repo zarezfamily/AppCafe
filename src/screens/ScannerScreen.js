@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { CameraView } from 'expo-camera';
 import { useCallback, useRef, useState } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   ActivityIndicator,
   Image,
@@ -52,6 +53,7 @@ export default function ScannerScreen({
 }) {
   const cameraRef = useRef(null);
   const barcodeLockRef = useRef(false);
+  const insets = useSafeAreaInsets();
 
   const [mode, setMode] = useState('photo');
   const [barcodeActive, setBarcodeActive] = useState(true);
@@ -140,7 +142,7 @@ export default function ScannerScreen({
 
       <View style={styles.overlay}>
         {/* Top bar */}
-        <View style={styles.topBar}>
+        <View style={[styles.topBar, { paddingTop: insets.top + 10 }]}>
           <TouchableOpacity style={styles.iconBtn} onPress={onBack}>
             <Ionicons name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
@@ -247,7 +249,7 @@ export default function ScannerScreen({
 
         {/* Bottom bar */}
         {state === 'idle' && (
-          <View style={styles.bottomBar}>
+          <View style={[styles.bottomBar, { paddingBottom: Math.max(insets.bottom, 12) + 24 }]}>
             <Text style={styles.hint}>
               {isPhotoMode
                 ? 'Encuadra la parte frontal de la bolsa'

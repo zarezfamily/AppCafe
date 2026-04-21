@@ -9,15 +9,8 @@ function parseDateValue(value) {
   return Number.isNaN(time) ? 0 : time;
 }
 
-function getCreatedAt(item) {
-  return (
-    item?.createdAt ||
-    item?.fecha ||
-    item?.approvedAt ||
-    item?.updatedAt ||
-    item?.adminReviewedAt ||
-    ''
-  );
+function getPublishedAt(item) {
+  return item?.createdAt || item?.fecha || item?.approvedAt || '';
 }
 
 function isApprovedCafe(item) {
@@ -46,7 +39,7 @@ function getStableTrendingScore(item) {
 }
 
 function getFreshnessBoost(item, nowTs) {
-  const createdAt = parseDateValue(getCreatedAt(item));
+  const createdAt = parseDateValue(getPublishedAt(item));
   if (!createdAt) return 0;
 
   const ageDays = (nowTs - createdAt) / (1000 * 60 * 60 * 24);
@@ -112,7 +105,7 @@ export function getLiveRankingBuckets(cafes = [], options = {}) {
     const trending = Number(item?.trendingScore || 0);
     const votes = Number(item?.votos || 0);
     const rating = Number(item?.puntuacion || 0);
-    const createdAtTs = parseDateValue(getCreatedAt(item));
+    const createdAtTs = parseDateValue(getPublishedAt(item));
     const freshnessBoost = getFreshnessBoost(item, nowTs);
     const stableTrending = getStableTrendingScore(item);
     const movementGap = trending - ranking;
@@ -163,16 +156,19 @@ export function getLiveRankingBuckets(cafes = [], options = {}) {
       rankingMomentum: buildMomentumText('fallers', item),
     }));
 
-  const newcomers = scored
+  const weeklyTopIds = new Set(weeklyTop.map((item) => item.id));
+
+  const newcomersAll = scored
     .filter((item) => item._createdAtTs >= twoWeeksAgo)
-    .sort((a, b) => b._newScore - a._newScore)
-    .slice(0, 8)
+    .sort((a, b) => b._createdAtTs - a._createdAtTs || b._newScore - a._newScore)
     .map((item) => ({
       ...item,
       rankingTag: 'Nuevo',
       rankingReason: buildReason('newcomers', item),
       rankingMomentum: buildMomentumText('newcomers', item),
     }));
+
+  const newcomers = newcomersAll.filter((item) => !weeklyTopIds.has(item.id)).slice(0, 8);
 
   return {
     weeklyTop,

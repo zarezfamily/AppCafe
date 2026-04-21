@@ -1,15 +1,4 @@
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  runTransaction,
-  serverTimestamp,
-  updateDoc,
-  where,
-} from 'firebase/firestore';
-import { db } from '../config/firebase';
+import { getDocument, queryCollection, setDocument, updateDocument } from './firestoreService';
 
 const CAFES_COLLECTION = 'cafes';
 
@@ -355,15 +344,7 @@ export async function findCafeByEan(rawEan) {
   const normalizedEan = normalizeEan(rawEan);
   if (!normalizedEan) return null;
 
-  const ref = doc(db, CAFES_COLLECTION, normalizedEan);
-  const snap = await getDoc(ref);
-
-  if (!snap.exists()) return null;
-
-  return {
-    id: snap.id,
-    ...snap.data(),
-  };
+  return await getDocument(CAFES_COLLECTION, normalizedEan);
 }
 
 /**
@@ -374,17 +355,8 @@ export async function findLegacyCafeByEan(rawEan) {
   const normalizedEan = normalizeEan(rawEan);
   if (!normalizedEan) return null;
 
-  const q = query(collection(db, CAFES_COLLECTION), where('normalizedEan', '==', normalizedEan));
-
-  const snap = await getDocs(q);
-
-  if (snap.empty) return null;
-
-  const first = snap.docs[0];
-  return {
-    id: first.id,
-    ...first.data(),
-  };
+  const docs = await queryCollection(CAFES_COLLECTION, 'normalizedEan', normalizedEan);
+  return docs?.[0] ?? null;
 }
 
 export async function findAnyCafeByEan(rawEan) {
@@ -401,59 +373,55 @@ export async function createOrGetPendingCafeFromScan(rawEan, userId = null) {
     throw new Error('EAN inválido');
   }
 
-  const ref = doc(db, CAFES_COLLECTION, normalizedEan);
+  const existing = await getDocument(CAFES_COLLECTION, normalizedEan);
+  if (!existing) {
+    const now = new Date().toISOString();
+    const basePayload = {
+      ean: normalizedEan,
+      normalizedEan,
+      name: '',
+      nombre: '',
+      roaster: '',
+      marca: '',
+      origin: '',
+      origen: '',
+      pais: '',
+      process: '',
+      proceso: '',
+      variety: '',
+      variedad: '',
+      notes: '',
+      notas: '',
+      imageUrl: '',
+      foto: '',
+      category: '',
+      coffeeCategory: '',
+      format: '',
+      formato: '',
+      roastLevel: '',
+      tueste: '',
+      species: '',
+      altitude: null,
+      altura: null,
+      scaScoreOfficial: null,
+      decaf: null,
+    };
 
-  await runTransaction(db, async (tx) => {
-    const snap = await tx.get(ref);
-
-    if (!snap.exists()) {
-      const basePayload = {
-        ean: normalizedEan,
-        normalizedEan,
-        name: '',
-        nombre: '',
-        roaster: '',
-        marca: '',
-        origin: '',
-        origen: '',
-        pais: '',
-        process: '',
-        proceso: '',
-        variety: '',
-        variedad: '',
-        notes: '',
-        notas: '',
-        imageUrl: '',
-        foto: '',
-        category: '',
-        coffeeCategory: '',
-        format: '',
-        formato: '',
-        roastLevel: '',
-        tueste: '',
-        species: '',
-        altitude: null,
-        altura: null,
-        scaScoreOfficial: null,
-        decaf: null,
-      };
-
-      tx.set(ref, {
-        ...basePayload,
-        sca: buildScaPayload(basePayload),
-        status: 'pending',
-        completionStatus: 'incomplete',
-        provisional: true,
-        createdFrom: 'scan',
-        createdBy: userId,
-        updatedBy: userId,
-        approvedBy: null,
-        approvedAt: null,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
-    }
-  });
+    await setDocument(CAFES_COLLECTION, normalizedEan, {
+      ...basePayload,
+      sca: buildScaPayload(basePayload),
+      status: 'pending',
+      completionStatus: 'incomplete',
+      provisional: true,
+      createdFrom: 'scan',
+      createdBy: userId,
+      updatedBy: userId,
+      approvedBy: null,
+      approvedAt: null,
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
 
   return normalizedEan;
 }
@@ -461,15 +429,7 @@ export async function createOrGetPendingCafeFromScan(rawEan, userId = null) {
 export async function getCafeById(cafeId) {
   if (!cafeId) return null;
 
-  const ref = doc(db, CAFES_COLLECTION, cafeId);
-  const snap = await getDoc(ref);
-
-  if (!snap.exists()) return null;
-
-  return {
-    id: snap.id,
-    ...snap.data(),
-  };
+  return await getDocument(CAFES_COLLECTION, cafeId);
 }
 
 export async function saveCafeDraft(cafeId, payload, userId = null) {
@@ -483,38 +443,28 @@ export async function saveCafeDraft(cafeId, payload, userId = null) {
     throw new Error('EAN inválido');
   }
 
-  const ref = doc(db, CAFES_COLLECTION, cafeId);
+  const current = await getDocument(CAFES_COLLECTION, cafeId);
+  if (!current) {
+    throw new Error('El café no existe');
+  }
 
-  await runTransaction(db, async (tx) => {
-    const snap = await tx.get(ref);
+  const merged = {
+    ...current,
+    ...clean,
+  };
 
-    if (!snap.exists()) {
-      throw new Error('El café no existe');
-    }
+  const completionStatus = buildCompletionStatus(merged);
+  const sca = buildScaPayload(merged);
 
-    const current = snap.data();
-
-    const merged = {
-      ...current,
-      ...clean,
-    };
-
-    const completionStatus = buildCompletionStatus(merged);
-    const sca = buildScaPayload(merged);
-
-    tx.set(
-      ref,
-      {
-        ...clean,
-        sca,
-        status: 'pending',
-        completionStatus,
-        provisional: true,
-        updatedBy: userId,
-        updatedAt: serverTimestamp(),
-      },
-      { merge: true }
-    );
+  const now = new Date().toISOString();
+  await updateDocument(CAFES_COLLECTION, cafeId, {
+    ...clean,
+    sca,
+    status: 'pending',
+    completionStatus,
+    provisional: true,
+    updatedBy: userId,
+    updatedAt: now,
   });
 
   return cafeId;
@@ -525,30 +475,24 @@ export async function approveCafe(cafeId, userId = null) {
     throw new Error('Falta cafeId');
   }
 
-  const ref = doc(db, CAFES_COLLECTION, cafeId);
+  const current = await getDocument(CAFES_COLLECTION, cafeId);
+  if (!current) {
+    throw new Error('El café no existe');
+  }
 
-  await runTransaction(db, async (tx) => {
-    const snap = await tx.get(ref);
+  if (!canBeApproved(current)) {
+    throw new Error('No se puede aprobar: faltan campos obligatorios');
+  }
 
-    if (!snap.exists()) {
-      throw new Error('El café no existe');
-    }
-
-    const data = snap.data();
-
-    if (!canBeApproved(data)) {
-      throw new Error('No se puede aprobar: faltan campos obligatorios');
-    }
-
-    tx.update(ref, {
-      status: 'approved',
-      completionStatus: 'complete',
-      provisional: false,
-      approvedBy: userId,
-      approvedAt: serverTimestamp(),
-      updatedBy: userId,
-      updatedAt: serverTimestamp(),
-    });
+  const now = new Date().toISOString();
+  await updateDocument(CAFES_COLLECTION, cafeId, {
+    status: 'approved',
+    completionStatus: 'complete',
+    provisional: false,
+    approvedBy: userId,
+    approvedAt: now,
+    updatedBy: userId,
+    updatedAt: now,
   });
 }
 
@@ -557,12 +501,11 @@ export async function rejectCafe(cafeId, userId = null) {
     throw new Error('Falta cafeId');
   }
 
-  const ref = doc(db, CAFES_COLLECTION, cafeId);
-
-  await updateDoc(ref, {
+  const now = new Date().toISOString();
+  await updateDocument(CAFES_COLLECTION, cafeId, {
     status: 'rejected',
     updatedBy: userId,
-    updatedAt: serverTimestamp(),
+    updatedAt: now,
   });
 }
 

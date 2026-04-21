@@ -1,5 +1,7 @@
+import { useMemo } from 'react';
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native';
 import { normalize } from '../core/utils';
+import { getPersonalizedCoffeeFeed } from '../domain/coffee/personalizedCoffee';
 import QuizSection from './QuizSection';
 
 export default function MisCafesTab({
@@ -39,6 +41,11 @@ export default function MisCafesTab({
 
   const cafesParaTiFiltrados = hasQuery ? (allCafes || []).filter(matchesCafe).slice(0, 8) : [];
   const favoritosFiltrados = hasQuery ? (favCafes || []).filter(matchesCafe).slice(0, 8) : [];
+
+  const personalizedFeed = useMemo(
+    () => getPersonalizedCoffeeFeed(allCafes || [], favs || []),
+    [allCafes, favs]
+  );
 
   const suggestionSource = [...(allCafes || []), ...(favCafes || []), ...(misCafes || [])].filter(
     (item, index, arr) => index === arr.findIndex((x) => x.id === item.id)
@@ -110,6 +117,71 @@ export default function MisCafesTab({
                 item={item}
                 badge={`${Number(item.puntuacion || 0).toFixed(1)}`}
                 onPress={() => setCafeDetalle({ cafes: favCafes, cafeIndex: idx })}
+                favs={favs}
+                onToggleFav={toggleFav}
+              />
+            ))}
+          </ScrollView>
+        </View>
+      )}
+
+      {!cargando && !hasQuery && personalizedFeed?.items?.length > 0 && (
+        <View style={sectionCardStyle}>
+          <View style={[s.sectionHeader, { marginTop: 0 }]}>
+            <Text style={s.sectionTitle}>{personalizedFeed.title || 'Para ti'}</Text>
+          </View>
+          <Text style={s.sectionSub}>
+            {personalizedFeed.subtitle ||
+              'Cafés que encajan con lo que ya te gusta dentro de ETIOVE.'}
+          </Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingLeft: 16, paddingRight: 8, gap: 12 }}
+          >
+            {personalizedFeed.items.slice(0, 12).map((item, idx) => (
+              <CardHorizontal
+                key={`pt-feed-${item.id}`}
+                item={item}
+                badge="Para ti"
+                recommendationText={item.recommendationReason || ''}
+                onPress={() => setCafeDetalle({ cafes: personalizedFeed.items, cafeIndex: idx })}
+                favs={favs}
+                onToggleFav={toggleFav}
+              />
+            ))}
+          </ScrollView>
+        </View>
+      )}
+
+      {!cargando && !hasQuery && personalizedFeed?.dailyUpgrade?.items?.length > 0 && (
+        <View style={sectionCardStyle}>
+          <View style={[s.sectionHeader, { marginTop: 0 }]}>
+            <Text style={s.sectionTitle}>
+              {personalizedFeed.dailyUpgrade.title || 'Mejora tu café diario'}
+            </Text>
+          </View>
+          <Text style={s.sectionSub}>
+            {personalizedFeed.dailyUpgrade.subtitle ||
+              'Opciones que suelen ser un upgrade claro desde tu café diario.'}
+          </Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ paddingLeft: 16, paddingRight: 8, gap: 12 }}
+          >
+            {personalizedFeed.dailyUpgrade.items.slice(0, 12).map((item, idx) => (
+              <CardHorizontal
+                key={`pt-daily-${item.id}`}
+                item={item}
+                badge="Para ti"
+                recommendationText={item.recommendationReason || ''}
+                onPress={() =>
+                  setCafeDetalle({
+                    cafes: personalizedFeed.dailyUpgrade.items,
+                    cafeIndex: idx,
+                  })
+                }
                 favs={favs}
                 onToggleFav={toggleFav}
               />

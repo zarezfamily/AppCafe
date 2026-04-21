@@ -98,8 +98,48 @@ export const queryCollection = async (colName, field, value, orderByField = null
 };
 
 export const getCollection = async (colName, orderByField = null, limitN = null) => {
-  const pageSize = limitN ? limitN * 3 : 100;
-  const url = `${BASE_URL}/${colName}?key=${FIREBASE_API_KEY}&pageSize=${pageSize}`;
+  // Cuando se pide orden/limit, el endpoint REST `documents?pagesize=` no garantiza
+  // traer los documentos correctos (devuelve una "primera página" por nombre de doc).
+  // Usamos `runQuery` para que el orden y el límite sean server-side.
+  if (orderByField || limitN) {
+    const url = `${BASE_URL}:runQuery?key=${FIREBASE_API_KEY}`;
+    const body = {
+      structuredQuery: {
+        from: [{ collectionId: colName }],
+      },
+    };
+
+    if (orderByField) {
+      body.structuredQuery.orderBy = [
+        { field: { fieldPath: orderByField }, direction: 'DESCENDING' },
+      ];
+    }
+
+    if (limitN) {
+      body.structuredQuery.limit = limitN;
+    }
+
+    const res = await firestoreFetch(
+      url,
+      {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(body),
+      },
+      `getCollection(${colName})`
+    );
+
+    if (!res.ok) {
+      const txt = await res.text();
+      console.log('[Firestore] Error:', res.status, txt.substring(0, 200));
+      throw new Error(`getCollection(${colName}) -> ${res.status}`);
+    }
+
+    const json = await res.json();
+    return (json || []).filter((r) => r.document).map((r) => docToObject(r.document));
+  }
+
+  const url = `${BASE_URL}/${colName}?key=${FIREBASE_API_KEY}&pageSize=200`;
   const res = await firestoreFetch(url, { headers: authHeaders() }, `getCollection(${colName})`);
 
   if (res.status === 404) return [];
@@ -112,16 +152,7 @@ export const getCollection = async (colName, orderByField = null, limitN = null)
   const json = await res.json();
   if (!json.documents) return [];
 
-  let docs = json.documents.map(docToObject);
-  if (orderByField) {
-    docs = docs.sort((a, b) =>
-      a[orderByField] < b[orderByField] ? 1 : a[orderByField] > b[orderByField] ? -1 : 0
-    );
-  }
-  if (limitN) {
-    docs = docs.slice(0, limitN);
-  }
-  return docs;
+  return json.documents.map(docToObject);
 };
 
 export const getUserCafes = async (uid) => {

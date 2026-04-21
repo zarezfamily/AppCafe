@@ -1,0 +1,18 @@
+[
+  {
+    "nombre": "Café en grano12 items",
+    "marca": "Starbucks",
+    "roaster": "Starbucks",
+    "formato": "beans",
+    "peso": null,
+    "pais": "Colombia",
+    "intensidad": 4,
+    "notas": ["chocolate"],
+    "tueste": "medio",
+    "fuente": "Starbucks",
+    "fuenteUrl": "https://www.starbucks.es/menu/cafe-en-casa/whole-bean",
+    "officialPhoto": "https://www.starbucks.es/_next/image?url=https%3A%2F%2Fwww.digitalassets.starbucks.eu%2Fsites%2Fstarbucks-medialibrary%2Ffiles%2F143495-1-1-Spring-26-Wholebean-CGI-model-v001-DELIVERY-1500x1500-MOP.jpeg&w=3840&q=75",
+    "foto": "https://www.starbucks.es/_next/image?url=https%3A%2F%2Fwww.digitalassets.starbucks.eu%2Fsites%2Fstarbucks-medialibrary%2Ffiles%2F143495-1-1-Spring-26-Wholebean-CGI-model-v001-DELIVERY-1500x1500-MOP.jpeg&w=3840&q=75",
+    "ean": ""
+  }
+]

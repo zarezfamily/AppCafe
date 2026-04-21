@@ -1,72 +1,20 @@
 [
   {
-    "nombre": "Chambakú",
-    "peso": 250,
-    "intensidad": 7,
-    "officialPhoto": "",
-    "ean": ""
+    "nombre": "Cápsulas Colombia",
+    "fuenteUrl": "https://www.aldi.es/ofertas/desde-13-abril/capsulas-de-cafe-colombia-6010585-0-0.article.html",
+    "tueste": "natural"
   },
   {
-    "nombre": "Lucero Blend",
-    "peso": 250,
-    "intensidad": 7,
-    "notas": ["dulce", "equilibrado"],
-    "ean": ""
+    "nombre": "Café en grano fuerte",
+    "fuenteUrl": "https://tienda.mercadona.es/product/19924/cafe-grano-fuerte-hacendado-paquete"
   },
   {
-    "nombre": "Brazil - Fazenda Serra",
-    "peso": 250,
-    "intensidad": 7,
-    "officialPhoto": "",
-    "ean": ""
+    "nombre": "Café molido natural",
+    "fuenteUrl": "https://tienda.mercadona.es/product/11178/cafe-molido-natural-hacendado-paquete",
+    "tueste": "natural"
   },
   {
-    "nombre": "Etiopía Raro Nansebo",
-    "peso": 250,
-    "intensidad": 7,
-    "officialPhoto": "",
-    "ean": ""
-  },
-  {
-    "nombre": "Finca El Paraíso Lychee",
-    "peso": 250,
-    "intensidad": 7,
-    "officialPhoto": "",
-    "ean": ""
-  },
-  {
-    "nombre": "Kenya Thiriku AA",
-    "peso": 250,
-    "intensidad": 7,
-    "officialPhoto": "",
-    "ean": ""
-  },
-  {
-    "nombre": "El Diviso Pink Bourbon",
-    "peso": 250,
-    "intensidad": 7,
-    "officialPhoto": "",
-    "ean": ""
-  },
-  {
-    "nombre": "Guatemala Huehuetenango",
-    "peso": 250,
-    "intensidad": 7,
-    "officialPhoto": "",
-    "ean": ""
-  },
-  {
-    "nombre": "Ethiopia Yirgacheffe",
-    "peso": 250,
-    "intensidad": 7,
-    "officialPhoto": "",
-    "ean": ""
-  },
-  {
-    "nombre": "Peru Cajamarca Organic",
-    "peso": 250,
-    "intensidad": 7,
-    "officialPhoto": "",
-    "ean": ""
+    "nombre": "Café molido Colombia",
+    "fuenteUrl": "https://tienda.mercadona.es/product/11715/cafe-molido-colombia-hacendado-paquete"
   }
 ]

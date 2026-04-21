@@ -4,10 +4,11 @@ const path = require('path');
 const crypto = require('crypto');
 
 const serviceAccountPath = path.join(__dirname, '..', 'serviceAccountKey.json');
-const cafesPath = path.join(__dirname, 'cafes.json');
+const inputFile = process.argv[2] || 'cafes.json';
+const cafesPath = path.join(__dirname, inputFile);
+const cafes = JSON.parse(fs.readFileSync(cafesPath, 'utf8'));
 
 const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
-const cafes = JSON.parse(fs.readFileSync(cafesPath, 'utf8'));
 
 const projectId = serviceAccount.project_id;
 const bucketCandidates = [`${projectId}.firebasestorage.app`, `${projectId}.appspot.com`];
@@ -29,8 +30,58 @@ function slugify(value) {
     .slice(0, 120);
 }
 
+function normalizeBrandName(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+
+  const normalized = raw
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  const brandMap = {
+    lavazza: 'Lavazza',
+    illy: 'Illy',
+    marcilla: 'Marcilla',
+    starbucks: 'Starbucks',
+    nescafe: 'Nescafé',
+    nescafé: 'Nescafé',
+    delta: 'Delta',
+    'delta cafes': 'Delta',
+    'delta cafés': 'Delta',
+    saula: 'Saula',
+    'cafe de finca': 'CAFE DE FINCA',
+    'café de finca': 'CAFE DE FINCA',
+    hacendado: 'Hacendado',
+    aldi: 'ALDI',
+    lor: "L'OR",
+    "l'or": "L'OR",
+    nomad: 'Nomad Coffee',
+    'nomad coffee': 'Nomad Coffee',
+    ineffable: 'Ineffable Coffee',
+    'ineffable coffee': 'Ineffable Coffee',
+    hola: 'Hola Coffee',
+    'hola coffee': 'Hola Coffee',
+    syra: 'Syra Coffee',
+    'syra coffee': 'Syra Coffee',
+    incapto: 'Incapto',
+    puchero: 'Puchero Coffee Roasters',
+    'puchero coffee roasters': 'Puchero Coffee Roasters',
+    'hidden coffee roasters': 'Hidden Coffee Roasters',
+    'right side coffee': 'Right Side Coffee',
+    'the fix coffee': 'The Fix Coffee',
+    'cafes el magnifico': 'Cafés El Magnífico',
+    'cafés el magnífico': 'Cafés El Magnífico',
+  };
+
+  return brandMap[normalized] || raw;
+}
+
 function buildCafeId(cafe) {
-  return slugify(`${cafe.roaster || 'roaster'}-${cafe.nombre || 'cafe'}`);
+  const normalizedBrand = normalizeBrandName(cafe.roaster || cafe.marca || 'roaster');
+  return slugify(`${normalizedBrand}-${cafe.nombre || 'cafe'}`);
 }
 
 function isSameCafe(a, b) {
@@ -204,6 +255,8 @@ async function markDuplicateDocsAsLegacy(cafe, keepDocId) {
 async function upsertCafe(cafe) {
   const cafeId = buildCafeId(cafe);
   const docRef = db.collection('cafes').doc(cafeId);
+  const normalizedMarca = normalizeBrandName(cafe.marca);
+  const normalizedRoaster = normalizeBrandName(cafe.roaster || cafe.marca);
 
   let fotoFinal = cafe.foto || null;
   let storageMeta = null;
@@ -253,6 +306,8 @@ async function upsertCafe(cafe) {
 
   const payload = {
     ...cafe,
+    marca: normalizedMarca || cafe.marca || null,
+    roaster: normalizedRoaster || cafe.roaster || cafe.marca || null,
     uid: cafe.uid || cafeId,
     foto: fotoFinal,
     officialPhoto: fotoFinal,
@@ -268,6 +323,8 @@ async function upsertCafe(cafe) {
         ? 'download_failed_or_invalid_url'
         : null,
     legacy: cafe.legacy === true,
+    normalizedMarca,
+    normalizedRoaster,
     updatedAt: new Date().toISOString(),
   };
 

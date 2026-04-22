@@ -18,6 +18,355 @@ import QuizSection from './QuizSection';
 const { width: SCREEN_W } = Dimensions.get('window');
 const GRID_GAP = 12;
 const GRID_PADDING = 16;
+
+const ESPRESSO = '#1c0f07';
+const ESPRESSO_CARD = '#2a1508';
+const GOLD = '#c8a97c';
+const GOLD_DIM = 'rgba(200,169,124,0.18)';
+const GOLD_BORDER = 'rgba(200,169,124,0.28)';
+const WARM_TEXT = '#f0dcc8';
+const MUTED_BROWN = '#8a6a52';
+
+function computeTasteProfile(favCafes) {
+  if (!favCafes.length) return null;
+
+  const specialty = favCafes.filter(
+    (c) => c.coffeeCategory === 'specialty' || (!c.coffeeCategory && !c.category)
+  ).length;
+  const daily = favCafes.length - specialty;
+
+  const origins = {};
+  const processes = {};
+  favCafes.forEach((c) => {
+    const o = c.pais || c.origen;
+    if (o) origins[o] = (origins[o] || 0) + 1;
+    const p = c.proceso;
+    if (p) processes[p] = (processes[p] || 0) + 1;
+  });
+
+  const topOrigins = Object.entries(origins)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([k]) => k);
+  const topProcesses = Object.entries(processes)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([k]) => k);
+
+  return {
+    specialtyPct: Math.round((specialty / favCafes.length) * 100),
+    dailyPct: Math.round((daily / favCafes.length) * 100),
+    topOrigins,
+    topProcesses,
+  };
+}
+
+function TasteProfileSection({ favCafes, recommendations, setCafeDetalle }) {
+  const profile = useMemo(() => computeTasteProfile(favCafes), [favCafes]);
+
+  if (!profile) return null;
+
+  return (
+    <View style={tp.wrap}>
+      {/* Header */}
+      <View style={tp.header}>
+        <View style={tp.titleRow}>
+          <View style={tp.iconCircle}>
+            <Text style={{ fontSize: 16 }}>✦</Text>
+          </View>
+          <View>
+            <Text style={tp.title}>Tu perfil de sabor</Text>
+            <Text style={tp.subtitle}>Basado en {favCafes.length} favoritos</Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Barras de categoría */}
+      <View style={tp.barsSection}>
+        <View style={tp.barRow}>
+          <Text style={tp.barLabel}>ESPECIALIDAD</Text>
+          <View style={tp.barTrack}>
+            <View style={[tp.barFill, { width: `${profile.specialtyPct}%` }]} />
+          </View>
+          <Text style={tp.barPct}>{profile.specialtyPct}%</Text>
+        </View>
+        <View style={tp.barRow}>
+          <Text style={tp.barLabel}>CAFÉ DIARIO</Text>
+          <View style={tp.barTrack}>
+            <View
+              style={[tp.barFill, { width: `${profile.dailyPct}%`, backgroundColor: '#7aaedc' }]}
+            />
+          </View>
+          <Text style={tp.barPct}>{profile.dailyPct}%</Text>
+        </View>
+      </View>
+
+      <View style={tp.divider} />
+
+      {/* Orígenes y procesos */}
+      <View style={tp.tagsSection}>
+        {profile.topOrigins.length > 0 && (
+          <View style={tp.tagGroup}>
+            <Text style={tp.tagGroupLabel}>🌍 ORÍGENES</Text>
+            <View style={tp.tagRow}>
+              {profile.topOrigins.map((o) => (
+                <View key={o} style={tp.tag}>
+                  <Text style={tp.tagText}>{o}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+        {profile.topProcesses.length > 0 && (
+          <View style={[tp.tagGroup, { marginTop: 12 }]}>
+            <Text style={tp.tagGroupLabel}>⚙️ PROCESOS</Text>
+            <View style={tp.tagRow}>
+              {profile.topProcesses.map((p) => (
+                <View key={p} style={[tp.tag, tp.tagProcess]}>
+                  <Text style={[tp.tagText, { color: '#b8d4f0' }]}>{p}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+      </View>
+
+      {/* Recomendaciones */}
+      {recommendations.length > 0 && (
+        <View>
+          <View style={tp.divider} />
+          <View style={tp.recsSection}>
+            <Text style={tp.recsLabel}>✦ PARA TI HOY</Text>
+            <View style={tp.recsRow}>
+              {recommendations.slice(0, 3).map((item, idx) => {
+                const uri = item.bestPhoto || item.officialPhoto || item.foto || null;
+                return (
+                  <TouchableOpacity
+                    key={item.id}
+                    style={tp.recCard}
+                    onPress={() => setCafeDetalle({ cafes: recommendations, cafeIndex: idx })}
+                    activeOpacity={0.82}
+                  >
+                    <View style={tp.recImg}>
+                      {uri ? (
+                        <Image
+                          source={{ uri }}
+                          style={StyleSheet.absoluteFill}
+                          resizeMode="cover"
+                        />
+                      ) : (
+                        <Text style={{ fontSize: 22, textAlign: 'center' }}>☕</Text>
+                      )}
+                      <View style={tp.recScoreBadge}>
+                        <Text style={tp.recScoreText}>
+                          {Number(item.puntuacion || 0).toFixed(1)}
+                        </Text>
+                      </View>
+                    </View>
+                    <Text style={tp.recBrand} numberOfLines={1}>
+                      {item.marca || item.roaster || ''}
+                    </Text>
+                    <Text style={tp.recName} numberOfLines={2}>
+                      {item.nombre}
+                    </Text>
+                    {item.recommendationReason ? (
+                      <Text style={tp.recReason} numberOfLines={2}>
+                        {item.recommendationReason}
+                      </Text>
+                    ) : null}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
+        </View>
+      )}
+    </View>
+  );
+}
+
+const REC_W = (SCREEN_W - GRID_PADDING * 2 - GOLD_DIM.length + 24) / 3;
+
+const tp = StyleSheet.create({
+  wrap: {
+    marginHorizontal: 16,
+    borderRadius: 20,
+    backgroundColor: ESPRESSO,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: GOLD_BORDER,
+  },
+  header: {
+    paddingHorizontal: 18,
+    paddingTop: 18,
+    paddingBottom: 14,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  iconCircle: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: GOLD_DIM,
+    borderWidth: 1,
+    borderColor: GOLD_BORDER,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  title: {
+    fontSize: 17,
+    fontWeight: '800',
+    color: WARM_TEXT,
+    letterSpacing: 0.2,
+  },
+  subtitle: {
+    fontSize: 12,
+    color: MUTED_BROWN,
+    marginTop: 1,
+  },
+  barsSection: {
+    paddingHorizontal: 18,
+    paddingBottom: 16,
+    gap: 10,
+  },
+  barRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  barLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: MUTED_BROWN,
+    letterSpacing: 0.6,
+    width: 90,
+  },
+  barTrack: {
+    flex: 1,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: 'rgba(255,255,255,0.07)',
+    overflow: 'hidden',
+  },
+  barFill: {
+    height: '100%',
+    borderRadius: 4,
+    backgroundColor: GOLD,
+  },
+  barPct: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: GOLD,
+    width: 34,
+    textAlign: 'right',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: 'rgba(255,255,255,0.07)',
+    marginHorizontal: 18,
+    marginVertical: 4,
+  },
+  tagsSection: {
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+  },
+  tagGroup: {},
+  tagGroupLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: MUTED_BROWN,
+    letterSpacing: 0.8,
+    marginBottom: 8,
+  },
+  tagRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  tag: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: GOLD_DIM,
+    borderWidth: 1,
+    borderColor: GOLD_BORDER,
+  },
+  tagProcess: {
+    backgroundColor: 'rgba(122,174,220,0.12)',
+    borderColor: 'rgba(122,174,220,0.25)',
+  },
+  tagText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: GOLD,
+  },
+  recsSection: {
+    paddingHorizontal: 18,
+    paddingTop: 14,
+    paddingBottom: 18,
+  },
+  recsLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: MUTED_BROWN,
+    letterSpacing: 0.8,
+    marginBottom: 12,
+  },
+  recsRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  recCard: {
+    flex: 1,
+  },
+  recImg: {
+    width: '100%',
+    aspectRatio: 0.85,
+    borderRadius: 12,
+    backgroundColor: ESPRESSO_CARD,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 7,
+  },
+  recScoreBadge: {
+    position: 'absolute',
+    bottom: 6,
+    left: 6,
+    backgroundColor: GOLD,
+    borderRadius: 8,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  recScoreText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: ESPRESSO,
+  },
+  recBrand: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: MUTED_BROWN,
+    textTransform: 'uppercase',
+    letterSpacing: 0.3,
+    marginBottom: 2,
+  },
+  recName: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: WARM_TEXT,
+    lineHeight: 15,
+  },
+  recReason: {
+    fontSize: 10,
+    color: MUTED_BROWN,
+    marginTop: 4,
+    lineHeight: 13,
+  },
+});
 const CARD_W = (SCREEN_W - GRID_PADDING * 2 - GRID_GAP) / 2;
 
 function getImageUri(item) {
@@ -234,30 +583,14 @@ export default function MisCafesTab({
         </View>
       )}
 
-      {/* Para ti */}
-      {!hasQuery && !cargando && personalizedFeed?.items?.length > 0 && (
-        <View style={styles.section}>
-          <SectionTitle
-            title={personalizedFeed.title || 'Para ti'}
-            subtitle={personalizedFeed.subtitle || 'Basado en lo que ya te gusta'}
+      {/* Perfil de sabor */}
+      {!hasQuery && !cargando && favCafes.length > 0 && (
+        <View style={{ marginTop: 24 }}>
+          <TasteProfileSection
+            favCafes={favCafes}
+            recommendations={personalizedFeed?.items || []}
+            setCafeDetalle={setCafeDetalle}
           />
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.hScroll}
-          >
-            {personalizedFeed.items.slice(0, 12).map((item, idx) => (
-              <CardHorizontal
-                key={`pt-${item.id}`}
-                item={item}
-                badge="Para ti"
-                recommendationText={item.recommendationReason || ''}
-                onPress={() => setCafeDetalle({ cafes: personalizedFeed.items, cafeIndex: idx })}
-                favs={favs}
-                onToggleFav={toggleFav}
-              />
-            ))}
-          </ScrollView>
         </View>
       )}
 

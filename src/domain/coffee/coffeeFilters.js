@@ -7,6 +7,7 @@ export const filterCoffeeList = (list, query) => {
   return list
     .filter(
       (coffee) =>
+        normalize(coffee.marca).includes(normalizedQuery) ||
         normalize(coffee.nombre).includes(normalizedQuery) ||
         normalize(coffee.pais).includes(normalizedQuery) ||
         normalize(coffee.region).includes(normalizedQuery) ||

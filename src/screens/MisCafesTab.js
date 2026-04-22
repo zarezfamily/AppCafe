@@ -31,6 +31,7 @@ export default function MisCafesTab({
 
   const containsQuery = (value) => normalize(String(value || '')).includes(normalize(query));
   const matchesCafe = (cafe) =>
+    containsQuery(cafe?.marca) ||
     containsQuery(cafe?.nombre) ||
     containsQuery(cafe?.pais) ||
     containsQuery(cafe?.region) ||

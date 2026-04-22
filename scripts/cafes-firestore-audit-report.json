@@ -1,0 +1,22 @@
+{
+  "generatedAt": "2026-04-22T19:25:12.871Z",
+  "dryRun": true,
+  "totals": {
+    "total": 1290,
+    "active": 1053,
+    "legacy": 237,
+    "duplicateEanGroups": 0,
+    "duplicateEanDocs": 0,
+    "duplicateKeyGroups": 0,
+    "duplicateKeyDocs": 0,
+    "invalidDocs": 0,
+    "toMarkLegacy": 0
+  },
+  "duplicateEanGroups": [],
+  "duplicateKeyGroups": [],
+  "invalidDocs": [],
+  "actions": {
+    "duplicateDocsToLegacy": [],
+    "invalidDocsToLegacy": []
+  }
+}

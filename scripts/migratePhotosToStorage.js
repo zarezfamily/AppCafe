@@ -17,6 +17,7 @@ const serviceAccountPath = path.join(__dirname, '..', 'serviceAccountKey.json');
 const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
 
 const DRY_RUN = process.argv.includes('--dry-run');
+const LIMIT = Number.parseInt(process.env.LIMIT || '', 10);
 
 const projectId = serviceAccount.project_id;
 const bucketCandidates = [`${projectId}.firebasestorage.app`, `${projectId}.appspot.com`];
@@ -173,15 +174,18 @@ async function migrate() {
 
   const snapshot = await db.collection('cafes').get();
   const docs = snapshot.docs.filter((d) => !d.data().legacy);
+  const targetDocs = Number.isFinite(LIMIT) ? docs.slice(0, LIMIT) : docs;
 
-  console.log(`📋 Total cafés activos: ${docs.length}\n`);
+  console.log(
+    `📋 Total cafés activos: ${docs.length}${Number.isFinite(LIMIT) ? ` (procesando ${targetDocs.length})` : ''}\n`
+  );
 
   let yaEnStorage = 0;
   let migrados = 0;
   let sinFoto = 0;
   let errores = 0;
 
-  for (const docSnap of docs) {
+  for (const docSnap of targetDocs) {
     const data = docSnap.data();
     const nombre = data.nombre || data.name || docSnap.id;
     const photoUrl = getBestPhotoUrl(data);
@@ -271,7 +275,7 @@ async function migrate() {
    ⬆️  Migrados ahora: ${migrados}
    ⬜ Sin foto:        ${sinFoto}
    ❌ Errores:         ${errores}
-   📋 Total:           ${docs.length}
+   📋 Total procesados: ${targetDocs.length}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 `);
 }

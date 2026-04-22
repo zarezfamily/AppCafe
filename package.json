@@ -27,6 +27,8 @@
     "import:es:coffee": "npm run env:check:import-write && node --env-file=.env scripts/import_top_es_real.js",
     "cafes:sca:dry": "DRY_RUN=true node --env-file=.env scripts/backfill_sca_firestore.js",
     "cafes:sca:backfill": "node --env-file=.env scripts/backfill_sca_firestore.js",
+    "cafes:audit:dry": "node scripts/audit_cafes_firestore.js",
+    "cafes:audit:apply": "APPLY=true node scripts/audit_cafes_firestore.js",
     "incapto:import:dry": "DRY_RUN=true node --env-file=.env scripts/import_incapto_cafes.js",
     "incapto:import": "node --env-file=.env scripts/import_incapto_cafes.js",
     "novell:import:dry": "DRY_RUN=true node --env-file=.env scripts/import_novell_cafes.js",

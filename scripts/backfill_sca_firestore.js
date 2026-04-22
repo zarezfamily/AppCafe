@@ -31,13 +31,6 @@ const FORCE = String(process.env.FORCE || '').toLowerCase() === 'true';
 const LIMIT = Number.parseInt(process.env.LIMIT || '', 10);
 const PAGE_SIZE = Math.max(1, Number.parseInt(process.env.PAGE_SIZE || '300', 10) || 300);
 
-if (!FIREBASE_PROJECT_ID || !FIREBASE_API_KEY) {
-  console.error(
-    'Faltan FIREBASE_PROJECT_ID y/o FIREBASE_API_KEY (o EXPO_PUBLIC_*) en variables de entorno.'
-  );
-  process.exit(1);
-}
-
 const BASE_URL = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
 const CAFES_COLLECTION = 'cafes';
 
@@ -464,6 +457,15 @@ function findServiceAccountPath() {
     if (fs.existsSync(candidate)) return candidate;
   }
   return null;
+}
+
+const HAS_SERVICE_ACCOUNT = Boolean(findServiceAccountPath());
+
+if (!HAS_SERVICE_ACCOUNT && (!FIREBASE_PROJECT_ID || !FIREBASE_API_KEY)) {
+  console.error(
+    'Faltan FIREBASE_PROJECT_ID y/o FIREBASE_API_KEY (o EXPO_PUBLIC_*) en variables de entorno.'
+  );
+  process.exit(1);
 }
 
 async function makeAdminClient() {

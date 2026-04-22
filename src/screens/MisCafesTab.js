@@ -20,44 +20,65 @@ const GRID_GAP = 10;
 const GRID_PADDING = 16;
 const CARD_W = (SCREEN_W - GRID_PADDING * 2 - GRID_GAP) / 2;
 
-// Paleta espresso premium
-const BG = '#120a04';
-const CARD = '#1e1108';
-const CARD_LIGHT = '#271610';
+// Paleta crema premium (consistente con Inicio)
+const BG = '#fffdf9';
+const CARD_BG = '#fffaf5';
+const CARD_BORDER = '#eadbce';
+const ACCENT = '#8f5e3b';
+const ACCENT_LIGHT = '#f4e8db';
+const TEXT_DARK = '#24160f';
+const TEXT_MID = '#6f5a4b';
+const TEXT_MUTED = '#9e7c62';
+
+// Paleta oscura para el widget destacado
+const DARK_BG = '#1a0e07';
 const GOLD = '#c8a97c';
 const GOLD_DIM = 'rgba(200,169,124,0.14)';
 const GOLD_BORDER = 'rgba(200,169,124,0.22)';
 const WARM = '#f0dcc8';
 const MUTED = '#7a5c42';
-const DIVIDER = 'rgba(200,169,124,0.12)';
 
 function getImageUri(item) {
   return item.bestPhoto || item.officialPhoto || item.foto || item.image || null;
 }
 
-function StatPill({ icon, value, label }) {
+// ─── Componentes UI ──────────────────────────────────────────────────────────
+
+function Section({ children, style }) {
+  return <View style={[styles.sectionCard, style]}>{children}</View>;
+}
+
+function SecHead({ title, sub, right }) {
   return (
-    <View style={s.statPill}>
-      <Text style={s.statIcon}>{icon}</Text>
-      <Text style={s.statValue}>{value}</Text>
-      <Text style={s.statLabel}>{label}</Text>
+    <View style={styles.secHead}>
+      <View style={{ flex: 1 }}>
+        <Text style={styles.secTitle}>{title}</Text>
+        {sub ? <Text style={styles.secSub}>{sub}</Text> : null}
+      </View>
+      {right || null}
     </View>
   );
 }
 
-function SecHead({ title, sub }) {
+function StatStrip({ misCafes, favCafes, totalCatas }) {
   return (
-    <View style={s.secHead}>
-      <View style={{ flex: 1 }}>
-        <Text style={s.secTitle}>{title}</Text>
-        {sub ? <Text style={s.secSub}>{sub}</Text> : null}
+    <View style={styles.statsStrip}>
+      <View style={styles.statItem}>
+        <Text style={styles.statValue}>{misCafes}</Text>
+        <Text style={styles.statLabel}>colección</Text>
+      </View>
+      <View style={styles.statDivider} />
+      <View style={styles.statItem}>
+        <Text style={styles.statValue}>{favCafes}</Text>
+        <Text style={styles.statLabel}>favoritos</Text>
+      </View>
+      <View style={styles.statDivider} />
+      <View style={styles.statItem}>
+        <Text style={styles.statValue}>{totalCatas}</Text>
+        <Text style={styles.statLabel}>catas</Text>
       </View>
     </View>
   );
-}
-
-function DarkCard({ children, style }) {
-  return <View style={[s.darkCard, style]}>{children}</View>;
 }
 
 function GridCard({ item, onPress, favs, onToggleFav }) {
@@ -65,40 +86,39 @@ function GridCard({ item, onPress, favs, onToggleFav }) {
   const uri = getImageUri(item);
 
   return (
-    <TouchableOpacity style={s.gridCard} onPress={() => onPress?.(item)} activeOpacity={0.85}>
-      <View style={s.gridImg}>
+    <TouchableOpacity style={styles.gridCard} onPress={() => onPress?.(item)} activeOpacity={0.85}>
+      <View style={styles.gridImg}>
         {uri ? (
           <Image source={{ uri }} style={StyleSheet.absoluteFill} resizeMode="cover" />
         ) : (
-          <View style={s.gridImgEmpty}>
+          <View style={styles.gridImgEmpty}>
             <Text style={{ fontSize: 26 }}>☕</Text>
           </View>
         )}
-        <View style={s.gridImgGradient} />
-        <TouchableOpacity style={s.gridFav} onPress={() => onToggleFav?.(item)}>
+        <TouchableOpacity style={styles.gridFav} onPress={() => onToggleFav?.(item)}>
           <Ionicons
             name={isFav ? 'star' : 'star-outline'}
             size={13}
-            color={isFav ? GOLD : 'rgba(255,255,255,0.6)'}
+            color={isFav ? PREMIUM_ACCENT : 'rgba(255,255,255,0.7)'}
           />
         </TouchableOpacity>
         {item.puntuacion ? (
-          <View style={s.gridBadge}>
-            <Text style={s.gridBadgeText}>{Number(item.puntuacion).toFixed(1)}</Text>
+          <View style={styles.gridBadge}>
+            <Text style={styles.gridBadgeText}>{Number(item.puntuacion).toFixed(1)}</Text>
           </View>
         ) : null}
       </View>
-      <View style={s.gridInfo}>
+      <View style={styles.gridInfo}>
         {item.marca || item.roaster ? (
-          <Text style={s.gridBrand} numberOfLines={1}>
+          <Text style={styles.gridBrand} numberOfLines={1}>
             {item.marca || item.roaster}
           </Text>
         ) : null}
-        <Text style={s.gridName} numberOfLines={2}>
+        <Text style={styles.gridName} numberOfLines={2}>
           {item.nombre}
         </Text>
         {item.pais || item.origen ? (
-          <Text style={s.gridMeta} numberOfLines={1}>
+          <Text style={styles.gridMeta} numberOfLines={1}>
             {item.pais || item.origen}
           </Text>
         ) : null}
@@ -106,6 +126,8 @@ function GridCard({ item, onPress, favs, onToggleFav }) {
     </TouchableOpacity>
   );
 }
+
+// ─── Widget oscuro: Perfil de sabor ─────────────────────────────────────────
 
 function computeProfile(favCafes) {
   if (!favCafes.length) return null;
@@ -139,86 +161,89 @@ function TasteProfile({ favCafes, recs, setCafeDetalle }) {
   if (!profile) return null;
 
   return (
-    <DarkCard style={s.tasteCard}>
-      <View style={s.tasteHeader}>
-        <View style={s.tasteIconCircle}>
-          <Text style={{ fontSize: 15, color: GOLD }}>✦</Text>
-        </View>
-        <View>
-          <Text style={s.tasteTitle}>Tu perfil de sabor</Text>
-          <Text style={s.tasteSub}>Calculado con {favCafes.length} favoritos</Text>
-        </View>
+    <View style={styles.tasteWrap}>
+      {/* Eyebrow */}
+      <View style={styles.tasteEyebrow}>
+        <View style={styles.tasteEyebrowLine} />
+        <Text style={styles.tasteEyebrowText}>TU PERFIL DE SABOR</Text>
+        <View style={styles.tasteEyebrowLine} />
       </View>
 
-      <View style={s.tasteBars}>
-        <View style={s.tasteBarRow}>
-          <Text style={s.tasteBarLabel}>ESPECIALIDAD</Text>
-          <View style={s.tasteBarTrack}>
-            <View
-              style={[s.tasteBarFill, { width: `${profile.specialtyPct}%`, backgroundColor: GOLD }]}
-            />
+      <View style={styles.tasteCard}>
+        {/* Barras */}
+        <View style={styles.tasteBars}>
+          <View style={styles.tasteBarRow}>
+            <Text style={styles.tasteBarLabel}>ESPECIALIDAD</Text>
+            <View style={styles.tasteBarTrack}>
+              <View
+                style={[
+                  styles.tasteBarFill,
+                  { width: `${profile.specialtyPct}%`, backgroundColor: GOLD },
+                ]}
+              />
+            </View>
+            <Text style={[styles.tasteBarPct, { color: GOLD }]}>{profile.specialtyPct}%</Text>
           </View>
-          <Text style={[s.tasteBarPct, { color: GOLD }]}>{profile.specialtyPct}%</Text>
-        </View>
-        <View style={s.tasteBarRow}>
-          <Text style={s.tasteBarLabel}>CAFÉ DIARIO</Text>
-          <View style={s.tasteBarTrack}>
-            <View
-              style={[
-                s.tasteBarFill,
-                { width: `${profile.dailyPct}%`, backgroundColor: '#7aaedc' },
-              ]}
-            />
+          <View style={styles.tasteBarRow}>
+            <Text style={styles.tasteBarLabel}>CAFÉ DIARIO</Text>
+            <View style={styles.tasteBarTrack}>
+              <View
+                style={[
+                  styles.tasteBarFill,
+                  { width: `${profile.dailyPct}%`, backgroundColor: '#7aaedc' },
+                ]}
+              />
+            </View>
+            <Text style={[styles.tasteBarPct, { color: '#7aaedc' }]}>{profile.dailyPct}%</Text>
           </View>
-          <Text style={[s.tasteBarPct, { color: '#7aaedc' }]}>{profile.dailyPct}%</Text>
         </View>
-      </View>
 
-      <View style={s.tasteDivider} />
+        <View style={styles.tasteDivider} />
 
-      <View style={s.tasteTags}>
-        {profile.topOrigins.length > 0 && (
+        {/* Tags */}
+        <View style={styles.tasteTags}>
+          {profile.topOrigins.length > 0 && (
+            <View>
+              <Text style={styles.tasteTagLabel}>🌍 ORÍGENES</Text>
+              <View style={styles.tasteTagRow}>
+                {profile.topOrigins.map((o) => (
+                  <View key={o} style={styles.tasteTag}>
+                    <Text style={styles.tasteTagText}>{o}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+          {profile.topProcesses.length > 0 && (
+            <View style={{ marginTop: 10 }}>
+              <Text style={styles.tasteTagLabel}>⚙️ PROCESOS</Text>
+              <View style={styles.tasteTagRow}>
+                {profile.topProcesses.map((p) => (
+                  <View key={p} style={[styles.tasteTag, styles.tasteTagBlue]}>
+                    <Text style={[styles.tasteTagText, { color: '#9dc8e8' }]}>{p}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+        </View>
+
+        {/* Recomendaciones */}
+        {recs.length > 0 && (
           <View>
-            <Text style={s.tasteTagLabel}>🌍 ORÍGENES FAVORITOS</Text>
-            <View style={s.tasteTagRow}>
-              {profile.topOrigins.map((o) => (
-                <View key={o} style={s.tasteTag}>
-                  <Text style={s.tasteTagText}>{o}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-        )}
-        {profile.topProcesses.length > 0 && (
-          <View style={{ marginTop: 12 }}>
-            <Text style={s.tasteTagLabel}>⚙️ PROCESOS PREFERIDOS</Text>
-            <View style={s.tasteTagRow}>
-              {profile.topProcesses.map((p) => (
-                <View key={p} style={[s.tasteTag, s.tasteTagBlue]}>
-                  <Text style={[s.tasteTagText, { color: '#9dc8e8' }]}>{p}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-        )}
-      </View>
-
-      {recs.length > 0 && (
-        <View>
-          <View style={s.tasteDivider} />
-          <View style={s.tasteRecs}>
-            <Text style={s.tasteTagLabel}>✦ SELECCIONADOS PARA TI</Text>
-            <View style={s.tasteRecsRow}>
+            <View style={styles.tasteDivider} />
+            <Text style={[styles.tasteTagLabel, { paddingTop: 12 }]}>✦ SELECCIONADOS PARA TI</Text>
+            <View style={styles.tasteRecsRow}>
               {recs.slice(0, 3).map((item, idx) => {
                 const uri = getImageUri(item);
                 return (
                   <TouchableOpacity
                     key={item.id}
-                    style={s.tasteRecCard}
+                    style={styles.tasteRecCard}
                     onPress={() => setCafeDetalle({ cafes: recs, cafeIndex: idx })}
                     activeOpacity={0.82}
                   >
-                    <View style={s.tasteRecImg}>
+                    <View style={styles.tasteRecImg}>
                       {uri ? (
                         <Image
                           source={{ uri }}
@@ -226,18 +251,18 @@ function TasteProfile({ favCafes, recs, setCafeDetalle }) {
                           resizeMode="cover"
                         />
                       ) : (
-                        <Text style={{ fontSize: 20, textAlign: 'center', color: MUTED }}>☕</Text>
+                        <Text style={{ fontSize: 18, textAlign: 'center', color: MUTED }}>☕</Text>
                       )}
-                      <View style={s.tasteRecScore}>
-                        <Text style={s.tasteRecScoreText}>
+                      <View style={styles.tasteRecScore}>
+                        <Text style={styles.tasteRecScoreText}>
                           {Number(item.puntuacion || 0).toFixed(1)}
                         </Text>
                       </View>
                     </View>
-                    <Text style={s.tasteRecBrand} numberOfLines={1}>
+                    <Text style={styles.tasteRecBrand} numberOfLines={1}>
                       {item.marca || item.roaster || ''}
                     </Text>
-                    <Text style={s.tasteRecName} numberOfLines={2}>
+                    <Text style={styles.tasteRecName} numberOfLines={2}>
                       {item.nombre}
                     </Text>
                   </TouchableOpacity>
@@ -245,11 +270,13 @@ function TasteProfile({ favCafes, recs, setCafeDetalle }) {
               })}
             </View>
           </View>
-        </View>
-      )}
-    </DarkCard>
+        )}
+      </View>
+    </View>
   );
 }
+
+// ─── Main ────────────────────────────────────────────────────────────────────
 
 export default function MisCafesTab({
   s: ext,
@@ -308,21 +335,15 @@ export default function MisCafesTab({
   const totalCatas = notebook?.stats?.totalCatas || 0;
 
   return (
-    <View style={s.screen}>
+    <View style={styles.screen}>
       {/* Header */}
-      <View style={s.header}>
-        <Text style={s.pageTitle}>Mi espacio</Text>
-        <View style={s.statsRow}>
-          <StatPill icon="☕" value={misCafes.length} label="colección" />
-          <View style={s.statDivider} />
-          <StatPill icon="⭐" value={favCafes.length} label="favoritos" />
-          <View style={s.statDivider} />
-          <StatPill icon="📓" value={totalCatas} label="catas" />
-        </View>
+      <View style={styles.header}>
+        <Text style={styles.pageTitle}>Mi espacio</Text>
+        <StatStrip misCafes={misCafes.length} favCafes={favCafes.length} totalCatas={totalCatas} />
       </View>
 
       {/* Search */}
-      <View style={s.searchWrap}>
+      <View style={styles.searchWrap}>
         <SearchInput
           value={busquedaMis}
           onChangeText={setBusquedaMis}
@@ -334,13 +355,13 @@ export default function MisCafesTab({
 
       {/* Resultados búsqueda */}
       {hasQuery && (
-        <DarkCard style={s.section}>
+        <Section>
           <SecHead
             title={`${searchResults.length} resultado${searchResults.length !== 1 ? 's' : ''}`}
             sub={`"${query}"`}
           />
           {searchResults.length > 0 ? (
-            <View style={s.grid}>
+            <View style={styles.grid}>
               {searchResults.map((item, idx) => (
                 <GridCard
                   key={item.id}
@@ -352,26 +373,26 @@ export default function MisCafesTab({
               ))}
             </View>
           ) : (
-            <Text style={s.empty}>Sin resultados para "{query}"</Text>
+            <Text style={styles.empty}>Sin resultados para "{query}"</Text>
           )}
-        </DarkCard>
+        </Section>
       )}
 
       {/* Quiz */}
       {!hasQuery && !cargando && (
-        <DarkCard style={[s.section, s.lightInner]}>
+        <View style={[styles.sectionCard, { padding: 0, overflow: 'hidden' }]}>
           <QuizSection {...quizSectionProps} />
-        </DarkCard>
+        </View>
       )}
 
       {/* Favoritos */}
       {!hasQuery && favCafes.length > 0 && (
-        <DarkCard style={s.section}>
-          <SecHead title="Tus favoritos" sub={`${favCafes.length} cafés guardados`} />
+        <Section>
+          <SecHead title="⭐  Tus favoritos" sub={`${favCafes.length} cafés guardados`} />
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={s.hScroll}
+            contentContainerStyle={styles.hScroll}
           >
             {favCafes.map((item, idx) => (
               <CardHorizontal
@@ -384,12 +405,12 @@ export default function MisCafesTab({
               />
             ))}
           </ScrollView>
-        </DarkCard>
+        </Section>
       )}
 
-      {/* Perfil de sabor */}
+      {/* Widget oscuro: Perfil de sabor */}
       {!hasQuery && !cargando && favCafes.length > 0 && (
-        <View style={s.section}>
+        <View style={styles.tasteOuter}>
           <TasteProfile
             favCafes={favCafes}
             recs={personalizedFeed?.items || []}
@@ -400,7 +421,7 @@ export default function MisCafesTab({
 
       {/* Diario de catas */}
       {!hasQuery && notebook && (
-        <DarkCard style={[s.section, s.lightInner]}>
+        <View style={[styles.sectionCard, { padding: 0, overflow: 'hidden' }]}>
           <DiarioCatasSection
             s={ext}
             theme={theme}
@@ -413,12 +434,12 @@ export default function MisCafesTab({
             irAbrirModal={notebook.irAbrirModal}
             irAbrirDetail={notebook.irAbrirDetail}
           />
-        </DarkCard>
+        </View>
       )}
 
       {/* Mi colección */}
       {!hasQuery && (
-        <DarkCard style={s.section}>
+        <Section>
           <SecHead
             title="Mi colección"
             sub={
@@ -428,9 +449,9 @@ export default function MisCafesTab({
             }
           />
           {cargando ? (
-            <ActivityIndicator color={GOLD} style={{ marginVertical: 32 }} />
+            <ActivityIndicator color={ACCENT} style={{ marginVertical: 32 }} />
           ) : cafesFiltrados.length > 0 ? (
-            <View style={s.grid}>
+            <View style={styles.grid}>
               {cafesFiltrados.map((item, idx) => (
                 <GridCard
                   key={item.id}
@@ -442,15 +463,15 @@ export default function MisCafesTab({
               ))}
             </View>
           ) : (
-            <View style={s.emptyWrap}>
-              <Text style={s.emptyIcon}>☕</Text>
-              <Text style={s.emptyTitle}>Tu colección está vacía</Text>
-              <Text style={s.emptyText}>
+            <View style={styles.emptyWrap}>
+              <Text style={styles.emptyIcon}>☕</Text>
+              <Text style={styles.emptyTitle}>Tu colección está vacía</Text>
+              <Text style={styles.emptyText}>
                 Escanea o añade cafés para empezar tu archivo personal
               </Text>
             </View>
           )}
-        </DarkCard>
+        </Section>
       )}
 
       <View style={{ height: 48 }} />
@@ -458,91 +479,68 @@ export default function MisCafesTab({
   );
 }
 
-const s = StyleSheet.create({
-  screen: {
-    backgroundColor: BG,
-    minHeight: '100%',
-  },
+const styles = StyleSheet.create({
+  screen: { backgroundColor: BG },
 
-  header: {
-    paddingHorizontal: 16,
-    paddingTop: 20,
-    paddingBottom: 10,
-  },
-  pageTitle: {
-    fontSize: 26,
-    fontWeight: '800',
-    color: WARM,
-    marginBottom: 14,
-    letterSpacing: 0.3,
-  },
+  header: { paddingHorizontal: 16, paddingTop: 20, paddingBottom: 4 },
+  pageTitle: { fontSize: 26, fontWeight: '800', color: TEXT_DARK, marginBottom: 14 },
 
-  statsRow: {
+  // Stats
+  statsStrip: {
     flexDirection: 'row',
-    backgroundColor: CARD,
+    backgroundColor: CARD_BG,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: GOLD_BORDER,
+    borderColor: CARD_BORDER,
     paddingVertical: 14,
-    paddingHorizontal: 8,
     alignItems: 'center',
-    justifyContent: 'space-around',
   },
-  statPill: { flex: 1, alignItems: 'center', gap: 2 },
-  statIcon: { fontSize: 17, marginBottom: 1 },
-  statValue: { fontSize: 20, fontWeight: '800', color: GOLD, lineHeight: 24 },
+  statItem: { flex: 1, alignItems: 'center' },
+  statValue: { fontSize: 20, fontWeight: '900', color: ACCENT },
   statLabel: {
     fontSize: 10,
-    color: MUTED,
+    color: TEXT_MUTED,
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
+    marginTop: 2,
   },
-  statDivider: { width: 1, height: 36, backgroundColor: GOLD_BORDER },
+  statDivider: { width: 1, height: 32, backgroundColor: CARD_BORDER },
 
-  searchWrap: { paddingHorizontal: 16, paddingTop: 10, paddingBottom: 4 },
+  searchWrap: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 4 },
 
-  section: { marginHorizontal: 16, marginTop: 16 },
-
-  darkCard: {
-    backgroundColor: CARD,
-    borderRadius: 18,
+  // Secciones
+  sectionCard: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: GOLD_BORDER,
+    borderColor: CARD_BORDER,
+    backgroundColor: CARD_BG,
     padding: 16,
-    overflow: 'hidden',
   },
-  lightInner: { padding: 0 },
-
   secHead: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 14 },
-  secTitle: { fontSize: 16, fontWeight: '800', color: WARM, letterSpacing: 0.2 },
-  secSub: { fontSize: 11, color: MUTED, marginTop: 2 },
+  secTitle: { fontSize: 16, fontWeight: '800', color: TEXT_DARK },
+  secSub: { fontSize: 11, color: TEXT_MUTED, marginTop: 2 },
 
   hScroll: { paddingRight: 4, gap: 12 },
 
+  // Grid colección
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: GRID_GAP },
   gridCard: {
     width: CARD_W,
-    borderRadius: 13,
+    borderRadius: 14,
     overflow: 'hidden',
-    backgroundColor: CARD_LIGHT,
+    backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: GOLD_BORDER,
+    borderColor: CARD_BORDER,
   },
-  gridImg: { width: '100%', height: CARD_W * 1.1, backgroundColor: '#1a0c04' },
+  gridImg: { width: '100%', height: CARD_W * 1.1, backgroundColor: ACCENT_LIGHT },
   gridImgEmpty: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#1f1008',
-  },
-  gridImgGradient: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 48,
-    backgroundColor: 'rgba(12,6,2,0.5)',
+    backgroundColor: '#f5ede3',
   },
   gridFav: {
     position: 'absolute',
@@ -551,7 +549,7 @@ const s = StyleSheet.create({
     width: 26,
     height: 26,
     borderRadius: 13,
-    backgroundColor: 'rgba(0,0,0,0.45)',
+    backgroundColor: 'rgba(0,0,0,0.35)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -559,52 +557,57 @@ const s = StyleSheet.create({
     position: 'absolute',
     bottom: 7,
     left: 7,
-    backgroundColor: GOLD,
+    backgroundColor: PREMIUM_ACCENT,
     borderRadius: 8,
     paddingHorizontal: 6,
     paddingVertical: 2,
   },
-  gridBadgeText: { color: '#1a0c04', fontSize: 10, fontWeight: '800' },
-  gridInfo: { padding: 9 },
+  gridBadgeText: { color: '#fff', fontSize: 10, fontWeight: '800' },
+  gridInfo: { padding: 9, backgroundColor: '#fff' },
   gridBrand: {
     fontSize: 9,
     fontWeight: '700',
-    color: GOLD,
+    color: ACCENT,
     textTransform: 'uppercase',
     letterSpacing: 0.4,
     marginBottom: 2,
   },
-  gridName: { fontSize: 12, fontWeight: '800', color: WARM, lineHeight: 16 },
-  gridMeta: { fontSize: 10, color: MUTED, marginTop: 3 },
+  gridName: { fontSize: 12, fontWeight: '800', color: TEXT_DARK, lineHeight: 16 },
+  gridMeta: { fontSize: 10, color: TEXT_MUTED, marginTop: 3 },
 
-  emptyWrap: { alignItems: 'center', paddingVertical: 40, paddingHorizontal: 24 },
-  emptyIcon: { fontSize: 44, marginBottom: 10 },
+  // Empty
+  emptyWrap: { alignItems: 'center', paddingVertical: 40 },
+  emptyIcon: { fontSize: 40, marginBottom: 10 },
   emptyTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '800',
-    color: WARM,
+    color: TEXT_DARK,
     marginBottom: 6,
     textAlign: 'center',
   },
-  emptyText: { fontSize: 12, color: MUTED, textAlign: 'center', lineHeight: 18 },
-  empty: { color: MUTED, textAlign: 'center', marginVertical: 24, fontSize: 13 },
+  emptyText: {
+    fontSize: 12,
+    color: TEXT_MUTED,
+    textAlign: 'center',
+    lineHeight: 18,
+    paddingHorizontal: 16,
+  },
+  empty: { color: TEXT_MUTED, textAlign: 'center', marginVertical: 24, fontSize: 13 },
 
-  // Taste profile
-  tasteCard: { backgroundColor: '#1a0e07', borderColor: GOLD_BORDER },
-  tasteHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 16 },
-  tasteIconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: GOLD_DIM,
+  // Taste profile (widget oscuro)
+  tasteOuter: { marginHorizontal: 16, marginTop: 16 },
+  tasteEyebrow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 10 },
+  tasteEyebrowLine: { flex: 1, height: 1, backgroundColor: CARD_BORDER },
+  tasteEyebrowText: { fontSize: 10, fontWeight: '800', color: TEXT_MUTED, letterSpacing: 1 },
+  tasteWrap: {},
+  tasteCard: {
+    backgroundColor: DARK_BG,
+    borderRadius: 20,
     borderWidth: 1,
     borderColor: GOLD_BORDER,
-    alignItems: 'center',
-    justifyContent: 'center',
+    padding: 16,
   },
-  tasteTitle: { fontSize: 16, fontWeight: '800', color: WARM },
-  tasteSub: { fontSize: 11, color: MUTED, marginTop: 1 },
-  tasteBars: { gap: 10, marginBottom: 14 },
+  tasteBars: { gap: 10 },
   tasteBarRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   tasteBarLabel: { fontSize: 9, fontWeight: '700', color: MUTED, letterSpacing: 0.7, width: 88 },
   tasteBarTrack: {
@@ -616,7 +619,7 @@ const s = StyleSheet.create({
   },
   tasteBarFill: { height: '100%', borderRadius: 3 },
   tasteBarPct: { fontSize: 12, fontWeight: '800', width: 34, textAlign: 'right' },
-  tasteDivider: { height: 1, backgroundColor: DIVIDER, marginVertical: 4 },
+  tasteDivider: { height: 1, backgroundColor: 'rgba(200,169,124,0.12)', marginVertical: 4 },
   tasteTags: { paddingVertical: 12 },
   tasteTagLabel: {
     fontSize: 9,
@@ -634,13 +637,9 @@ const s = StyleSheet.create({
     borderWidth: 1,
     borderColor: GOLD_BORDER,
   },
-  tasteTagBlue: {
-    backgroundColor: 'rgba(122,174,220,0.1)',
-    borderColor: 'rgba(122,174,220,0.22)',
-  },
+  tasteTagBlue: { backgroundColor: 'rgba(122,174,220,0.1)', borderColor: 'rgba(122,174,220,0.22)' },
   tasteTagText: { fontSize: 11, fontWeight: '700', color: GOLD },
-  tasteRecs: { paddingTop: 12 },
-  tasteRecsRow: { flexDirection: 'row', gap: 10 },
+  tasteRecsRow: { flexDirection: 'row', gap: 10, paddingTop: 10 },
   tasteRecCard: { flex: 1 },
   tasteRecImg: {
     width: '100%',

@@ -139,12 +139,7 @@ export default function MasTab({
           onEditProfile={() => setShowProfile(true)}
         />
 
-        <PremiumSection
-          mas={mas}
-          isPremium={isPremium}
-          premiumDaysLeft={premiumDaysLeft}
-          onOpenPaywall={onOpenPaywall}
-        />
+        {/* Premium section temporarily hidden (will launch as free) */}
 
         <BlogSection mas={mas} />
 

@@ -31,6 +31,8 @@
     "cafes:audit:apply": "APPLY=true node scripts/audit_cafes_firestore.js",
     "cafes:price:dry": "node scripts/enrich_prices_from_sources.js",
     "cafes:price:apply": "APPLY=true node scripts/enrich_prices_from_sources.js",
+    "eci:price:bot:dry": "c:/Datos/Sourcetree/etiove/etiove/.venv/Scripts/python.exe scripts/extract_eci_prices_botasaurus.py",
+    "eci:price:bot:apply": "APPLY=true c:/Datos/Sourcetree/etiove/etiove/.venv/Scripts/python.exe scripts/extract_eci_prices_botasaurus.py",
     "cafes:ean:dry": "node scripts/enrich_ean_from_sources.js",
     "cafes:ean:apply": "APPLY=true node scripts/enrich_ean_from_sources.js",
     "cafes:ean:db:dry": "node scripts/suggest_ean_from_db.js",

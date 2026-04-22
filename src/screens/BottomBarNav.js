@@ -8,7 +8,6 @@ export default function BottomBarNav({
   activeTab,
   setActiveTab,
   setScanning,
-  favs,
   accentColor,
   inactiveColor,
 }) {
@@ -54,7 +53,6 @@ export default function BottomBarNav({
         tab={MAIN_TABS.MORE}
         active={activeTab}
         onPress={setActiveTab}
-        badge={favs.length}
         accentColor={accentColor}
         inactiveColor={inactiveColor}
       />

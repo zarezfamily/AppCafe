@@ -379,9 +379,6 @@ export function ModerationSection({
   if (!isAdmin && !isStaff) return null;
 
   const title = isAdmin ? 'Panel de administración' : 'Panel de staff';
-  const subtitle = isAdmin
-    ? 'Revisa cafés pendientes, aprueba specialty, marca no specialty y rechaza contenido inválido.'
-    : 'Accede a herramientas internas de moderación y revisión.';
 
   return (
     <>
@@ -406,7 +403,6 @@ export function ModerationSection({
             alignItems: 'center',
             justifyContent: 'space-between',
             gap: 12,
-            marginBottom: 12,
           }}
         >
           <View style={{ flex: 1 }}>
@@ -430,114 +426,33 @@ export function ModerationSection({
             >
               {title}
             </Text>
-            <Text
-              style={{
-                marginTop: 6,
-                fontSize: 13,
-                lineHeight: 19,
-                color: '#6f5a4b',
-              }}
-            >
-              {subtitle}
-            </Text>
           </View>
 
-          <View
-            style={{
-              minWidth: 84,
-              alignItems: 'center',
-              justifyContent: 'center',
-              paddingHorizontal: 12,
-              paddingVertical: 10,
-              borderRadius: 16,
-              backgroundColor: '#24160f',
+          <TouchableOpacity
+            activeOpacity={0.88}
+            onPress={() => {
+              if (isAdmin && onOpenAdminPanel) {
+                onOpenAdminPanel();
+                return;
+              }
+              openDialog(
+                title,
+                'Las herramientas de moderación estarán disponibles en este módulo.',
+                [{ label: 'Cerrar' }]
+              );
             }}
+            style={[
+              mas.newsletterBtn,
+              {
+                paddingHorizontal: 20,
+                paddingVertical: 12,
+                borderRadius: 999,
+              },
+            ]}
           >
-            <Text style={{ color: '#fff7ef', fontSize: 11, fontWeight: '900' }}>
-              {isAdmin ? 'ADMIN' : 'STAFF'}
-            </Text>
-          </View>
+            <Text style={mas.newsletterBtnText}>ABRIR</Text>
+          </TouchableOpacity>
         </View>
-
-        <View
-          style={{
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            gap: 10,
-            marginBottom: 14,
-          }}
-        >
-          <View
-            style={{
-              borderRadius: 999,
-              backgroundColor: '#f3e7d9',
-              borderWidth: 1,
-              borderColor: '#eadbce',
-              paddingHorizontal: 12,
-              paddingVertical: 8,
-            }}
-          >
-            <Text style={{ fontSize: 11, fontWeight: '800', color: '#8f5e3b' }}>
-              Revisar pendientes
-            </Text>
-          </View>
-          <View
-            style={{
-              borderRadius: 999,
-              backgroundColor: '#f3e7d9',
-              borderWidth: 1,
-              borderColor: '#eadbce',
-              paddingHorizontal: 12,
-              paddingVertical: 8,
-            }}
-          >
-            <Text style={{ fontSize: 11, fontWeight: '800', color: '#8f5e3b' }}>
-              Aprobar specialty
-            </Text>
-          </View>
-          <View
-            style={{
-              borderRadius: 999,
-              backgroundColor: '#f3e7d9',
-              borderWidth: 1,
-              borderColor: '#eadbce',
-              paddingHorizontal: 12,
-              paddingVertical: 8,
-            }}
-          >
-            <Text style={{ fontSize: 11, fontWeight: '800', color: '#8f5e3b' }}>
-              Marcar no specialty
-            </Text>
-          </View>
-        </View>
-
-        <TouchableOpacity
-          activeOpacity={0.88}
-          onPress={() => {
-            if (isAdmin && onOpenAdminPanel) {
-              onOpenAdminPanel();
-              return;
-            }
-            openDialog(
-              title,
-              'Las herramientas de moderación estarán disponibles en este módulo.',
-              [{ label: 'Cerrar' }]
-            );
-          }}
-          style={[
-            mas.newsletterBtn,
-            {
-              alignSelf: 'flex-start',
-              paddingHorizontal: 18,
-              paddingVertical: 12,
-              borderRadius: 999,
-            },
-          ]}
-        >
-          <Text style={mas.newsletterBtnText}>
-            {isAdmin ? 'ABRIR PANEL ADMIN' : 'ABRIR MODERACIÓN'}
-          </Text>
-        </TouchableOpacity>
       </View>
     </>
   );

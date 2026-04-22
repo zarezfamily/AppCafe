@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { spreadByBrand } from '../utils/coffeeRanking';
 import SimpleCoffeeListTab from './SimpleCoffeeListTab';
 
 export default function BestValueTab({
@@ -13,29 +14,28 @@ export default function BestValueTab({
   toggleFav,
 }) {
   const valueItems = useMemo(() => {
-    return (
-      [...(top100 || [])]
-        // Solo cafés con precio válido
-        .filter((item) => Number(item?.precio || 0) > 0)
-        // Evitar cafés sin suficiente base (muy importante para PRO)
-        .filter((item) => Number(item?.votos || 0) >= 2)
-        // Orden principal por valueScore (backend)
-        .sort((a, b) => {
-          const valueDiff = Number(b?.valueScore || 0) - Number(a?.valueScore || 0);
+    const sorted = [...(top100 || [])]
+      // Solo cafés con precio válido
+      .filter((item) => Number(item?.precio || 0) > 0)
+      // Evitar cafés sin suficiente base (muy importante para PRO)
+      .filter((item) => Number(item?.votos || 0) >= 2)
+      // Orden principal por valueScore (backend)
+      .sort((a, b) => {
+        const valueDiff = Number(b?.valueScore || 0) - Number(a?.valueScore || 0);
 
-          if (valueDiff !== 0) return valueDiff;
+        if (valueDiff !== 0) return valueDiff;
 
-          // fallback: mejor puntuación
-          const ratingDiff = Number(b?.puntuacion || 0) - Number(a?.puntuacion || 0);
+        // fallback: mejor puntuación
+        const ratingDiff = Number(b?.puntuacion || 0) - Number(a?.puntuacion || 0);
 
-          if (ratingDiff !== 0) return ratingDiff;
+        if (ratingDiff !== 0) return ratingDiff;
 
-          // fallback final: más votos
-          return Number(b?.votos || 0) - Number(a?.votos || 0);
-        })
-        // Limitar a TOP 50 para performance y calidad visual
-        .slice(0, 50)
-    );
+        // fallback final: más votos
+        return Number(b?.votos || 0) - Number(a?.votos || 0);
+      })
+      // Limitar a TOP 50 para performance y calidad visual
+      .slice(0, 50);
+    return spreadByBrand(sorted);
   }, [top100]);
 
   return (

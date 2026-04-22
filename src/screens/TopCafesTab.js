@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useMemo } from 'react';
+import { spreadByBrand } from '../utils/coffeeRanking';
 import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SkeletonVerticalList } from '../components/SkeletonLoader';
 import { MAIN_TABS } from './mainScreenTabs';
@@ -139,10 +140,11 @@ export default function TopCafesTab({
   const country = perfil?.pais || 'España';
 
   const filteredItems = useMemo(() => {
-    return [...(top100 || [])]
+    const sorted = [...(top100 || [])]
       .filter((item) => item?.coffeeCategory === 'specialty' && item?.qualityLevel !== 'commercial')
       .filter((item) => matchesSearch(item, searchQuery))
       .sort((a, b) => Number(b?.rankingScore || 0) - Number(a?.rankingScore || 0));
+    return spreadByBrand(sorted);
   }, [top100, searchQuery]);
 
   const hero = filteredItems?.[0] || null;

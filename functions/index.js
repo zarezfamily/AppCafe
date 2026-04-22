@@ -121,6 +121,94 @@ exports.onForumReplyCreatedNotifyThreadOwner = onDocumentCreated(
   }
 );
 
+// Extracts @Name tokens from a body string (1–30 chars, letters/numbers/underscores/hyphens).
+function extractMentionNames(body) {
+  const raw = String(body || '');
+  const matches = raw.match(/@([\w\-]{1,30})/g) || [];
+  return [...new Set(matches.map((m) => m.slice(1)))];
+}
+
+// Returns push subscription for a uid, or null if not found / disabled.
+async function getActiveSub(uid) {
+  const snap = await db.collection('push_subscriptions').doc(String(uid)).get();
+  if (!snap.exists) return null;
+  const sub = snap.data() || {};
+  if (!sub.expoPushToken || sub.notificationsEnabled === false) return null;
+  return sub;
+}
+
+exports.onForumReplyCreatedNotifyMentioned = onDocumentCreated(
+  'foro_respuestas/{replyId}',
+  async (event) => {
+    const reply = event.data?.data();
+    if (!reply?.authorUid || !reply?.threadId) return;
+
+    const replierUid = String(reply.authorUid);
+    const authorName = String(reply.authorName || 'Alguien');
+    const threadId = String(reply.threadId);
+    const threadRef = db.collection('foro_hilos').doc(threadId);
+    const threadSnap = await threadRef.get();
+    const threadTitle = threadSnap.exists
+      ? String(threadSnap.data()?.title || 'un hilo')
+      : 'un hilo';
+
+    // Collect UIDs to notify, avoiding duplicates and self-notifications.
+    const uidsToNotify = new Set();
+    const messages = [];
+
+    // 1. Notify parent reply author when this is a nested reply.
+    const parentId = String(reply.parentId || '');
+    if (parentId) {
+      const parentSnap = await db.collection('foro_respuestas').doc(parentId).get();
+      if (parentSnap.exists) {
+        const parentAuthorUid = String(parentSnap.data()?.authorUid || '');
+        if (parentAuthorUid && parentAuthorUid !== replierUid) {
+          uidsToNotify.add(parentAuthorUid);
+        }
+      }
+    }
+
+    // 2. Detect @Name mentions in body and resolve to UIDs via user_profiles.
+    const mentionNames = extractMentionNames(reply.body);
+    if (mentionNames.length > 0) {
+      const profilesSnap = await db
+        .collection('user_profiles')
+        .where('displayName', 'in', mentionNames.slice(0, 10))
+        .get();
+      profilesSnap.docs.forEach((doc) => {
+        const uid = String(doc.data()?.uid || doc.id);
+        if (uid && uid !== replierUid) uidsToNotify.add(uid);
+      });
+    }
+
+    // Also notify the thread owner if they are mentioned or replied-to (skip if already covered
+    // by onForumReplyCreatedNotifyThreadOwner — that function only fires for thread owner).
+    // We intentionally do NOT re-notify the thread owner here to avoid double notifications.
+    if (threadSnap.exists) {
+      const threadOwnerUid = String(threadSnap.data()?.authorUid || '');
+      uidsToNotify.delete(threadOwnerUid); // thread owner already notified by other function
+    }
+
+    // Build push messages for each unique UID.
+    await Promise.all(
+      [...uidsToNotify].map(async (uid) => {
+        const sub = await getActiveSub(uid);
+        if (!sub) return;
+        messages.push(
+          buildMessage(
+            sub.expoPushToken,
+            `${authorName} te ha mencionado`,
+            `En el hilo "${threadTitle}": ${String(reply.body || '').slice(0, 80)}`,
+            { type: 'forum_mention', threadId }
+          )
+        );
+      })
+    );
+
+    await sendExpoPushMessages(messages);
+  }
+);
+
 exports.onCafeScoreChangedNotifyFans = onDocumentUpdated('cafes/{cafeId}', async (event) => {
   const before = event.data?.before?.data() || {};
   const after = event.data?.after?.data() || {};

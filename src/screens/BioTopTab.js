@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { spreadByBrand } from '../utils/coffeeRanking';
 import SimpleCoffeeListTab from './SimpleCoffeeListTab';
 
 export default function BioTopTab({
@@ -13,9 +14,10 @@ export default function BioTopTab({
   toggleFav,
 }) {
   const bioItems = useMemo(() => {
-    return [...(top100 || [])]
+    const sorted = [...(top100 || [])]
       .filter((item) => item?.isBio === true)
       .sort((a, b) => Number(b?.bioScore || 0) - Number(a?.bioScore || 0));
+    return spreadByBrand(sorted);
   }, [top100]);
 
   return (

@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { spreadByBrand } from '../utils/coffeeRanking';
 import SimpleCoffeeListTab from './SimpleCoffeeListTab';
 
 export default function DailyTopTab({
@@ -13,9 +14,10 @@ export default function DailyTopTab({
   toggleFav,
 }) {
   const dailyItems = useMemo(() => {
-    return [...(top100 || [])]
+    const sorted = [...(top100 || [])]
       .filter((item) => item?.coffeeCategory === 'daily')
       .sort((a, b) => Number(b?.rankingScore || 0) - Number(a?.rankingScore || 0));
+    return spreadByBrand(sorted);
   }, [top100]);
 
   return (

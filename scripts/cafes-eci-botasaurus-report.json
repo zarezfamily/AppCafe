@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-04-22T21:08:43.291299Z",
+  "dryRun": true,
+  "headless": true,
+  "waitSeconds": 3,
+  "useHttpFallback": true,
+  "includePriced": true,
+  "totals": {
+    "targeted": 1,
+    "found": 1,
+    "applied": 0
+  },
+  "results": [
+    {
+      "id": "club-del-gourmet-cafe-en-grano-tueste-natural-100-arabica-origen-brasil-club-del-gourmet",
+      "nombre": "Café en grano tueste natural 100% Arábica origen Brasil Club del Gourmet",
+      "marca": "Club del Gourmet",
+      "fuente": "Club del Gourmet",
+      "url": "https://www.elcorteingles.es/club-del-gourmet/A32650686-cafe-en-grano-tueste-natural-100-arabica-origen-brasil-club-del-gourmet/?color=Sin+especificar&parentCategoryId=999.34318690013",
+      "ok": true,
+      "price": 10.5,
+      "currency": "EUR",
+      "source": "botasaurus:eci_offer_jsonld",
+      "botasaurusHtmlLength": 243268,
+      "botasaurusTitle": "Café en grano tueste natural 100% Arábica origen Brasil Club del Gourmet · Club del Gourmet · El Corte Inglés",
+      "fallbackUsed": false,
+      "reason": null
+    }
+  ]
+}

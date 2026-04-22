@@ -4,6 +4,7 @@ import * as SecureStore from 'expo-secure-store';
 import { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
+  Image,
   Modal,
   SafeAreaView,
   ScrollView,
@@ -62,10 +63,57 @@ function formatCategoryBadgeLabel(isDaily, cafeToShow) {
 }
 
 function formatScaCategory(score) {
-  if (score >= 90) return '☕ Excepcional';
-  if (score >= 85) return '⭐ Excelente';
-  if (score >= 80) return '✓ Especialidad';
-  return '◎ Correcto';
+  if (score >= 90) return 'Excepcional';
+  if (score >= 85) return 'Excelente';
+  if (score >= 80) return 'Especialidad';
+  if (score >= 70) return 'Correcto';
+  return 'Por debajo de especialidad';
+}
+
+function getScaColor(score) {
+  if (score >= 90) return '#c9a227';
+  if (score >= 85) return '#4a8f6a';
+  if (score >= 80) return '#c47d2a';
+  if (score >= 70) return '#8f6a48';
+  return '#9b9490';
+}
+
+function ScaTierBar({ score }) {
+  const markerPct = score > 0 ? Math.min(Math.max(((score - 60) / 40) * 100, 1), 99) : -1;
+
+  return (
+    <View style={{ position: 'relative', marginTop: 14, height: 16 }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          height: 10,
+          borderRadius: 999,
+          overflow: 'hidden',
+        }}
+      >
+        <View style={{ flex: 10, backgroundColor: '#d4ccc4' }} />
+        <View style={{ flex: 10, backgroundColor: '#b08860' }} />
+        <View style={{ flex: 5, backgroundColor: '#d4a843' }} />
+        <View style={{ flex: 5, backgroundColor: '#4a8f6a' }} />
+        <View style={{ flex: 10, backgroundColor: '#c9a227' }} />
+      </View>
+      {markerPct >= 0 && (
+        <View
+          style={{
+            position: 'absolute',
+            left: `${markerPct}%`,
+            top: 0,
+            width: 4,
+            height: 16,
+            backgroundColor: '#fff',
+            borderRadius: 2,
+            borderWidth: 1.5,
+            borderColor: '#24160f',
+          }}
+        />
+      )}
+    </View>
+  );
 }
 
 export default function CafeDetailScreen({
@@ -102,6 +150,7 @@ export default function CafeDetailScreen({
   const [dialogConfig, setDialogConfig] = useState({ title: '', description: '', actions: [] });
   const [compareVisible, setCompareVisible] = useState(false);
   const [selectedComparisonId, setSelectedComparisonId] = useState(null);
+  const [photoZoomVisible, setPhotoZoomVisible] = useState(false);
 
   const fotoCafe =
     cafeToShow.bestPhoto ||
@@ -256,17 +305,55 @@ export default function CafeDetailScreen({
         onSelectCafe={(nextCafe) => setSelectedComparisonId(nextCafe?.id || null)}
       />
 
+      <Modal
+        visible={photoZoomVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setPhotoZoomVisible(false)}
+      >
+        <TouchableOpacity
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.92)',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+          activeOpacity={1}
+          onPress={() => setPhotoZoomVisible(false)}
+        >
+          <Image
+            source={{ uri: fotoCafe }}
+            style={{ width: '95%', height: '75%' }}
+            resizeMode="contain"
+          />
+          <Text
+            style={{
+              color: 'rgba(255,255,255,0.5)',
+              fontSize: 12,
+              marginTop: 16,
+              fontWeight: '600',
+            }}
+          >
+            Toca para cerrar
+          </Text>
+        </TouchableOpacity>
+      </Modal>
+
       <SafeAreaView style={styles.safe}>
         <StatusBar barStyle="dark-content" />
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={det.hero}>
-            <View style={[StyleSheet.absoluteFillObject, styles.packshotBg]}>
+            <TouchableOpacity
+              style={[StyleSheet.absoluteFillObject, styles.packshotBg]}
+              activeOpacity={0.9}
+              onPress={() => fotoCafe && setPhotoZoomVisible(true)}
+            >
               <PackshotImage
                 uri={fotoCafe}
                 frameStyle={s?.packshotHeroFrame}
                 imageStyle={s?.packshotHeroImage}
               />
-            </View>
+            </TouchableOpacity>
 
             <View style={det.heroOverlayTop} />
             <View style={det.heroOverlayBottom} />
@@ -427,57 +514,87 @@ export default function CafeDetailScreen({
                   )
                 }
               >
-                <View style={det.scaBox}>
-                  <View style={det.scaTop}>
-                    <View style={det.scaLeftBlock}>
-                      <View style={det.scaLeft}>
-                        <Text style={det.scaScore}>
+                <View style={det.scaCard}>
+                  <View
+                    style={[
+                      det.scaStripe,
+                      { backgroundColor: scaInfo ? getScaColor(scaInfo.score) : '#ccc' },
+                    ]}
+                  />
+                  <View style={{ flex: 1, paddingLeft: 14 }}>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'flex-start',
+                        justifyContent: 'space-between',
+                        gap: 8,
+                      }}
+                    >
+                      <View>
+                        <Text style={det.scaScoreBig}>
                           {scaInfo ? Number(scaInfo.score).toFixed(1) : '—'}
                         </Text>
-                        <Text style={det.scaLabel}>
-                          {scaInfo?.type === 'official' ? 'SCA oficial' : 'SCA estimado'}
+                        <Text
+                          style={[
+                            det.scaCatLabel,
+                            { color: scaInfo ? getScaColor(scaInfo.score) : '#999' },
+                          ]}
+                        >
+                          {scaInfo
+                            ? formatScaCategory(Number(scaInfo.score) || 0)
+                            : 'Sin datos SCA'}
                         </Text>
                       </View>
 
-                      {scaInfo?.type === 'estimated' ? (
-                        <Text style={det.scaConfidence}>
-                          Confianza {Math.round(Number(scaInfo.confidence || 0) * 100)}%
-                        </Text>
-                      ) : null}
-                    </View>
-
-                    <Text style={det.scaCat}>
-                      {scaInfo ? formatScaCategory(Number(scaInfo.score) || 0) : ''}
-                    </Text>
-                  </View>
-
-                  <View style={det.scaBar}>
-                    <View
-                      style={[
-                        det.scaFill,
-                        {
-                          width: `${
-                            scaInfo
-                              ? Math.min(
-                                  Math.max(((Number(scaInfo.score) - 80) / 20) * 100, 0),
-                                  100
-                                )
-                              : 0
-                          }%`,
-                        },
-                      ]}
-                    />
-                  </View>
-
-                  {Array.isArray(scaInfo?.reasons) && scaInfo.reasons.length ? (
-                    <View style={det.scaReasonsWrap}>
-                      {scaInfo.reasons.map((reason) => (
-                        <View key={reason} style={det.scaReasonPill}>
-                          <Text style={det.scaReasonText}>{reason}</Text>
+                      <View style={{ gap: 6, alignItems: 'flex-end' }}>
+                        <View
+                          style={[
+                            det.scaTypeBadge,
+                            scaInfo?.type === 'official'
+                              ? det.scaTypeBadgeOfficial
+                              : det.scaTypeBadgeEstimated,
+                          ]}
+                        >
+                          <Text
+                            style={[
+                              det.scaTypeBadgeText,
+                              scaInfo?.type === 'official'
+                                ? det.scaTypeBadgeTextOfficial
+                                : det.scaTypeBadgeTextEstimated,
+                            ]}
+                          >
+                            {scaInfo?.type === 'official' ? '✓ SCA OFICIAL' : '~ SCA ESTIMADO'}
+                          </Text>
                         </View>
-                      ))}
+                        {scaInfo?.type === 'estimated' ? (
+                          <Text style={det.scaConfidence}>
+                            Confianza {Math.round(Number(scaInfo.confidence || 0) * 100)}%
+                          </Text>
+                        ) : null}
+                      </View>
                     </View>
-                  ) : null}
+
+                    {scaInfo ? <ScaTierBar score={scaInfo.score} /> : null}
+
+                    <View style={det.scaTierLegend}>
+                      <Text style={det.scaTierLabel}>60</Text>
+                      <Text style={det.scaTierLabel}>70</Text>
+                      <Text style={det.scaTierLabel}>80</Text>
+                      <Text style={det.scaTierLabel}>85</Text>
+                      <Text style={det.scaTierLabel}>90</Text>
+                      <Text style={det.scaTierLabel}>100</Text>
+                    </View>
+
+                    {Array.isArray(scaInfo?.reasons) && scaInfo.reasons.length ? (
+                      <View style={det.scaReasonsWrap}>
+                        {scaInfo.reasons.map((reason) => (
+                          <View key={reason} style={det.scaReasonPill}>
+                            <Text style={det.scaReasonText}>{reason}</Text>
+                          </View>
+                        ))}
+                      </View>
+                    ) : null}
+                  </View>
                 </View>
               </TouchableOpacity>
 
@@ -1067,64 +1184,78 @@ const det = StyleSheet.create({
     textAlign: 'center',
   },
 
-  scaBox: {
+  scaCard: {
+    flexDirection: 'row',
     backgroundColor: '#faf8f5',
     borderRadius: 18,
-    padding: 16,
     borderWidth: 1,
     borderColor: '#eee4d9',
-    gap: 10,
+    overflow: 'hidden',
+    paddingRight: 16,
+    paddingVertical: 16,
   },
-  scaTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    gap: 12,
+  scaStripe: {
+    width: 6,
+    borderTopLeftRadius: 18,
+    borderBottomLeftRadius: 18,
+    marginRight: 0,
   },
-  scaLeftBlock: {
-    flex: 1,
-    gap: 6,
-  },
-  scaLeft: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: 8,
-  },
-  scaScore: {
-    fontSize: 36,
+  scaScoreBig: {
+    fontSize: 46,
     fontWeight: '900',
     color: '#17120e',
+    lineHeight: 50,
   },
-  scaLabel: {
-    fontSize: 13,
-    color: '#7d6a5a',
+  scaCatLabel: {
+    fontSize: 14,
+    fontWeight: '800',
+    marginTop: 2,
+  },
+  scaTypeBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 999,
+    borderWidth: 1,
+  },
+  scaTypeBadgeOfficial: {
+    backgroundColor: '#edf8ef',
+    borderColor: '#a8d5b5',
+  },
+  scaTypeBadgeEstimated: {
+    backgroundColor: '#f8f3ed',
+    borderColor: '#e8d9c8',
+  },
+  scaTypeBadgeText: {
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.4,
+  },
+  scaTypeBadgeTextOfficial: {
+    color: '#3a7d54',
+  },
+  scaTypeBadgeTextEstimated: {
+    color: '#8f6a48',
   },
   scaConfidence: {
     fontSize: 12,
     color: '#8b7665',
     fontWeight: '700',
   },
-  scaBar: {
-    height: 9,
-    backgroundColor: '#eadfd3',
-    borderRadius: 999,
-    overflow: 'hidden',
+  scaTierLegend: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 4,
   },
-  scaFill: {
-    height: '100%',
-    backgroundColor: '#8f5e3b',
-    borderRadius: 999,
-  },
-  scaCat: {
-    fontSize: 13,
-    color: '#5d4030',
-    fontWeight: '700',
+  scaTierLabel: {
+    fontSize: 10,
+    color: '#a89888',
+    fontWeight: '600',
   },
   scaReasonsWrap: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
-    marginTop: 4,
+    marginTop: 12,
   },
   scaReasonPill: {
     backgroundColor: '#F3ECE4',

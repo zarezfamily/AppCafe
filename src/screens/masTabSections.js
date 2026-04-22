@@ -59,6 +59,7 @@ export function MemberStatusCard({
   pendingAchievements,
   achievementProgress,
   onLongPress,
+  onEditProfile,
 }) {
   return (
     <TouchableOpacity
@@ -86,10 +87,31 @@ export function MemberStatusCard({
             </Text>
           </View>
         </View>
-        <View style={mas.premiumLevelBadge}>
-          <Text style={mas.premiumLevelText}>
-            {memberStatus.icon} {memberStatus.label}
-          </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          {onEditProfile && (
+            <TouchableOpacity
+              onPress={onEditProfile}
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 16,
+                backgroundColor: 'rgba(255,248,241,0.12)',
+                borderWidth: 1,
+                borderColor: 'rgba(250,229,206,0.22)',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              activeOpacity={0.75}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Ionicons name="pencil" size={14} color="#fff4ea" />
+            </TouchableOpacity>
+          )}
+          <View style={mas.premiumLevelBadge}>
+            <Text style={mas.premiumLevelText}>
+              {memberStatus.icon} {memberStatus.label}
+            </Text>
+          </View>
         </View>
       </View>
 
@@ -496,12 +518,9 @@ export function ModerationSection({
               onOpenAdminPanel();
               return;
             }
-
             openDialog(
               title,
-              isAdmin
-                ? 'El panel admin avanzado está listo para conectarse con la revisión de cafés pendientes, aprobaciones y rechazos.'
-                : 'Las herramientas de moderación del staff estarán disponibles en este módulo.',
+              'Las herramientas de moderación estarán disponibles en este módulo.',
               [{ label: 'Cerrar' }]
             );
           }}
@@ -519,45 +538,6 @@ export function ModerationSection({
             {isAdmin ? 'ABRIR PANEL ADMIN' : 'ABRIR MODERACIÓN'}
           </Text>
         </TouchableOpacity>
-      </View>
-
-      <View style={mas.listCard}>
-        <MasItem
-          icon="shield-checkmark-outline"
-          label="Revisión de cafés"
-          sub="Pendientes, aprobados, rechazados y clasificación specialty"
-          onPress={() => {
-            if (isAdmin && onOpenAdminPanel) {
-              onOpenAdminPanel();
-              return;
-            }
-
-            openDialog(
-              'Revisión de cafés',
-              'Aquí podrás revisar los cafés detectados por escáner o foto, aprobarlos o rechazarlos.',
-              [{ label: 'Cerrar' }]
-            );
-          }}
-          mas={mas}
-          premiumAccent={premiumAccent}
-          iconFaint={iconFaint}
-        />
-
-        <MasItem
-          icon="sparkles-outline"
-          label="Validación IA"
-          sub="Usar IA para completar datos, detectar specialty y filtrar contenido inválido"
-          onPress={() =>
-            openDialog(
-              'Validación IA',
-              'La siguiente fase conectará el panel con IA para completar datos, detectar si un café es specialty y bloquear imágenes no relacionadas con café.',
-              [{ label: 'Cerrar' }]
-            )
-          }
-          mas={mas}
-          premiumAccent={premiumAccent}
-          iconFaint={iconFaint}
-        />
       </View>
     </>
   );

@@ -7,7 +7,6 @@ import { getHeroCafe } from '../domain/coffee/heroCoffee';
 import { getLiveRankingBuckets } from '../domain/coffee/liveRankings';
 import {
   BioCoffeeSection,
-  BlogSection,
   DailyCoffeeSection,
   InicioTopBar,
   LiveRankingSection,
@@ -256,8 +255,6 @@ export default function InicioTab({
             cargarCafeteriasInicio={cargarCafeteriasInicio}
             theme={theme}
           />
-
-          <BlogSection s={s} />
         </>
       )}
     </View>

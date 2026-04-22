@@ -1,0 +1,1117 @@
+{
+  "generatedAt": "2026-04-22T19:52:17.484Z",
+  "dryRun": true,
+  "totals": {
+    "activeWithoutEan": 121,
+    "processed": 60,
+    "manualOverrides": 0,
+    "found": 0,
+    "applied": 0,
+    "failed": 44
+  },
+  "sampleFound": [],
+  "sampleMissing": [
+    {
+      "id": "peets_anniversary-blend",
+      "fuente": "peets",
+      "nombre": "Anniversary Blend 2026",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/anniversary-blend",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_bacon-cheddar-brioche",
+      "fuente": "peets",
+      "nombre": "Bacon & Cheddar Brioche",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/bacon-cheddar-brioche",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_bacon-sausage-cheddar-crispy",
+      "fuente": "peets",
+      "nombre": "Bacon Sausage Cheddar Crispy",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/bacon-sausage-cheddar-crispy",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_bacon-spinach-swiss-frittata",
+      "fuente": "peets",
+      "nombre": "Bacon Gouda Frittata",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/bacon-spinach-swiss-frittata",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_bali-kintamani",
+      "fuente": "peets",
+      "nombre": "Bali Kintamani",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/bali-kintamani",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_baridi-cold-brew",
+      "fuente": "peets",
+      "nombre": "Baridi Cold Brew",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/baridi-cold-brew",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_black-tie",
+      "fuente": "peets",
+      "nombre": "The Black Tie",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/black-tie",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_bolivia-yungas-valley",
+      "fuente": "peets",
+      "nombre": "Bolivia Yungas Valley",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/bolivia-yungas-valley",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_brazil-bright-river",
+      "fuente": "peets",
+      "nombre": "Brazil Bright River",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/brazil-bright-river",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_brazil-encantador",
+      "fuente": "peets",
+      "nombre": "Brazil Encantador",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/brazil-encantador",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_brazil-fazendas-dutra-organic",
+      "fuente": "peets",
+      "nombre": "Brazil Fazendas Dutra Organic",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/brazil-fazendas-dutra-organic",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_brazil-peaberry",
+      "fuente": "peets",
+      "nombre": "Brazil Peaberry",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/brazil-peaberry",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_burundi-turashobora",
+      "fuente": "peets",
+      "nombre": "Burundi Turashobora",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/burundi-turashobora",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_caffe-americano",
+      "fuente": "peets",
+      "nombre": "Americano",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/caffe-americano",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_caffe-latte",
+      "fuente": "peets",
+      "nombre": "Caffe Latte",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/caffe-latte",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_caffe-macchiato",
+      "fuente": "peets",
+      "nombre": "Caffe Macchiato",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/caffe-macchiato",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_caffe-mocha",
+      "fuente": "peets",
+      "nombre": "Caffe Mocha",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/caffe-mocha",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/caffe-mocha <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_cappuccino",
+      "fuente": "peets",
+      "nombre": "Cappuccino",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/cappuccino",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/cappuccino <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_caramel-frappe",
+      "fuente": "peets",
+      "nombre": "Caramel Frappé",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/caramel-frappe",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/caramel-frappe <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_caramel-macchiato",
+      "fuente": "peets",
+      "nombre": "Caramel Macchiato",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/caramel-macchiato",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/caramel-macchiato <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_cheesy-sausage-slider",
+      "fuente": "peets",
+      "nombre": "Cheesy Sausage Slider",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/cheesy-sausage-slider",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/cheesy-sausage-slider <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_chemex-8c-coffeemaker-pcup",
+      "fuente": "peets",
+      "nombre": "Chemex 8 Cup Coffeemaker with P Cup",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/chemex-8c-coffeemaker-pcup",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/chemex-8c-coffeemaker-pcup <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_chemex-bonded-filters-unfolded-half-moon",
+      "fuente": "peets",
+      "nombre": "Chemex Bonded Filters Unfolded Half Moon",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/chemex-bonded-filters-unfolded-half-moon",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/chemex-bonded-filters-unfolded-half-moon <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_chemex-fsu-100-brown-filters",
+      "fuente": "peets",
+      "nombre": "Chemex Natural Coffee Filters 8 Cup",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/chemex-fsu-100-brown-filters",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/chemex-fsu-100-brown-filters <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_chicken-chorizo-wrap",
+      "fuente": "peets",
+      "nombre": "Chicken Chorizo Wrap",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/chicken-chorizo-wrap",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/chicken-chorizo-wrap <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_chicken-waffles-sandwich",
+      "fuente": "peets",
+      "nombre": "Chicken & Waffles Sandwich",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/chicken-waffles-sandwich",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/chicken-waffles-sandwich <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_chuao-exploding-coal-chocolate-bar",
+      "fuente": "peets",
+      "nombre": "Exploding Coal Chocolate bar",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/chuao-exploding-coal-chocolate-bar",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/chuao-exploding-coal-chocolate-bar <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_chuao-peppermint-bar",
+      "fuente": "peets",
+      "nombre": "For the Love of Peppermint Bar",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/chuao-peppermint-bar",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/chuao-peppermint-bar <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_coffee-of-the-day",
+      "fuente": "peets",
+      "nombre": "Coffee of the Day",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/coffee-of-the-day",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/coffee-of-the-day <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_cold-brew-iced-coffee",
+      "fuente": "peets",
+      "nombre": "Cold Brew Iced Coffee",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/cold-brew-iced-coffee",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/cold-brew-iced-coffee <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_copper-airscape",
+      "fuente": "peets",
+      "nombre": "Airscape® Canister 64oz",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/copper-airscape",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/copper-airscape <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_costa-rica-la-candelaria-estate",
+      "fuente": "peets",
+      "nombre": "Costa Rica La Candelaria Estate",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/costa-rica-la-candelaria-estate",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/costa-rica-la-candelaria-estate <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_costa-rica-la-minita",
+      "fuente": "peets",
+      "nombre": "Costa Rica Hacienda La Minita",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/costa-rica-la-minita",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/costa-rica-la-minita <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_costa-rica-los-santos",
+      "fuente": "peets",
+      "nombre": "Costa Rica Los Santos",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/costa-rica-los-santos",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/costa-rica-los-santos <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_crispy-ham-swiss",
+      "fuente": "peets",
+      "nombre": "Crispy Ham & Swiss",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/crispy-ham-swiss",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/crispy-ham-swiss <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_croissant-grilled-cheese",
+      "fuente": "peets",
+      "nombre": "Croissant Grilled Cheese",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/croissant-grilled-cheese",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/croissant-grilled-cheese <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_decaf-holiday-blend",
+      "fuente": "peets",
+      "nombre": "Decaf Holiday Blend 2025",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/decaf-holiday-blend",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/decaf-holiday-blend <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_dubs-blend",
+      "fuente": "peets",
+      "nombre": "Dubs Blend 2022",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/dubs-blend",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/dubs-blend <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_egg-cheese",
+      "fuente": "peets",
+      "nombre": "Egg & Cheese",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/egg-cheese",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/egg-cheese <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_egg-white-tomato-feta-frittata",
+      "fuente": "peets",
+      "nombre": "Egg White, Tomato & Feta Frittata",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/egg-white-tomato-feta-frittata",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/egg-white-tomato-feta-frittata <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_elote-taco",
+      "fuente": "peets",
+      "nombre": "Elote Taco",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/elote-taco",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/elote-taco <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_espresso",
+      "fuente": "peets",
+      "nombre": "Espresso",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/espresso",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/espresso <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_established-1966-peets-mug",
+      "fuente": "peets",
+      "nombre": "Established 1966 Peet's Mug",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/established-1966-peets-mug",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/established-1966-peets-mug <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_ethiopia-duet",
+      "fuente": "peets",
+      "nombre": "Ethiopia Duet",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/ethiopia-duet",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/ethiopia-duet <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_ethiopia-hambela-farm-organic",
+      "fuente": "peets",
+      "nombre": "Ethiopia Hambela Farm Organic",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/ethiopia-hambela-farm-organic",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/ethiopia-hambela-farm-organic <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_ethiopia-refisa-station",
+      "fuente": "peets",
+      "nombre": "Ethiopia Refisa Station",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/ethiopia-refisa-station",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/ethiopia-refisa-station <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_ethiopian-super-natural",
+      "fuente": "peets",
+      "nombre": "Ethiopian Super Natural",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/ethiopian-super-natural",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/ethiopian-super-natural <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_everything-plant-based-sandwich",
+      "fuente": "peets",
+      "nombre": "Everything Plant-Based Sandwich",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/everything-plant-based-sandwich",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/everything-plant-based-sandwich <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_faithful-blend",
+      "fuente": "peets",
+      "nombre": "Faithful Blend",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/faithful-blend",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/faithful-blend <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_golden-protein-latte",
+      "fuente": "peets",
+      "nombre": "Golden Protein Latte",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/golden-protein-latte",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/golden-protein-latte <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    }
+  ],
+  "results": [
+    {
+      "id": "peets_anniversary-blend",
+      "fuente": "peets",
+      "nombre": "Anniversary Blend 2026",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/anniversary-blend",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_bacon-cheddar-brioche",
+      "fuente": "peets",
+      "nombre": "Bacon & Cheddar Brioche",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/bacon-cheddar-brioche",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_bacon-sausage-cheddar-crispy",
+      "fuente": "peets",
+      "nombre": "Bacon Sausage Cheddar Crispy",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/bacon-sausage-cheddar-crispy",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_bacon-spinach-swiss-frittata",
+      "fuente": "peets",
+      "nombre": "Bacon Gouda Frittata",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/bacon-spinach-swiss-frittata",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_bali-kintamani",
+      "fuente": "peets",
+      "nombre": "Bali Kintamani",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/bali-kintamani",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_baridi-cold-brew",
+      "fuente": "peets",
+      "nombre": "Baridi Cold Brew",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/baridi-cold-brew",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_black-tie",
+      "fuente": "peets",
+      "nombre": "The Black Tie",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/black-tie",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_bolivia-yungas-valley",
+      "fuente": "peets",
+      "nombre": "Bolivia Yungas Valley",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/bolivia-yungas-valley",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_brazil-bright-river",
+      "fuente": "peets",
+      "nombre": "Brazil Bright River",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/brazil-bright-river",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_brazil-encantador",
+      "fuente": "peets",
+      "nombre": "Brazil Encantador",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/brazil-encantador",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_brazil-fazendas-dutra-organic",
+      "fuente": "peets",
+      "nombre": "Brazil Fazendas Dutra Organic",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/brazil-fazendas-dutra-organic",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_brazil-peaberry",
+      "fuente": "peets",
+      "nombre": "Brazil Peaberry",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/brazil-peaberry",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_burundi-turashobora",
+      "fuente": "peets",
+      "nombre": "Burundi Turashobora",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/burundi-turashobora",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_caffe-americano",
+      "fuente": "peets",
+      "nombre": "Americano",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/caffe-americano",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_caffe-latte",
+      "fuente": "peets",
+      "nombre": "Caffe Latte",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/caffe-latte",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_caffe-macchiato",
+      "fuente": "peets",
+      "nombre": "Caffe Macchiato",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/caffe-macchiato",
+      "ok": false,
+      "reason": "ean_not_found",
+      "candidates": []
+    },
+    {
+      "id": "peets_caffe-mocha",
+      "fuente": "peets",
+      "nombre": "Caffe Mocha",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/caffe-mocha",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/caffe-mocha <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_cappuccino",
+      "fuente": "peets",
+      "nombre": "Cappuccino",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/cappuccino",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/cappuccino <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_caramel-frappe",
+      "fuente": "peets",
+      "nombre": "Caramel Frappé",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/caramel-frappe",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/caramel-frappe <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_caramel-macchiato",
+      "fuente": "peets",
+      "nombre": "Caramel Macchiato",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/caramel-macchiato",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/caramel-macchiato <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_cheesy-sausage-slider",
+      "fuente": "peets",
+      "nombre": "Cheesy Sausage Slider",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/cheesy-sausage-slider",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/cheesy-sausage-slider <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_chemex-8c-coffeemaker-pcup",
+      "fuente": "peets",
+      "nombre": "Chemex 8 Cup Coffeemaker with P Cup",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/chemex-8c-coffeemaker-pcup",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/chemex-8c-coffeemaker-pcup <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_chemex-bonded-filters-unfolded-half-moon",
+      "fuente": "peets",
+      "nombre": "Chemex Bonded Filters Unfolded Half Moon",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/chemex-bonded-filters-unfolded-half-moon",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/chemex-bonded-filters-unfolded-half-moon <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_chemex-fsu-100-brown-filters",
+      "fuente": "peets",
+      "nombre": "Chemex Natural Coffee Filters 8 Cup",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/chemex-fsu-100-brown-filters",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/chemex-fsu-100-brown-filters <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_chicken-chorizo-wrap",
+      "fuente": "peets",
+      "nombre": "Chicken Chorizo Wrap",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/chicken-chorizo-wrap",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/chicken-chorizo-wrap <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_chicken-waffles-sandwich",
+      "fuente": "peets",
+      "nombre": "Chicken & Waffles Sandwich",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/chicken-waffles-sandwich",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/chicken-waffles-sandwich <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_chuao-exploding-coal-chocolate-bar",
+      "fuente": "peets",
+      "nombre": "Exploding Coal Chocolate bar",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/chuao-exploding-coal-chocolate-bar",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/chuao-exploding-coal-chocolate-bar <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_chuao-peppermint-bar",
+      "fuente": "peets",
+      "nombre": "For the Love of Peppermint Bar",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/chuao-peppermint-bar",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/chuao-peppermint-bar <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_coffee-of-the-day",
+      "fuente": "peets",
+      "nombre": "Coffee of the Day",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/coffee-of-the-day",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/coffee-of-the-day <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_cold-brew-iced-coffee",
+      "fuente": "peets",
+      "nombre": "Cold Brew Iced Coffee",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/cold-brew-iced-coffee",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/cold-brew-iced-coffee <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_copper-airscape",
+      "fuente": "peets",
+      "nombre": "Airscape® Canister 64oz",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/copper-airscape",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/copper-airscape <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_costa-rica-la-candelaria-estate",
+      "fuente": "peets",
+      "nombre": "Costa Rica La Candelaria Estate",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/costa-rica-la-candelaria-estate",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/costa-rica-la-candelaria-estate <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_costa-rica-la-minita",
+      "fuente": "peets",
+      "nombre": "Costa Rica Hacienda La Minita",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/costa-rica-la-minita",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/costa-rica-la-minita <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_costa-rica-los-santos",
+      "fuente": "peets",
+      "nombre": "Costa Rica Los Santos",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/costa-rica-los-santos",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/costa-rica-los-santos <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_crispy-ham-swiss",
+      "fuente": "peets",
+      "nombre": "Crispy Ham & Swiss",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/crispy-ham-swiss",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/crispy-ham-swiss <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_croissant-grilled-cheese",
+      "fuente": "peets",
+      "nombre": "Croissant Grilled Cheese",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/croissant-grilled-cheese",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/croissant-grilled-cheese <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_decaf-holiday-blend",
+      "fuente": "peets",
+      "nombre": "Decaf Holiday Blend 2025",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/decaf-holiday-blend",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/decaf-holiday-blend <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_dubs-blend",
+      "fuente": "peets",
+      "nombre": "Dubs Blend 2022",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/dubs-blend",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/dubs-blend <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_egg-cheese",
+      "fuente": "peets",
+      "nombre": "Egg & Cheese",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/egg-cheese",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/egg-cheese <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_egg-white-tomato-feta-frittata",
+      "fuente": "peets",
+      "nombre": "Egg White, Tomato & Feta Frittata",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/egg-white-tomato-feta-frittata",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/egg-white-tomato-feta-frittata <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_elote-taco",
+      "fuente": "peets",
+      "nombre": "Elote Taco",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/elote-taco",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/elote-taco <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_espresso",
+      "fuente": "peets",
+      "nombre": "Espresso",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/espresso",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/espresso <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_established-1966-peets-mug",
+      "fuente": "peets",
+      "nombre": "Established 1966 Peet's Mug",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/established-1966-peets-mug",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/established-1966-peets-mug <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_ethiopia-duet",
+      "fuente": "peets",
+      "nombre": "Ethiopia Duet",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/ethiopia-duet",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/ethiopia-duet <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_ethiopia-hambela-farm-organic",
+      "fuente": "peets",
+      "nombre": "Ethiopia Hambela Farm Organic",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/ethiopia-hambela-farm-organic",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/ethiopia-hambela-farm-organic <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_ethiopia-refisa-station",
+      "fuente": "peets",
+      "nombre": "Ethiopia Refisa Station",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/ethiopia-refisa-station",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/ethiopia-refisa-station <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_ethiopian-super-natural",
+      "fuente": "peets",
+      "nombre": "Ethiopian Super Natural",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/ethiopian-super-natural",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/ethiopian-super-natural <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_everything-plant-based-sandwich",
+      "fuente": "peets",
+      "nombre": "Everything Plant-Based Sandwich",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/everything-plant-based-sandwich",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/everything-plant-based-sandwich <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_faithful-blend",
+      "fuente": "peets",
+      "nombre": "Faithful Blend",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/faithful-blend",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/faithful-blend <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_golden-protein-latte",
+      "fuente": "peets",
+      "nombre": "Golden Protein Latte",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/golden-protein-latte",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/golden-protein-latte <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_guatemala-huehuetenango",
+      "fuente": "peets",
+      "nombre": "Guatemala Huehuetenango Organic",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/guatemala-huehuetenango",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/guatemala-huehuetenango <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_guatemala-xocomil-solola",
+      "fuente": "peets",
+      "nombre": "Guatemala Xocomil Sololá",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/guatemala-xocomil-solola",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/guatemala-xocomil-solola <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_havana-cappuccino",
+      "fuente": "peets",
+      "nombre": "Havana Cappuccino",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/havana-cappuccino",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/havana-cappuccino <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_holiday-blend",
+      "fuente": "peets",
+      "nombre": "Holiday Blend 2025",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/holiday-blend",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/holiday-blend <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_holiday-blend-kcup-pods",
+      "fuente": "peets",
+      "nombre": "Holiday Blend 2025 Coffee Pods",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/holiday-blend-kcup-pods",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/holiday-blend-kcup-pods <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_honduras-organic-new-crop-corquin",
+      "fuente": "peets",
+      "nombre": "Organic New Crop Honduras Corquín",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/honduras-organic-new-crop-corquin",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/honduras-organic-new-crop-corquin <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_horchata-cold-brew-oat-latte",
+      "fuente": "peets",
+      "nombre": "Horchata Cold Brew Oat Latte",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/horchata-cold-brew-oat-latte",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/horchata-cold-brew-oat-latte <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_huatusco-mexico-microlot",
+      "fuente": "peets",
+      "nombre": "Huatusco Mexico Microlot",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/huatusco-mexico-microlot",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/huatusco-mexico-microlot <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_iced-caffe-mocha",
+      "fuente": "peets",
+      "nombre": "Iced Caffè Mocha",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/iced-caffe-mocha",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/iced-caffe-mocha <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    },
+    {
+      "id": "peets_iced-cappuccino",
+      "fuente": "peets",
+      "nombre": "Iced Cappuccino",
+      "marca": "Peet's",
+      "url": "https://www.peets.com/products/iced-cappuccino",
+      "ok": false,
+      "reason": "HTTP_429 https://www.peets.com/products/iced-cappuccino <!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Verifying your connecti",
+      "candidates": []
+    }
+  ]
+}

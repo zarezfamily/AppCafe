@@ -1,22 +1,44 @@
 {
-  "generatedAt": "2026-04-22T19:25:12.871Z",
-  "dryRun": true,
+  "generatedAt": "2026-04-22T20:03:20.449Z",
+  "dryRun": false,
   "totals": {
     "total": 1290,
-    "active": 1053,
-    "legacy": 237,
+    "active": 942,
+    "legacy": 348,
     "duplicateEanGroups": 0,
     "duplicateEanDocs": 0,
     "duplicateKeyGroups": 0,
     "duplicateKeyDocs": 0,
     "invalidDocs": 0,
-    "toMarkLegacy": 0
+    "nonCoffeeDocs": 1,
+    "toMarkLegacy": 1
   },
   "duplicateEanGroups": [],
   "duplicateKeyGroups": [],
   "invalidDocs": [],
+  "nonCoffeeDocs": [
+    {
+      "id": "pellini_amazon_b000fwhwo0",
+      "fuente": "pellini_amazon",
+      "nombre": "pellini Caffè Top 100% Arabica, Granos, 1er Pack (1 x 1 kg)",
+      "marca": "Pellini",
+      "ean": "",
+      "formato": "beans",
+      "legacy": false,
+      "hasSca": true,
+      "photo": "https://m.media-amazon.com/images/I/41EOUO0sadL._AC_SL1080_.jpg",
+      "photoInStorage": false,
+      "canonicalScore": 95
+    }
+  ],
   "actions": {
     "duplicateDocsToLegacy": [],
-    "invalidDocsToLegacy": []
+    "invalidDocsToLegacy": [],
+    "nonCoffeeDocsToLegacy": [
+      {
+        "id": "pellini_amazon_b000fwhwo0",
+        "reason": "invalid_non_coffee_product"
+      }
+    ]
   }
 }

@@ -55,8 +55,8 @@ export default function useCoffeeData({ ...props }) {
 
     try {
       const cafes = await getUserCafes(user.uid);
-      const ranking = await getCollection('cafes', 'puntuacion', 200);
-      const todos = await getCollection('cafes', 'fecha', 200);
+      const ranking = await getCollection('cafes', 'puntuacion', 1500);
+      const todos = await getCollection('cafes', 'fecha', 1500);
 
       const cafesOrdenados = [...cafes].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
@@ -121,7 +121,10 @@ export default function useCoffeeData({ ...props }) {
   }, [allCafes]);
 
   // 🔥 FAVORITOS
-  const favCafes = useMemo(() => allCafes.filter((c) => favs.includes(c.id)), [allCafes, favs]);
+  const favCafes = useMemo(() => {
+    const byId = new Map([...allCafes, ...misCafes].map((c) => [c.id, c]));
+    return favs.map((id) => byId.get(id)).filter(Boolean);
+  }, [allCafes, misCafes, favs]);
 
   // 🔥 FILTROS
   const filtrar = (lista, query) => filterCoffeeList(lista, query);

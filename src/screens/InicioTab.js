@@ -7,7 +7,6 @@ import { getHeroCafe } from '../domain/coffee/heroCoffee';
 import { getLiveRankingBuckets } from '../domain/coffee/liveRankings';
 import {
   BioCoffeeSection,
-  BlogSection,
   DailyCoffeeSection,
   InicioTopBar,
   LiveRankingSection,
@@ -123,9 +122,18 @@ export default function InicioTab({
     return (allCafes || []).filter((item) => normalizeCategory(item) === 'daily');
   }, [allCafes]);
 
+  const specialtyTopIds = useMemo(() => {
+    const sorted = [...specialtyCafes].sort(
+      (a, b) =>
+        Number(b?.rankingScore || b?.puntuacion || 0) -
+        Number(a?.rankingScore || a?.puntuacion || 0)
+    );
+    return new Set(sorted.slice(0, 25).map((c) => c.id));
+  }, [specialtyCafes]);
+
   const bioCafes = useMemo(() => {
-    return (allCafes || []).filter((item) => hasBioTag(item));
-  }, [allCafes]);
+    return (allCafes || []).filter((item) => hasBioTag(item) && !specialtyTopIds.has(item.id));
+  }, [allCafes, specialtyTopIds]);
 
   const stepUpPairs = useMemo(() => {
     return buildStepUpPairs(dailyCafes, specialtyCafes);
@@ -247,8 +255,6 @@ export default function InicioTab({
             cargarCafeteriasInicio={cargarCafeteriasInicio}
             theme={theme}
           />
-
-          <BlogSection s={s} />
         </>
       )}
     </View>

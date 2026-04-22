@@ -431,7 +431,7 @@ export default function AdminPanelScreen() {
 
   const loadCafes = useCallback(async () => {
     try {
-      const rows = await getCollection('cafes', 'updatedAt', 500);
+      const rows = await getCollection('cafes', 'updatedAt', 1500);
       setPendingCafes((rows || []).filter((c) => !c.legacy));
     } catch (error) {
       console.error('Error cargando cafés:', error);

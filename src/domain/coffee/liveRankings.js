@@ -125,7 +125,7 @@ export function getLiveRankingBuckets(cafes = [], options = {}) {
   const weeklyTop = scored
     .filter((item) => item._createdAtTs >= weekAgo || item._stableTrending >= 6)
     .sort((a, b) => b._weeklyTopScore - a._weeklyTopScore)
-    .slice(0, 8)
+    .slice(0, 10)
     .map((item) => ({
       ...item,
       rankingTag: 'Top semanal',
@@ -136,7 +136,7 @@ export function getLiveRankingBuckets(cafes = [], options = {}) {
   const risers = scored
     .filter((item) => item._movementGap > 0)
     .sort((a, b) => b._riserScore - a._riserScore)
-    .slice(0, 8)
+    .slice(0, 10)
     .map((item) => ({
       ...item,
       rankingTag: 'Sube',
@@ -148,7 +148,7 @@ export function getLiveRankingBuckets(cafes = [], options = {}) {
     .filter((item) => item._createdAtTs < weekAgo)
     .filter((item) => item._movementGap < 0)
     .sort((a, b) => b._fallerScore - a._fallerScore)
-    .slice(0, 8)
+    .slice(0, 10)
     .map((item) => ({
       ...item,
       rankingTag: 'Baja',
@@ -168,7 +168,7 @@ export function getLiveRankingBuckets(cafes = [], options = {}) {
       rankingMomentum: buildMomentumText('newcomers', item),
     }));
 
-  const newcomers = newcomersAll.filter((item) => !weeklyTopIds.has(item.id)).slice(0, 8);
+  const newcomers = newcomersAll.filter((item) => !weeklyTopIds.has(item.id)).slice(0, 10);
 
   return {
     weeklyTop,

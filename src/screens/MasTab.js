@@ -13,7 +13,6 @@ import {
   ModerationSection,
   NewsletterSection,
   PremiumSection,
-  QuickAccessSection,
   SettingsSection,
   SocialSection,
 } from './masTabSections';
@@ -137,6 +136,7 @@ export default function MasTab({
           pendingAchievements={pendingAchievements}
           achievementProgress={achievementProgress}
           onLongPress={() => setShowMemberInfo(true)}
+          onEditProfile={() => setShowProfile(true)}
         />
 
         <PremiumSection
@@ -147,13 +147,6 @@ export default function MasTab({
         />
 
         <BlogSection mas={mas} />
-
-        <QuickAccessSection
-          mas={mas}
-          premiumAccentDeep={premiumAccentDeep}
-          setShowProfile={setShowProfile}
-          setActiveTab={setActiveTab}
-        />
 
         <AchievementsSection
           mas={mas}

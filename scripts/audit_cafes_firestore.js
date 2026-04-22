@@ -152,6 +152,85 @@ function isClearlyInvalid(doc) {
   return !name || !brand || !hasHttpUrl(photo);
 }
 
+function isClearlyNonCoffee(doc) {
+  const name = normalizeKey(doc.nombre || doc.name);
+  const url = normalizeKey(doc.fuenteUrl || doc.urlProducto);
+  const source = normalizeKey(doc.fuente);
+
+  if (!name && !url) return false;
+
+  const blockedPatterns = [
+    /\bfiltros\b/,
+    /\bpaper filters?\b/,
+    /\bcoffeemaker\b/,
+    /\bcanister\b/,
+    /\bmug\b/,
+    /\bglass\b/,
+    /\bbrioche\b/,
+    /\bsandwich\b/,
+    /\bwrap\b/,
+    /\btaco\b/,
+    /\bfrittata\b/,
+    /\bcroissant\b/,
+    /\bchocolate bar\b/,
+    /\bbarra de chocolate\b/,
+    /\bcaramelos\b/,
+    /\bflan\b/,
+    /\bgranizado\b/,
+    /\brefresco\b/,
+    /\bcola zero\b/,
+    /\bzero cafeina\b/,
+    /\bzero caffeine\b/,
+    /\bgel energetico\b/,
+    /\bprotein(a|as)?\b/,
+    /\bbatido\b/,
+    /\bcrema de leche\b/,
+    /\bbebida de avena\b/,
+    /\bbebida de soja\b/,
+  ];
+
+  if (blockedPatterns.some((pattern) => pattern.test(name) || pattern.test(url))) {
+    return true;
+  }
+
+  const isPackLike =
+    /\bpack\b/.test(name) ||
+    /\bcesta\b/.test(name) ||
+    /\bregalo\b/.test(name) ||
+    /\bgift\b/.test(name) ||
+    /\bdegustacion\b/.test(name) ||
+    /\bdegustacion\b/.test(url) ||
+    /\bwelcome pack\b/.test(name) ||
+    /\/pack[-/]/.test(url) ||
+    /\/welcome-pack[-/]/.test(url) ||
+    /\/regalar-cafe[-/]/.test(url);
+
+  if (isPackLike) {
+    return true;
+  }
+
+  const isPeetsDrinkOrAccessory =
+    source === 'peets' &&
+    [
+      /\blatte\b/,
+      /\bcaffe mocha\b/,
+      /\bwhite chocolate mocha\b/,
+      /\bmocha frappe\b/,
+      /\bmacchiato\b/,
+      /\bfrappe\b/,
+      /\biced\b/,
+      /\bcold brew\b/,
+      /\brecycling kit\b/,
+      /\benamel pin\b/,
+    ].some((pattern) => pattern.test(name) || pattern.test(url));
+
+  if (isPeetsDrinkOrAccessory) {
+    return true;
+  }
+
+  return false;
+}
+
 function toSummary(doc) {
   return {
     id: doc.id,
@@ -241,6 +320,7 @@ async function main() {
     });
 
   const invalidDocs = activeDocs.filter(isClearlyInvalid).map(toSummary);
+  const nonCoffeeDocs = activeDocs.filter(isClearlyNonCoffee).map(toSummary);
 
   const duplicateIdsToLegacy = new Map();
   for (const group of [...duplicateEanGroups, ...duplicateKeyGroups]) {
@@ -261,6 +341,13 @@ async function main() {
     }
   }
 
+  const nonCoffeeIdsToLegacy = new Map();
+  for (const doc of nonCoffeeDocs) {
+    if (!duplicateIdsToLegacy.has(doc.id) && !invalidIdsToLegacy.has(doc.id)) {
+      nonCoffeeIdsToLegacy.set(doc.id, { reason: 'invalid_non_coffee_product' });
+    }
+  }
+
   const report = {
     generatedAt: new Date().toISOString(),
     dryRun: !APPLY,
@@ -273,17 +360,23 @@ async function main() {
       duplicateKeyGroups: duplicateKeyGroups.length,
       duplicateKeyDocs: duplicateKeyGroups.reduce((sum, group) => sum + group.duplicates.length, 0),
       invalidDocs: invalidDocs.length,
-      toMarkLegacy: duplicateIdsToLegacy.size + invalidIdsToLegacy.size,
+      nonCoffeeDocs: nonCoffeeDocs.length,
+      toMarkLegacy: duplicateIdsToLegacy.size + invalidIdsToLegacy.size + nonCoffeeIdsToLegacy.size,
     },
     duplicateEanGroups,
     duplicateKeyGroups,
     invalidDocs,
+    nonCoffeeDocs,
     actions: {
       duplicateDocsToLegacy: [...duplicateIdsToLegacy.entries()].map(([id, payload]) => ({
         id,
         ...payload,
       })),
       invalidDocsToLegacy: [...invalidIdsToLegacy.entries()].map(([id, payload]) => ({
+        id,
+        ...payload,
+      })),
+      nonCoffeeDocsToLegacy: [...nonCoffeeIdsToLegacy.entries()].map(([id, payload]) => ({
         id,
         ...payload,
       })),
@@ -297,6 +390,7 @@ async function main() {
   console.log(`[AUDIT] Duplicate EAN groups: ${report.totals.duplicateEanGroups}`);
   console.log(`[AUDIT] Duplicate brand/name/format groups: ${report.totals.duplicateKeyGroups}`);
   console.log(`[AUDIT] Invalid docs: ${report.totals.invalidDocs}`);
+  console.log(`[AUDIT] Non-coffee docs: ${report.totals.nonCoffeeDocs}`);
   console.log(`[AUDIT] Candidate legacy updates: ${report.totals.toMarkLegacy}`);
   console.log(`[AUDIT] Report: ${REPORT_PATH}`);
 
@@ -311,6 +405,10 @@ async function main() {
     applied += 1;
   }
   for (const [id, payload] of invalidIdsToLegacy.entries()) {
+    await markLegacy(id, payload.reason);
+    applied += 1;
+  }
+  for (const [id, payload] of nonCoffeeIdsToLegacy.entries()) {
     await markLegacy(id, payload.reason);
     applied += 1;
   }

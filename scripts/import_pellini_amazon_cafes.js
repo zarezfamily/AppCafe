@@ -113,8 +113,21 @@ function ensureAdmin() {
 }
 
 function parsePrice(text) {
-  const clean = normalizeText(text).replace(/\./g, '').replace(',', '.');
-  const value = Number.parseFloat(clean);
+  const raw = normalizeText(text);
+  if (!raw) return null;
+
+  const hasDecimalSeparator = raw.includes(',') || raw.includes('.');
+  const clean = raw.replace(/\./g, '').replace(',', '.');
+  let value = Number.parseFloat(clean);
+  if (!Number.isFinite(value)) return null;
+
+  // Amazon often exposes priceAmount in cents (e.g. 1159 => 11.59) while
+  // the visible DOM price already includes decimals. Normalize only integer-like
+  // values that are implausibly high for this catalog.
+  if (!hasDecimalSeparator && Number.isInteger(value) && value >= 100) {
+    value = value / 100;
+  }
+
   return Number.isFinite(value) ? value : null;
 }
 

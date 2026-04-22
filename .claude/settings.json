@@ -1,5 +1,5 @@
 {
   "permissions": {
-    "allow": ["Bash(npx expo *)"]
+    "allow": ["Bash(npx expo *)", "Bash(grep -E \"\\\\.\\(js|ts|tsx\\)$\")"]
   }
 }

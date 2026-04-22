@@ -55,8 +55,8 @@ export default function useCoffeeData({ ...props }) {
 
     try {
       const cafes = await getUserCafes(user.uid);
-      const ranking = await getCollection('cafes', 'puntuacion', 200);
-      const todos = await getCollection('cafes', 'fecha', 200);
+      const ranking = await getCollection('cafes', 'puntuacion', 1500);
+      const todos = await getCollection('cafes', 'fecha', 1500);
 
       const cafesOrdenados = [...cafes].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 

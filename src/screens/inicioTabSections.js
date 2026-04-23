@@ -241,12 +241,13 @@ export function SpecialtyForYouSection({
 }) {
   if (!cafes?.length) return null;
 
+  const { spreadByBrand } = require('../utils/coffeeRanking');
   const sorted = [...cafes].sort(
     (a, b) =>
       Number(b?.rankingScore || b?.puntuacion || 0) - Number(a?.rankingScore || a?.puntuacion || 0)
   );
   const top = sorted.slice(0, 25);
-  const items = top;
+  const items = spreadByBrand(top);
   const handlePress = (item) => {
     const index = top.findIndex((c) => c.id === item.id);
     setCafeDetalle({ cafes: top, cafeIndex: index });
@@ -371,7 +372,37 @@ export function LiveRankingSection({
 
   const currentKey = availableKeys.includes(activeBucket) ? activeBucket : availableKeys[0];
   const currentConfig = config[currentKey];
-  const items = rankingBuckets?.[currentKey] || [];
+  const { spreadByBrand } = require('../utils/coffeeRanking');
+  // Agrupar por formato y aplicar spreadByBrand para variedad de tostadores y evitar saltos de formato
+  function groupByFormat(items) {
+    const formats = {};
+    for (const item of items) {
+      const fmt = (item.formato || item.format || '').toLowerCase();
+      if (!formats[fmt]) formats[fmt] = [];
+      formats[fmt].push(item);
+    }
+    return formats;
+  }
+
+  let items = rankingBuckets?.[currentKey] || [];
+  // Agrupar y repartir variedad de tostadores en todos los buckets, incluyendo 'Nuevos'
+  if (currentKey === 'newcomers') {
+    const grouped = groupByFormat(items);
+    const orderedFormats = ['grano', 'beans', 'molido', 'ground', 'cápsulas', 'capsules'];
+    items = orderedFormats.flatMap((fmt) => spreadByBrand(grouped[fmt] || []));
+    const used = new Set(orderedFormats);
+    Object.keys(grouped).forEach((fmt) => {
+      if (!used.has(fmt)) items.push(...spreadByBrand(grouped[fmt]));
+    });
+  } else {
+    const grouped = groupByFormat(items);
+    const orderedFormats = ['grano', 'beans', 'molido', 'ground', 'cápsulas', 'capsules'];
+    items = orderedFormats.flatMap((fmt) => spreadByBrand(grouped[fmt] || []));
+    const used = new Set(orderedFormats);
+    Object.keys(grouped).forEach((fmt) => {
+      if (!used.has(fmt)) items.push(...spreadByBrand(grouped[fmt]));
+    });
+  }
 
   const handlePress = (item) => {
     const index = items.findIndex((c) => c.id === item.id);
@@ -460,9 +491,10 @@ export function LiveRankingSection({
 export function DailyCoffeeSection({ s, cafes, setCafeDetalle, favs, toggleFav, CardHorizontal }) {
   if (!cafes?.length) return null;
 
+  const { spreadByBrand } = require('../utils/coffeeRanking');
   const sorted = [...cafes].sort((a, b) => Number(b?.puntuacion || 0) - Number(a?.puntuacion || 0));
   const top = sorted.slice(0, 25);
-  const items = top;
+  const items = spreadByBrand(top);
   const handlePress = (item) => {
     const index = top.findIndex((c) => c.id === item.id);
     setCafeDetalle({ cafes: top, cafeIndex: index });
@@ -495,9 +527,10 @@ export function DailyCoffeeSection({ s, cafes, setCafeDetalle, favs, toggleFav, 
 export function BioCoffeeSection({ s, cafes, setCafeDetalle, favs, toggleFav, CardHorizontal }) {
   if (!cafes?.length) return null;
 
+  const { spreadByBrand } = require('../utils/coffeeRanking');
   const sorted = [...cafes].sort((a, b) => Number(b?.puntuacion || 0) - Number(a?.puntuacion || 0));
   const top = sorted.slice(0, 25);
-  const items = top;
+  const items = spreadByBrand(top);
   const handlePress = (item) => {
     const index = top.findIndex((c) => c.id === item.id);
     setCafeDetalle({ cafes: top, cafeIndex: index });
@@ -540,8 +573,24 @@ export function StepUpSection({ s, pairs, setCafeDetalle, favs, toggleFav, CardH
 
   if (!pairs?.length) return null;
 
-  const total = pairs.length;
-  const pair = pairs[activeIndex] || pairs[0];
+  // Filtrar pares para que el specialty tenga el mismo formato que el daily
+  const filterSameFormatPairs = (pairs) => {
+    return pairs.filter((pair) => {
+      const dailyFormat = (pair.daily?.formato || pair.daily?.format || '').toLowerCase();
+      const specialtyFormat = (
+        pair.specialty?.formato ||
+        pair.specialty?.format ||
+        ''
+      ).toLowerCase();
+      // Si no hay formato, dejar pasar; si hay, deben coincidir
+      if (!dailyFormat || !specialtyFormat) return true;
+      return dailyFormat === specialtyFormat;
+    });
+  };
+  const filteredPairs = filterSameFormatPairs(pairs);
+  const total = filteredPairs.length;
+  const pair = filteredPairs[activeIndex] || filteredPairs[0];
+  if (!filteredPairs.length) return null;
 
   const cycleNext = () => setActiveIndex((prev) => (prev + 1) % total);
 

@@ -85,6 +85,7 @@ function GridCard({ item, onPress, favs, onToggleFav }) {
   const isFav = favs.includes(item.id);
   const uri = getImageUri(item);
 
+  // Mostrar solo marca, nombre, país/origen y SCA si existe
   return (
     <TouchableOpacity style={styles.gridCard} onPress={() => onPress?.(item)} activeOpacity={0.85}>
       <View style={styles.gridImg}>
@@ -102,9 +103,13 @@ function GridCard({ item, onPress, favs, onToggleFav }) {
             color={isFav ? PREMIUM_ACCENT : 'rgba(255,255,255,0.7)'}
           />
         </TouchableOpacity>
-        {item.puntuacion ? (
+        {item.sca || (item.sca && typeof item.sca === 'object' && item.sca.score) ? (
           <View style={styles.gridBadge}>
-            <Text style={styles.gridBadgeText}>{Number(item.puntuacion).toFixed(1)}</Text>
+            <Text style={styles.gridBadgeText}>
+              {typeof item.sca === 'object'
+                ? Number(item.sca.score).toFixed(1)
+                : Number(item.sca).toFixed(1)}
+            </Text>
           </View>
         ) : null}
       </View>

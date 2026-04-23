@@ -510,6 +510,9 @@ function mapProductToCafe(product) {
 
   const now = new Date().toISOString();
 
+  // Usar createdAt como fecha principal, si no existe usar now
+  let fecha = product?.createdAt || now;
+
   const base = {
     fuente: 'novell',
     fuentePais: 'ES',
@@ -569,6 +572,7 @@ function mapProductToCafe(product) {
     updatedAt: now,
     approvedAt: now,
     createdAt: now,
+    fecha,
   };
 
   const sca = buildScaPayload(base);

@@ -1,0 +1,92 @@
+[
+  {
+    "nombre": "Nespresso Ristretto",
+    "roaster": "Nespresso",
+    "pais": "Suiza",
+    "formato": "Cápsulas",
+    "imagen": "https://www.nespresso.com/ecom/medias/sys_master/public/134678/ristretto-capsule.png",
+    "descripcion": "Café intenso y con cuerpo, mezcla de Arábicas de Sudamérica y África Oriental.",
+    "precio": 4.2
+  },
+  {
+    "nombre": "Lavazza Qualità Oro",
+    "roaster": "Lavazza",
+    "pais": "Italia",
+    "formato": "Grano",
+    "imagen": "https://www.lavazza.es/content/dam/lavazza/products/3705.png",
+    "descripcion": "Mezcla 100% Arábica, notas florales y afrutadas, tueste medio.",
+    "precio": 12.5
+  },
+  {
+    "nombre": "Illy Espresso Classico",
+    "roaster": "Illy",
+    "pais": "Italia",
+    "formato": "Molido",
+    "imagen": "https://www.illy.com/dw/image/v2/BFJJ_PRD/on/demandware.static/-/Sites-masterCatalog_illy/default/dw7e2e7e7e/images/large/8003753900517.jpg?sw=800&sh=800&sm=fit",
+    "descripcion": "100% Arábica, sabor equilibrado con notas de caramelo y chocolate.",
+    "precio": 7.9
+  },
+  {
+    "nombre": "Marcilla Gran Aroma",
+    "roaster": "Marcilla",
+    "pais": "España",
+    "formato": "Molido",
+    "imagen": "https://www.marcilla.com/wp-content/uploads/2020/09/gran-aroma-molido.png",
+    "descripcion": "Café molido de tueste natural, sabor intenso y persistente.",
+    "precio": 3.5
+  },
+  {
+    "nombre": "Saula Premium Original",
+    "roaster": "Saula",
+    "pais": "España",
+    "formato": "Grano",
+    "imagen": "https://www.cafesaula.com/wp-content/uploads/2019/10/saula-premium-original.png",
+    "descripcion": "Mezcla de Arábicas seleccionadas, tueste natural, notas dulces y afrutadas.",
+    "precio": 14.0
+  },
+  {
+    "nombre": "Starbucks House Blend",
+    "roaster": "Starbucks",
+    "pais": "Estados Unidos",
+    "formato": "Grano",
+    "imagen": "https://globalassets.starbucks.com/assets/7e7e7e7e7e7e4e7e8e7e7e7e7e7e7e7e/house-blend.png",
+    "descripcion": "Mezcla de América Latina, notas de cacao y nuez tostada, tueste medio.",
+    "precio": 8.5
+  },
+  {
+    "nombre": "Bonka Natural",
+    "roaster": "Bonka",
+    "pais": "España",
+    "formato": "Molido",
+    "imagen": "https://www.bonka.es/sites/g/files/jfdpif266/files/2021-03/bonka-natural-molido.png",
+    "descripcion": "Café molido natural, sabor equilibrado y aroma intenso.",
+    "precio": 3.2
+  },
+  {
+    "nombre": "Saimaza Gran Selección",
+    "roaster": "Saimaza",
+    "pais": "España",
+    "formato": "Molido",
+    "imagen": "https://www.saimaza.es/sites/g/files/jfdpif266/files/2021-03/saimaza-gran-seleccion.png",
+    "descripcion": "Café molido de tueste natural, mezcla equilibrada y aromática.",
+    "precio": 3.4
+  },
+  {
+    "nombre": "Fortaleza Natural",
+    "roaster": "Fortaleza",
+    "pais": "España",
+    "formato": "Molido",
+    "imagen": "https://www.cafefortaleza.com/wp-content/uploads/2020/09/fortaleza-natural-molido.png",
+    "descripcion": "Café molido natural, sabor intenso y persistente.",
+    "precio": 3.3
+  },
+  {
+    "nombre": "Oquendo Espresso",
+    "roaster": "Oquendo",
+    "pais": "España",
+    "formato": "Grano",
+    "imagen": "https://www.oquendo.com/wp-content/uploads/2020/09/oquendo-espresso-grano.png",
+    "descripcion": "Café en grano, mezcla de Arábica y Robusta, sabor intenso.",
+    "precio": 10.0
+  }
+]

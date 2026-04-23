@@ -1,8 +1,8 @@
+import NetInfo from '@react-native-community/netinfo';
 import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
 import * as SecureStore from 'expo-secure-store';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import NetInfo from '@react-native-community/netinfo';
 
 import { fetchNearbyPlaces, isGooglePlacesConfigured } from '../core/places';
 import { mapPlacesToCafeterias } from '../screens/cafeterias/cafeteriasPlaceMapper';
@@ -49,9 +49,8 @@ export default function useCoffeeData({ ...props }) {
     const cached = await loadCollectionOfflineCache(user.uid);
     if (cached) {
       setMisCafes(cached.misCafes || []);
-      const hasPhoto = (c) => !!(c.bestPhoto || c.officialPhoto || c.foto || c.image || c.imageUrl);
-      setTopCafes((cached.topCafes || []).filter((c) => !c.legacy && hasPhoto(c)));
-      setAllCafes((cached.allCafes || []).filter((c) => !c.legacy && hasPhoto(c)));
+      setTopCafes(cached.topCafes || []);
+      setAllCafes(cached.allCafes || []);
     }
 
     try {
@@ -61,18 +60,14 @@ export default function useCoffeeData({ ...props }) {
 
       const cafesOrdenados = [...cafes].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
-      const hasPhoto = (c) => !!(c.bestPhoto || c.officialPhoto || c.foto || c.image || c.imageUrl);
-      const rankingFiltrado = ranking.filter((c) => !c.legacy && hasPhoto(c));
-      const todosFiltrados = todos.filter((c) => !c.legacy && hasPhoto(c));
-
       setMisCafes(cafesOrdenados);
-      setTopCafes(rankingFiltrado);
-      setAllCafes(todosFiltrados);
+      setTopCafes(ranking);
+      setAllCafes(todos);
 
       await saveCollectionOfflineCache(user.uid, {
         misCafes: cafesOrdenados,
-        topCafes: rankingFiltrado,
-        allCafes: todosFiltrados,
+        topCafes: ranking,
+        allCafes: todos,
       });
     } catch (e) {
       setErrorCargaDatos('Error cargando datos');

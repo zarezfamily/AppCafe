@@ -4,6 +4,7 @@ import {
   ActivityIndicator,
   Image,
   Linking,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -11,6 +12,8 @@ import {
 } from 'react-native';
 import HorizontalCardRow from '../components/HorizontalCardRow';
 import SectionHeaderNav from '../components/SectionHeaderNav';
+import SocialCataCard from '../components/SocialCataCard';
+import useSocialFeed from '../hooks/useSocialFeed';
 import { MAIN_TABS } from './mainScreenTabs';
 
 export const FEATURED_BLOG_POSTS = [
@@ -807,6 +810,53 @@ export function NearbyCafeteriasSection({
             </TouchableOpacity>
           )}
         />
+      )}
+    </HomeSectionCard>
+  );
+}
+
+export function SocialFeedSection({ s, allCafes, setCafeDetalle, setActiveTab }) {
+  const { recentCatas, loadingSocial } = useSocialFeed({ allCafes });
+
+  const visible = recentCatas.slice(0, 12);
+
+  if (!loadingSocial && visible.length === 0) return null;
+
+  return (
+    <HomeSectionCard>
+      <SectionHeaderNav
+        s={s}
+        title="Lo que están catando"
+        onPress={() => setActiveTab?.(MAIN_TABS.NOTEBOOK)}
+        marginTop={0}
+      />
+      <Text style={[s.sectionSub, { paddingHorizontal: 0 }]}>
+        Catas recientes de la comunidad ETIOVE
+      </Text>
+
+      {loadingSocial ? (
+        <ActivityIndicator size="small" color="#8f5e3b" style={{ marginTop: 14 }} />
+      ) : (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ paddingRight: 4, marginTop: 12 }}
+        >
+          {visible.map((cata, idx) => (
+            <SocialCataCard
+              key={cata.id || `${cata.fechaHora}-${idx}`}
+              cata={cata}
+              onPress={(c) => {
+                if (!setCafeDetalle) return;
+                // Attempt to open the cafe detail if we have a cafeId
+                if (c.cafeId) {
+                  const match = (allCafes || []).find((cafe) => cafe.id === c.cafeId);
+                  if (match) setCafeDetalle(match);
+                }
+              }}
+            />
+          ))}
+        </ScrollView>
       )}
     </HomeSectionCard>
   );

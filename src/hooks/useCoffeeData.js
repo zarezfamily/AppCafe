@@ -1,13 +1,14 @@
-// IMPORTS IGUAL QUE LOS TUYOS
 import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
 import * as SecureStore from 'expo-secure-store';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import NetInfo from '@react-native-community/netinfo';
 
 import { fetchNearbyPlaces, isGooglePlacesConfigured } from '../core/places';
 import { mapPlacesToCafeterias } from '../screens/cafeterias/cafeteriasPlaceMapper';
 
 import { loadCollectionOfflineCache, saveCollectionOfflineCache } from '../core/offlineCache';
+import { enqueueAction } from '../core/syncQueue';
 import { filterCoffeeList, selectTopCoffeesForCountry } from '../domain/coffee/coffeeFilters';
 
 export default function useCoffeeData({ ...props }) {
@@ -141,12 +142,24 @@ export default function useCoffeeData({ ...props }) {
     const wasFav = favs.includes(cafe.id);
     const nf = wasFav ? favs.filter((f) => f !== cafe.id) : [...favs, cafe.id];
 
+    // Always update local state immediately (optimistic)
     setFavs(nf);
     await SecureStore.setItemAsync(keyFavs, JSON.stringify(nf)).catch(() => {});
 
     if (!wasFav) {
       registrarEventoGamificacion('favorite_mark', { cafe });
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+    }
+
+    // Queue server-side fav sync if offline so it runs when connection is back
+    const net = await NetInfo.fetch().catch(() => ({ isConnected: true }));
+    if (!net.isConnected) {
+      await enqueueAction('toggle_favorite', {
+        uid: user?.uid,
+        cafeId: cafe.id,
+        value: !wasFav,
+        allFavs: nf,
+      });
     }
   };
 

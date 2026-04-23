@@ -5,6 +5,7 @@ import BestValueTab from './BestValueTab';
 import BioTopTab from './BioTopTab';
 import DailyTopTab from './DailyTopTab';
 import TopCafesTab from './TopCafesTab';
+import WeeklyRankingTab from './WeeklyRankingTab';
 
 function RankingModeChip({ label, active, onPress }) {
   return (
@@ -62,6 +63,11 @@ export default function RankingTab(props) {
               active={mode === 'value'}
               onPress={() => setMode('value')}
             />
+            <RankingModeChip
+              label="🔥 Semanal"
+              active={mode === 'weekly'}
+              onPress={() => setMode('weekly')}
+            />
           </View>
         </ScrollView>
       </View>
@@ -70,6 +76,12 @@ export default function RankingTab(props) {
       {mode === 'daily' && <DailyTopTab {...props} />}
       {mode === 'bio' && <BioTopTab {...props} />}
       {mode === 'value' && <BestValueTab {...props} />}
+      {mode === 'weekly' && (
+        <WeeklyRankingTab
+          allCafes={props.allCafes || props.top100 || []}
+          setCafeDetalle={props.setCafeDetalle}
+        />
+      )}
     </View>
   );
 }

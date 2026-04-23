@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { ScrollView, View } from 'react-native';
+import OfflineBanner from '../components/OfflineBanner';
 import AdminPanelScreen from './AdminPanelScreen'; // 🔥 NUEVO
 import BottomBarNav from './BottomBarNav';
 import CafeteriasScreen from './CafeteriasScreen';
@@ -60,6 +61,8 @@ export default function MainScreenBody({
 
   return (
     <>
+      <OfflineBanner />
+
       {activeTab === MAIN_TABS.CAFETERIAS && (
         <View style={{ flex: 1 }}>
           <CafeteriasScreen onBack={() => setActiveTab(MAIN_TABS.HOME)} />

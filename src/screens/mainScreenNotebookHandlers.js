@@ -1,3 +1,6 @@
+import NetInfo from '@react-native-community/netinfo';
+import { enqueueAction } from '../core/syncQueue';
+
 export function createMainScreenNotebookHandlers({
   user,
   notebook,
@@ -34,6 +37,33 @@ export function createMainScreenNotebookHandlers({
 
     notebook.setGuardando(true);
     try {
+      // ── Offline check ────────────────────────────────────────────────────
+      const net = await NetInfo.fetch();
+      if (!net.isConnected) {
+        await enqueueAction('add_tasting', {
+          uid: user.uid,
+          cafeNombre: notebook.cafeNombre,
+          cafeId: notebook.cafeId,
+          fechaHora: notebook.fechaHora,
+          metodoPreparacion: notebook.metodoPreparacion,
+          dosis: Number(notebook.dosis) || 0,
+          agua: Number(notebook.agua) || 0,
+          temperatura: Number(notebook.temperatura) || 0,
+          tiempoExtraccion: Number(notebook.tiempoExtraccion) || 0,
+          puntuacion: notebook.puntuacion,
+          notas: notebook.notas,
+          foto: notebook.foto || '',
+          contexto: notebook.contexto,
+          createdAt: new Date().toISOString(),
+        });
+        showDialog(
+          'Guardado offline',
+          'Sin conexión: tu cata se guardó en el dispositivo y se sincronizará automáticamente cuando vuelvas a tener internet.'
+        );
+        notebook.irCerrarModal();
+        return;
+      }
+      // ── Online path ──────────────────────────────────────────────────────
       let fotoUrl = notebook.foto;
       let fotoOmitidaPorPermisos = false;
 
@@ -66,6 +96,8 @@ export function createMainScreenNotebookHandlers({
         foto: fotoUrl || '',
         contexto: notebook.contexto,
         createdAt: new Date().toISOString(),
+        // Social layer: allow public feed (no personal data stored here)
+        public: true,
       });
 
       await cargarCatas();

@@ -5,6 +5,7 @@ import {
 } from '../core/notifications';
 import { formatRelativeTime } from '../core/utils';
 import useGamification from '../hooks/useGamification';
+import useOfflineSync from '../hooks/useOfflineSync';
 import {
   buildMainScreenBootstrapInput,
   buildMainScreenDomainInput,
@@ -178,6 +179,14 @@ export default function useMainScreenComposition({ onLogout, services, ui }) {
     forumThreadsLength: forum.forumThreads.length,
     forumLoading: forum.forumLoading,
     cargarForo: forum.cargarForo,
+  });
+
+  useOfflineSync({
+    user,
+    addDocument: services.addDocument,
+    deleteDocument: services.deleteDocument,
+    setDocument: services.setDocument,
+    cargarCatas: domain.cargarCatas,
   });
 
   const tabProps = useMainScreenTabProps(

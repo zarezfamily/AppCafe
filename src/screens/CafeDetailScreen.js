@@ -19,6 +19,7 @@ import AppDialogModal from '../components/AppDialogModal';
 import PackshotImage from '../components/PackshotImage';
 import Stars from '../components/Stars';
 import { getComparableCafes } from '../domain/coffee/compareCoffee';
+import useSocialFeed from '../hooks/useSocialFeed';
 import { updateDocument } from '../services/firestoreService';
 
 function normalizeCoffeeCategory(cafeToShow) {
@@ -151,6 +152,8 @@ export default function CafeDetailScreen({
   const [compareVisible, setCompareVisible] = useState(false);
   const [selectedComparisonId, setSelectedComparisonId] = useState(null);
   const [photoZoomVisible, setPhotoZoomVisible] = useState(false);
+
+  const { tastingCountByCafeId } = useSocialFeed();
 
   const fotoCafe =
     cafeToShow.bestPhoto ||
@@ -399,6 +402,14 @@ export default function CafeDetailScreen({
               <Text style={det.scoreVotos}>
                 {votosActuales} {votosActuales === 1 ? 'valoración' : 'valoraciones'}
               </Text>
+              {cafeToShow.id && (tastingCountByCafeId.get(cafeToShow.id) || 0) > 0 && (
+                <View style={styles.socialProofPill}>
+                  <Ionicons name="people-outline" size={11} color="#c8a97c" />
+                  <Text style={styles.socialProofText}>
+                    {tastingCountByCafeId.get(cafeToShow.id)} lo han catado este mes
+                  </Text>
+                </View>
+              )}
             </View>
           </View>
 
@@ -1454,6 +1465,24 @@ const styles = StyleSheet.create({
   },
   bottomSpacer: {
     height: 40,
+  },
+  socialProofPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 999,
+    backgroundColor: 'rgba(200,169,124,0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(200,169,124,0.3)',
+  },
+  socialProofText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#c8a97c',
+    letterSpacing: 0.2,
   },
 });
 

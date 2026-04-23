@@ -12,6 +12,7 @@ import {
   LiveRankingSection,
   NearbyCafeteriasSection,
   SearchResultsSection,
+  SocialFeedSection,
   SpecialtyForYouSection,
   StepUpSection,
 } from './inicioTabSections';
@@ -243,6 +244,13 @@ export default function InicioTab({
             favs={favs}
             toggleFav={toggleFav}
             CardHorizontal={CardHorizontal}
+          />
+
+          <SocialFeedSection
+            s={s}
+            allCafes={allCafes}
+            setCafeDetalle={setCafeDetalle}
+            setActiveTab={setActiveTab}
           />
 
           <NearbyCafeteriasSection

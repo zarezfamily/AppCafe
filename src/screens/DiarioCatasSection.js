@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import {
   ActivityIndicator,
   Animated,
@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { getPendingCatas } from '../core/offlineCatas';
+import usePendingActions from '../hooks/usePendingActions';
 
 const { width: W } = Dimensions.get('window');
 const CARD_SIZE = (W - 48) / 2; // 2 columns, 16px padding each side, 12px gap
@@ -29,7 +29,7 @@ export default function DiarioCatasSection({
   irAbrirDetail,
   cargando,
 }) {
-  const [pendientes, setPendientes] = useState(0);
+  const { pendingCount, pendingByType, isSyncing } = usePendingActions();
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -38,8 +38,6 @@ export default function DiarioCatasSection({
       duration: 400,
       useNativeDriver: true,
     }).start();
-    // Cargar catas pendientes offline
-    getPendingCatas().then((arr) => setPendientes(arr.length));
   }, [fadeAnim]);
 
   if (!catas || catas.length === 0) {
@@ -58,13 +56,30 @@ export default function DiarioCatasSection({
             <Ionicons name="add-circle" size={28} color={premiumAccent} />
           </TouchableOpacity>
         </View>
-        {pendientes > 0 && (
+        {pendingCount > 0 && (
           <View
             style={{ backgroundColor: '#ffe7c2', borderRadius: 8, padding: 10, marginBottom: 10 }}
           >
             <Text style={{ color: '#8f5e3b', fontWeight: '700', fontSize: 13 }}>
-              {pendientes} cata(s) pendientes de sincronizar
+              {isSyncing
+                ? '⟳ Sincronizando…'
+                : `${pendingCount} acción(es) pendiente${pendingCount > 1 ? 's' : ''}`}
             </Text>
+            {pendingByType.catas > 0 && (
+              <Text style={{ color: '#8f5e3b', fontSize: 11, marginTop: 2 }}>
+                ☕ {pendingByType.catas} cata{pendingByType.catas > 1 ? 's' : ''}
+              </Text>
+            )}
+            {pendingByType.favorites > 0 && (
+              <Text style={{ color: '#8f5e3b', fontSize: 11, marginTop: 2 }}>
+                ❤️ {pendingByType.favorites} favorito{pendingByType.favorites > 1 ? 's' : ''}
+              </Text>
+            )}
+            {pendingByType.scans > 0 && (
+              <Text style={{ color: '#8f5e3b', fontSize: 11, marginTop: 2 }}>
+                📷 {pendingByType.scans} escaneo{pendingByType.scans > 1 ? 's' : ''}
+              </Text>
+            )}
           </View>
         )}
         <View
@@ -130,13 +145,30 @@ export default function DiarioCatasSection({
             <Ionicons name="add-circle" size={28} color={premiumAccent} />
           </TouchableOpacity>
         </View>
-        {pendientes > 0 && (
+        {pendingCount > 0 && (
           <View
             style={{ backgroundColor: '#ffe7c2', borderRadius: 8, padding: 10, marginBottom: 10 }}
           >
             <Text style={{ color: '#8f5e3b', fontWeight: '700', fontSize: 13 }}>
-              {pendientes} cata(s) pendientes de sincronizar
+              {isSyncing
+                ? '⟳ Sincronizando…'
+                : `${pendingCount} acción(es) pendiente${pendingCount > 1 ? 's' : ''}`}
             </Text>
+            {pendingByType.catas > 0 && (
+              <Text style={{ color: '#8f5e3b', fontSize: 11, marginTop: 2 }}>
+                ☕ {pendingByType.catas} cata{pendingByType.catas > 1 ? 's' : ''}
+              </Text>
+            )}
+            {pendingByType.favorites > 0 && (
+              <Text style={{ color: '#8f5e3b', fontSize: 11, marginTop: 2 }}>
+                ❤️ {pendingByType.favorites} favorito{pendingByType.favorites > 1 ? 's' : ''}
+              </Text>
+            )}
+            {pendingByType.scans > 0 && (
+              <Text style={{ color: '#8f5e3b', fontSize: 11, marginTop: 2 }}>
+                📷 {pendingByType.scans} escaneo{pendingByType.scans > 1 ? 's' : ''}
+              </Text>
+            )}
           </View>
         )}
         {/* Stats Row */}

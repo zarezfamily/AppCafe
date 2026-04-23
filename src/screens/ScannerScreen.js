@@ -1,7 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { CameraView } from 'expo-camera';
 import { useCallback, useRef, useState } from 'react';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   ActivityIndicator,
   Image,
@@ -13,6 +12,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNetwork } from '../context/NetworkContext';
 import { getAuthToken } from '../services/firebaseCore';
 
 const BARCODE_TYPES = ['ean13', 'ean8', 'upc_a', 'upc_e'];
@@ -54,10 +55,11 @@ export default function ScannerScreen({
   const cameraRef = useRef(null);
   const barcodeLockRef = useRef(false);
   const insets = useSafeAreaInsets();
+  const { isOnline } = useNetwork();
 
   const [mode, setMode] = useState('photo');
   const [barcodeActive, setBarcodeActive] = useState(true);
-  const [state, setState] = useState('idle'); // idle | capturing | recognizing | results | error
+  const [state, setState] = useState('idle'); // idle | capturing | recognizing | results | error | offline
   const [candidates, setCandidates] = useState([]);
   const [lastExtracted, setLastExtracted] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
@@ -74,6 +76,13 @@ export default function ScannerScreen({
 
   const handleCapture = useCallback(async () => {
     if (state !== 'idle' || !cameraRef.current) return;
+
+    // Photo recognition requires network
+    if (!isOnline) {
+      setState('offline');
+      return;
+    }
+
     setState('capturing');
     try {
       const photo = await cameraRef.current.takePictureAsync({
@@ -115,7 +124,7 @@ export default function ScannerScreen({
       setErrorMsg(`Error: ${err?.message || 'desconocido'}. Vuelve a intentarlo.`);
       setState('error');
     }
-  }, [state]);
+  }, [state, isOnline]);
 
   const handleReset = () => {
     setState('idle');
@@ -207,6 +216,29 @@ export default function ScannerScreen({
           </View>
         )}
 
+        {state === 'offline' && (
+          <View style={styles.stateBox}>
+            <Ionicons name="cloud-offline-outline" size={48} color="#c8a97c" />
+            <Text style={styles.stateText}>
+              Sin conexión{'\n'}La identificación por foto necesita internet
+            </Text>
+            <TouchableOpacity
+              style={styles.retryBtn}
+              onPress={() => {
+                setMode('barcode');
+                handleReset();
+              }}
+            >
+              <Text style={[styles.retryText, { color: premiumAccent }]}>
+                Usar código de barras
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.retryBtn} onPress={onSkip}>
+              <Text style={[styles.retryText, { color: '#999' }]}>Buscar manualmente</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
         {state === 'results' && (
           <View style={styles.resultsSheet}>
             <Text style={styles.resultsTitle}>¿Es este tu café?</Text>
@@ -253,7 +285,9 @@ export default function ScannerScreen({
             <Text style={styles.hint}>
               {isPhotoMode
                 ? 'Encuadra la parte frontal de la bolsa'
-                : 'Apunta al código de barras del paquete'}
+                : !isOnline
+                  ? 'Modo offline · escanea códigos de tu colección'
+                  : 'Apunta al código de barras del paquete'}
             </Text>
 
             {isPhotoMode && (

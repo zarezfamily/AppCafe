@@ -16,11 +16,13 @@ const EXPO_PUSH_URL = 'https://exp.host/--/api/v2/push/send';
 const OPENAI_API_URL = 'https://api.openai.com/v1/responses';
 const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4.1-mini';
 const AI_AUTO_APPROVE_THRESHOLD = Number(process.env.AI_AUTO_APPROVE_THRESHOLD || 0.85);
+const DATA_COMPLETENESS_THRESHOLD = Number(process.env.DATA_COMPLETENESS_THRESHOLD || 0.7);
 
 const BARCODE_LOOKUP_API_URL = 'https://api.barcodelookup.com/v3/products';
 
 const DAILY_AI_JOB_LIMIT_PER_USER = Number(process.env.DAILY_AI_JOB_LIMIT_PER_USER || 5);
 const OPENAI_RETRY_DELAY_MS = Number(process.env.OPENAI_RETRY_DELAY_MS || 2500);
+const OPENAI_MAX_RETRIES = 3;
 
 const buildMessage = (token, title, body, data = {}) => ({
   to: token,
@@ -124,7 +126,7 @@ exports.onForumReplyCreatedNotifyThreadOwner = onDocumentCreated(
 // Extracts @Name tokens from a body string (1–30 chars, letters/numbers/underscores/hyphens).
 function extractMentionNames(body) {
   const raw = String(body || '');
-  const matches = raw.match(/@([\w\-]{1,30})/g) || [];
+  const matches = raw.match(/@([\w-]{1,30})/g) || [];
   return [...new Set(matches.map((m) => m.slice(1)))];
 }
 
@@ -327,6 +329,115 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+/**
+ * Scores how complete a café record is (0-1).
+ * Used alongside AI confidence to decide auto-approval.
+ *
+ * Fields & weights:
+ *   nombre (0.20), marca (0.15), origen (0.12), ean (0.10),
+ *   foto/bestPhoto (0.12), notas (0.08), proceso (0.06),
+ *   variedad (0.05), tueste (0.04), formato (0.04), precio (0.04)
+ */
+function computeDataCompleteness(cafe) {
+  const has = (v, min = 2) => String(v || '').trim().length >= min;
+  const hasNum = (v) => typeof v === 'number' && v > 0;
+
+  const fields = [
+    { key: 'nombre', w: 0.2, ok: has(cafe?.nombre, 3) },
+    { key: 'marca', w: 0.15, ok: has(cafe?.marca || cafe?.roaster, 2) },
+    { key: 'origen', w: 0.12, ok: has(cafe?.origen || cafe?.origin || cafe?.pais, 2) },
+    { key: 'ean', w: 0.1, ok: has(cafe?.ean, 8) },
+    {
+      key: 'foto',
+      w: 0.12,
+      ok: has(cafe?.photos?.selected || cafe?.bestPhoto || cafe?.officialPhoto || cafe?.foto, 8),
+    },
+    { key: 'notas', w: 0.08, ok: has(cafe?.notas || cafe?.notes, 3) },
+    { key: 'proceso', w: 0.06, ok: has(cafe?.proceso || cafe?.process, 2) },
+    { key: 'variedad', w: 0.05, ok: has(cafe?.variedad || cafe?.variety, 2) },
+    { key: 'tueste', w: 0.04, ok: has(cafe?.tueste || cafe?.roastLevel, 2) },
+    { key: 'formato', w: 0.04, ok: has(cafe?.formato || cafe?.format, 2) },
+    { key: 'precio', w: 0.04, ok: hasNum(cafe?.precio) },
+  ];
+
+  let score = 0;
+  const missing = [];
+  for (const f of fields) {
+    if (f.ok) score += f.w;
+    else missing.push(f.key);
+  }
+
+  return {
+    score: Math.round(score * 100) / 100,
+    missing,
+    total: fields.length,
+    filled: fields.length - missing.length,
+  };
+}
+
+/**
+ * Robust OpenAI call with exponential backoff.
+ * Retries on 429 (rate limit), 500, 502, 503, 529 (overloaded).
+ * Also retries once on invalid JSON response.
+ */
+async function robustOpenAICall({ apiKey, body, maxRetries = OPENAI_MAX_RETRIES }) {
+  const RETRYABLE_CODES = new Set([429, 500, 502, 503, 529]);
+  let lastError = null;
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const response = await performOpenAIRequest({ apiKey, body });
+
+      if (RETRYABLE_CODES.has(response.status)) {
+        const delay = OPENAI_RETRY_DELAY_MS * Math.pow(2, attempt - 1);
+        logger.warn('OpenAI retryable error', {
+          status: response.status,
+          attempt,
+          delayMs: delay,
+        });
+        if (attempt < maxRetries) {
+          await sleep(delay);
+          continue;
+        }
+        throw new Error(`OPENAI_REQUEST_FAILED_${response.status}`);
+      }
+
+      if (!response.ok) {
+        const errBody = await response.json().catch(() => null);
+        logger.error('OpenAI non-retryable error', { status: response.status, body: errBody });
+        throw new Error(`OPENAI_REQUEST_FAILED_${response.status}`);
+      }
+
+      const json = await response.json().catch(() => null);
+      const text = extractTextOutput(json);
+      const parsed = tryExtractJsonObject(text);
+
+      if (!parsed) {
+        logger.warn('OpenAI returned invalid JSON', { attempt, text: (text || '').slice(0, 300) });
+        if (attempt < maxRetries) {
+          await sleep(OPENAI_RETRY_DELAY_MS);
+          continue;
+        }
+        throw new Error('OPENAI_INVALID_JSON');
+      }
+
+      return parsed;
+    } catch (error) {
+      lastError = error;
+      if (
+        attempt < maxRetries &&
+        String(error?.message || '').includes('OPENAI_REQUEST_FAILED_429')
+      ) {
+        await sleep(OPENAI_RETRY_DELAY_MS * Math.pow(2, attempt - 1));
+        continue;
+      }
+      if (attempt >= maxRetries) throw error;
+    }
+  }
+
+  throw lastError || new Error('OPENAI_MAX_RETRIES_EXHAUSTED');
+}
+
 function extractTextOutput(json) {
   if (!json) return '';
 
@@ -433,6 +544,43 @@ function pickSelectedPhotoSource({ officialPhoto, aiConfidence, isCoffeePackage 
   }
 
   return 'user';
+}
+
+/**
+ * Builds the canonical photos object for a café.
+ *
+ * photos: {
+ *   official: string[],     // brand / barcode photos
+ *   user: string[],         // user-uploaded photos
+ *   selected: string,       // computed best photo URL
+ *   source: 'official' | 'user' | 'fallback'
+ * }
+ */
+function buildPhotosObject({
+  officialPhotos = [],
+  userPhotos = [],
+  isCoffeePackage = true,
+  aiConfidence = 0,
+}) {
+  const validUrl = (u) => typeof u === 'string' && u.startsWith('http') && u.length > 10;
+  const official = officialPhotos.filter(validUrl);
+  const user = userPhotos.filter(validUrl);
+
+  let selected = '';
+  let source = 'fallback';
+
+  if (official.length > 0 && isCoffeePackage && aiConfidence >= 0.6) {
+    selected = official[0];
+    source = 'official';
+  } else if (user.length > 0) {
+    selected = user[0];
+    source = 'user';
+  } else if (official.length > 0) {
+    selected = official[0];
+    source = 'official';
+  }
+
+  return { official, user, selected, source };
 }
 
 function normalizeAiResult(parsed, cafe, job, barcodeData) {
@@ -1138,34 +1286,7 @@ Datos del lookup por barcode:
     },
   };
 
-  let response = await performOpenAIRequest({ apiKey, body });
-
-  if (response.status === 429) {
-    logger.warn('OpenAI rate limited, retrying once', {
-      ean: job?.ean || cafe?.ean || '',
-      delayMs: OPENAI_RETRY_DELAY_MS,
-    });
-    await sleep(OPENAI_RETRY_DELAY_MS);
-    response = await performOpenAIRequest({ apiKey, body });
-  }
-
-  const json = await response.json().catch(() => null);
-
-  if (!response.ok) {
-    logger.error('OpenAI request failed', {
-      status: response.status,
-      body: json,
-    });
-    throw new Error(`OPENAI_REQUEST_FAILED_${response.status}`);
-  }
-
-  const text = extractTextOutput(json);
-  const parsed = tryExtractJsonObject(text);
-
-  if (!parsed) {
-    logger.error('OpenAI returned non-JSON output', { text, json });
-    throw new Error('OPENAI_INVALID_JSON');
-  }
+  const parsed = await robustOpenAICall({ apiKey, body });
 
   return normalizeAiResult(parsed, cafe, job, barcodeData);
 }
@@ -1190,18 +1311,61 @@ async function getTodaysAiJobsCountForUser(uid) {
 function buildCafeUpdateFromBarcodeOnly({ cafe, job, barcodeData }) {
   const userPhoto = normalizeText(cafe?.foto || job?.foto || '');
   const officialPhoto = normalizeText(barcodeData?.imagen || '');
-  const selectedBy = officialPhoto ? 'official' : 'user';
-  const bestPhoto = officialPhoto || userPhoto || '';
+
+  // Build canonical photos object
+  const existingOfficials = Array.isArray(cafe?.photos?.official) ? cafe.photos.official : [];
+  const existingUsers = Array.isArray(cafe?.photos?.user) ? cafe.photos.user : [];
+  const officialPhotos = [...new Set([officialPhoto, ...existingOfficials].filter(Boolean))];
+  const userPhotos = [...new Set([userPhoto, ...existingUsers].filter(Boolean))];
+
+  const photos = buildPhotosObject({
+    officialPhotos,
+    userPhotos,
+    isCoffeePackage: true,
+    aiConfidence: 0,
+  });
+
+  const bestPhoto = photos.selected || officialPhoto || userPhoto || '';
+  const selectedBy =
+    photos.source !== 'fallback' ? photos.source : officialPhoto ? 'official' : 'user';
+
+  const merged = {
+    ...cafe,
+    nombre: barcodeData?.nombre || cafe?.nombre || '',
+    marca: barcodeData?.marca || cafe?.marca || '',
+    ean: barcodeData?.barcode || job?.ean || cafe?.ean || '',
+    bestPhoto,
+  };
+  const completeness = computeDataCompleteness(merged);
 
   const update = {
     updatedAt: new Date().toISOString(),
     aiGenerated: false,
     aiStatus: 'barcode_completed',
     aiConfidenceScore: 0,
+    confidenceScore: 0,
+    dataCompletenessScore: completeness.score,
+    dataSource: 'barcode',
     imageValidation: {
       status: bestPhoto ? 'approved' : 'not_provided',
       reason: 'barcode_lookup_only',
       confidence: 0,
+    },
+    enrichmentPipeline: {
+      phase1_barcode: {
+        found: !!barcodeData,
+        strong: barcodeLookupLooksStrong(barcodeData),
+        source: barcodeData ? 'barcodelookup.com' : null,
+      },
+      phase2_ai: { skipped: true, reason: 'barcode_sufficient_or_no_photo' },
+      phase3_validation: {
+        confidenceScore: 0,
+        dataCompletenessScore: completeness.score,
+        missingFields: completeness.missing,
+        autoApproved: false,
+        decision: 'pending_admin',
+      },
+      processedAt: new Date().toISOString(),
     },
     nombre: barcodeData?.nombre || cafe?.nombre || 'Pendiente de identificar',
     marca: barcodeData?.marca || cafe?.marca || '',
@@ -1216,6 +1380,7 @@ function buildCafeUpdateFromBarcodeOnly({ cafe, job, barcodeData }) {
       officialPhoto: officialPhoto || '',
       source: 'barcode_lookup',
     },
+    photos,
     bestPhoto,
     photoSources: {
       userPhoto,
@@ -1296,6 +1461,8 @@ exports.onAiJobCreatedProcessCoffee = onDocumentCreated(
           result: {
             usedOpenAI: false,
             barcodeLookupFound: !!barcodeData,
+            dataCompletenessScore: cafeUpdate.dataCompletenessScore,
+            dataSource: 'barcode',
             selectedPhotoSource: cafeUpdate.photoSources?.selectedBy || 'user',
           },
           updatedAt: new Date().toISOString(),
@@ -1318,11 +1485,31 @@ exports.onAiJobCreatedProcessCoffee = onDocumentCreated(
       const ai = await callOpenAIForCoffeeEnrichment({ job, cafe, barcodeData });
 
       const imageValidationStatus = ai.isCoffeePackage ? 'approved' : 'rejected';
-      const shouldAutoApprove =
-        ai.isCoffeePackage && ai.isSpecialty === true && ai.confidence >= AI_AUTO_APPROVE_THRESHOLD;
 
       const userPhoto = normalizeText(cafe?.foto || job?.foto || '');
       const officialPhoto = normalizeText(barcodeData?.imagen || '');
+
+      // Build merged café data for completeness scoring
+      const mergedForCompleteness = {
+        ...cafe,
+        nombre: ai.nombre || barcodeData?.nombre || cafe?.nombre || '',
+        marca: ai.marca || barcodeData?.marca || cafe?.marca || '',
+        origen: ai.origen || cafe?.origen || '',
+        ean: ai.ean || cafe?.ean || '',
+        bestPhoto: officialPhoto || userPhoto || cafe?.bestPhoto || '',
+      };
+      const completeness = computeDataCompleteness(mergedForCompleteness);
+
+      // Dual gate: confidence AND completeness
+      const shouldAutoApprove =
+        ai.isCoffeePackage &&
+        ai.isSpecialty === true &&
+        ai.confidence >= AI_AUTO_APPROVE_THRESHOLD &&
+        completeness.score >= DATA_COMPLETENESS_THRESHOLD;
+
+      // Determine source priority
+      const dataSource =
+        barcodeData && ai.confidence < 0.5 ? 'barcode' : ai.confidence >= 0.5 ? 'ai' : 'user';
 
       const cafeUpdate = {
         aiGenerated: true,
@@ -1336,6 +1523,9 @@ exports.onAiJobCreatedProcessCoffee = onDocumentCreated(
           officialPhoto: officialPhoto || '',
           source: 'openai',
         },
+        confidenceScore: ai.confidence,
+        dataCompletenessScore: completeness.score,
+        dataSource,
         aiConfidenceScore: ai.confidence,
         aiStatus: shouldAutoApprove ? 'auto_approved' : 'completed',
         updatedAt: new Date().toISOString(),
@@ -1343,6 +1533,31 @@ exports.onAiJobCreatedProcessCoffee = onDocumentCreated(
           status: imageValidationStatus,
           reason: ai.imageReason || (ai.isCoffeePackage ? '' : 'not_coffee_package'),
           confidence: ai.confidence,
+        },
+        enrichmentPipeline: {
+          phase1_barcode: {
+            found: !!barcodeData,
+            strong: barcodeLookupLooksStrong(barcodeData),
+            source: barcodeData ? 'barcodelookup.com' : null,
+          },
+          phase2_ai: {
+            model: OPENAI_MODEL,
+            confidence: ai.confidence,
+            isCoffeePackage: ai.isCoffeePackage,
+            isSpecialty: ai.isSpecialty,
+          },
+          phase3_validation: {
+            confidenceScore: ai.confidence,
+            dataCompletenessScore: completeness.score,
+            missingFields: completeness.missing,
+            autoApproved: shouldAutoApprove,
+            decision: !ai.isCoffeePackage
+              ? 'rejected'
+              : shouldAutoApprove
+                ? 'auto_approved'
+                : 'pending_admin',
+          },
+          processedAt: new Date().toISOString(),
         },
         nombre: ai.nombre || barcodeData?.nombre || cafe?.nombre || 'Pendiente de identificar',
         marca: ai.marca || barcodeData?.marca || cafe?.marca || '',
@@ -1357,22 +1572,41 @@ exports.onAiJobCreatedProcessCoffee = onDocumentCreated(
         cafeUpdate.officialPhoto = officialPhoto;
       }
 
-      cafeUpdate.bestPhoto = pickBestPhoto({
-        userPhoto,
-        officialPhoto,
-        aiConfidence: ai.confidence,
+      // Build canonical photos object
+      const existingOfficials = Array.isArray(cafe?.photos?.official) ? cafe.photos.official : [];
+      const existingUsers = Array.isArray(cafe?.photos?.user) ? cafe.photos.user : [];
+      const officialPhotos = [...new Set([officialPhoto, ...existingOfficials].filter(Boolean))];
+      const userPhotos = [...new Set([userPhoto, ...existingUsers].filter(Boolean))];
+
+      const photos = buildPhotosObject({
+        officialPhotos,
+        userPhotos,
         isCoffeePackage: ai.isCoffeePackage,
+        aiConfidence: ai.confidence,
       });
+
+      cafeUpdate.photos = photos;
+      cafeUpdate.bestPhoto =
+        photos.selected ||
+        pickBestPhoto({
+          userPhoto,
+          officialPhoto,
+          aiConfidence: ai.confidence,
+          isCoffeePackage: ai.isCoffeePackage,
+        });
 
       cafeUpdate.photoSources = {
         userPhoto: userPhoto || '',
         officialPhoto: officialPhoto || '',
         bestPhoto: cafeUpdate.bestPhoto || '',
-        selectedBy: pickSelectedPhotoSource({
-          officialPhoto,
-          aiConfidence: ai.confidence,
-          isCoffeePackage: ai.isCoffeePackage,
-        }),
+        selectedBy:
+          photos.source !== 'fallback'
+            ? photos.source
+            : pickSelectedPhotoSource({
+                officialPhoto,
+                aiConfidence: ai.confidence,
+                isCoffeePackage: ai.isCoffeePackage,
+              }),
       };
 
       if (!ai.isCoffeePackage) {
@@ -1395,6 +1629,9 @@ exports.onAiJobCreatedProcessCoffee = onDocumentCreated(
         result: {
           usedOpenAI: true,
           aiConfidenceScore: ai.confidence,
+          dataCompletenessScore: completeness.score,
+          dataSource,
+          missingFields: completeness.missing,
           isSpecialty: ai.isSpecialty,
           isCoffeePackage: ai.isCoffeePackage,
           autoApproved: shouldAutoApprove,
@@ -1409,8 +1646,11 @@ exports.onAiJobCreatedProcessCoffee = onDocumentCreated(
         targetCollection,
         targetId,
         confidence: ai.confidence,
+        completeness: completeness.score,
+        dataSource,
         autoApproved: shouldAutoApprove,
         barcodeLookupFound: !!barcodeData,
+        missingFields: completeness.missing,
         selectedPhotoSource: cafeUpdate.photoSources?.selectedBy || 'user',
       });
     } catch (error) {
@@ -1571,29 +1811,7 @@ Datos barcode:
     },
   };
 
-  let response = await performOpenAIRequest({ apiKey, body });
-
-  if (response.status === 429) {
-    await sleep(OPENAI_RETRY_DELAY_MS);
-    response = await performOpenAIRequest({ apiKey, body });
-  }
-
-  const json = await response.json().catch(() => null);
-
-  if (!response.ok) {
-    logger.error('callOpenAIForAdminDraft failed', {
-      status: response.status,
-      body: json,
-    });
-    throw new Error(`OPENAI_REQUEST_FAILED_${response.status}`);
-  }
-
-  const text = extractTextOutput(json);
-  const parsed = tryExtractJsonObject(text);
-
-  if (!parsed) {
-    throw new Error('OPENAI_INVALID_JSON');
-  }
+  const parsed = await robustOpenAICall({ apiKey, body });
 
   return {
     suggestedNombre: String(parsed.suggestedNombre || '').trim(),
@@ -1726,18 +1944,7 @@ async function callOpenAIForRecognition({ imageBase64 }) {
     },
   };
 
-  const response = await performOpenAIRequest({ apiKey, body });
-  const json = await response.json().catch(() => null);
-
-  if (!response.ok) {
-    logger.error('recognizeCoffee OpenAI failed', { status: response.status, body: json });
-    throw new Error(`OPENAI_REQUEST_FAILED_${response.status}`);
-  }
-
-  const text = extractTextOutput(json);
-  const parsed = tryExtractJsonObject(text);
-  if (!parsed) throw new Error('OPENAI_INVALID_JSON');
-  return parsed;
+  return robustOpenAICall({ apiKey, body });
 }
 
 exports.recognizeCoffee = onRequest(
@@ -1813,7 +2020,12 @@ exports.recognizeCoffee = onRequest(
                 roaster: remembered.roaster,
                 pais: remembered.pais,
                 proceso: remembered.proceso,
-                officialPhoto: remembered.officialPhoto || remembered.foto || null,
+                officialPhoto:
+                  remembered.photos?.selected ||
+                  remembered.bestPhoto ||
+                  remembered.officialPhoto ||
+                  remembered.foto ||
+                  null,
                 puntuacion: remembered.puntuacion,
                 score: 100,
               },
@@ -1855,7 +2067,8 @@ exports.recognizeCoffee = onRequest(
           roaster: cafe.roaster,
           pais: cafe.pais,
           proceso: cafe.proceso,
-          officialPhoto: cafe.officialPhoto || cafe.foto || null,
+          officialPhoto:
+            cafe.photos?.selected || cafe.bestPhoto || cafe.officialPhoto || cafe.foto || null,
           puntuacion: cafe.puntuacion,
           score,
         })),
@@ -1949,6 +2162,91 @@ exports.adminEnrichCoffeeDraft = onRequest(
       });
     } catch (error) {
       logger.error('adminEnrichCoffeeDraft error', {
+        error: String(error?.message || error),
+      });
+      res.status(500).json({
+        ok: false,
+        error: String(error?.message || error),
+      });
+    }
+  }
+);
+
+// ── Admin: retry full enrichment pipeline on a specific café ──
+exports.adminRetryEnrichment = onRequest(
+  {
+    region: 'europe-west1',
+    cors: true,
+    timeoutSeconds: 15,
+    memory: '128MiB',
+  },
+  async (req, res) => {
+    if (req.method !== 'POST') {
+      res.status(405).json({ error: 'METHOD_NOT_ALLOWED' });
+      return;
+    }
+
+    try {
+      const authHeader = req.headers.authorization || '';
+      const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+      if (!token) {
+        res.status(401).json({ error: 'UNAUTHENTICATED' });
+        return;
+      }
+
+      const decoded = await admin.auth().verifyIdToken(token);
+      const uid = decoded.uid;
+
+      // Verify admin role
+      const profileSnap = await db.collection('user_profiles').doc(uid).get();
+      if (!profileSnap.exists || profileSnap.data()?.role !== 'admin') {
+        res.status(403).json({ error: 'FORBIDDEN' });
+        return;
+      }
+
+      const { cafeId } = req.body || {};
+      if (!cafeId) {
+        res.status(400).json({ error: 'MISSING_CAFE_ID' });
+        return;
+      }
+
+      const cafeRef = db.collection('cafes').doc(cafeId);
+      const cafeSnap = await cafeRef.get();
+      if (!cafeSnap.exists) {
+        res.status(404).json({ error: 'CAFE_NOT_FOUND' });
+        return;
+      }
+
+      const cafe = cafeSnap.data() || {};
+
+      // Reset aiStatus so the pipeline won't skip it
+      await cafeRef.update({
+        aiStatus: 'queued',
+        updatedAt: new Date().toISOString(),
+      });
+
+      // Create ai_job to trigger the pipeline
+      const jobRef = await db.collection('ai_jobs').add({
+        type: 'coffee_enrichment',
+        status: 'queued',
+        targetCollection: 'cafes',
+        targetId: cafeId,
+        uid: cafe.uid || uid,
+        ean: cafe.ean || '',
+        foto: cafe.foto || cafe.imageUrl || '',
+        adminRetry: true,
+        retriggeredBy: uid,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+
+      res.status(200).json({
+        ok: true,
+        jobId: jobRef.id,
+        message: 'Enrichment pipeline retriggered',
+      });
+    } catch (error) {
+      logger.error('adminRetryEnrichment error', {
         error: String(error?.message || error),
       });
       res.status(500).json({

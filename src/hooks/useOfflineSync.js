@@ -9,11 +9,12 @@
  *   - toggle_favorite → update push_subscriptions (allFavs) via setDocument
  *   - add_cafe        → addDocument('cafes', payload)
  *   - delete_cafe     → deleteDocument('cafes', cafeId)
+ *   - pending_scan    → re-process scanned barcode (lookup on server)
  */
 import { useEffect, useRef } from 'react';
 import { useNetwork } from '../context/NetworkContext';
-import { processSyncQueue } from '../core/syncQueue';
 import { syncPendingCatas } from '../core/offlineCatas';
+import { processSyncQueue } from '../core/syncQueue';
 
 export default function useOfflineSync({
   user,
@@ -21,6 +22,7 @@ export default function useOfflineSync({
   deleteDocument,
   setDocument,
   cargarCatas,
+  onPendingScanProcessed,
 }) {
   const { registerSyncHandler, unregisterSyncHandler } = useNetwork();
 
@@ -28,7 +30,14 @@ export default function useOfflineSync({
   // without needing to re-register on every render.
   const servicesRef = useRef({});
   useEffect(() => {
-    servicesRef.current = { user, addDocument, deleteDocument, setDocument, cargarCatas };
+    servicesRef.current = {
+      user,
+      addDocument,
+      deleteDocument,
+      setDocument,
+      cargarCatas,
+      onPendingScanProcessed,
+    };
   });
 
   useEffect(() => {
@@ -39,6 +48,7 @@ export default function useOfflineSync({
         deleteDocument: del,
         setDocument: set,
         cargarCatas: reload,
+        onPendingScanProcessed: onScan,
       } = servicesRef.current;
 
       if (!u?.uid) return;
@@ -84,6 +94,15 @@ export default function useOfflineSync({
         },
         delete_cafe: async (payload) => {
           await del('cafes', payload.cafeId);
+        },
+        pending_scan: async (payload) => {
+          // Notify the app that a pending scan is ready to process
+          // The app can re-run the barcode lookup now that data is fresh
+          if (typeof onScan === 'function') {
+            await onScan(payload);
+          }
+          // If no handler, just discard — the scan was queued when offline
+          // and we can't do anything with it automatically
         },
       });
 

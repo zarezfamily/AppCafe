@@ -1,3 +1,5 @@
+import { getCafePhoto } from '../../core/utils';
+
 function normalizeText(value) {
   return String(value || '').trim();
 }
@@ -10,11 +12,7 @@ function normalizeCategory(cafe) {
   return 'specialty';
 }
 
-function getPhoto(cafe) {
-  return (
-    cafe?.bestPhoto || cafe?.officialPhoto || cafe?.foto || cafe?.image || cafe?.imageUrl || ''
-  );
-}
+const getPhoto = getCafePhoto;
 
 function isApprovedCafe(cafe) {
   return (

@@ -1,3 +1,5 @@
+import { getCafePhoto } from '../../core/utils';
+
 function normalizeText(value) {
   return String(value || '').trim();
 }
@@ -12,11 +14,7 @@ function getScaScore(cafe) {
   return Number.isFinite(legacyScore) ? legacyScore : 0;
 }
 
-function getPhoto(cafe) {
-  return (
-    cafe?.bestPhoto || cafe?.officialPhoto || cafe?.foto || cafe?.image || cafe?.imageUrl || ''
-  );
-}
+const getPhoto = getCafePhoto;
 
 function isApprovedCafe(cafe) {
   return (

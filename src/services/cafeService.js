@@ -170,6 +170,43 @@ export function isCafeIncomplete(cafe) {
   return !(ean && name && roaster && image);
 }
 
+/**
+ * Scores how complete a café record is (0-1).
+ * Matches the server-side computeDataCompleteness in functions/index.js.
+ */
+export function computeDataCompleteness(cafe) {
+  const has = (v, min = 2) => String(v || '').trim().length >= min;
+  const hasNum = (v) => typeof v === 'number' && v > 0;
+
+  const fields = [
+    { key: 'nombre', w: 0.2, ok: has(cafe?.nombre || cafe?.name, 3) },
+    { key: 'marca', w: 0.15, ok: has(cafe?.marca || cafe?.roaster, 2) },
+    { key: 'origen', w: 0.12, ok: has(cafe?.origen || cafe?.origin || cafe?.pais, 2) },
+    { key: 'ean', w: 0.1, ok: has(cafe?.ean, 8) },
+    { key: 'foto', w: 0.12, ok: has(cafe?.bestPhoto || cafe?.officialPhoto || cafe?.foto, 8) },
+    { key: 'notas', w: 0.08, ok: has(cafe?.notas || cafe?.notes, 3) },
+    { key: 'proceso', w: 0.06, ok: has(cafe?.proceso || cafe?.process, 2) },
+    { key: 'variedad', w: 0.05, ok: has(cafe?.variedad || cafe?.variety, 2) },
+    { key: 'tueste', w: 0.04, ok: has(cafe?.tueste || cafe?.roastLevel, 2) },
+    { key: 'formato', w: 0.04, ok: has(cafe?.formato || cafe?.format, 2) },
+    { key: 'precio', w: 0.04, ok: hasNum(cafe?.precio) },
+  ];
+
+  let score = 0;
+  const missing = [];
+  for (const f of fields) {
+    if (f.ok) score += f.w;
+    else missing.push(f.key);
+  }
+
+  return {
+    score: Math.round(score * 100) / 100,
+    missing,
+    total: fields.length,
+    filled: fields.length - missing.length,
+  };
+}
+
 export function canBeApproved(cafe) {
   return !isCafeIncomplete(cafe);
 }

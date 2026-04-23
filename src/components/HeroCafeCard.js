@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef } from 'react';
 import { Animated, Easing, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { PREMIUM_ACCENT, THEME } from '../constants/theme';
+import { getCafePhoto } from '../core/utils';
 import PackshotImage from './PackshotImage';
 
 function getScaScore(item) {
@@ -19,9 +20,7 @@ function getOriginLabel(item) {
 }
 
 function getPhoto(item) {
-  return (
-    item?.bestPhoto || item?.officialPhoto || item?.foto || item?.image || item?.imageUrl || null
-  );
+  return getCafePhoto(item);
 }
 
 function StatPill({ icon, label, value }) {

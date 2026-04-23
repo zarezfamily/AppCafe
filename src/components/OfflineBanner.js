@@ -1,15 +1,18 @@
 import { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 import { useNetwork } from '../context/NetworkContext';
+import usePendingActions from '../hooks/usePendingActions';
 
 export default function OfflineBanner() {
   const { isOnline, justReconnected } = useNetwork();
+  const { pendingCount, isSyncing } = usePendingActions();
 
   const translateY = useRef(new Animated.Value(-48)).current;
   const opacity = useRef(new Animated.Value(0)).current;
 
-  const isVisible = !isOnline || justReconnected;
-  const isBack = isOnline && justReconnected;
+  // Show banner when offline, just reconnected, or syncing with pending actions
+  const isVisible = !isOnline || justReconnected || (isSyncing && pendingCount > 0);
+  const isBack = isOnline && (justReconnected || isSyncing);
 
   useEffect(() => {
     if (isVisible) {
@@ -25,6 +28,16 @@ export default function OfflineBanner() {
     }
   }, [isVisible, translateY, opacity]);
 
+  const offlineLabel =
+    pendingCount > 0
+      ? `Sin conexión · ${pendingCount} pendiente${pendingCount > 1 ? 's' : ''}`
+      : 'Sin conexión · modo offline';
+
+  const onlineLabel =
+    pendingCount > 0
+      ? `Sincronizando ${pendingCount} acción${pendingCount > 1 ? 'es' : ''}…`
+      : 'Conexión restaurada ✓';
+
   return (
     <Animated.View
       pointerEvents="none"
@@ -32,9 +45,7 @@ export default function OfflineBanner() {
     >
       <View style={[styles.pill, isBack ? styles.pillOnline : styles.pillOffline]}>
         <Text style={styles.dot}>{isBack ? '●' : '●'}</Text>
-        <Text style={styles.label}>
-          {isBack ? 'Conexión restaurada · sincronizando…' : 'Sin conexión · modo offline'}
-        </Text>
+        <Text style={styles.label}>{isBack ? onlineLabel : offlineLabel}</Text>
       </View>
     </Animated.View>
   );

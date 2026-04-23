@@ -15,12 +15,14 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { getAuthToken } from '../services/firebaseCore';
+import { getCafePhoto } from '../core/utils';
 import { buildScaPayload } from '../services/cafeService';
-import { getCollection, updateDocument } from '../services/firestoreService';
+import { getAuthToken } from '../services/firebaseCore';
+import { deleteDocument, getCollection, updateDocument } from '../services/firestoreService';
 import { uploadImageToStorage } from '../services/storageService';
 
 const FILTERS = {
+  PENDING: 'pending',
   ALL: 'all',
   WITHOUT_IMAGE: 'without_image',
   WITHOUT_PRICE: 'without_price',
@@ -32,6 +34,10 @@ const FILTERS = {
 
 const ADMIN_ENRICH_URL =
   'https://europe-west1-miappdecafe.cloudfunctions.net/adminEnrichCoffeeDraft';
+const ADMIN_RETRY_URL = 'https://europe-west1-miappdecafe.cloudfunctions.net/adminRetryEnrichment';
+
+const CLEAN_COFFEE_IMAGE =
+  'https://images.openfoodfacts.org/images/products/761/303/656/9927/front_en.44.400.jpg';
 
 async function resizeForApp(uri) {
   const manipulated = await ImageManipulator.manipulateAsync(uri, [{ resize: { width: 800 } }], {
@@ -52,9 +58,8 @@ function getUserPhoto(cafe) {
 }
 
 function getBestPhoto(cafe) {
-  return String(
-    cafe?.bestPhoto || cafe?.officialPhoto || cafe?.foto || cafe?.imageUrl || ''
-  ).trim();
+  const url = getCafePhoto(cafe);
+  return url === CLEAN_COFFEE_IMAGE ? '' : url;
 }
 
 function parsePrice(value) {
@@ -217,7 +222,7 @@ function ReviewCheckPill({ label, ok }) {
   );
 }
 
-function PendingCafeCard({ item, onApprove, onReject, onEdit, busy }) {
+function PendingCafeCard({ item, onApprove, onReject, onEdit, onRetryIA, busy }) {
   const allowApprove = canBeApproved(item);
   const incomplete = isCafeIncomplete(item);
   const nombre = item.nombre || item.name || 'Sin nombre';
@@ -296,8 +301,39 @@ function PendingCafeCard({ item, onApprove, onReject, onEdit, busy }) {
         <FieldRow label="Tipo" value={getCategoryLabel(coffeeCategory)} />
         <FieldRow label="BIO" value={item.isBio ? 'Sí' : 'No'} />
         {!!item.precio && <FieldRow label="Precio" value={`${item.precio} €`} />}
-        {!!item.aiConfidenceScore && (
-          <FieldRow label="Confianza IA" value={`${Math.round(item.aiConfidenceScore * 100)}%`} />
+        {item.aiConfidenceScore != null && (
+          <View style={styles.scoreRow}>
+            <Text style={styles.cardLineLabel}>Score IA: </Text>
+            <View style={styles.scoreBarBg}>
+              <View
+                style={[
+                  styles.scoreBarFill,
+                  { width: `${Math.round(item.aiConfidenceScore * 100)}%` },
+                  item.aiConfidenceScore >= 0.85
+                    ? styles.scoreBarGood
+                    : item.aiConfidenceScore >= 0.5
+                      ? styles.scoreBarMid
+                      : styles.scoreBarLow,
+                ]}
+              />
+            </View>
+            <Text style={styles.scoreText}>{Math.round(item.aiConfidenceScore * 100)}%</Text>
+          </View>
+        )}
+        {item.dataCompletenessScore != null && (
+          <View style={styles.scoreRow}>
+            <Text style={styles.cardLineLabel}>Completitud: </Text>
+            <View style={styles.scoreBarBg}>
+              <View
+                style={[
+                  styles.scoreBarFill,
+                  { width: `${Math.round(item.dataCompletenessScore * 100)}%` },
+                  item.dataCompletenessScore >= 0.7 ? styles.scoreBarGood : styles.scoreBarMid,
+                ]}
+              />
+            </View>
+            <Text style={styles.scoreText}>{Math.round(item.dataCompletenessScore * 100)}%</Text>
+          </View>
         )}
       </View>
 
@@ -319,7 +355,7 @@ function PendingCafeCard({ item, onApprove, onReject, onEdit, busy }) {
           disabled={busy}
           activeOpacity={0.8}
         >
-          <Text style={styles.actionBtnText}>Editar ficha</Text>
+          <Text style={styles.actionBtnText}>Editar</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -336,12 +372,21 @@ function PendingCafeCard({ item, onApprove, onReject, onEdit, busy }) {
         </TouchableOpacity>
 
         <TouchableOpacity
+          style={[styles.actionBtn, styles.retryIABtn, busy && styles.actionBtnDisabled]}
+          onPress={() => onRetryIA(item)}
+          disabled={busy}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.actionBtnText}>🤖 IA</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
           style={[styles.actionBtn, styles.rejectBtn, busy && styles.actionBtnDisabled]}
           onPress={() => onReject(item)}
           disabled={busy}
           activeOpacity={0.8}
         >
-          <Text style={styles.actionBtnTextDark}>Rechazar</Text>
+          <Text style={styles.actionBtnTextDark}>Eliminar</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -415,7 +460,7 @@ export default function AdminPanelScreen() {
   const [busyId, setBusyId] = useState(null);
   const [pendingCafes, setPendingCafes] = useState([]);
   const [searchText, setSearchText] = useState('');
-  const [activeFilter, setActiveFilter] = useState(FILTERS.ALL);
+  const [activeFilter, setActiveFilter] = useState(FILTERS.PENDING);
 
   const [editingCafe, setEditingCafe] = useState(null);
   const [editData, setEditData] = useState(null);
@@ -715,24 +760,29 @@ export default function AdminPanelScreen() {
   }, []);
 
   const handleReject = useCallback(async (item) => {
-    try {
-      setBusyId(item.id);
-      await updateDocument('cafes', item.id, {
-        status: 'rejected',
-        provisional: false,
-        reviewStatus: 'rejected',
-        appVisible: false,
-        scannerVisible: false,
-        adminReviewedAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      });
-      setPendingCafes((prev) => prev.filter((c) => c.id !== item.id));
-      Alert.alert('OK', 'Café rechazado');
-    } catch (error) {
-      Alert.alert('Error', error?.message || 'No se pudo rechazar');
-    } finally {
-      setBusyId(null);
-    }
+    Alert.alert(
+      'Eliminar café',
+      `¿Seguro que quieres eliminar "${item.nombre || item.name || 'Sin nombre'}" de la base de datos? Esta acción no se puede deshacer.`,
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Eliminar',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setBusyId(item.id);
+              await deleteDocument('cafes', item.id);
+              setPendingCafes((prev) => prev.filter((c) => c.id !== item.id));
+              Alert.alert('OK', 'Café eliminado de la base de datos');
+            } catch (error) {
+              Alert.alert('Error', error?.message || 'No se pudo eliminar');
+            } finally {
+              setBusyId(null);
+            }
+          },
+        },
+      ]
+    );
   }, []);
 
   const getScaPreviewPayload = useCallback((data) => {
@@ -795,6 +845,12 @@ export default function AdminPanelScreen() {
         imageUrl: bestPhoto || userPhoto || '',
         bestPhoto,
         foto: bestPhoto || userPhoto || '',
+        photos: {
+          official: officialPhoto ? [officialPhoto] : [],
+          user: userPhoto ? [userPhoto] : [],
+          selected: bestPhoto || '',
+          source: selectedBy,
+        },
         photoSources: {
           userPhoto,
           officialPhoto,
@@ -880,43 +936,95 @@ export default function AdminPanelScreen() {
   }, [buildEditedPayload, closeEditor, editingCafe, loadCafes]);
 
   const handleRejectFromEditor = useCallback(async () => {
-    try {
-      if (!editingCafe) return;
-      setBusyId(editingCafe.id);
+    if (!editingCafe) return;
 
-      await updateDocument('cafes', editingCafe.id, {
-        status: 'rejected',
-        provisional: false,
-        reviewStatus: 'rejected',
-        appVisible: false,
-        scannerVisible: false,
-        adminReviewedAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+    Alert.alert(
+      'Eliminar café',
+      `¿Seguro que quieres eliminar "${editData?.nombre || editingCafe.nombre || 'Sin nombre'}" de la base de datos? Esta acción no se puede deshacer.`,
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Eliminar',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setBusyId(editingCafe.id);
+              await deleteDocument('cafes', editingCafe.id);
+              Alert.alert('OK', 'Café eliminado de la base de datos');
+              closeEditor();
+              loadCafes();
+            } catch (error) {
+              Alert.alert('Error', error?.message || 'No se pudo eliminar');
+            } finally {
+              setBusyId(null);
+            }
+          },
+        },
+      ]
+    );
+  }, [closeEditor, editingCafe, editData, loadCafes]);
+
+  const handleRetryEnrichment = useCallback(async (item) => {
+    try {
+      setBusyId(item.id);
+
+      const token = getAuthToken();
+      if (!token) {
+        Alert.alert('Sesión', 'No hay sesión activa.');
+        return;
+      }
+
+      const res = await fetch(ADMIN_RETRY_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ cafeId: item.id }),
       });
 
-      Alert.alert('OK', 'Café rechazado');
-      closeEditor();
-      loadCafes();
+      const json = await res.json().catch(() => null);
+
+      if (!res.ok || !json?.ok) {
+        throw new Error(json?.error || 'No se pudo relanzar el enrichment');
+      }
+
+      // Update local state to show it's processing
+      setPendingCafes((prev) =>
+        prev.map((c) => (c.id === item.id ? { ...c, aiStatus: 'queued' } : c))
+      );
+
+      Alert.alert('OK', 'Pipeline IA relanzado. Los datos se actualizarán en unos segundos.');
     } catch (error) {
-      Alert.alert('Error', error?.message || 'No se pudo rechazar');
+      Alert.alert('Error', error?.message || 'No se pudo completar con IA');
     } finally {
       setBusyId(null);
     }
-  }, [closeEditor, editingCafe, loadCafes]);
+  }, []);
 
   const stats = useMemo(() => {
     const total = pendingCafes.length;
+    const pending = pendingCafes.filter((c) => {
+      const st = String(c.reviewStatus || c.status || '');
+      return st !== 'approved' && st !== 'rejected';
+    }).length;
     const sinFoto = pendingCafes.filter((c) => !getBestPhoto(c)).length;
     const sinPrecio = pendingCafes.filter((c) => !c.precio).length;
     const sinNotas = pendingCafes.filter((c) => !String(c.notas || '').trim()).length;
     const sinEan = pendingCafes.filter((c) => !String(c.ean || c.barcode || '').trim()).length;
     const listos = pendingCafes.filter((c) => canBeApproved(c)).length;
-    return { total, sinFoto, sinPrecio, sinNotas, sinEan, listos };
+    return { total, pending, sinFoto, sinPrecio, sinNotas, sinEan, listos };
   }, [pendingCafes]);
 
   const filteredCafes = useMemo(() => {
     let rows = pendingCafes.filter((cafe) => matchesSearch(cafe, searchText));
     switch (activeFilter) {
+      case FILTERS.PENDING:
+        rows = rows.filter((c) => {
+          const st = String(c.reviewStatus || c.status || '');
+          return st !== 'approved' && st !== 'rejected';
+        });
+        break;
       case FILTERS.WITHOUT_IMAGE:
         rows = rows.filter((c) => !getBestPhoto(c));
         break;
@@ -947,6 +1055,7 @@ export default function AdminPanelScreen() {
       onApprove={handleApprove}
       onReject={handleReject}
       onEdit={openEditor}
+      onRetryIA={handleRetryEnrichment}
       busy={busyId === item.id}
     />
   );
@@ -1037,7 +1146,7 @@ export default function AdminPanelScreen() {
             onPress={handleRejectFromEditor}
             disabled={busyId === editingCafe.id}
           >
-            <Text style={styles.editorTopActionGhostText}>Rechazar</Text>
+            <Text style={[styles.editorTopActionGhostText, { color: '#991B1B' }]}>Eliminar</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.editorTopActionGhost} onPress={closeEditor}>
@@ -1502,7 +1611,7 @@ export default function AdminPanelScreen() {
             onPress={handleRejectFromEditor}
             disabled={busyId === editingCafe.id}
           >
-            <Text style={styles.actionBtnTextDark}>Rechazar</Text>
+            <Text style={styles.actionBtnTextDark}>Eliminar</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -1536,6 +1645,11 @@ export default function AdminPanelScreen() {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.filtersRow}
       >
+        <FilterChip
+          label={`Pendientes (${stats.pending})`}
+          active={activeFilter === FILTERS.PENDING}
+          onPress={() => setActiveFilter(FILTERS.PENDING)}
+        />
         <FilterChip
           label="Todos"
           active={activeFilter === FILTERS.ALL}
@@ -1574,6 +1688,7 @@ export default function AdminPanelScreen() {
       </ScrollView>
 
       <View style={styles.statsRow}>
+        <InfoPill label="Pendientes" value={stats.pending} />
         <InfoPill label="Total" value={stats.total} />
         <InfoPill label="Listos" value={stats.listos} />
         <InfoPill label="Sin foto" value={stats.sinFoto} />
@@ -1851,6 +1966,7 @@ const styles = StyleSheet.create({
   },
   editBtn: { backgroundColor: '#111827' },
   approveBtn: { backgroundColor: '#166534' },
+  retryIABtn: { backgroundColor: '#7C3AED' },
   rejectBtn: { backgroundColor: '#FEE2E2', borderWidth: 1, borderColor: '#FECACA' },
   actionBtnDisabled: { opacity: 0.4 },
   actionBtnText: { color: '#FFF', fontWeight: '700', fontSize: 14 },
@@ -2215,5 +2331,33 @@ const styles = StyleSheet.create({
     color: '#111827',
     fontWeight: '700',
     fontSize: 14,
+  },
+
+  scoreRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  scoreBarBg: {
+    flex: 1,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#E5E7EB',
+    marginHorizontal: 8,
+    overflow: 'hidden',
+  },
+  scoreBarFill: {
+    height: 8,
+    borderRadius: 4,
+  },
+  scoreBarGood: { backgroundColor: '#22C55E' },
+  scoreBarMid: { backgroundColor: '#F59E0B' },
+  scoreBarLow: { backgroundColor: '#EF4444' },
+  scoreText: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#111827',
+    minWidth: 38,
+    textAlign: 'right',
   },
 });

@@ -12,6 +12,9 @@ import {
 
 import AppDialogModal from '../components/AppDialogModal';
 import OnboardingModal from '../components/OnboardingModal';
+import { useNetwork } from '../context/NetworkContext';
+import { enqueueAction } from '../core/syncQueue';
+import { getCafePhoto } from '../core/utils';
 import { getUpgradeForScannedCafe } from '../domain/coffee/scanUpgrade';
 import CafeDetailScreen from './CafeDetailScreen';
 import FormScreen from './FormScreen';
@@ -93,7 +96,7 @@ function ExistingCafeMatchScreen({
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.96)).current;
   const matchCopy = getCafeMatchCopy(cafe);
-  const image = cafe?.bestPhoto || cafe?.officialPhoto || cafe?.foto || null;
+  const image = getCafePhoto(cafe);
 
   useEffect(() => {
     Animated.parallel([
@@ -361,11 +364,7 @@ function ExistingCafeMatchScreen({
               <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
                 <Image
                   source={{
-                    uri:
-                      upgrade.cafe.bestPhoto ||
-                      upgrade.cafe.officialPhoto ||
-                      upgrade.cafe.foto ||
-                      undefined,
+                    uri: getCafePhoto(upgrade.cafe),
                   }}
                   style={{ width: 68, height: 68, borderRadius: 16, backgroundColor: '#1a1a1a' }}
                 />
@@ -541,6 +540,7 @@ function ScannerMatchFlow({
   showDialog,
 }) {
   const [matchedCafe, setMatchedCafe] = useState(null);
+  const { isOnline } = useNetwork();
   const scanUpgrade = useMemo(
     () => getUpgradeForScannedCafe(matchedCafe, allCafes),
     [allCafes, matchedCafe]
@@ -611,6 +611,16 @@ function ScannerMatchFlow({
 
         if (existing) {
           setMatchedCafe(existing);
+          return;
+        }
+
+        // Offline: queue scan for later processing
+        if (!isOnline) {
+          enqueueAction('pending_scan', { ean, source: 'barcode', ts: Date.now() });
+          showDialog?.(
+            'Escaneo guardado',
+            `Código ${ean} guardado. Se procesará cuando vuelvas a tener conexión.`
+          );
           return;
         }
 

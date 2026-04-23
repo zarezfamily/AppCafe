@@ -16,6 +16,7 @@ import {
 
 import AppDialogModal from '../components/AppDialogModal';
 import PackshotImage from '../components/PackshotImage';
+import { getCafePhoto } from '../core/utils';
 import { getComparableCafes } from '../domain/coffee/compareCoffee';
 import useSocialFeed from '../hooks/useSocialFeed';
 import { updateDocument } from '../services/firestoreService';
@@ -153,13 +154,7 @@ export default function CafeDetailScreen({
 
   const { tastingCountByCafeId } = useSocialFeed();
 
-  const fotoCafe =
-    cafeToShow.bestPhoto ||
-    cafeToShow.officialPhoto ||
-    cafeToShow.imageUrl ||
-    cafeToShow.foto ||
-    cafeToShow.image ||
-    null;
+  const fotoCafe = getCafePhoto(cafeToShow);
 
   const precioTexto =
     cafeToShow.precio !== undefined && cafeToShow.precio !== null ? `${cafeToShow.precio} €` : null;
@@ -395,10 +390,26 @@ export default function CafeDetailScreen({
                   {formatCategoryBadgeLabel(isDaily, cafeToShow)}
                 </Text>
               </View>
-              <Text style={det.scoreNum}>{scaInfo ? Number(scaInfo.score).toFixed(1) : '—'}</Text>
-              <Text style={det.scoreVotos}>
-                {scaInfo ? formatScaCategory(Number(scaInfo.score) || 0) : 'Sin datos SCA'}
-              </Text>
+              {votosActuales > 0 ? (
+                <View style={styles.heroVotesRow}>
+                  <View style={styles.heroStarsRow}>
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Ionicons
+                        key={star}
+                        name={star <= Math.round(puntuacionActual) ? 'star' : 'star-outline'}
+                        size={14}
+                        color={
+                          star <= Math.round(puntuacionActual) ? '#f0c040' : 'rgba(255,255,255,0.5)'
+                        }
+                      />
+                    ))}
+                  </View>
+                  <Text style={styles.heroVotesText}>
+                    {puntuacionActual.toFixed(1)} · {votosActuales} voto
+                    {votosActuales !== 1 ? 's' : ''}
+                  </Text>
+                </View>
+              ) : null}
               {cafeToShow.id && (tastingCountByCafeId.get(cafeToShow.id) || 0) > 0 && (
                 <View style={styles.socialProofPill}>
                   <Ionicons name="people-outline" size={11} color="#c8a97c" />
@@ -411,7 +422,24 @@ export default function CafeDetailScreen({
           </View>
 
           <View style={det.body}>
-            {/* SCA siempre primero */}
+            {/* Marca y nombre primero */}
+            {!!(cafeToShow.roaster || cafeToShow.marca) && (
+              <Text style={det.roaster}>{cafeToShow.roaster || cafeToShow.marca}</Text>
+            )}
+            <Text style={det.nombre}>{cafeToShow.nombre || cafeToShow.name}</Text>
+            {cafeToShow.finca ? <Text style={det.finca}>{cafeToShow.finca}</Text> : null}
+
+            {/* Origen */}
+            {originText ? (
+              <View style={det.originRow}>
+                <Ionicons name="earth-outline" size={14} color="#8b6d57" />
+                <Text style={det.originText}>{originText}</Text>
+              </View>
+            ) : null}
+
+            <View style={det.divider} />
+
+            {/* SCA - una sola vez */}
             <TouchableOpacity
               activeOpacity={0.92}
               delayLongPress={250}
@@ -512,29 +540,6 @@ export default function CafeDetailScreen({
               </View>
             </TouchableOpacity>
 
-            <View style={det.divider} />
-
-            {/* Marca y nombre */}
-            {!!(cafeToShow.roaster || cafeToShow.marca) && (
-              <Text style={det.roaster}>{cafeToShow.roaster || cafeToShow.marca}</Text>
-            )}
-            <Text style={det.nombre}>{cafeToShow.nombre || cafeToShow.name}</Text>
-            {cafeToShow.finca ? <Text style={det.finca}>{cafeToShow.finca}</Text> : null}
-
-            {/* Origen y precio */}
-            {originText ? (
-              <View style={det.originRow}>
-                <Ionicons name="earth-outline" size={14} color="#8b6d57" />
-                <Text style={det.originText}>{originText}</Text>
-              </View>
-            ) : null}
-            {precioTexto ? (
-              <View style={det.priceHeroPill}>
-                <Text style={det.priceHeroLabel}>Precio orientativo</Text>
-                <Text style={det.priceHeroValue}>{precioTexto}</Text>
-              </View>
-            ) : null}
-
             {/* Chips de atributos clave */}
             {chips.length ? (
               <ScrollView
@@ -568,114 +573,36 @@ export default function CafeDetailScreen({
               <Ionicons name="chevron-forward" size={18} color="#8b6d57" />
             </TouchableOpacity>
 
-            {/* Se elimina la votación por estrellas en la ficha general, solo se mantiene en catas personales */}
+            {/* Votación */}
+            <View style={det.voteBox}>
+              <Text style={det.voteTitle}>
+                {yaVotado || miVoto > 0 ? 'Tu valoración' : 'Valora este café'}
+              </Text>
+              <Text style={det.voteSub}>
+                {votosActuales} voto{votosActuales !== 1 ? 's' : ''} · Media:{' '}
+                {puntuacionActual.toFixed(1)}
+              </Text>
+              <View style={styles.starsRow}>
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <TouchableOpacity
+                    key={star}
+                    style={styles.starTap}
+                    onPress={() => votar(star)}
+                    disabled={yaVotado || miVoto > 0 || votando}
+                  >
+                    <Ionicons
+                      name={star <= votedStarsValue ? 'star' : 'star-outline'}
+                      size={30}
+                      color={star <= votedStarsValue ? premiumAccent : '#ccc'}
+                    />
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
 
             <View style={det.divider} />
 
             <>
-              <TouchableOpacity
-                activeOpacity={0.92}
-                delayLongPress={250}
-                onLongPress={() =>
-                  showDialog(
-                    'Escala SCA',
-                    [
-                      'Guía rápida para interpretar la puntuación:',
-                      '',
-                      '0–69 · Malo',
-                      '70–79 · Correcto',
-                      '80–84 · Bueno (especialidad)',
-                      '85–89 · Excelente',
-                      '90–100 · Excepcional',
-                    ].join('\n')
-                  )
-                }
-              >
-                <View style={det.scaCard}>
-                  <View
-                    style={[
-                      det.scaStripe,
-                      { backgroundColor: scaInfo ? getScaColor(scaInfo.score) : '#ccc' },
-                    ]}
-                  />
-                  <View style={{ flex: 1, paddingLeft: 14 }}>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        alignItems: 'flex-start',
-                        justifyContent: 'space-between',
-                        gap: 8,
-                      }}
-                    >
-                      <View>
-                        <Text style={det.scaScoreBig}>
-                          {scaInfo ? Number(scaInfo.score).toFixed(1) : '—'}
-                        </Text>
-                        <Text
-                          style={[
-                            det.scaCatLabel,
-                            { color: scaInfo ? getScaColor(scaInfo.score) : '#999' },
-                          ]}
-                        >
-                          {scaInfo
-                            ? formatScaCategory(Number(scaInfo.score) || 0)
-                            : 'Sin datos SCA'}
-                        </Text>
-                      </View>
-
-                      <View style={{ gap: 6, alignItems: 'flex-end' }}>
-                        <View
-                          style={[
-                            det.scaTypeBadge,
-                            scaInfo?.type === 'official'
-                              ? det.scaTypeBadgeOfficial
-                              : det.scaTypeBadgeEstimated,
-                          ]}
-                        >
-                          <Text
-                            style={[
-                              det.scaTypeBadgeText,
-                              scaInfo?.type === 'official'
-                                ? det.scaTypeBadgeTextOfficial
-                                : det.scaTypeBadgeTextEstimated,
-                            ]}
-                          >
-                            {scaInfo?.type === 'official' ? '✓ SCA OFICIAL' : '~ SCA ESTIMADO'}
-                          </Text>
-                        </View>
-                        {scaInfo?.type === 'estimated' ? (
-                          <Text style={det.scaConfidence}>
-                            Confianza {Math.round(Number(scaInfo.confidence || 0) * 100)}%
-                          </Text>
-                        ) : null}
-                      </View>
-                    </View>
-
-                    {scaInfo ? <ScaTierBar score={scaInfo.score} /> : null}
-
-                    <View style={det.scaTierLegend}>
-                      <Text style={det.scaTierLabel}>60</Text>
-                      <Text style={det.scaTierLabel}>70</Text>
-                      <Text style={det.scaTierLabel}>80</Text>
-                      <Text style={det.scaTierLabel}>85</Text>
-                      <Text style={det.scaTierLabel}>90</Text>
-                      <Text style={det.scaTierLabel}>100</Text>
-                    </View>
-
-                    {Array.isArray(scaInfo?.reasons) && scaInfo.reasons.length ? (
-                      <View style={det.scaReasonsWrap}>
-                        {scaInfo.reasons.map((reason) => (
-                          <View key={reason} style={det.scaReasonPill}>
-                            <Text style={det.scaReasonText}>{reason}</Text>
-                          </View>
-                        ))}
-                      </View>
-                    ) : null}
-                  </View>
-                </View>
-              </TouchableOpacity>
-
-              <View style={det.divider} />
               <Text style={det.sectionTitle}>Producto</Text>
 
               <InfoRow
@@ -854,15 +781,14 @@ export default function CafeDetailScreen({
               </>
             </>
 
+            {/* Precio al final */}
             {precioTexto ? (
               <>
                 <View style={det.divider} />
-                <View style={det.priceBox}>
-                  <View>
-                    <Text style={det.priceBoxLabel}>Precio</Text>
-                    <Text style={det.priceBoxHint}>Valor orientativo</Text>
-                  </View>
-                  <Text style={det.priceBoxValue}>{precioTexto}</Text>
+                <Text style={det.sectionTitle}>Precio</Text>
+                <View style={det.priceHeroPill}>
+                  <Text style={det.priceHeroLabel}>Precio orientativo</Text>
+                  <Text style={det.priceHeroValue}>{precioTexto}</Text>
                 </View>
               </>
             ) : null}
@@ -1549,6 +1475,21 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#c8a97c',
     letterSpacing: 0.2,
+  },
+  heroVotesRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 4,
+  },
+  heroStarsRow: {
+    flexDirection: 'row',
+    gap: 2,
+  },
+  heroVotesText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: 'rgba(255,255,255,0.88)',
   },
 });
 

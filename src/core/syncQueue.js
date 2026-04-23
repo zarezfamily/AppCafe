@@ -9,6 +9,7 @@
  *   - 'toggle_favorite'  payload: { uid, cafeId, value: boolean }
  *   - 'add_cafe'         payload: { uid, ...cafeFields }
  *   - 'delete_cafe'      payload: { uid, cafeId }
+ *   - 'pending_scan'     payload: { ean, source: 'barcode'|'photo', ts }
  *
  * Each entry: { id, type, payload, ts }
  */
@@ -103,4 +104,17 @@ export async function processSyncQueue(handlers) {
   }
 
   return processedIds.length;
+}
+
+/**
+ * Returns count of pending actions grouped by type.
+ * { total, add_tasting, toggle_favorite, pending_scan, add_cafe, delete_cafe }
+ */
+export async function getQueueStats() {
+  const queue = await readQueue();
+  const stats = { total: queue.length };
+  for (const item of queue) {
+    stats[item.type] = (stats[item.type] || 0) + 1;
+  }
+  return stats;
 }

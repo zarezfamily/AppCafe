@@ -122,7 +122,7 @@ export default function CafeDetailScreen({
   cafes = null,
   allCafes = [],
   cafeIndex = 0,
-  onChangeCafe,
+  onChangeCafe: _onChangeCafe,
   onClose,
   onDelete,
   favs = [],

@@ -126,6 +126,11 @@
     "lacolombe:import": "node scripts/import_lacolombe_cafes.js",
     "stumptown:import:dry": "DRY_RUN=true node scripts/import_stumptown_cafes.js",
     "stumptown:import": "node scripts/import_stumptown_cafes.js",
+    "cafes:enrich:dry": "node --env-file=.env scripts/enrich_cafes_ai.js",
+    "cafes:enrich:clean": "SKIP_AI=true APPLY=true node --env-file=.env scripts/enrich_cafes_ai.js",
+    "cafes:enrich:apply": "APPLY=true node --env-file=.env scripts/enrich_cafes_ai.js",
+    "cafes:enrich:force": "FORCE=true APPLY=true node --env-file=.env scripts/enrich_cafes_ai.js",
+    "cafes:enrich:all": "ONLY_INCOMPLETE=false APPLY=true node --env-file=.env scripts/enrich_cafes_ai.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier . --write",
@@ -161,7 +166,7 @@
     "react-native": "0.81.5",
     "react-native-purchases": "^9.15.1",
     "react-native-safe-area-context": "~5.6.0",
-    "react-native-svg": "^15.15.4"
+    "react-native-svg": "15.12.1"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

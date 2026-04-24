@@ -16,7 +16,7 @@ import {
   View,
 } from 'react-native';
 import { getCafePhoto } from '../core/utils';
-import { buildScaPayload } from '../services/cafeService';
+import { buildApprovalPayload, buildScaPayload } from '../services/cafeService';
 import { getAuthToken } from '../services/firebaseCore';
 import { deleteDocument, getCollection, updateDocument } from '../services/firestoreService';
 import { uploadImageToStorage } from '../services/storageService';
@@ -81,10 +81,20 @@ function isPriceInputInvalid(value) {
   return parsePrice(raw) === null;
 }
 
+function _hasEan(cafe) {
+  const raw = String(cafe?.ean || cafe?.barcode || '').trim();
+  return !!raw && raw !== 'N/A';
+}
+
+function hasEanOrNA(cafe) {
+  const raw = String(cafe?.ean || cafe?.barcode || '').trim();
+  return !!raw;
+}
+
 function isCafeIncomplete(cafe) {
   if (!cafe) return true;
   return !(
-    String(cafe.ean || '').trim() &&
+    hasEanOrNA(cafe) &&
     String(cafe.nombre || cafe.name || '').trim() &&
     String(cafe.marca || cafe.roaster || '').trim() &&
     getBestPhoto(cafe)
@@ -233,7 +243,7 @@ function PendingCafeCard({ item, onApprove, onReject, onEdit, onRetryIA, busy })
   const coffeeCategory = item.coffeeCategory || 'specialty';
   const missingName = !String(nombre || '').trim() || nombre === 'Sin nombre';
   const missingBrand = !String(marca || '').trim();
-  const missingEan = !String(item.ean || item.barcode || '').trim();
+  const missingEan = !hasEanOrNA(item);
   const missingPrice = !item.precio;
   const cardToneStyle = allowApprove
     ? styles.cardReady
@@ -739,19 +749,27 @@ export default function AdminPanelScreen() {
   const handleApprove = useCallback(async (item) => {
     try {
       setBusyId(item.id);
-      await updateDocument('cafes', item.id, {
-        status: 'approved',
-        completionStatus: 'complete',
-        provisional: false,
-        reviewStatus: 'approved',
-        appVisible: true,
-        scannerVisible: true,
-        approvedAt: new Date().toISOString(),
-        adminReviewedAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      });
+      const payload = buildApprovalPayload(item, item.id);
+      await updateDocument('cafes', item.id, payload);
       setPendingCafes((prev) => prev.filter((c) => c.id !== item.id));
-      Alert.alert('OK', 'Café aprobado');
+      const filled = Object.keys(payload).filter(
+        (k) =>
+          ![
+            'status',
+            'estado',
+            'reviewStatus',
+            'completionStatus',
+            'provisional',
+            'appVisible',
+            'scannerVisible',
+            'approvedAt',
+            'adminReviewedAt',
+            'updatedAt',
+            'createdAt',
+          ].includes(k)
+      );
+      const extra = filled.length > 0 ? `\nAuto-completados: ${filled.join(', ')}` : '';
+      Alert.alert('OK', `Café aprobado${extra}`);
     } catch (error) {
       Alert.alert('Error', error?.message || 'No se pudo aprobar');
     } finally {
@@ -829,9 +847,12 @@ export default function AdminPanelScreen() {
           : userPhoto || officialPhoto || '';
 
       const draftPayload = {
-        ean: String(editData.ean || '')
-          .replace(/\D/g, '')
-          .trim(),
+        ean:
+          String(editData.ean || '').trim() === 'N/A'
+            ? 'N/A'
+            : String(editData.ean || '')
+                .replace(/\D/g, '')
+                .trim(),
         nombre: String(editData.nombre || '').trim(),
         name: String(editData.nombre || '').trim(),
         marca: String(editData.marca || '').trim(),
@@ -1011,7 +1032,7 @@ export default function AdminPanelScreen() {
     const sinFoto = pendingCafes.filter((c) => !getBestPhoto(c)).length;
     const sinPrecio = pendingCafes.filter((c) => !c.precio).length;
     const sinNotas = pendingCafes.filter((c) => !String(c.notas || '').trim()).length;
-    const sinEan = pendingCafes.filter((c) => !String(c.ean || c.barcode || '').trim()).length;
+    const sinEan = pendingCafes.filter((c) => !hasEanOrNA(c)).length;
     const listos = pendingCafes.filter((c) => canBeApproved(c)).length;
     return { total, pending, sinFoto, sinPrecio, sinNotas, sinEan, listos };
   }, [pendingCafes]);
@@ -1035,7 +1056,7 @@ export default function AdminPanelScreen() {
         rows = rows.filter((c) => !String(c.notas || '').trim());
         break;
       case FILTERS.WITHOUT_EAN:
-        rows = rows.filter((c) => !String(c.ean || c.barcode || '').trim());
+        rows = rows.filter((c) => !hasEanOrNA(c));
         break;
       case FILTERS.INCOMPLETE:
         rows = rows.filter(isCafeIncomplete);
@@ -1097,9 +1118,7 @@ export default function AdminPanelScreen() {
     const completionItems = [
       {
         label: 'EAN',
-        ok: !!String(editData.ean || '')
-          .replace(/\D/g, '')
-          .trim(),
+        ok: !!String(editData.ean || '').trim(),
       },
       { label: 'Nombre', ok: !!String(editData.nombre || '').trim() },
       { label: 'Marca', ok: !!String(editData.marca || '').trim() },

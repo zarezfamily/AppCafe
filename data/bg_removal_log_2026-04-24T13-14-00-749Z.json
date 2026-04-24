@@ -1,0 +1,242 @@
+[
+  {
+    "id": "0gbaTRLkg5agxlSfqKM7",
+    "nombre": "Bonka Natural",
+    "original": "https://images.openfoodfacts.org/images/products/841/007/642/1012/front_fr.6.400.jpg",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/0gbaTRLkg5agxlSfqKM7.png"
+  },
+  {
+    "id": "8436591727972",
+    "nombre": "Café Blend de Primavera",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/incapto-cafe-blend-de-primavera/9d1fce882e.png?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=Fq9s0JYH0cvTysJLlqWP5ChAUqKS%2FnpnwqtYaybnXQgvopdZnYFhsv2ogTREfHfCSn3vuOMyeVVkLUvJyskZkSTHF3h1crWs3YWfgjVXd%2B8uWg45NgOWiX1GqOvEuuJ9s5Gc%2FLebonbZP1SDpuZTCl6EzOTa%2BDRXRw1%2BeWNUJkz%2BGdTGvuEjrWoLImO8kQjrgccH4ZKu1loMetaM9%2BRTlHDMzGy%2BUiN6qQ%2Bt40sc2f7j54QCypfaRJHHq3W0wU%2BeAd73XK9YnKKrA9UWJTqpL5id%2FhWzp4KuAUu7jQShN9uhmtbh08j84UGKQyuBfOspDhKGP4qpXftDoTkZCRsBPg%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/8436591727972.png"
+  },
+  {
+    "id": "AF2gqonWWfxf4Ez7PkIy",
+    "nombre": "Lavazza Qualità Oro",
+    "original": "https://kaffekapslen.media/media/catalog/product/cache/74c1057f7991b4edb2bc7bdaa94de933/cb/cb-lavazza-1000g-qualita-oro-v2-1201.webp",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/AF2gqonWWfxf4Ez7PkIy.png"
+  },
+  {
+    "id": "F1VZFiSkq6UoIjxQF7I8",
+    "nombre": "Starbucks House Blend",
+    "original": "https://images.openfoodfacts.org/images/products/761/303/693/2097/front_fr.35.400.jpg",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/F1VZFiSkq6UoIjxQF7I8.png"
+  },
+  {
+    "id": "alcampo_561733",
+    "nombre": "PRODUCTO ALCAMPO Café en grano natural Tradición 500 g.",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/producto-alcampo-producto-alcampo-cafe-en-grano-natural-tradicion-500-g/19994d8a6c.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=b62O54UI4aOaWc0CUHrQLIW4QGv5ZjeEKM1dufD%2BfnYTZMG657sBWbe6EuxQBIqLLMEwP7sHHL9zdlciAJ47E4CoD%2FhgtkBkNJhBjAfQy0kXazN2PxL29OpqY6Ue6GTejsTDnJ1Ji6ytQ9jl5hDLBKosn%2FHr9PNj1p9evPudfhuGrgHXJRGaUrtzlTWfeF%2FcP0L6uwwJ8G9tpBJrNkKF6VNh6kW%2Fq%2F%2FhAkOYzABANUEF7SkozKqe1Sxj98a4t6O96bmhFFiapSnx%2BStKVuFIYn3HiUn8j8FOxqD%2FX1wjJMdplU7WoYC5I1gpM0Icfboa1exas3JXzsdgI0ljfTNHag%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/alcampo_561733.png"
+  },
+  {
+    "id": "aldi-bio-origin-peru",
+    "nombre": "Bio & Origin Peru",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/aldi-bio-origin-peru/0269679b28.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=svnd53l6mrh80XDwJb5f7ExD6NUKXCYyNisedohwQC0V1Ao21xogqryrwoaEG3bZxQR6Y%2BjEvfW88RUHTGltMFEnZ0gMY3eXpvUXiFfw2cm5gLiXpaZVfsuv1qeQzlLutnN1UpILzku%2BR8JYyQ7HkFagUr1av40nSi5DpU6kweF%2By4Rg0QLCVF2tdhlD3GTAgvCfLwg9btKOUtZh2R%2FTzVDOPy8%2Fd3CYu50ughFPP8LpCUWX9vR9yjumogRoIQ%2BKCzMDqzCCX3WTT4ogLdlaaK2hBQ%2BYNGuzClw5eBYslL9%2Fy987iL2Rz30vQuxq4k3sLH4O%2FRCYLZqqZCePdUm86Q%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/aldi-bio-origin-peru.png"
+  },
+  {
+    "id": "aldi-bio-origin-tanzania",
+    "nombre": "Bio & Origin Tanzania",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/aldi-bio-origin-tanzania/d0964aa2d5.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=oBtdQ31QNtzqGG%2FSgO5Oe22%2FVNOVCqNg0EvNSG6YGJI10lW8SNUfgfQEWt7LA2CEfpUo4H5EDcYvnfqPqX5pfg%2FXW7aD7ccqPGWSHi21r2JAiq6%2FQQcI4raYxb%2BiJgva67rMK%2BH8E3mfpOD6TMv%2BPHz61fMSO4%2FJAvIPF3Z%2B975mBVHrF9bILyMasjJCLJJsMFE21elnCGc9Nkw491XAs4dkMxmZdjr3yHxXHSOfyJN%2B6V9F2a7UAj6a04G4fh86LJXFoBgOh8ABqFgaEBojLpUcqVzLVLBEuMpkwlXHYlbeNBdcERp%2F6zDZeAFJei7miRQkZMsYJGvZJiZXhjhlAQ%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/aldi-bio-origin-tanzania.png"
+  },
+  {
+    "id": "aldi-blonde-roast",
+    "nombre": "Blonde Roast",
+    "original": "https://firebasestorage.googleapis.com/v0/b/miappdecafe.firebasestorage.app/o/cafes%2F1776755096154_53wg10.jpg?alt=media&token=bb9f1458-3c1f-4b04-8343-1ff5d91d3f57",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/aldi-blonde-roast.png"
+  },
+  {
+    "id": "aldi-espresso-classico",
+    "nombre": "Espresso Classico",
+    "original": "https://firebasestorage.googleapis.com/v0/b/miappdecafe.firebasestorage.app/o/cafes%2F1776754944616_eogndt.jpg?alt=media&token=1edf912a-96e7-4c37-bdb3-1ddbff82fb2b",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/aldi-espresso-classico.png"
+  },
+  {
+    "id": "aldi-espresso-cremoso",
+    "nombre": "Espresso Cremoso",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/aldi-espresso-cremoso/3bf7f135d0.png?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=0zYwt8ioNy2HwaMs7PQfKeYjRJ8m8E0HVhFp0SjKyt%2FtuWtzn8KJal1jtTVLdGtxVbbVxCCieZqULIT6mnpNlari3lDBynaVevlqmOWA6DB752YsvlYeoJmKpKOIksA8FbK6guWOn%2B674omb3d0Up6vXgICdngo3s8jxhed9avmZnN9Kc4k%2B84%2BtdKh3BXVAcQzQKXQ1TWdZzBjnOmBUENsrPO3a7dVzq059IstslPoWq7d07jKd8IevZrTEvdEH4W3LeN9FXrlShctXrrSM0wekMmV%2BTETPKLEEDGQosCTBz3JdaCh7oO0HOBEAuHYDPKJTGvjk3gW1dOO%2BLUMw%2Fg%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/aldi-espresso-cremoso.png"
+  },
+  {
+    "id": "aldi-schumli-kaffee-crema",
+    "nombre": "Schümli Kaffee Crema",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/aldi-schumli-kaffee-crema/2290d61b0b.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=B0r3kFJsjdhRoEJllmYrUZhKwmsSDZsVdQlT%2FRK2RpAU1DPlw8KXqSpKRrrypX9V5EV74gvBIjuuKEPeQjpp8UWaJDEl4H%2FhMC0%2FM%2Fa%2FyYxB5XDAkW%2Bkge%2BjAIbxHm3CPf1qeUD5GgwpR2iIxPN32yRHp8%2BvJpSuvSDwFyJ4x8mGhHBlfvxD12MODw3Q54qK9I7sR295SiY6j%2FNyrtygzF1pWc4o0x%2FY98kEQHhIOzbpGebtQkn8mLNGgFFYfjBfNDTBnxkrrR%2BfAlQYZPcctzHq9zOhz4VcWhjW7ZWNh5o4VRQwu0fJEfQAX1IY%2BRFGldRiyH0Hf4QIG5sEX7A8zg%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/aldi-schumli-kaffee-crema.png"
+  },
+  {
+    "id": "aldi-siciliano-espresso",
+    "nombre": "Siciliano Espresso",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/aldi-siciliano-espresso/fdf9d5229a.png?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=H8YpJ5VLpn2g1%2FDp88fodcThj35f5WV%2BY6PjfBNSZebhTDP7XaFAca0Tx0T0SgZgQcbl%2B%2Fcck%2FlaJ2HDr9frzuDCXePeiVn6kJTedeD2p7oKCL82K%2F3Q9IouulOTjDxrtQ%2BFdqT0%2B4JfMV%2F5JPUCV7Rht9dLq6AE0sYRNb27cnPf9r6lIIYLYirTfSnebFSD8i2ys6S4Htl2bOObl0g%2BbbbmApN5hZ8rwdIolDNBMm60v6acupaACjzwg0R0WJN7lis3lw2tFKLD2DdipBRx1lRiiQV4cRNb%2BUx3wOCrMNQK3j%2FVChCIUKOhEs62w2%2Bk5bNp%2FVuGCp%2FMPODAXidA%2Bw%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/aldi-siciliano-espresso.png"
+  },
+  {
+    "id": "baque_21111004",
+    "nombre": "Café en grano Varanasi Intenso, 500 g.",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/cafes-baque-cafe-en-grano-varanasi-intenso-500-g/24efd2f541.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=WkwAKrBxZGbpCt8fx%2FdcXLrMb6QnF4Mm0MmMzeMVgvJ4JcV6su86gHEAcq3mgDpmF3HlgpY8iTeJLjRWsLcAryn34EQoi%2BehQxe5zVM%2FAP%2F%2FVwX7ePRTu7tN3pFGiV%2F4deYRsUIROrvABqbc6qS3XAypodZs9Ky%2FiHk0nNpLFq716YesmAOfBqLCLKxkubO%2FMnaf0Gis%2FLFKotvetMh4d%2B3EhBKKaTnX5JQlLEjIEQ4JEZUMRGHa4L1E%2Fpqmksj1OU2dwYDDqZ8wVQ0dL06SeaDlSumf4h7VgCeU5fZbmc%2B0W33r4j2W7tUj7xpZnYNMZo87vQTNAnMY7DQASg4ccg%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/baque_21111004.png"
+  },
+  {
+    "id": "baque_21111005",
+    "nombre": "Café en grano Extra Intenso, 500 g.",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/cafes-baque-cafe-en-grano-extra-intenso-500-g/93a29d2feb.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=iyU8Dq5L%2Fyq6U0xtqRbiYyCjLkbm8MeRDQ%2FwTIxwyraffTtCWGIbDvuIuoHalh1TzHAdsmt2GpXDfPlf7edHhLQEwaWlb%2FQepwQ2JzNSRAXdnhhQtGZPyIDhndhorleCP3TAk9mTQAxtkCH1G3I%2Bdgu6s21fi1zB0%2FfpWPdm9priCBstSwnjgj8zbPXkBv27IvArwsUmnEhANavN4SdK9NQ%2BebJPjZAO%2FY8LC9GnUoEwyRioEz82i7BkhXcrNEULNfNKtGD25USBPZ8n1VLj96cvqet8ytfClATsz91JDr7hypJw97eovlaiNPzxB43kkUUgfvg3smct%2Fmgh9Z8nSA%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/baque_21111005.png"
+  },
+  {
+    "id": "baque_21111006",
+    "nombre": "Café en grano Descafeinado, 400 g.",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/cafes-baque-cafe-en-grano-descafeinado-400-g/d5df40306d.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=fXXmzblkl5ccNqaSeBqqoflmyL9BdugLeyxDtdOOOXluWD0cKFGRhln9JeOht4CydwRZiqt%2BKypaQtgHdIiDz2hayMqDK%2FYikB3yj2ozW%2FE%2Fem6hibd27pS%2BD94xjJkwuAyzy08YQGTk5aD2kR5A5C3h395nGdzTIOvIkMYQQdFnRg%2F%2F0dj0zyA5YtDor%2B9CmZBs8L6scUjhSaHtdvJjjoGV%2BWnyu5yBpqXjyKYL9plCRBd3sUYh1g5WlvRmk8UIwh8N4BrP278K3MS5DEqiTT25ewyme%2FXLWPHFYmICAPx869s%2BFTK35qLiWy05id4IRuD8tbPo8zQlr93eys1pRA%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/baque_21111006.png"
+  },
+  {
+    "id": "baque_21111007",
+    "nombre": "Café en grano Orgánico Natural, 400 g.",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/cafes-baque-cafe-en-grano-organico-natural-400-g/19360631f9.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=Oxsj8DlIlomFERem3CEKYe6FYH%2BsREhRHC9Or%2Fc8EIZYI5RVDPj7iAYFkAs2r4vROpcTjyFuMFi2VywTGBEOjy8p9P6KW7t8tLc1FmmoGwHrVkQBb687l7T24ErOmQjx%2FV2bBQ3TcN1itOdDxkQycBCnRoVqSKBGBA6Pebx2P%2FxzxSiqXtzglQWsw4djemEr9KVo3l7SQ%2B3KIXt4tlUHJaZQkt%2BqSU7nwJtOm%2FA%2Fwx0wP%2BX9H4rTwmGS%2BpvnaIpVMOuo%2BpwXrlLk%2BQPG7pbeKmFv7LpUQVGk6YVCR3GtSd01m%2Bpg8E0c62V6NM6AXaZCpWYElqrv3ohj51cYzVw7Tg%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/baque_21111007.png"
+  },
+  {
+    "id": "baque_21111008",
+    "nombre": "Café en grano Natural, 500 g.",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/cafes-baque-cafe-en-grano-natural-500-g/49034b7f4d.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=Mi23WrUE1f6ay6NVYoFdmDUzB3JueLnSb6FJUIl1DY8GUIevd35GdDC%2B%2FCdwUo4qwcxvlLedloBxQzUz6RL0qcBNdM7xH8TLECTiq8%2FBRjWfZ9WU4Cx8JBMxmQ4Xvg5LTQNc0ogpZJqQY9DkESnlnf9fuw6UBiRL9YN7XZgV2uCDMpBtTol7J6xnwQxRJ22Nx%2BQxrdX6a01CVR0p6cE7sjPVVXxsQxRZ1CLI5VVNxUgpgLg01KnWgHg3CszpKaDbNo3RdR%2BVHSY7MLls%2BhgAi6lstfg%2BgRVDATUNre%2FTrGyxrtmstHqaN1IAmMgZPpk8eYEihITFNZJdSAlR3joWkA%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/baque_21111008.png"
+  },
+  {
+    "id": "baque_21201000",
+    "nombre": "Café molido Natural, 250 g.",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/cafes-baque-cafe-molido-natural-250-g/fb9500fb08.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=Rs33lmPZU4Ursb2H3jxIm4gL3aRCGNgwfxRevj7N8ZxR8mM9lzvh4elEoCDArQyNbc3T4irdx9E31ryLvPy2ydenol25Pm1xosxmvLXY%2BwXBDvg%2BUalhH6KBRCX1fxfZze6rC%2FxfZiBgZV4CzcWwFomfN38NbOwqfCbzPyV37WegtXaJSEJ0chklvsM5SGY4SeI%2FKqlpz86Iq3Jw9g02UMFF9kBahIn2FNslOvk4oqDiTWUJ%2F5md1KYORqcrTm13gMU%2Fdjmzxo4Q2oZ98sNhPs6XBTchUNji2y1YlLwq7pP8SrLfY5lPbGPhGpxsMX2zjHYvYwO8sulU8l2penk11g%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/baque_21201000.png"
+  },
+  {
+    "id": "baque_21201050",
+    "nombre": "Café molido Natural, 500 g.",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/cafes-baque-cafe-molido-natural-500-g/73baca5857.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=OnPL%2BtQjhvxpT5X7jF8uc2cF3nZR4VxkZ2cxm5A%2Fyzu5vra%2FPupdTx83wds6YQRC8KdjEEhFxyvnQQBNi4K5xl39p%2B4ULpTPmnZVFJU5EIrENTCaDWHu8piEZO45s2oAI3I9Mn%2FXdnsy385CTihBAQVCtfH8tDpn4ogqPn%2FrrG0pwNNarmnRoSlKB6%2FnryPH0iC%2Ff8pq%2B04x2y7HRQHrnBIHKIg6AsOyPO1akgOfnN3gJATRvai%2BfAxvNCplP1x6MYvMku9vfZoeNfoGaQwK%2BkBTryHExXeAq3FoZVYoCqLNiNym86PmgwuHZpDGYhx%2BZhcuga7P7qWQQHZfm6sqlg%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/baque_21201050.png"
+  },
+  {
+    "id": "baque_21201060",
+    "nombre": "Café molido extra intenso, 250 g.",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/cafes-baque-cafe-molido-extra-intenso-250-g/fd2a7a7ed4.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=NZuR5j1M5kaA7pSBQc2fx4hUM1%2B44P%2FNucfnfGAxe7q5R%2FNwQ%2FP0eeUKcgxyt6OVzhoARpzQurEqlS22vnuoKVZfUo5ZyX4YBSwiAtbVIcZZVqdfxAoIwfoLTDXT7dI0CgiukhPVruZqgoqITVMLMVh0o34i5mYKioBWw3Itc7M5HTLUx87UUSLVZ%2F15ZQAUbXzNhB7DRXyRUxKou0bULXD8R6OJwo8y%2FDKof66ugV6RXX%2F5qh9HwFe%2FFvz7qztHzr4LODuL85bYZvBQXr8qDIoSJNaPEHSckLBQuBBdcfyRjNDOb%2BD%2F8p7ixOvk0uXpoTuZfwGUNoegf%2Ba1ht%2Fgtg%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/baque_21201060.png"
+  },
+  {
+    "id": "baque_21202100",
+    "nombre": "Café molido Arábica Oro, 500 g.",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/cafes-baque-cafe-molido-arabica-oro-500-g/27966c5929.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=e8ACHGy8QwIG%2Bu2KdjIayyzAxccaSRyyddq1QtTprLjRyuxxV4oKa6OEt80W5FxLTiE94mjpMLvbB7BpG%2BNoLabtE9VZSl%2FyCe8%2F7tTEjTufFkem4u3z5z3wNjX%2BhIVVVJXlSVt6Ux%2FErvMPCCgXBiQ%2F9Y4gJKIr3UjJvJEswG9MJmLvD%2FFCLeK4wLXKJgkfG9xKSSzZOwDn8YdpLkAPneDcuSvhHUKeRnDkEaCCu%2BySTZWeWWeFmjO04Ozg28FAAXgJ5TffzgRsAlskx0irwYckn%2Fhk6S23m1xXDMWnMdTbDP36%2Bhsu9%2BPATUIfTkvduTpoi%2FPRalD8NjLyxyPrqg%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/baque_21202100.png"
+  },
+  {
+    "id": "baque_21203000",
+    "nombre": "Café molido Gran Sabor, 250 g.",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/cafes-baque-cafe-molido-gran-sabor-250-g/dc90a34a8c.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=TAJqTLSDl6ctOyNd7CC%2FxYQ%2F1xGv8%2Boqi9j2C0rDja5wz4Tvzt1WLPQ45iapDqfT258DI91NB4ldye5fOzzy3MCY0jqrKb2CIu7fX1xmkiz9B3AcAq33aPsxriT6pr%2Fz41P1iFA6YTpLjkoVz%2FeYM4WwRycSsRVKpcvxwei3WuX%2B8PcZocyoXZbw%2BRxXig1%2FVDsLwQgtCrrmY4ySXvvj0R9lNO6tJE7Ce9YKumMLJZKqq68vF9nP2iClE56jOAiArUU1%2Be056rVIUwtxLxVKrJR%2BRtL8gDoQdgTFtNhP8pjeT6Ov6180FciWloEAqZN8VvT4fX2sntHmfbrqdhIsVw%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/baque_21203000.png"
+  },
+  {
+    "id": "baque_21203050",
+    "nombre": "Café molido Gran Sabor, 500 g.",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/cafes-baque-cafe-molido-gran-sabor-500-g/5723225654.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=hdvK8yI%2B4JCQrPB20O2JXZhQgR2jJJQzYWGWwUHoifNSsHiAYSCfR%2Ber8SuZqcU6epZXyixk4Xas0my6KQyQR9gVliKDuqmDTTO52630sLTC58rN4%2FMNioQuL0bgkP527JAaOoDLdDvBKK3Tb7Bbnqo4pmUFvH5flAxLPZUAwJHlljtPW4qu%2B6KoPNCVXwbHxJltYC3d0gwhx1CE%2FJ7KEJhEC3dJkO0NY1X5gAuhw6H%2FdJVBu3CE9NMnYIhdDteATG25zezV3kd%2BEWDAspKET2UWitk%2FUe2sDWS7jAAnX1YxLW7lYUWHWufgLYEDwUwFLLOIwgrcCQp4g9K1FZ2MHQ%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/baque_21203050.png"
+  },
+  {
+    "id": "baque_21204000",
+    "nombre": "Café molido Descafeinado Mezcla, 250 g.",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/cafes-baque-cafe-molido-descafeinado-mezcla-250-g/dbf655b209.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=Ym%2BJOK9FV%2FNzMnoNfNb9G5JiKBv6ndm5cV5Dm5N4bRsChlwwKRQQI0tyYIbxg57v3sZWd7YAP6EBcYi3cR3rJO6QE4pWQINzTx4hsm%2BbuHMQ1FFxF2OoN8P25%2FbwuRS0%2BaTHLhf%2Bvfg8sGsopx%2FhRNNhYo9F7nCBzbTSCK%2FUrnu0HxBGq3M1WWgExDRrOGzYC6V4LP1mxyulccz1KOfXQK2EKIlwho4wAKoe86asAbEoUM7y%2BNTtImw2tQEOIjhuG5iUjFja5eAcN9PN524ayRck3EyWBHXqtZ2GW75PvVF2OcFSBQztuNr4HJJ%2F1RxpZ3fgaGcelHcJocDgS1OTrQ%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/baque_21204000.png"
+  },
+  {
+    "id": "baque_21212001",
+    "nombre": "Café molido Colombia, 250 g.",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/cafes-baque-cafe-molido-colombia-250-g/e9023817f9.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=rD2Npo%2BFfMX1cTcHbx0m8FsjBzSws8svpWmWgJyKc8Tq4U%2BwHgerZprj8o0I%2Fqm2ALf2FqtQNl2%2Bbk4N1mtnawmWgQ56jkac3x%2BTichLOaMEJkBMN%2ByOIzybPhXB%2FwbtAHtybXgWIjTXXgkkkokRA%2FhZ8kbjXBXijGhZp%2Ft20MxNQUu2EKejpn40nuJa%2FB9DiXe2WatKOAeD0LLuGveYSYOJwaoP6JNICdamt7gZ57Vsf%2BwomKColvzsw%2FK0D3VMrEL3bXg0JHPLrvn5O0qud8ESlA7piEGfc7hfShjL7ekuFaULTiVnWDVL8rfDKHTltwI7I4%2FfTYbKpc7Y9dkL3w%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/baque_21212001.png"
+  },
+  {
+    "id": "baque_21212002",
+    "nombre": "Café molido 100% Arábicas, 250 g.",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/cafes-baque-cafe-molido-100-arabicas-250-g/7ead4ae216.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=FpQb1iFVKKUAxzWpFWWunDl22eSTSeVfAv66BqaNAkPnuyWZwkJ1ZHB4aZbcUyDQJ%2BVKmSWjyYP1DkZEXniOrmQfB60oLz2oexgHtBNe8R%2BDXSWm4HXzto7a4cxVMy%2F1GhodI9nR1ySz72XBmD3xZSFzMJQIyEDOCPUsmWCwdW0u%2BOjWxygG9aD88ynrmlX1U7gzwgpbqYptyYqkQHQobc%2Fr%2Bi1pvyhu9XSowSzYFju3z%2BK8hO0IJxQs7nObGDxbUrCugvdraAB64roNrgtSJBQzxJmJ2SE9hHty5d%2BC1%2B0Ii966d6fOVlcOXXlNSzqgwbNKs38uiDeclnmajGl5Og%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/baque_21212002.png"
+  },
+  {
+    "id": "baque_21212003",
+    "nombre": "Café molido Espresso Cremoso, 250 g.",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/cafes-baque-cafe-molido-espresso-cremoso-250-g/e4cf35188e.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=iCv6S9qWsSex4TDcusU%2B0V9NMJVcvn%2BP9KXYUeXZ1f4tZrjJHPMhY2MXqS9OWjHvMUESrlScy5M3OWYRZrcTYtfFN5PmyDmHdNMe3JLRh5suaN8YD1rvvYZ4qIMJzacvs1xNxzM4nATdcL4vmljb4Hjqkwkkiwm655%2FZc9HzseoYTyTUhkzZN%2Bv6guR2n7leA9U679c1SdUJlsr6mU6DkKmR8PgEalgMgcfGjkERTj6ratU9yJVUQbrHiO0iOMs2o6uIpsYTu7Dc%2BsWGRPQ%2FY8a%2BOVsKHuOJv4bIetA8d%2Fdq0%2B5rPf6ObESxp%2Bygut6zYixca9M03nWhdjtCenDiaQ%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/baque_21212003.png"
+  },
+  {
+    "id": "baque_21212004",
+    "nombre": "Café molido Espresso Descafeinado, 250 g.",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/cafes-baque-cafe-molido-espresso-descafeinado-250-g/d1b54efd32.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=I7iJgXsRvcGM8Q6bwwgxF0rKI%2FuE5JECUhc%2B%2FAKG6PTWKcr%2Bc9kZdDV5SztkeJzUR7jT23Si44WZlae8Zz7olgSF1y2OYt35d4hzsTyZXmaKTUUpCiIN7JU%2FFvBNX7V5G1%2BzkX%2BYwFARfhKeX9mZL6BB%2BMa3FMjeEgRjGdNIqf4hEGDh92VhRm1elJEZAj6UkxoDerJWbNhsP4dPJnNPHImNi1ZZRJ3VPnh%2B9bGSh8tuuvRlRhp1JWzhIH8w6mAcZTxYc2209wZcNWAWbFIwQGE01Ds3cu3FkuXQcsQdewzOPzgTJpAmZkyFUZLvb%2FUNv%2FjfmKfaUJa2pEW8c0GZRg%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/baque_21212004.png"
+  },
+  {
+    "id": "baque_21212005",
+    "nombre": "Café molido Honey process, 250 g.",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/cafes-baque-cafe-molido-honey-process-250-g/62d61f363d.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=WiyLUgqPKqVLfULg13Y0LYUhUatHYuA1tCXDvDscb38zPXzzIl8xE89NtAWk4z26c42gBYr9MjI8JkOcNtzlyJdmCZw2RkiSjOquyuYL5BXXhU4HBXzBx8N5%2BpcLb2uXqYpahC6TmYEjyT9hkXC7ub9eYP5zmSKeuQ7k9j67kEyceXGSPLH3qRQOiMAwmEn1awcosTloC3DMtp3ToAqmCQNRyKpVP1v8lMwJUK5Kfznnnly4S6wfQj8o503Zm85egJ3fK1MJxYq6UsvDxo%2BCNT4McqM%2FSlXR0fWZ6V4rzIZJsyLukhRYsHFhLVyKsCKBmNGGAxIcZH4Lo7S6vUKj7w%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/baque_21212005.png"
+  },
+  {
+    "id": "baque_21212006",
+    "nombre": "Café molido Orgánico, 250 g.",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/cafes-baque-cafe-molido-organico-250-g/9d267a4610.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=MV2tOMWJnNPEbtBgLARne7UYsWJOim0ExVNTTK4JIr9i0t8OPAqNM9gofy6pWQDPshYlNjRGAa2RRumorEChRd60ch85nsFidqUxrHI85V6sXJU4aaeX5%2F6wxZV6uVAwCuTTkScy3uFDQN7bTy3Sfwc%2FLuYu6abX2sYfEk7aJvMq8fha7q28VS%2FT%2F9b6AXYyGUVNOFaIUZ6khv9vc2qMpVRl%2FGJ5uYhZLF9JbaOMx%2BXolG8ovcdH9jMho4Yn30HaFXcxw4%2BdXgtKaxlkS4i2K53MaXdGiWvA1uV8toOl1DB85XyaUhrzQySLYB2ymuGrG8mzjB1EME6uwhpXchJ%2B%2Fg%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/baque_21212006.png"
+  },
+  {
+    "id": "baque_21241000",
+    "nombre": "Café molido Descafeinado, 250 g.",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/cafes-baque-cafe-molido-descafeinado-250-g/ee351bcfd9.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=krJ3pzkhIMG66rJ6Wb3wWVdRYUymJjn400grvhDsY26oR1GPZ0RJx3JRSGu%2FZEwWxOKfsebEHtQCiuQw%2Bw3VUlLq8uMwt6UMNZuQdi4dWWeA1jGw06qU%2FA9LWgxH9AIruEuO0Pee3BOmdivnkl9B%2F4RGJFC0D%2Bt5nctLeAi2g8nMMAltOkKHQRWN4buIIp9Gr%2FcNQsWE%2BpPNLsUEZONJADmWTuu1KbDytDO3tC5chCwOi%2FRavX2mB%2BU7yPb5bXs9fCv5oLx8T9ruO5VHZInICF6onUQKQ9kF%2BTBcSCh34KT0sIa%2ByDMYY5%2BT091O3F2OpNy1GtWtASctgy93tA9N4Q%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/baque_21241000.png"
+  },
+  {
+    "id": "baque_21241040",
+    "nombre": "Café molido Descafeinado, 400 g.",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/cafes-baque-cafe-molido-descafeinado-400-g/f51d2ee33a.png?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=R7jDN0o3RALhY4lBR3Z%2FYlNPa0ELZGbSkeBdMw4RSXPP4pCE%2FyLIobGJR4XtgjsvzrCttPmbqf476RUn%2FUrO8rrlIfTMvKC3ZR184DCBD07Y5r3z8%2FqYuCvw6AYZPiGcv%2Fz8Y%2BYR3XsKfdQHN2yGAMuV9Cwl8gJIWK2w%2Bepgq2msQYApQmDCj9%2B5Aje%2BOcsJV7Dn8%2FN%2Bd%2Fz3t93O48%2FvfmcMuGS8vktESCh9PZW1qJ8J4zbVM0mQrv4IpNlnS87EAhiprJkfoJ1yCQx66Dt2Tc94vusyWmgsLpQ8xhS5QNfjoAU%2FKicaxTNqqJAGpUGMEq6HvJLoojm%2FGp%2FjdUuclA%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/baque_21241040.png"
+  },
+  {
+    "id": "baque_21251000",
+    "nombre": "Café molido mezcla, 250 g.",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/cafes-baque-cafe-molido-mezcla-250-g/6a905d09d7.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=WY06GDF2GHPZo5BBydrsAT0J%2B9jFipdsqKC5n%2Ba0RePKxhJ33nNItO%2BlJxuTDysX3V4vmwZdq%2BSHjZBdAzo0aOQ%2FKjznR0Is%2FYkPRJsZhp9kWEHDYLFyzMecig2iXkbPRZrNkLsrL0qp8t6pFpwoyGSnxNrLTGzLdJRoHKqNANoJ7VWYr4eq8c4W68InjzbpGWwmeCeZYjFbAR5SaeSPrK1G4lGZbsOasWt5%2BxluErjTKWX57mgu9o1l2fSzIKxvfzPplCOqRcLL9ScDGb2A50b74JbDl0CkKZ%2BdliNXDC2lPe8WeWaT8jc9oVFag2E1bvAkYaNPyzUL7bY%2F%2BpbSQg%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/baque_21251000.png"
+  },
+  {
+    "id": "baque_21251050",
+    "nombre": "Café molido mezcla, 500 g.",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/cafes-baque-cafe-molido-mezcla-500-g/9009ede701.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=D1YeOjgpcMsdOuJeLtgDZ39jIWQY%2By8L6rM%2FZBvs7ua0RCj7aXTYMSa8Q1qMYUXwuJJXO6Cxciwvf6b%2FSu%2BBBbRkDvWHfhWUpqNtRnci%2BVWEJlTc6kPEPUNNejTkxF%2BFisMRRHikFF4IviQIQRxNSu9dSVrWSQWsuxQoUO9lmhKab2oBoG0VyWtcVgho5b7aCiIIZhKL1x9%2BRkpN7sa44sirF%2BXC%2BcF3Dld3GxJFyb2laOtcfet7SXtG9IUdzWKouw7FHIFa%2B6m6%2B4WE4umsU9cV61vUdjxkIfp7U58GqW%2FWpJFqG6KdHPfLASopuYaKCu0Vhlm4vn28R2sRyFfMYw%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/baque_21251050.png"
+  },
+  {
+    "id": "baque_26112282",
+    "nombre": "Sabor intenso 10 cápsulas compostables compatibles NESPRESSO®",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/cafes-baque-sabor-intenso-10-capsulas-compostables-compatibles-nespresso/ceca7d11e0.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=PAF5%2FELaAfElmNblYR%2Boc9vdJvp74zaXpvK%2B1E5xzDjsfb83MiRpIXmioCDFS6VDQpa9VNIcLPrAPtdAIP2SCX73NV2HDl%2BKyLqJXeluMp2hSh3xtsVIu7oidQ%2Fv3gNCiRqE%2FGP%2F7Za%2FfPleQFmpblzUKnog2k84TemDZppftohNhwz%2Bj%2FbuACgJ8zlLVSRbll2yuNpehGRkQ%2BL1SxIvSHKA6vrlnj5923MZhI87lhL2EZyLOPT0IU4F1knLVmRS4GUctKXqfpE0zlnKdgKiP9aUXk9gfogkSBYd4S2IEzTfsFEFNbaUWaS1FA20Q20TYFR6WhaaPDgdeHyddXk0gA%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/baque_26112282.png"
+  },
+  {
+    "id": "baque_26113421",
+    "nombre": "Colombia 20 cápsulas Aluminio compatibles Nespresso®",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/cafes-baque-colombia-20-capsulas-aluminio-compatibles-nespresso/8ad668c56d.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=dTiDT1akYW%2F0Gs9JHOFiWaoy%2BcSUFsnZjUZgTevYK8idApx0lerooDhBKKss4KlpntFfYonPggLAyDmpcH2bjsVe02x3i1DIcZIZRjfi9OjPLz8gW9UUx1MiSdgjdOb2Li3qvdey4TYBqjOQDa5BJNLklAUf3L01Hvy8RMGYwf9SCgSmFnSrZOwNzSbinySkPQb3Yen7jlRCAyE9ZZ4BaCs5TkjoPzqnFaGmuKT9czzAbVi%2BnQVBXdAL8tklqzOY8n9xHItNY43EcxVv7dETgEimWz%2FfzqmkbJSarWum3qtGVJhxUiiFNp5oCACpaUuBtlNzdHWk2CurDfpXL2xa4A%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/baque_26113421.png"
+  },
+  {
+    "id": "baque_26113422",
+    "nombre": "Ristretto 20 cápsulas Aluminio compatibles Nespresso®",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/cafes-baque-ristretto-20-capsulas-aluminio-compatibles-nespresso/8aa113b4cc.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=RO6HScTdR4zxDsOSh%2FnaE8nQ79aXJdpZS42juwIJJI%2B7n6Ff1Juwb6OhZkgAG4z%2BKGg%2FpoBivyLMb4KZEj6xj52OM586NUYEFtj07HuxSgv9%2BOrQCzjqJszBg%2FPGv3fisrZsibDQA9K5M1KwMWvKb%2FnAOQYeRKWp20JNrOQdBmIFiXmSxWws9MIZ5%2BW%2FpA8RHdhJudw0oFFY5lCivhMTvQ%2BWKPldTN4uuNPhHT4AvMk0LRDtvcAPOlA5dbGhpFuG%2Fr24bEIZlpBJq5w5BSojxyM1AV173C4c22Lz64Gha%2BROGFLdVgSkjfnmtxeXWbrlDeo8w9apElG7MqypNrjdkQ%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/baque_26113422.png"
+  },
+  {
+    "id": "baque_26113423",
+    "nombre": "Vainilla 20 cápsulas de Aluminio compatibles Nespresso®",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/cafes-baque-vainilla-20-capsulas-de-aluminio-compatibles-nespresso/c24a8d41a2.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=UxlxpYDxoYUm9OFGB2o8uoZdJ72mK2zAANAw9pRD0DisDzXzLEn9hCV9%2BlgVS21t0%2F8dcMYs9sRinh7zOnBTwIVOPASskTLBupkP%2F30fD%2FMnumXfGCcWHkvSzO%2FKRBfl3sdYszwMx8pLRanYau3gp505CCJCOuLjqe9rUQRyrL762YXPxNNpi3H4wlPiW6vYMJvj924oHQIs0ZrzKkZ%2F5hg3Q3tfAup1M%2FfqGNv4eiQj8jQWGCvdXD2h0HEwtJwzOT11bwlM45IKQwZqfLdJebz7pOSZ7EzQ47PQ%2Fx93m2jEFabZb%2Fc06mnIievR4XuamuAk8YqItkBT%2BbwkCj4p8w%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/baque_26113423.png"
+  },
+  {
+    "id": "baque_26113424",
+    "nombre": "Sabor Extra Intenso 20 cápsulas Aluminio compatibles Nespresso®",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/cafes-baque-sabor-extra-intenso-20-capsulas-aluminio-compatibles-nespresso/98efe881b3.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=RpvyVcfZ%2BS88uzh9eAZbs6CftTsH5ax5Py5kapmH%2BjjZKOHgor%2BnwA9Bsoa00AEf%2Bjx18cGzonxuJMDwgxh5kVU%2FAcGUkEOcuebRiRw1E0KDrPPJ%2F%2BiErAINK2wukQtf89TblUeN%2FNeeZqLNaiwfAuRRB1giVne5Ql1J9vQWjM1WieAmw97GKfgOdLFB1tXJEAg4GboETaxBFsPFVp22WlSaI1AgqzwGh1sZ5Igut6qEBENEcumkauGg9VT8EubAL7WLIXaPCIlWuE5pgKw0KGCbAoF95QVAkS9D7o69LsdudpTO1I2vftYoJCHxDmNh1ID3YR4KUFmhv3PSdeQDHw%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/baque_26113424.png"
+  },
+  {
+    "id": "baque_26113425",
+    "nombre": "Descafeinado Intenso 20 cápsulas Aluminio compatibles Nespresso®",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafes/cafes-baque-descafeinado-intenso-20-capsulas-aluminio-compatibles-nespresso/3f88b8810a.jpg?GoogleAccessId=firebase-adminsdk-fbsvc%40miappdecafe.iam.gserviceaccount.com&Expires=16441228800&Signature=eyMZUjLDpIxKMEPB%2FcplYQeE%2Bne8ZPUZ7A8HdjmnosKcGyf2Lc1f4SkBqPsJS5gMHBsK3EZ4XjXCp3lk%2Fyp0H6Wq%2FCunjHY8VJSgWz04SPoNeaKn%2FCnnHlzCY8%2BY8HLnA6kA%2BnaY%2BP%2FohwotA06MIAp3GhPdepNwCoiqHxwHzzIe0VvnVsDaYJI18TkJjvlu7LePg66oEJdfQUx%2Bqu%2BgGJzVvf%2FlBhqAftI9Mf4YJWiD2cas%2BkS15aiukbgbjCwWMY18IE2aNHEdETJPSfsigPoujXm%2FOn2YIgyWeR67oeAzdvP5sec7RyEncuRnneTwfTsxyed%2B%2Fhub1u8zKjnsdA%3D%3D",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/baque_26113425.png"
+  }
+]

@@ -132,21 +132,25 @@ export default function CommunityTab({
     interactionFeedbackMode,
   });
 
-  return (
-    <View style={{ flex: 1 }}>
-      <MemberInfoModal visible={showMemberInfo} onClose={() => setShowMemberInfo(false)} />
-
-      {showCategories && (
+  const renderCommunityView = () => {
+    if (showThreadDetail) return <CommunityThreadDetailView {...threadDetailViewProps} />;
+    if (showThreadList) return <CommunityThreadListView {...threadListViewProps} />;
+    if (showCategories) {
+      return (
         <View style={{ flex: 1 }}>
           <Animated.View style={{ flex: 1, opacity: communityHeroAnim }}>
             <CommunityCategoriesView {...categoriesViewProps} />
           </Animated.View>
         </View>
-      )}
+      );
+    }
+    return null;
+  };
 
-      {showThreadList && <CommunityThreadListView {...threadListViewProps} />}
-      {showThreadDetail && <CommunityThreadDetailView {...threadDetailViewProps} />}
-
+  return (
+    <View style={{ flex: 1 }}>
+      <MemberInfoModal visible={showMemberInfo} onClose={() => setShowMemberInfo(false)} />
+      {renderCommunityView()}
       <CommunityCreateThreadModal {...createModalProps} />
       <CommunityEditItemModal {...editModalProps} />
     </View>

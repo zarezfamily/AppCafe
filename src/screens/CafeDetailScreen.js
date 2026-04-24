@@ -125,7 +125,7 @@ function buildWhyYouMightLike(cafe) {
 }
 
 function getIdealProfile(cafe) {
-  const notas = (cafe.notas || cafe.notes || '').toLowerCase();
+  const _notas = (cafe.notas || cafe.notes || '').toLowerCase();
   const proceso = (cafe.proceso || cafe.process || '').toLowerCase();
   const tueste = (cafe.tueste || cafe.roastLevel || '').toLowerCase();
   const prep = (cafe.preparacion || '').toLowerCase();
@@ -235,7 +235,7 @@ export default function CafeDetailScreen({
   cafes = null,
   allCafes = [],
   cafeIndex = 0,
-  onChangeCafe,
+  onChangeCafe: _onChangeCafe,
   onClose,
   onDelete,
   favs = [],
@@ -475,21 +475,14 @@ export default function CafeDetailScreen({
               <Ionicons name="chevron-back" size={24} color="#fff" />
             </TouchableOpacity>
 
-            {onToggleFav ? (
-              <TouchableOpacity style={det.favBtn} onPress={() => onToggleFav(cafeToShow)}>
-                <Ionicons
-                  name={isFav ? 'star' : 'star-outline'}
-                  size={22}
-                  color={isFav ? theme?.status?.favorite || premiumAccent : '#fff'}
-                />
-              </TouchableOpacity>
-            ) : null}
-
-            {onDelete ? (
-              <TouchableOpacity style={det.deleteBtn} onPress={() => onDelete(cafeToShow)}>
-                <Ionicons name="trash-outline" size={20} color="#fff" />
-              </TouchableOpacity>
-            ) : null}
+            <HeroFavButton
+              onToggleFav={onToggleFav}
+              cafeToShow={cafeToShow}
+              isFav={isFav}
+              theme={theme}
+              premiumAccent={premiumAccent}
+            />
+            <HeroDeleteButton onDelete={onDelete} cafeToShow={cafeToShow} />
 
             <View style={det.scoreBox}>
               <View
@@ -507,56 +500,19 @@ export default function CafeDetailScreen({
                   {formatCategoryBadgeLabel(isDaily, cafeToShow)}
                 </Text>
               </View>
-              {votosActuales > 0 ? (
-                <View style={styles.heroVotesRow}>
-                  <View style={styles.heroStarsRow}>
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Ionicons
-                        key={star}
-                        name={star <= Math.round(puntuacionActual) ? 'star' : 'star-outline'}
-                        size={14}
-                        color={
-                          star <= Math.round(puntuacionActual) ? '#f0c040' : 'rgba(255,255,255,0.5)'
-                        }
-                      />
-                    ))}
-                  </View>
-                  <Text style={styles.heroVotesText}>
-                    {puntuacionActual.toFixed(1)} · {votosActuales} voto
-                    {votosActuales !== 1 ? 's' : ''}
-                  </Text>
-                </View>
-              ) : null}
-              {cafeToShow.id && (tastingCountByCafeId.get(cafeToShow.id) || 0) > 0 && (
-                <View style={styles.socialProofPill}>
-                  <Ionicons name="people-outline" size={11} color="#c8a97c" />
-                  <Text style={styles.socialProofText}>
-                    {tastingCountByCafeId.get(cafeToShow.id)} lo han catado este mes
-                  </Text>
-                </View>
-              )}
+              <HeroVotes votosActuales={votosActuales} puntuacionActual={puntuacionActual} />
+              <SocialProofPill cafeId={cafeToShow.id} tastingCountByCafeId={tastingCountByCafeId} />
             </View>
           </View>
 
           <View style={det.body}>
-            {/* Marca y nombre primero */}
-            {!!(cafeToShow.roaster || cafeToShow.marca) && (
-              <Text style={det.roaster}>{cafeToShow.roaster || cafeToShow.marca}</Text>
-            )}
-            <Text style={det.nombre}>{cafeToShow.nombre || cafeToShow.name}</Text>
-            {cafeToShow.finca ? <Text style={det.finca}>{cafeToShow.finca}</Text> : null}
+            <DetailHeader cafeToShow={cafeToShow} originText={originText} />
 
-            {/* Origen */}
-            {originText ? (
-              <View style={det.originRow}>
-                <Ionicons name="earth-outline" size={14} color="#8b6d57" />
-                <Text style={det.originText}>{originText}</Text>
-              </View>
-            ) : null}
+            <ChipsBar chips={chips} premiumAccent={premiumAccent} />
 
             <View style={det.divider} />
 
-            {/* SCA - una sola vez */}
+            {/* SCA */}
             <TouchableOpacity
               activeOpacity={0.92}
               delayLongPress={250}
@@ -657,99 +613,212 @@ export default function CafeDetailScreen({
               </View>
             </TouchableOpacity>
 
-            {/* Chips de atributos clave */}
-            {chips.length ? (
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                style={det.chipsWrap}
-                contentContainerStyle={{ paddingRight: 4 }}
-              >
-                {chips.map((chip) => (
-                  <Chip
-                    key={`${chip.icon}-${chip.label}`}
-                    det={det}
-                    label={chip.label}
-                    icon={chip.icon}
-                    premiumAccent={premiumAccent}
-                  />
-                ))}
-              </ScrollView>
-            ) : null}
+            <View style={det.divider} />
 
-            <TouchableOpacity style={det.compareBtn} onPress={openComparison} activeOpacity={0.9}>
-              <View style={det.compareBtnIcon}>
-                <Ionicons name="git-compare-outline" size={18} color={premiumAccent} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={det.compareBtnTitle}>Comparar con...</Text>
-                <Text style={det.compareBtnSub}>
-                  Precio, SCA, notas y valoracion frente a otra alternativa real.
-                </Text>
-              </View>
-              <Ionicons name="chevron-forward" size={18} color="#8b6d57" />
-            </TouchableOpacity>
+            {/* Perfil sensorial — siempre visible */}
+            <Text style={det.sectionTitle}>Perfil sensorial</Text>
 
-            {/* Por qué te puede gustar */}
-            {whyReasons.length > 0 && (
-              <View style={det.whySection}>
-                <Text style={det.sectionTitle}>🧠 Por qué te puede gustar</Text>
-                {whyReasons.map((r, i) => (
-                  <View key={i} style={det.whyRow}>
-                    <Text style={det.whyIcon}>{r.icon}</Text>
-                    <Text style={det.whyText}>{r.text}</Text>
-                  </View>
-                ))}
-              </View>
-            )}
-
-            {/* Perfil ideal */}
-            <View style={det.idealSection}>
-              <Text style={det.sectionTitle}>🎯 Perfil ideal</Text>
-              <View style={det.idealCard}>
-                <View style={det.idealMethods}>
-                  <View
-                    style={[
-                      det.idealBadge,
-                      (idealProfile.method === 'espresso' || idealProfile.method === 'ambos') &&
-                        det.idealBadgeActive,
-                    ]}
-                  >
-                    <Text style={det.idealBadgeIcon}>☕</Text>
-                    <Text
-                      style={[
-                        det.idealBadgeLabel,
-                        (idealProfile.method === 'espresso' || idealProfile.method === 'ambos') &&
-                          det.idealBadgeLabelActive,
-                      ]}
-                    >
-                      Espresso
-                    </Text>
-                  </View>
-                  <View
-                    style={[
-                      det.idealBadge,
-                      (idealProfile.method === 'filtro' || idealProfile.method === 'ambos') &&
-                        det.idealBadgeActive,
-                    ]}
-                  >
-                    <Text style={det.idealBadgeIcon}>🫗</Text>
-                    <Text
-                      style={[
-                        det.idealBadgeLabel,
-                        (idealProfile.method === 'filtro' || idealProfile.method === 'ambos') &&
-                          det.idealBadgeLabelActive,
-                      ]}
-                    >
-                      Filtro
-                    </Text>
-                  </View>
-                </View>
-                <Text style={det.idealReason}>{idealProfile.reason}</Text>
-              </View>
+            <View style={det.notasBox}>
+              <Text style={det.notasLabel}>Notas de cata</Text>
+              <Text style={det.notasText}>
+                {cafeToShow.notas || cafeToShow.notes || 'Sin notas disponibles'}
+              </Text>
             </View>
 
-            {/* Votación */}
+            <View style={det.sensRow}>
+              <SensItem
+                det={det}
+                label="Acidez"
+                value={cafeToShow.acidez || '—'}
+                icon="flash-outline"
+                premiumAccent={premiumAccent}
+              />
+              <SensItem
+                det={det}
+                label="Cuerpo"
+                value={cafeToShow.cuerpo || '—'}
+                icon="fitness-outline"
+                premiumAccent={premiumAccent}
+              />
+              <SensItem
+                det={det}
+                label="Regusto"
+                value={cafeToShow.regusto || '—'}
+                icon="time-outline"
+                premiumAccent={premiumAccent}
+              />
+            </View>
+
+            <View style={det.divider} />
+
+            {/* Perfil ideal — siempre visible */}
+            <Text style={det.sectionTitle}>Perfil ideal</Text>
+            <View style={det.idealCard}>
+              <View style={det.idealRow}>
+                <View
+                  style={[
+                    det.idealItem,
+                    (idealProfile.method === 'espresso' || idealProfile.method === 'ambos') &&
+                      det.idealItemActive,
+                  ]}
+                >
+                  <Ionicons
+                    name="cafe-outline"
+                    size={22}
+                    color={
+                      idealProfile.method === 'espresso' || idealProfile.method === 'ambos'
+                        ? premiumAccent
+                        : '#a89888'
+                    }
+                  />
+                  <Text
+                    style={[
+                      det.idealItemLabel,
+                      (idealProfile.method === 'espresso' || idealProfile.method === 'ambos') &&
+                        det.idealItemLabelActive,
+                    ]}
+                  >
+                    Espresso
+                  </Text>
+                </View>
+                <View
+                  style={[
+                    det.idealItem,
+                    (idealProfile.method === 'filtro' || idealProfile.method === 'ambos') &&
+                      det.idealItemActive,
+                  ]}
+                >
+                  <Ionicons
+                    name="water-outline"
+                    size={22}
+                    color={
+                      idealProfile.method === 'filtro' || idealProfile.method === 'ambos'
+                        ? premiumAccent
+                        : '#a89888'
+                    }
+                  />
+                  <Text
+                    style={[
+                      det.idealItemLabel,
+                      (idealProfile.method === 'filtro' || idealProfile.method === 'ambos') &&
+                        det.idealItemLabelActive,
+                    ]}
+                  >
+                    Filtro
+                  </Text>
+                </View>
+              </View>
+              <Text style={det.idealReason}>{idealProfile.reason}</Text>
+            </View>
+
+            <WhyYouMightLike reasons={whyReasons} />
+
+            <View style={det.divider} />
+
+            {/* Ficha del café — toda la info técnica en una sola sección */}
+            <Text style={det.sectionTitle}>Ficha del café</Text>
+
+            <InfoRow
+              det={det}
+              icon="storefront-outline"
+              label="Marca"
+              value={cafeToShow.marca || cafeToShow.roaster}
+              premiumAccent={premiumAccent}
+            />
+            <InfoRow
+              det={det}
+              icon="bag-outline"
+              label="Formato"
+              value={cafeToShow.formato || cafeToShow.format}
+              premiumAccent={premiumAccent}
+            />
+            <InfoRow
+              det={det}
+              icon="location-outline"
+              label="País / Región"
+              value={originText}
+              premiumAccent={premiumAccent}
+            />
+            <InfoRow
+              det={det}
+              icon="person-outline"
+              label="Productor"
+              value={cafeToShow.productor}
+              premiumAccent={premiumAccent}
+            />
+            <InfoRow
+              det={det}
+              icon="home-outline"
+              label="Finca"
+              value={cafeToShow.finca}
+              premiumAccent={premiumAccent}
+            />
+            <InfoRow
+              det={det}
+              icon="trending-up-outline"
+              label="Altura"
+              value={
+                cafeToShow.altura || cafeToShow.altitude
+                  ? `${cafeToShow.altura || cafeToShow.altitude} msnm`
+                  : null
+              }
+              premiumAccent={premiumAccent}
+            />
+            <InfoRow
+              det={det}
+              icon="leaf-outline"
+              label="Variedad"
+              value={cafeToShow.variedad || cafeToShow.variety}
+              premiumAccent={premiumAccent}
+            />
+            <InfoRow
+              det={det}
+              icon="water-outline"
+              label="Proceso"
+              value={cafeToShow.proceso || cafeToShow.process}
+              premiumAccent={premiumAccent}
+            />
+            <InfoRow
+              det={det}
+              icon="sunny-outline"
+              label="Secado"
+              value={cafeToShow.secado}
+              premiumAccent={premiumAccent}
+            />
+            <InfoRow
+              det={det}
+              icon="flame-outline"
+              label="Tueste"
+              value={cafeToShow.tueste || cafeToShow.roastLevel}
+              premiumAccent={premiumAccent}
+            />
+            <InfoRow
+              det={det}
+              icon="calendar-outline"
+              label="Fecha de tueste"
+              value={cafeToShow.fechaTueste}
+              premiumAccent={premiumAccent}
+            />
+            <InfoRow
+              det={det}
+              icon="cafe-outline"
+              label="Preparación"
+              value={cafeToShow.preparacion}
+              premiumAccent={premiumAccent}
+            />
+            <InfoRow
+              det={det}
+              icon="shield-checkmark-outline"
+              label="Certificaciones"
+              value={cafeToShow.certificaciones}
+              premiumAccent={premiumAccent}
+            />
+
+            <PrecioSection precioTexto={precioTexto} />
+
+            <View style={det.divider} />
+
+            {/* Votación — al final para que valoren después de leer */}
             <View style={det.voteBox}>
               <Text style={det.voteTitle}>
                 {yaVotado || miVoto > 0 ? 'Tu valoración' : 'Valora este café'}
@@ -776,198 +845,18 @@ export default function CafeDetailScreen({
               </View>
             </View>
 
-            <View style={det.divider} />
-
-            <>
-              <Text style={det.sectionTitle}>Producto</Text>
-
-              <InfoRow
-                det={det}
-                icon="storefront-outline"
-                label="Marca"
-                value={cafeToShow.marca || cafeToShow.roaster}
-                premiumAccent={premiumAccent}
-              />
-              <InfoRow
-                det={det}
-                icon="bag-outline"
-                label="Formato"
-                value={cafeToShow.formato || cafeToShow.format}
-                premiumAccent={premiumAccent}
-              />
-
-              <View style={det.divider} />
-
-              <>
-                {cafeToShow.notas ||
-                cafeToShow.notes ||
-                cafeToShow.acidez ||
-                cafeToShow.cuerpo ||
-                cafeToShow.regusto ? (
-                  <>
-                    <Text style={det.sectionTitle}>Perfil sensorial</Text>
-
-                    {cafeToShow.notas || cafeToShow.notes ? (
-                      <View style={det.notasBox}>
-                        <Text style={det.notasLabel}>Notas de cata</Text>
-                        <Text style={det.notasText}>{cafeToShow.notas || cafeToShow.notes}</Text>
-                      </View>
-                    ) : null}
-
-                    <View style={det.sensRow}>
-                      {!!cafeToShow.acidez && (
-                        <SensItem
-                          det={det}
-                          label="Acidez"
-                          value={cafeToShow.acidez}
-                          icon="flash-outline"
-                          premiumAccent={premiumAccent}
-                        />
-                      )}
-                      {!!cafeToShow.cuerpo && (
-                        <SensItem
-                          det={det}
-                          label="Cuerpo"
-                          value={cafeToShow.cuerpo}
-                          icon="fitness-outline"
-                          premiumAccent={premiumAccent}
-                        />
-                      )}
-                      {!!cafeToShow.regusto && (
-                        <SensItem
-                          det={det}
-                          label="Regusto"
-                          value={cafeToShow.regusto}
-                          icon="time-outline"
-                          premiumAccent={premiumAccent}
-                        />
-                      )}
-                    </View>
-
-                    <View style={det.divider} />
-                  </>
-                ) : null}
-
-                <Text style={det.sectionTitle}>Origen y proceso</Text>
-
-                <InfoRow
-                  det={det}
-                  icon="location-outline"
-                  label="País / Región"
-                  value={originText}
-                  premiumAccent={premiumAccent}
-                />
-                <InfoRow
-                  det={det}
-                  icon="person-outline"
-                  label="Productor"
-                  value={cafeToShow.productor}
-                  premiumAccent={premiumAccent}
-                />
-                <InfoRow
-                  det={det}
-                  icon="home-outline"
-                  label="Finca"
-                  value={cafeToShow.finca}
-                  premiumAccent={premiumAccent}
-                />
-                <InfoRow
-                  det={det}
-                  icon="trending-up-outline"
-                  label="Altura"
-                  value={
-                    cafeToShow.altura || cafeToShow.altitude
-                      ? `${cafeToShow.altura || cafeToShow.altitude} msnm`
-                      : null
-                  }
-                  premiumAccent={premiumAccent}
-                />
-                <InfoRow
-                  det={det}
-                  icon="leaf-outline"
-                  label="Variedad"
-                  value={cafeToShow.variedad || cafeToShow.variety}
-                  premiumAccent={premiumAccent}
-                />
-                <InfoRow
-                  det={det}
-                  icon="water-outline"
-                  label="Proceso"
-                  value={cafeToShow.proceso || cafeToShow.process}
-                  premiumAccent={premiumAccent}
-                />
-                <InfoRow
-                  det={det}
-                  icon="sunny-outline"
-                  label="Secado"
-                  value={cafeToShow.secado}
-                  premiumAccent={premiumAccent}
-                />
-
-                {cafeToShow.tueste || cafeToShow.roastLevel || cafeToShow.fechaTueste ? (
-                  <>
-                    <View style={det.divider} />
-                    <Text style={det.sectionTitle}>Tueste</Text>
-
-                    <InfoRow
-                      det={det}
-                      icon="flame-outline"
-                      label="Nivel"
-                      value={cafeToShow.tueste || cafeToShow.roastLevel}
-                      premiumAccent={premiumAccent}
-                    />
-                    <InfoRow
-                      det={det}
-                      icon="calendar-outline"
-                      label="Fecha de tueste"
-                      value={cafeToShow.fechaTueste}
-                      premiumAccent={premiumAccent}
-                    />
-                  </>
-                ) : null}
-
-                {cafeToShow.preparacion ? (
-                  <>
-                    <View style={det.divider} />
-                    <Text style={det.sectionTitle}>Preparación recomendada</Text>
-                    <View style={det.prepBox}>
-                      <Ionicons name="cafe-outline" size={20} color={premiumAccent} />
-                      <Text style={det.prepText}>{cafeToShow.preparacion}</Text>
-                    </View>
-                  </>
-                ) : null}
-
-                {cafeToShow.certificaciones ? (
-                  <>
-                    <View style={det.divider} />
-                    <Text style={det.sectionTitle}>Certificaciones</Text>
-                    <Text style={det.certText}>{cafeToShow.certificaciones}</Text>
-                  </>
-                ) : null}
-
-                <View style={det.divider} />
-                <Text style={det.sectionTitle}>Puente con tu café diario</Text>
-                <View style={det.prepBox}>
-                  <Ionicons name="swap-horizontal-outline" size={20} color={premiumAccent} />
-                  <Text style={det.prepText}>
-                    Este café puede ser una buena evolución si buscas más limpieza, más dulzor
-                    natural y mejor trazabilidad.
-                  </Text>
-                </View>
-              </>
-            </>
-
-            {/* Precio al final */}
-            {precioTexto ? (
-              <>
-                <View style={det.divider} />
-                <Text style={det.sectionTitle}>Precio</Text>
-                <View style={det.priceHeroPill}>
-                  <Text style={det.priceHeroLabel}>Precio orientativo</Text>
-                  <Text style={det.priceHeroValue}>{precioTexto}</Text>
-                </View>
-              </>
-            ) : null}
+            <TouchableOpacity style={det.compareBtn} onPress={openComparison} activeOpacity={0.9}>
+              <View style={det.compareBtnIcon}>
+                <Ionicons name="git-compare-outline" size={18} color={premiumAccent} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={det.compareBtnTitle}>Comparar con...</Text>
+                <Text style={det.compareBtnSub}>
+                  Precio, SCA, notas y valoracion frente a otra alternativa real.
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color="#8b6d57" />
+            </TouchableOpacity>
 
             <View style={styles.bottomSpacer} />
           </View>
@@ -1121,6 +1010,131 @@ function formatRatingValue(cafe) {
   const votes = Number(cafe?.votos || 0);
   if (!Number.isFinite(rating) || rating <= 0) return '-';
   return `${rating.toFixed(1)} (${votes})`;
+}
+
+function HeroFavButton({ onToggleFav, cafeToShow, isFav, theme, premiumAccent }) {
+  if (!onToggleFav) return null;
+  return (
+    <TouchableOpacity style={det.favBtn} onPress={() => onToggleFav(cafeToShow)}>
+      <Ionicons
+        name={isFav ? 'star' : 'star-outline'}
+        size={22}
+        color={isFav ? theme?.status?.favorite || premiumAccent : '#fff'}
+      />
+    </TouchableOpacity>
+  );
+}
+
+function HeroDeleteButton({ onDelete, cafeToShow }) {
+  if (!onDelete) return null;
+  return (
+    <TouchableOpacity style={det.deleteBtn} onPress={() => onDelete(cafeToShow)}>
+      <Ionicons name="trash-outline" size={20} color="#fff" />
+    </TouchableOpacity>
+  );
+}
+
+function HeroVotes({ votosActuales, puntuacionActual }) {
+  if (votosActuales <= 0) return null;
+  return (
+    <View style={styles.heroVotesRow}>
+      <View style={styles.heroStarsRow}>
+        {[1, 2, 3, 4, 5].map((star) => (
+          <Ionicons
+            key={star}
+            name={star <= Math.round(puntuacionActual) ? 'star' : 'star-outline'}
+            size={14}
+            color={star <= Math.round(puntuacionActual) ? '#f0c040' : 'rgba(255,255,255,0.5)'}
+          />
+        ))}
+      </View>
+      <Text style={styles.heroVotesText}>
+        {puntuacionActual.toFixed(1)} · {votosActuales} voto{votosActuales !== 1 ? 's' : ''}
+      </Text>
+    </View>
+  );
+}
+
+function SocialProofPill({ cafeId, tastingCountByCafeId }) {
+  const count = cafeId ? tastingCountByCafeId.get(cafeId) || 0 : 0;
+  if (count <= 0) return null;
+  return (
+    <View style={styles.socialProofPill}>
+      <Ionicons name="people-outline" size={11} color="#c8a97c" />
+      <Text style={styles.socialProofText}>{count} lo han catado este mes</Text>
+    </View>
+  );
+}
+
+function DetailHeader({ cafeToShow, originText }) {
+  return (
+    <View>
+      {cafeToShow.roaster || cafeToShow.marca ? (
+        <Text style={det.roaster}>{cafeToShow.roaster || cafeToShow.marca}</Text>
+      ) : null}
+      <Text style={det.nombre}>{cafeToShow.nombre || cafeToShow.name}</Text>
+      {cafeToShow.finca ? <Text style={det.finca}>{cafeToShow.finca}</Text> : null}
+      {originText ? (
+        <View style={det.originRow}>
+          <Ionicons name="earth-outline" size={14} color="#8b6d57" />
+          <Text style={det.originText}>{originText}</Text>
+        </View>
+      ) : null}
+    </View>
+  );
+}
+
+function ChipsBar({ chips, premiumAccent }) {
+  if (!chips.length) return null;
+  return (
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      style={det.chipsWrap}
+      contentContainerStyle={{ paddingRight: 4 }}
+    >
+      {chips.map((chip) => (
+        <Chip
+          key={`${chip.icon}-${chip.label}`}
+          det={det}
+          label={chip.label}
+          icon={chip.icon}
+          premiumAccent={premiumAccent}
+        />
+      ))}
+    </ScrollView>
+  );
+}
+
+function WhyYouMightLike({ reasons }) {
+  if (!reasons.length) return null;
+  return (
+    <View style={det.whySection}>
+      <View style={det.divider} />
+      <Text style={det.sectionTitle}>Por qué te puede gustar</Text>
+      {reasons.map((r, i) => (
+        <View key={i} style={det.whyRow}>
+          <Text style={det.whyText}>
+            {r.icon} {r.text}
+          </Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+function PrecioSection({ precioTexto }) {
+  if (!precioTexto) return null;
+  return (
+    <View>
+      <View style={det.divider} />
+      <Text style={det.sectionTitle}>Precio</Text>
+      <View style={det.priceHeroPill}>
+        <Text style={det.priceHeroLabel}>Precio orientativo</Text>
+        <Text style={det.priceHeroValue}>{precioTexto}</Text>
+      </View>
+    </View>
+  );
 }
 
 function Chip({ det, label, icon, premiumAccent }) {
@@ -1670,77 +1684,67 @@ const styles = StyleSheet.create({
 
   // ── "Por qué te puede gustar" ──
   whySection: {
-    marginTop: 8,
-    marginBottom: 4,
+    marginTop: 0,
+    marginBottom: 0,
   },
   whyRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    paddingVertical: 7,
-    gap: 10,
-  },
-  whyIcon: {
-    fontSize: 18,
-    lineHeight: 24,
-    width: 26,
-    textAlign: 'center',
+    paddingVertical: 6,
   },
   whyText: {
     flex: 1,
     fontSize: 14,
-    color: '#3e2c1c',
-    lineHeight: 20,
+    color: '#31251d',
+    lineHeight: 21,
+    fontWeight: '600',
   },
 
   // ── Perfil ideal ──
   idealSection: {
-    marginTop: 4,
-    marginBottom: 4,
+    marginTop: 0,
+    marginBottom: 0,
   },
   idealCard: {
-    backgroundColor: '#faf6f1',
+    backgroundColor: '#fbf5ee',
     borderRadius: 14,
-    padding: 16,
     borderWidth: 1,
-    borderColor: 'rgba(139,109,87,0.12)',
+    borderColor: '#f0e2d4',
+    padding: 14,
   },
-  idealMethods: {
+  idealRow: {
     flexDirection: 'row',
     gap: 10,
-    marginBottom: 10,
+    marginBottom: 12,
   },
-  idealBadge: {
+  idealItem: {
     flex: 1,
-    flexDirection: 'row',
+    backgroundColor: '#fff',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#eee4d9',
+    paddingVertical: 14,
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 10,
-    borderRadius: 10,
-    backgroundColor: '#f0ebe5',
     gap: 6,
-    borderWidth: 1.5,
-    borderColor: 'transparent',
   },
-  idealBadgeActive: {
+  idealItemActive: {
     backgroundColor: '#fff8ef',
     borderColor: '#c8a97c',
   },
-  idealBadgeIcon: {
-    fontSize: 18,
-  },
-  idealBadgeLabel: {
+  idealItemLabel: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#999',
+    color: '#a89888',
+    fontWeight: '700',
   },
-  idealBadgeLabelActive: {
+  idealItemLabelActive: {
     color: '#5a3e28',
   },
   idealReason: {
     fontSize: 13,
-    color: '#8b6d57',
-    lineHeight: 18,
+    color: '#8b7665',
+    lineHeight: 19,
     textAlign: 'center',
+    fontWeight: '600',
   },
 });
 

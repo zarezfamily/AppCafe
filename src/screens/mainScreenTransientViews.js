@@ -16,6 +16,7 @@ import { useNetwork } from '../context/NetworkContext';
 import { enqueueAction } from '../core/syncQueue';
 import { getCafePhoto } from '../core/utils';
 import { getUpgradeForScannedCafe } from '../domain/coffee/scanUpgrade';
+import { findAnyCafeByEan } from '../services/cafeService';
 import CafeDetailScreen from './CafeDetailScreen';
 import FormScreen from './FormScreen';
 import ProfileScreen from './ProfileScreen';
@@ -552,13 +553,11 @@ function ScannerMatchFlow({
     const matchCopy = getCafeMatchCopy(matchedCafe);
     if (!matchCopy.autoOpen) return undefined;
 
-    const timer = setTimeout(() => {
-      setScanning(false);
-      setCafeDetalle?.(matchedCafe);
-      setMatchedCafe(null);
-    }, 900);
-
-    return () => clearTimeout(timer);
+    // Go directly to detail without intermediate flash screen
+    setScanning(false);
+    setCafeDetalle?.(matchedCafe);
+    setMatchedCafe(null);
+    return undefined;
   }, [matchedCafe, setCafeDetalle, setScanning]);
 
   if (matchedCafe) {
@@ -599,7 +598,7 @@ function ScannerMatchFlow({
 
   return (
     <ScannerScreen
-      onScanned={(result) => {
+      onScanned={async (result) => {
         const ean = normalizeEan(result?.ean);
 
         if (!ean) {
@@ -607,6 +606,7 @@ function ScannerMatchFlow({
           return;
         }
 
+        // 1) Check local cache
         const existing = allCafes.find((c) => normalizeEan(c?.ean) === ean);
 
         if (existing) {
@@ -614,7 +614,7 @@ function ScannerMatchFlow({
           return;
         }
 
-        // Offline: queue scan for later processing
+        // 2) Offline: queue scan
         if (!isOnline) {
           enqueueAction('pending_scan', { ean, source: 'barcode', ts: Date.now() });
           showDialog?.(
@@ -622,6 +622,17 @@ function ScannerMatchFlow({
             `Código ${ean} guardado. Se procesará cuando vuelvas a tener conexión.`
           );
           return;
+        }
+
+        // 3) Fallback: check Firestore (covers legacy docs with auto-ID)
+        try {
+          const remote = await findAnyCafeByEan(ean);
+          if (remote) {
+            setMatchedCafe(remote);
+            return;
+          }
+        } catch (_err) {
+          // Network error — proceed to create new
         }
 
         onScannerDone?.({
@@ -733,7 +744,7 @@ export function MainScreenOverlayLayer({
   closeProfile,
   refrescarPerfil,
 }) {
-  return (
+  const renderOverlayContent = () => (
     <>
       <AppDialogModal
         visible={!!dialogVisible}
@@ -751,7 +762,7 @@ export function MainScreenOverlayLayer({
         onStartQuiz={startQuizFromOnboarding}
       />
 
-      {!!achievementToast && (
+      {achievementToast ? (
         <TouchableOpacity
           activeOpacity={0.95}
           onPress={closeAchievementToast}
@@ -779,9 +790,9 @@ export function MainScreenOverlayLayer({
             </View>
           </Animated.View>
         </TouchableOpacity>
-      )}
+      ) : null}
 
-      {cafeDetalle && (
+      {cafeDetalle ? (
         <CafeDetailScreen
           cafe={cafeDetalle?.cafes ? null : cafeDetalle}
           cafes={cafeDetalle?.cafes || null}
@@ -804,16 +815,18 @@ export function MainScreenOverlayLayer({
           s={s}
           keyVotes={keyVotes}
         />
-      )}
+      ) : null}
 
-      {!!showProfile && (
+      {showProfile ? (
         <ProfileScreen
           isPremium={premium.isPremium}
           premiumDaysLeft={premium.daysLeft}
           onClose={closeProfile}
           onProfileSaved={refrescarPerfil}
         />
-      )}
+      ) : null}
     </>
   );
+
+  return <View>{renderOverlayContent()}</View>;
 }

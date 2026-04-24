@@ -6,6 +6,7 @@ import MemberInfoModal from '../components/MemberInfoModal';
 import { HeroCafeSkeleton } from '../components/SkeletonLoader';
 import { getHeroCafe } from '../domain/coffee/heroCoffee';
 import { getLiveRankingBuckets } from '../domain/coffee/liveRankings';
+import useCollapsibleSections from '../hooks/useCollapsibleSections';
 import useDailyChallenge from '../hooks/useDailyChallenge';
 import {
   BioCoffeeSection,
@@ -81,6 +82,20 @@ function buildStepUpPairs(dailyCafes, specialtyCafes) {
     .filter(Boolean);
 }
 
+function HeroArea({ showHeroSkeleton, heroEntry, premiumAccent, setCafeDetalle, setActiveTab }) {
+  if (showHeroSkeleton) return <HeroCafeSkeleton />;
+  if (!heroEntry?.cafe) return null;
+  return (
+    <HeroCafeCard
+      item={heroEntry.cafe}
+      variant={heroEntry.variant}
+      premiumAccent={premiumAccent}
+      onOpenCafe={(item) => setCafeDetalle(item)}
+      onOpenRanking={() => setActiveTab(MAIN_TABS.TOP)}
+    />
+  );
+}
+
 export default function InicioTab({
   s,
   perfil,
@@ -111,6 +126,16 @@ export default function InicioTab({
   onGamifyEvent,
 }) {
   const [showMemberInfo, setShowMemberInfo] = useState(false);
+
+  const { isCollapsed, toggle } = useCollapsibleSections([
+    'liveRanking',
+    'specialty',
+    'daily',
+    'bio',
+    'stepUp',
+    'social',
+    'cafeterias',
+  ]);
 
   const handleMemberRoastLongPress = () => {
     setShowMemberInfo(true);
@@ -203,17 +228,13 @@ export default function InicioTab({
         />
       ) : (
         <View>
-          {showHeroSkeleton ? <HeroCafeSkeleton /> : null}
-
-          {!!heroEntry?.cafe && (
-            <HeroCafeCard
-              item={heroEntry.cafe}
-              variant={heroEntry.variant}
-              premiumAccent={premiumAccent}
-              onOpenCafe={(item) => setCafeDetalle(item)}
-              onOpenRanking={() => setActiveTab(MAIN_TABS.TOP)}
-            />
-          )}
+          <HeroArea
+            showHeroSkeleton={showHeroSkeleton}
+            heroEntry={heroEntry}
+            premiumAccent={premiumAccent}
+            setCafeDetalle={setCafeDetalle}
+            setActiveTab={setActiveTab}
+          />
 
           <DailyChallengeSection
             dailyCoffee={daily.dailyCoffee}
@@ -232,6 +253,8 @@ export default function InicioTab({
             favs={favs}
             toggleFav={toggleFav}
             CardHorizontal={CardHorizontal}
+            collapsed={isCollapsed('liveRanking')}
+            onToggle={() => toggle('liveRanking')}
           />
 
           <SpecialtyForYouSection
@@ -241,6 +264,8 @@ export default function InicioTab({
             favs={favs}
             toggleFav={toggleFav}
             CardHorizontal={CardHorizontal}
+            collapsed={isCollapsed('specialty')}
+            onToggle={() => toggle('specialty')}
           />
 
           <DailyCoffeeSection
@@ -250,6 +275,8 @@ export default function InicioTab({
             favs={favs}
             toggleFav={toggleFav}
             CardHorizontal={CardHorizontal}
+            collapsed={isCollapsed('daily')}
+            onToggle={() => toggle('daily')}
           />
 
           <BioCoffeeSection
@@ -259,6 +286,8 @@ export default function InicioTab({
             favs={favs}
             toggleFav={toggleFav}
             CardHorizontal={CardHorizontal}
+            collapsed={isCollapsed('bio')}
+            onToggle={() => toggle('bio')}
           />
 
           <StepUpSection
@@ -268,6 +297,8 @@ export default function InicioTab({
             favs={favs}
             toggleFav={toggleFav}
             CardHorizontal={CardHorizontal}
+            collapsed={isCollapsed('stepUp')}
+            onToggle={() => toggle('stepUp')}
           />
 
           <SocialFeedSection
@@ -275,6 +306,8 @@ export default function InicioTab({
             allCafes={allCafes}
             setCafeDetalle={setCafeDetalle}
             setActiveTab={setActiveTab}
+            collapsed={isCollapsed('social')}
+            onToggle={() => toggle('social')}
           />
 
           <NearbyCafeteriasSection
@@ -286,6 +319,8 @@ export default function InicioTab({
             cafeteriasInicio={cafeteriasInicio}
             cargarCafeteriasInicio={cargarCafeteriasInicio}
             theme={theme}
+            collapsed={isCollapsed('cafeterias')}
+            onToggle={() => toggle('cafeterias')}
           />
         </View>
       )}

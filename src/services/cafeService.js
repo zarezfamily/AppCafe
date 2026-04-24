@@ -377,6 +377,300 @@ export function buildScaPayload(payload = {}) {
   };
 }
 
+// ── Auto-fill inference helpers (used on approve) ──────────────────
+
+const CAPSULE_BRANDS = ['dolce gusto', 'tassimo', 'nespresso', 'a modo mio'];
+const SPEC_GRANO_BRANDS = [
+  'nomad',
+  'ineffable',
+  'right side',
+  'hola coffee',
+  'syra',
+  'peet',
+  'la colombe',
+  'incapto',
+  'cafe de finca',
+];
+
+function inferTipo(nombre, marca, docId) {
+  const n = (nombre || '').toLowerCase();
+  const m = (marca || '').toLowerCase();
+  const id = (docId || '').toLowerCase();
+  if (CAPSULE_BRANDS.some((b) => n.includes(b) || m.includes(b) || id.includes(b)))
+    return 'cápsula';
+  if (/c[aá]psula|capsul|nespresso|compatible|compostable|monodosis/i.test(n)) return 'cápsula';
+  if (/molido|ground|moka|filtro/i.test(n)) return 'molido';
+  if (/soluble|instant|liofiliz/i.test(n)) return 'soluble';
+  if (/grano|beans|grain|whole|en gra/i.test(n)) return 'grano';
+  if (SPEC_GRANO_BRANDS.some((b) => m.includes(b) || id.includes(b))) return 'grano';
+  if (id.includes('grano') || id.includes('bean')) return 'grano';
+  if (id.includes('molido') || id.includes('ground')) return 'molido';
+  if (id.includes('capsul')) return 'cápsula';
+  if (/1\s*kg|500\s*g/i.test(n)) return 'grano';
+  return 'grano';
+}
+
+function inferPeso(nombre, tipo) {
+  const n = (nombre || '').toLowerCase();
+  const m2 = n.match(/(\d+(?:[.,]\d+)?)\s*(?:kg|kilo)/i);
+  if (m2) return m2[1].replace(',', '.') + 'kg';
+  const m3 = n.match(/(\d+)\s*(?:g|gr|gramos)\b/i);
+  if (m3) return m3[1] + 'g';
+  const m4 = n.match(/(\d+)\s*(?:c[aá]psulas|caps|unidades|uds|pods|sobres)/i);
+  if (m4) return m4[1] + ' uds';
+  if (tipo === 'cápsula') return '10 uds';
+  if (tipo === 'molido') return '250g';
+  return '250g';
+}
+
+function inferVariedad(nombre, marca, origen) {
+  const n = (nombre || '').toLowerCase();
+  const m = (marca || '').toLowerCase();
+  if (/100%\s*ar[aá]bic/i.test(n)) return '100% Arábica';
+  if (/ar[aá]bica\s*(?:y|&|\+|\/)\s*robusta/i.test(n)) return 'Arábica y Robusta';
+  if (/robusta/i.test(n)) return 'Robusta';
+  if (/ar[aá]bic/i.test(n)) return 'Arábica';
+  if (/geisha|gesha/i.test(n)) return 'Geisha';
+  if (/bourbon/i.test(n)) return 'Bourbon';
+  const singleOrigins = [
+    'colombia',
+    'etiopía',
+    'etiopia',
+    'guatemala',
+    'costa rica',
+    'kenia',
+    'kenya',
+    'perú',
+    'peru',
+    'honduras',
+    'nicaragua',
+    'brasil',
+    'ruanda',
+    'rwanda',
+    'tanzania',
+  ];
+  const o = (origen || '').toLowerCase();
+  if (singleOrigins.some((s) => n.includes(s) || o.includes(s))) return 'Arábica';
+  const italianBlend = ['lavazza', 'illy', 'kimbo', 'segafredo', 'pellini'];
+  if (italianBlend.some((b) => m.includes(b))) return 'Arábica y Robusta';
+  const spanishBlend = [
+    'marcilla',
+    'bonka',
+    'hacendado',
+    'la estrella',
+    'fortaleza',
+    'baqué',
+    'candelas',
+  ];
+  if (spanishBlend.some((b) => m.includes(b))) return 'Arábica y Robusta';
+  return 'Arábica';
+}
+
+function inferOrigen(nombre) {
+  const n = (nombre || '').toLowerCase();
+  const origins = {
+    colombia: 'Colombia',
+    colombiano: 'Colombia',
+    brasil: 'Brasil',
+    brazil: 'Brasil',
+    etiopía: 'Etiopía',
+    etiopia: 'Etiopía',
+    ethiopia: 'Etiopía',
+    yirgacheffe: 'Etiopía',
+    guatemala: 'Guatemala',
+    'costa rica': 'Costa Rica',
+    perú: 'Perú',
+    peru: 'Perú',
+    kenia: 'Kenia',
+    kenya: 'Kenia',
+    honduras: 'Honduras',
+    nicaragua: 'Nicaragua',
+    méxico: 'México',
+    mexico: 'México',
+    indonesia: 'Indonesia',
+    sumatra: 'Indonesia',
+    india: 'India',
+    ruanda: 'Ruanda',
+    rwanda: 'Ruanda',
+    tanzania: 'Tanzania',
+    jamaica: 'Jamaica',
+    panamá: 'Panamá',
+    bolivia: 'Bolivia',
+    cuba: 'Cuba',
+  };
+  for (const [key, val] of Object.entries(origins)) {
+    if (n.includes(key)) return val;
+  }
+  return 'Blend';
+}
+
+function inferPais(marca) {
+  const m = (marca || '').toLowerCase();
+  const map = {
+    lavazza: 'Italia',
+    illy: 'Italia',
+    kimbo: 'Italia',
+    segafredo: 'Italia',
+    pellini: 'Italia',
+    vergnano: 'Italia',
+    gimoka: 'Italia',
+    corsini: 'Italia',
+    hacendado: 'España',
+    marcilla: 'España',
+    bonka: 'España',
+    baqué: 'España',
+    novell: 'España',
+    catunambu: 'España',
+    mexicana: 'España',
+    candelas: 'España',
+    dromedario: 'España',
+    fortaleza: 'España',
+    granell: 'España',
+    camuy: 'España',
+    mogorttini: 'España',
+    saula: 'España',
+    oquendo: 'España',
+    nomad: 'España',
+    incapto: 'España',
+    ineffable: 'España',
+    criollo: 'España',
+    'right side': 'España',
+    platino: 'España',
+    estrella: 'España',
+    finca: 'España',
+    barco: 'España',
+    starbucks: 'EEUU',
+    "peet's": 'EEUU',
+    colombe: 'EEUU',
+    delta: 'Portugal',
+    nespresso: 'Suiza',
+    lidl: 'Alemania',
+    aldi: 'Alemania',
+    amazon: 'Internacional',
+    julius: 'Austria',
+    saimaza: 'España',
+    mocay: 'España',
+    supracafé: 'España',
+  };
+  for (const [key, val] of Object.entries(map)) {
+    if (m.includes(key)) return val;
+  }
+  return 'Internacional';
+}
+
+function inferTueste(nombre) {
+  const n = (nombre || '').toLowerCase();
+  if (/torrefacto/i.test(n)) return 'torrefacto';
+  if (/oscuro|dark|intenso|forte|extra/i.test(n)) return 'oscuro';
+  if (/claro|light|blonde|suave|ligero/i.test(n)) return 'claro';
+  return 'medio';
+}
+
+/**
+ * Builds a complete update payload to apply when approving a café.
+ * Auto-fills all missing fields using inference, normalizes photos,
+ * sets normalizedEan, and marks as approved.
+ */
+export function buildApprovalPayload(cafe, cafeId = '') {
+  if (!cafe) return {};
+
+  const nombre = cafe.nombre || cafe.name || '';
+  const marca = cafe.marca || cafe.roaster || '';
+  const updates = {};
+
+  // ── normalizedEan ──
+  const ean = normalizeEan(cafe.ean);
+  if (ean && !cafe.normalizedEan) {
+    updates.normalizedEan = ean;
+  }
+
+  // ── Photos: unify all fields from best available ──
+  const bestUrl = [
+    cafe.photos?.selected,
+    cafe.bestPhoto,
+    cafe.officialPhoto,
+    cafe.imagenUrl,
+    cafe.imageUrl,
+    cafe.foto,
+    cafe.image,
+  ].find(
+    (u) =>
+      typeof u === 'string' &&
+      u.startsWith('http') &&
+      u.length > 10 &&
+      !u.includes('placeholder') &&
+      !u.includes('generic')
+  );
+
+  if (bestUrl) {
+    if (
+      !cafe.imagenUrl ||
+      cafe.imagenUrl.includes('placeholder') ||
+      cafe.imagenUrl.includes('generic')
+    )
+      updates.imagenUrl = bestUrl;
+    if (
+      !cafe.imageUrl ||
+      cafe.imageUrl.includes('placeholder') ||
+      cafe.imageUrl.includes('generic')
+    )
+      updates.imageUrl = bestUrl;
+    if (
+      !cafe.officialPhoto ||
+      cafe.officialPhoto.includes('placeholder') ||
+      cafe.officialPhoto.includes('generic')
+    )
+      updates.officialPhoto = bestUrl;
+    if (!cafe.foto || cafe.foto.includes('placeholder') || cafe.foto.includes('generic'))
+      updates.foto = bestUrl;
+    if (
+      !cafe.bestPhoto ||
+      cafe.bestPhoto.includes('placeholder') ||
+      cafe.bestPhoto.includes('generic')
+    )
+      updates.bestPhoto = bestUrl;
+  }
+
+  // ── Auto-fill empty data fields ──
+  const empty = (v) => !v || (typeof v === 'string' && v.trim() === '');
+
+  if (empty(cafe.tipo)) updates.tipo = inferTipo(nombre, marca, cafeId);
+  if (empty(cafe.formato)) updates.formato = updates.tipo || cafe.tipo || 'grano';
+
+  if (empty(cafe.peso)) updates.peso = inferPeso(nombre, updates.tipo || cafe.tipo);
+
+  const pesoStr = updates.peso || cafe.peso;
+  if (pesoStr && (!cafe.pesoGramos || cafe.pesoGramos === 0)) {
+    const p = String(pesoStr).toLowerCase();
+    const kgM = p.match(/([\d.]+)\s*kg/);
+    const gM = p.match(/(\d+)\s*g/);
+    if (kgM) updates.pesoGramos = Math.round(parseFloat(kgM[1]) * 1000);
+    else if (gM) updates.pesoGramos = parseInt(gM[1], 10);
+  }
+
+  if (empty(cafe.origen)) updates.origen = inferOrigen(nombre);
+  if (empty(cafe.pais)) updates.pais = inferPais(marca);
+  if (empty(cafe.variedad))
+    updates.variedad = inferVariedad(nombre, marca, updates.origen || cafe.origen);
+  if (empty(cafe.tueste)) updates.tueste = inferTueste(nombre);
+
+  // ── Status fields ──
+  const now = new Date().toISOString();
+  updates.status = 'approved';
+  updates.estado = 'approved';
+  updates.reviewStatus = 'approved';
+  updates.completionStatus = 'complete';
+  updates.provisional = false;
+  updates.appVisible = true;
+  updates.scannerVisible = true;
+  updates.approvedAt = now;
+  updates.adminReviewedAt = now;
+  updates.updatedAt = now;
+  if (!cafe.createdAt) updates.createdAt = now;
+
+  return updates;
+}
+
 export async function findCafeByEan(rawEan) {
   const normalizedEan = normalizeEan(rawEan);
   if (!normalizedEan) return null;

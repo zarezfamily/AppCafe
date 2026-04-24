@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { spreadByBrand } from '../utils/coffeeRanking';
+import { getValueScore, spreadByBrand } from '../utils/coffeeRanking';
 import SimpleCoffeeListTab from './SimpleCoffeeListTab';
 
 export default function BestValueTab({
@@ -8,20 +8,22 @@ export default function BestValueTab({
   premiumAccent,
   cargando,
   top100,
+  allCafes,
   CardVertical,
   setCafeDetalle,
   favs,
   toggleFav,
 }) {
   const valueItems = useMemo(() => {
-    const sorted = [...(top100 || [])]
+    const source = allCafes?.length ? allCafes : top100 || [];
+    const sorted = [...source]
       // Solo cafés con precio válido
       .filter((item) => Number(item?.precio || 0) > 0)
-      // Evitar cafés sin suficiente base (muy importante para PRO)
-      .filter((item) => Number(item?.votos || 0) >= 2)
-      // Orden principal por valueScore (backend)
+      // Orden principal por valueScore (backend), fallback a cálculo local
       .sort((a, b) => {
-        const valueDiff = Number(b?.valueScore || 0) - Number(a?.valueScore || 0);
+        const aScore = Number(a?.valueScore || 0) || getValueScore(a);
+        const bScore = Number(b?.valueScore || 0) || getValueScore(b);
+        const valueDiff = bScore - aScore;
 
         if (valueDiff !== 0) return valueDiff;
 
@@ -36,7 +38,7 @@ export default function BestValueTab({
       // Limitar a TOP 50 para performance y calidad visual
       .slice(0, 50);
     return spreadByBrand(sorted);
-  }, [top100]);
+  }, [allCafes, top100]);
 
   return (
     <SimpleCoffeeListTab

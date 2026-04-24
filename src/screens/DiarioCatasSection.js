@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import CollapsibleSectionHeader from '../components/CollapsibleSectionHeader';
 import usePendingActions from '../hooks/usePendingActions';
 
 const { width: W } = Dimensions.get('window');
@@ -28,6 +29,8 @@ export default function DiarioCatasSection({
   irAbrirModal,
   irAbrirDetail,
   cargando,
+  collapsed,
+  onToggle,
 }) {
   const { pendingCount, pendingByType, isSyncing } = usePendingActions();
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -49,81 +52,99 @@ export default function DiarioCatasSection({
             justifyContent: 'space-between',
             alignItems: 'center',
             marginBottom: 12,
+            position: 'relative',
           }}
         >
           <Text style={s.sectionTitle}>📔 Mi Diario de Catas</Text>
-          <TouchableOpacity onPress={() => irAbrirModal()} style={{ padding: 6 }}>
-            <Ionicons name="add-circle" size={28} color={premiumAccent} />
-          </TouchableOpacity>
+          {onToggle && <CollapsibleSectionHeader collapsed={collapsed} onToggle={onToggle} />}
+          {!collapsed && (
+            <TouchableOpacity onPress={() => irAbrirModal()} style={{ padding: 6 }}>
+              <Ionicons name="add-circle" size={28} color={premiumAccent} />
+            </TouchableOpacity>
+          )}
         </View>
-        {pendingCount > 0 && (
-          <View
-            style={{ backgroundColor: '#ffe7c2', borderRadius: 8, padding: 10, marginBottom: 10 }}
-          >
-            <Text style={{ color: '#8f5e3b', fontWeight: '700', fontSize: 13 }}>
-              {isSyncing
-                ? '⟳ Sincronizando…'
-                : `${pendingCount} acción(es) pendiente${pendingCount > 1 ? 's' : ''}`}
-            </Text>
-            {pendingByType.catas > 0 && (
-              <Text style={{ color: '#8f5e3b', fontSize: 11, marginTop: 2 }}>
-                ☕ {pendingByType.catas} cata{pendingByType.catas > 1 ? 's' : ''}
-              </Text>
+        {collapsed ? null : (
+          <>
+            {pendingCount > 0 && (
+              <View
+                style={{
+                  backgroundColor: '#ffe7c2',
+                  borderRadius: 8,
+                  padding: 10,
+                  marginBottom: 10,
+                }}
+              >
+                <Text style={{ color: '#8f5e3b', fontWeight: '700', fontSize: 13 }}>
+                  {isSyncing
+                    ? '⟳ Sincronizando…'
+                    : `${pendingCount} acción(es) pendiente${pendingCount > 1 ? 's' : ''}`}
+                </Text>
+                {pendingByType.catas > 0 && (
+                  <Text style={{ color: '#8f5e3b', fontSize: 11, marginTop: 2 }}>
+                    ☕ {pendingByType.catas} cata{pendingByType.catas > 1 ? 's' : ''}
+                  </Text>
+                )}
+                {pendingByType.favorites > 0 && (
+                  <Text style={{ color: '#8f5e3b', fontSize: 11, marginTop: 2 }}>
+                    ❤️ {pendingByType.favorites} favorito{pendingByType.favorites > 1 ? 's' : ''}
+                  </Text>
+                )}
+                {pendingByType.scans > 0 && (
+                  <Text style={{ color: '#8f5e3b', fontSize: 11, marginTop: 2 }}>
+                    📷 {pendingByType.scans} escaneo{pendingByType.scans > 1 ? 's' : ''}
+                  </Text>
+                )}
+              </View>
             )}
-            {pendingByType.favorites > 0 && (
-              <Text style={{ color: '#8f5e3b', fontSize: 11, marginTop: 2 }}>
-                ❤️ {pendingByType.favorites} favorito{pendingByType.favorites > 1 ? 's' : ''}
+            <View
+              style={{
+                backgroundColor: '#f9f7f4',
+                borderRadius: 12,
+                padding: 20,
+                alignItems: 'center',
+              }}
+            >
+              <Ionicons
+                name="book-outline"
+                size={40}
+                color={theme.text.muted}
+                style={{ marginBottom: 10 }}
+              />
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontWeight: '600',
+                  color: theme.text.muted,
+                  textAlign: 'center',
+                }}
+              >
+                Comienza a registrar tus catas
               </Text>
-            )}
-            {pendingByType.scans > 0 && (
-              <Text style={{ color: '#8f5e3b', fontSize: 11, marginTop: 2 }}>
-                📷 {pendingByType.scans} escaneo{pendingByType.scans > 1 ? 's' : ''}
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: theme.text.secondary,
+                  marginTop: 6,
+                  textAlign: 'center',
+                }}
+              >
+                Fecha, método, parámetros y tus notas personales
               </Text>
-            )}
-          </View>
+              <TouchableOpacity
+                onPress={() => irAbrirModal()}
+                style={{
+                  marginTop: 14,
+                  paddingHorizontal: 16,
+                  paddingVertical: 8,
+                  backgroundColor: premiumAccent,
+                  borderRadius: 8,
+                }}
+              >
+                <Text style={{ color: '#fff', fontWeight: '700', fontSize: 12 }}>+ Nueva cata</Text>
+              </TouchableOpacity>
+            </View>
+          </>
         )}
-        <View
-          style={{
-            backgroundColor: '#f9f7f4',
-            borderRadius: 12,
-            padding: 20,
-            alignItems: 'center',
-          }}
-        >
-          <Ionicons
-            name="book-outline"
-            size={40}
-            color={theme.text.muted}
-            style={{ marginBottom: 10 }}
-          />
-          <Text
-            style={{
-              fontSize: 14,
-              fontWeight: '600',
-              color: theme.text.muted,
-              textAlign: 'center',
-            }}
-          >
-            Comienza a registrar tus catas
-          </Text>
-          <Text
-            style={{ fontSize: 12, color: theme.text.secondary, marginTop: 6, textAlign: 'center' }}
-          >
-            Fecha, método, parámetros y tus notas personales
-          </Text>
-          <TouchableOpacity
-            onPress={() => irAbrirModal()}
-            style={{
-              marginTop: 14,
-              paddingHorizontal: 16,
-              paddingVertical: 8,
-              backgroundColor: premiumAccent,
-              borderRadius: 8,
-            }}
-          >
-            <Text style={{ color: '#fff', fontWeight: '700', fontSize: 12 }}>+ Nueva cata</Text>
-          </TouchableOpacity>
-        </View>
       </View>
     );
   }
@@ -138,14 +159,18 @@ export default function DiarioCatasSection({
             justifyContent: 'space-between',
             alignItems: 'center',
             marginBottom: 10,
+            position: 'relative',
           }}
         >
           <Text style={s.sectionTitle}>📔 Mi Diario de Catas</Text>
-          <TouchableOpacity onPress={() => irAbrirModal()} style={{ padding: 6 }}>
-            <Ionicons name="add-circle" size={28} color={premiumAccent} />
-          </TouchableOpacity>
+          {onToggle && <CollapsibleSectionHeader collapsed={collapsed} onToggle={onToggle} />}
+          {!collapsed && (
+            <TouchableOpacity onPress={() => irAbrirModal()} style={{ padding: 6 }}>
+              <Ionicons name="add-circle" size={28} color={premiumAccent} />
+            </TouchableOpacity>
+          )}
         </View>
-        {pendingCount > 0 && (
+        {!collapsed && pendingCount > 0 && (
           <View
             style={{ backgroundColor: '#ffe7c2', borderRadius: 8, padding: 10, marginBottom: 10 }}
           >
@@ -171,99 +196,121 @@ export default function DiarioCatasSection({
             )}
           </View>
         )}
-        {/* Stats Row */}
-        <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
-          <View style={{ flex: 1, backgroundColor: '#fff9f4', borderRadius: 8, padding: 10 }}>
-            <Text style={{ fontSize: 16, fontWeight: '800', color: premiumAccent }}>
-              {stats.totalCatas}
-            </Text>
-            <Text
-              style={{ fontSize: 10, fontWeight: '600', color: theme.text.secondary, marginTop: 2 }}
-            >
-              CATAS
-            </Text>
-          </View>
-          <View style={{ flex: 1, backgroundColor: '#fff9f4', borderRadius: 8, padding: 10 }}>
-            <Text style={{ fontSize: 16, fontWeight: '800', color: premiumAccent }}>
-              ⭐ {stats.promedioPuntuacion}
-            </Text>
-            <Text
-              style={{ fontSize: 10, fontWeight: '600', color: theme.text.secondary, marginTop: 2 }}
-            >
-              PROMEDIO
-            </Text>
-          </View>
-          <View style={{ flex: 1, backgroundColor: '#fff9f4', borderRadius: 8, padding: 10 }}>
-            <Text style={{ fontSize: 16, fontWeight: '800', color: premiumAccent }}>
-              {stats.cafesProbados}
-            </Text>
-            <Text
-              style={{ fontSize: 10, fontWeight: '600', color: theme.text.secondary, marginTop: 2 }}
-            >
-              CAFÉS
-            </Text>
-          </View>
-        </View>
-        {/* Filtros */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: 8 }}
-        >
-          {['hoy', 'semana', 'mes', 'todo'].map((periodo) => (
-            <TouchableOpacity
-              key={periodo}
-              onPress={() => setFiltroPeriodo(periodo)}
-              style={{
-                paddingHorizontal: 12,
-                paddingVertical: 6,
-                borderRadius: 16,
-                backgroundColor: filtroPeriodo === periodo ? premiumAccent : '#e8dfd5',
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 12,
-                  fontWeight: '600',
-                  textTransform: 'capitalize',
-                  color: filtroPeriodo === periodo ? '#fff' : theme.text.primary,
-                }}
-              >
-                {periodo === 'hoy'
-                  ? 'Hoy'
-                  : periodo === 'todo'
-                    ? 'Todo'
-                    : periodo === 'semana'
-                      ? 'Semana'
-                      : 'Mes'}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
       </View>
-      {/* Timeline Grid (2 columns estilo IG con foto + info superpuesta) */}
-      {cargando ? (
-        <View style={{ paddingHorizontal: 16, paddingBottom: 20 }}>
-          <ActivityIndicator color={premiumAccent} size="large" />
-        </View>
-      ) : catasFiltradas.length === 0 ? (
-        <View style={{ paddingHorizontal: 16, paddingBottom: 20, alignItems: 'center' }}>
-          <Text style={{ color: theme.text.secondary, fontSize: 12 }}>
-            No hay catas en este período
-          </Text>
-        </View>
-      ) : (
-        <FlatList
-          scrollEnabled={false}
-          data={catasFiltradas}
-          numColumns={2}
-          columnWrapperStyle={{ gap: 12, paddingHorizontal: 16, marginBottom: 12 }}
-          renderItem={({ item }) => (
-            <CataCard cata={item} onPress={() => irAbrirDetail(item)} theme={theme} />
+
+      {collapsed ? null : (
+        <>
+          <View style={{ paddingHorizontal: 16, marginBottom: 12 }}>
+            {/* Stats Row */}
+            <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
+              <View style={{ flex: 1, backgroundColor: '#fff9f4', borderRadius: 8, padding: 10 }}>
+                <Text style={{ fontSize: 16, fontWeight: '800', color: premiumAccent }}>
+                  {stats.totalCatas}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 10,
+                    fontWeight: '600',
+                    color: theme.text.secondary,
+                    marginTop: 2,
+                  }}
+                >
+                  CATAS
+                </Text>
+              </View>
+              <View style={{ flex: 1, backgroundColor: '#fff9f4', borderRadius: 8, padding: 10 }}>
+                <Text style={{ fontSize: 16, fontWeight: '800', color: premiumAccent }}>
+                  ⭐ {stats.promedioPuntuacion}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 10,
+                    fontWeight: '600',
+                    color: theme.text.secondary,
+                    marginTop: 2,
+                  }}
+                >
+                  PROMEDIO
+                </Text>
+              </View>
+              <View style={{ flex: 1, backgroundColor: '#fff9f4', borderRadius: 8, padding: 10 }}>
+                <Text style={{ fontSize: 16, fontWeight: '800', color: premiumAccent }}>
+                  {stats.cafesProbados}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 10,
+                    fontWeight: '600',
+                    color: theme.text.secondary,
+                    marginTop: 2,
+                  }}
+                >
+                  CAFÉS
+                </Text>
+              </View>
+            </View>
+            {/* Filtros */}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ gap: 8 }}
+            >
+              {['hoy', 'semana', 'mes', 'todo'].map((periodo) => (
+                <TouchableOpacity
+                  key={periodo}
+                  onPress={() => setFiltroPeriodo(periodo)}
+                  style={{
+                    paddingHorizontal: 12,
+                    paddingVertical: 6,
+                    borderRadius: 16,
+                    backgroundColor: filtroPeriodo === periodo ? premiumAccent : '#e8dfd5',
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      fontWeight: '600',
+                      textTransform: 'capitalize',
+                      color: filtroPeriodo === periodo ? '#fff' : theme.text.primary,
+                    }}
+                  >
+                    {periodo === 'hoy'
+                      ? 'Hoy'
+                      : periodo === 'todo'
+                        ? 'Todo'
+                        : periodo === 'semana'
+                          ? 'Semana'
+                          : 'Mes'}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+          {/* Timeline Grid (2 columns estilo IG con foto + info superpuesta) */}
+          {cargando ? (
+            <View style={{ paddingHorizontal: 16, paddingBottom: 20 }}>
+              <ActivityIndicator color={premiumAccent} size="large" />
+            </View>
+          ) : catasFiltradas.length === 0 ? (
+            <View style={{ paddingHorizontal: 16, paddingBottom: 20, alignItems: 'center' }}>
+              <Text style={{ color: theme.text.secondary, fontSize: 12 }}>
+                No hay catas en este período
+              </Text>
+            </View>
+          ) : (
+            <FlatList
+              scrollEnabled={false}
+              data={catasFiltradas}
+              numColumns={2}
+              columnWrapperStyle={{ gap: 12, paddingHorizontal: 16, marginBottom: 12 }}
+              renderItem={({ item }) => (
+                <CataCard cata={item} onPress={() => irAbrirDetail(item)} theme={theme} />
+              )}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={{ paddingBottom: 12 }}
+            />
           )}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={{ paddingBottom: 12 }}
-        />
+        </>
       )}
     </Animated.View>
   );

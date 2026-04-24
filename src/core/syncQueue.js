@@ -13,7 +13,7 @@
  *
  * Each entry: { id, type, payload, ts }
  */
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 
 const QUEUE_DIR = `${FileSystem.documentDirectory || ''}etiove-sync`;
 const QUEUE_FILE = `${QUEUE_DIR}/sync-queue.json`;

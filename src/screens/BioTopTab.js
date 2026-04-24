@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { spreadByBrand } from '../utils/coffeeRanking';
+import { getBioScore, isBioCoffee, spreadByBrand } from '../utils/coffeeRanking';
 import SimpleCoffeeListTab from './SimpleCoffeeListTab';
 
 export default function BioTopTab({
@@ -8,17 +8,23 @@ export default function BioTopTab({
   premiumAccent,
   cargando,
   top100,
+  allCafes,
   CardVertical,
   setCafeDetalle,
   favs,
   toggleFav,
 }) {
   const bioItems = useMemo(() => {
-    const sorted = [...(top100 || [])]
-      .filter((item) => item?.isBio === true)
-      .sort((a, b) => Number(b?.bioScore || 0) - Number(a?.bioScore || 0));
+    const source = allCafes?.length ? allCafes : top100 || [];
+    const sorted = [...source]
+      .filter((item) => isBioCoffee(item))
+      .sort((a, b) => {
+        const diff = Number(b?.bioScore || 0) - Number(a?.bioScore || 0);
+        return diff !== 0 ? diff : getBioScore(b) - getBioScore(a);
+      })
+      .slice(0, 50);
     return spreadByBrand(sorted);
-  }, [top100]);
+  }, [allCafes, top100]);
 
   return (
     <SimpleCoffeeListTab

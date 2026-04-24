@@ -10,9 +10,11 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import CollapsibleSectionHeader from '../components/CollapsibleSectionHeader';
 import { PREMIUM_ACCENT } from '../constants/theme';
 import { normalize } from '../core/utils';
 import { getPersonalizedCoffeeFeed } from '../domain/coffee/personalizedCoffee';
+import useCollapsibleSections from '../hooks/useCollapsibleSections';
 import QuizSection from './QuizSection';
 
 const { width: SCREEN_W } = Dimensions.get('window');
@@ -27,7 +29,7 @@ const CARD_BORDER = '#eadbce';
 const ACCENT = '#8f5e3b';
 const ACCENT_LIGHT = '#f4e8db';
 const TEXT_DARK = '#24160f';
-const TEXT_MID = '#6f5a4b';
+const _TEXT_MID = '#6f5a4b';
 const TEXT_MUTED = '#9e7c62';
 
 // Paleta oscura para el widget destacado
@@ -298,7 +300,7 @@ export default function MisCafesTab({
   misCafes,
   SearchInput,
   cafesFiltrados,
-  eliminarCafe,
+  eliminarCafe: _eliminarCafe,
   premiumAccent,
   notebook,
   theme,
@@ -339,27 +341,11 @@ export default function MisCafesTab({
 
   const totalCatas = notebook?.stats?.totalCatas || 0;
 
-  return (
-    <View style={styles.screen}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.pageTitle}>Mi espacio</Text>
-        <StatStrip misCafes={misCafes.length} favCafes={favCafes.length} totalCatas={totalCatas} />
-      </View>
+  const { isCollapsed, toggle } = useCollapsibleSections(['favoritos', 'diario', 'coleccion']);
 
-      {/* Search */}
-      <View style={styles.searchWrap}>
-        <SearchInput
-          value={busquedaMis}
-          onChangeText={setBusquedaMis}
-          onSearch={setBusquedaMis}
-          allCafes={suggestionSource}
-          placeholder="Buscar cafés, marcas, países..."
-        />
-      </View>
-
-      {/* Resultados búsqueda */}
-      {hasQuery && (
+  const renderContent = () => {
+    if (hasQuery) {
+      return (
         <Section>
           <SecHead
             title={`${searchResults.length} resultado${searchResults.length !== 1 ? 's' : ''}`}
@@ -381,103 +367,141 @@ export default function MisCafesTab({
             <Text style={styles.empty}>Sin resultados para "{query}"</Text>
           )}
         </Section>
-      )}
+      );
+    }
 
-      {/* Quiz */}
-      {!hasQuery && !cargando && (
-        <View style={[styles.sectionCard, { padding: 0, overflow: 'hidden' }]}>
-          <QuizSection {...quizSectionProps} />
-        </View>
-      )}
+    return (
+      <View>
+        {!cargando ? (
+          <View style={[styles.sectionCard, { padding: 0, overflow: 'hidden' }]}>
+            <QuizSection {...quizSectionProps} />
+          </View>
+        ) : null}
 
-      {/* Favoritos */}
-      {!hasQuery && favCafes.length > 0 && (
-        <Section>
-          <SecHead title="⭐  Tus favoritos" sub={`${favCafes.length} cafés guardados`} />
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.hScroll}
-          >
-            {favCafes.map((item, idx) => (
-              <CardHorizontal
-                key={item.id}
-                item={item}
-                badge={`${Number(item.puntuacion || 0).toFixed(1)}`}
-                onPress={() => setCafeDetalle({ cafes: favCafes, cafeIndex: idx })}
-                favs={favs}
-                onToggleFav={toggleFav}
+        {favCafes.length > 0 ? (
+          <Section>
+            <View style={{ position: 'relative' }}>
+              <SecHead title="⭐  Tus favoritos" sub={`${favCafes.length} cafés guardados`} />
+              <CollapsibleSectionHeader
+                collapsed={isCollapsed('favoritos')}
+                onToggle={() => toggle('favoritos')}
               />
-            ))}
-          </ScrollView>
-        </Section>
-      )}
+            </View>
+            {isCollapsed('favoritos') ? null : (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.hScroll}
+              >
+                {favCafes.map((item, idx) => (
+                  <CardHorizontal
+                    key={item.id}
+                    item={item}
+                    badge={`${Number(item.puntuacion || 0).toFixed(1)}`}
+                    onPress={() => setCafeDetalle({ cafes: favCafes, cafeIndex: idx })}
+                    favs={favs}
+                    onToggleFav={toggleFav}
+                  />
+                ))}
+              </ScrollView>
+            )}
+          </Section>
+        ) : null}
 
-      {/* Widget oscuro: Perfil de sabor */}
-      {!hasQuery && !cargando && favCafes.length > 0 && (
-        <View style={styles.tasteOuter}>
-          <TasteProfile
-            favCafes={favCafes}
-            recs={personalizedFeed?.items || []}
-            setCafeDetalle={setCafeDetalle}
-          />
-        </View>
-      )}
+        {!cargando && favCafes.length > 0 ? (
+          <View style={styles.tasteOuter}>
+            <TasteProfile
+              favCafes={favCafes}
+              recs={personalizedFeed?.items || []}
+              setCafeDetalle={setCafeDetalle}
+            />
+          </View>
+        ) : null}
 
-      {/* Diario de catas */}
-      {!hasQuery && notebook && (
-        <View style={[styles.sectionCard, { padding: 0, overflow: 'hidden' }]}>
-          <DiarioCatasSection
-            s={ext}
-            theme={theme}
-            premiumAccent={premiumAccent || PREMIUM_ACCENT}
-            catas={notebook.catas || []}
-            catasFiltradas={notebook.catasFiltradas || []}
-            stats={notebook.stats || { totalCatas: 0, promedioPuntuacion: 0, cafesProbados: 0 }}
-            filtroPeriodo={notebook.filtroPeriodo}
-            setFiltroPeriodo={notebook.setFiltroPeriodo}
-            irAbrirModal={notebook.irAbrirModal}
-            irAbrirDetail={notebook.irAbrirDetail}
-          />
-        </View>
-      )}
+        {notebook ? (
+          <View style={[styles.sectionCard, { padding: 0, overflow: 'hidden' }]}>
+            <DiarioCatasSection
+              s={ext}
+              theme={theme}
+              premiumAccent={premiumAccent || PREMIUM_ACCENT}
+              catas={notebook.catas || []}
+              catasFiltradas={notebook.catasFiltradas || []}
+              stats={notebook.stats || { totalCatas: 0, promedioPuntuacion: 0, cafesProbados: 0 }}
+              filtroPeriodo={notebook.filtroPeriodo}
+              setFiltroPeriodo={notebook.setFiltroPeriodo}
+              irAbrirModal={notebook.irAbrirModal}
+              irAbrirDetail={notebook.irAbrirDetail}
+              collapsed={isCollapsed('diario')}
+              onToggle={() => toggle('diario')}
+            />
+          </View>
+        ) : null}
 
-      {/* Mi colección */}
-      {!hasQuery && (
         <Section>
-          <SecHead
-            title="Mi colección"
-            sub={
-              misCafes.length > 0
-                ? `${misCafes.length} café${misCafes.length !== 1 ? 's' : ''} añadido${misCafes.length !== 1 ? 's' : ''}`
-                : null
-            }
-          />
-          {cargando ? (
-            <ActivityIndicator color={ACCENT} style={{ marginVertical: 32 }} />
-          ) : cafesFiltrados.length > 0 ? (
-            <View style={styles.grid}>
-              {cafesFiltrados.map((item, idx) => (
-                <GridCard
-                  key={item.id}
-                  item={item}
-                  onPress={() => setCafeDetalle({ cafes: cafesFiltrados, cafeIndex: idx })}
-                  favs={favs}
-                  onToggleFav={toggleFav}
-                />
-              ))}
-            </View>
-          ) : (
-            <View style={styles.emptyWrap}>
-              <Text style={styles.emptyIcon}>☕</Text>
-              <Text style={styles.emptyTitle}>Tu colección está vacía</Text>
-              <Text style={styles.emptyText}>
-                Escanea o añade cafés para empezar tu archivo personal
-              </Text>
-            </View>
+          <View style={{ position: 'relative' }}>
+            <SecHead
+              title="Mi colección"
+              sub={
+                misCafes.length > 0
+                  ? `${misCafes.length} café${misCafes.length !== 1 ? 's' : ''} añadido${misCafes.length !== 1 ? 's' : ''}`
+                  : null
+              }
+            />
+            <CollapsibleSectionHeader
+              collapsed={isCollapsed('coleccion')}
+              onToggle={() => toggle('coleccion')}
+            />
+          </View>
+          {isCollapsed('coleccion') ? null : (
+            <>
+              {cargando ? (
+                <ActivityIndicator color={ACCENT} style={{ marginVertical: 32 }} />
+              ) : cafesFiltrados.length > 0 ? (
+                <View style={styles.grid}>
+                  {cafesFiltrados.map((item, idx) => (
+                    <GridCard
+                      key={item.id}
+                      item={item}
+                      onPress={() => setCafeDetalle({ cafes: cafesFiltrados, cafeIndex: idx })}
+                      favs={favs}
+                      onToggleFav={toggleFav}
+                    />
+                  ))}
+                </View>
+              ) : (
+                <View style={styles.emptyWrap}>
+                  <Text style={styles.emptyIcon}>☕</Text>
+                  <Text style={styles.emptyTitle}>Tu colección está vacía</Text>
+                  <Text style={styles.emptyText}>
+                    Escanea o añade cafés para empezar tu archivo personal
+                  </Text>
+                </View>
+              )}
+            </>
           )}
         </Section>
-      )}
+      </View>
+    );
+  };
+
+  return (
+    <View style={styles.screen}>
+      <View style={styles.header}>
+        <Text style={styles.pageTitle}>Mi espacio</Text>
+        <StatStrip misCafes={misCafes.length} favCafes={favCafes.length} totalCatas={totalCatas} />
+      </View>
+
+      <View style={styles.searchWrap}>
+        <SearchInput
+          value={busquedaMis}
+          onChangeText={setBusquedaMis}
+          onSearch={setBusquedaMis}
+          allCafes={suggestionSource}
+          placeholder="Buscar cafés, marcas, países..."
+        />
+      </View>
+
+      {renderContent()}
 
       <View style={{ height: 48 }} />
     </View>

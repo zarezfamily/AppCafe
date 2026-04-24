@@ -41,7 +41,7 @@ export default function HeroCafeCard({
   variant,
   premiumAccent = PREMIUM_ACCENT,
   onOpenCafe,
-  onOpenRanking,
+  onOpenRanking: _onOpenRanking,
 }) {
   if (!item) return null;
 
@@ -141,18 +141,10 @@ export default function HeroCafeCard({
           <View style={styles.actionsRow}>
             <TouchableOpacity
               activeOpacity={0.9}
-              style={[styles.primaryBtn, { backgroundColor: premiumAccent }]}
+              style={[styles.primaryBtn, { backgroundColor: premiumAccent, flex: 1 }]}
               onPress={() => onOpenCafe?.(item)}
             >
               <Text style={styles.primaryBtnText}>Ver ficha</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              activeOpacity={0.9}
-              style={styles.secondaryBtn}
-              onPress={onOpenRanking}
-            >
-              <Text style={styles.secondaryBtnText}>{variant?.ctaSecondary || 'Ver ranking'}</Text>
             </TouchableOpacity>
           </View>
         </View>

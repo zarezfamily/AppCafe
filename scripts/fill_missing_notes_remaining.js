@@ -4,12 +4,18 @@ const admin = require('firebase-admin');
 const serviceAccount = require('../serviceAccountKey.json');
 const OpenAI = require('openai');
 
+// Read API keys from credentials.json (gitignored), fallback to env
+let credentials = {};
+try {
+  credentials = require('../credentials.json');
+} catch (_e) {}
+
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
 const db = admin.firestore();
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({ apiKey: credentials.OPENAI_API_KEY || process.env.OPENAI_API_KEY });
 
 async function generateNotes(cafe) {
   const prompt = `Genera una breve nota de cata para un café con estas características:\nNombre: ${cafe.nombre}\nOrigen: ${cafe.pais || ''}\nTostador: ${cafe.roaster || ''}\nFormato: ${cafe.formato || ''}\nDescripción: ${cafe.descripcion || ''}\nNotas:`;

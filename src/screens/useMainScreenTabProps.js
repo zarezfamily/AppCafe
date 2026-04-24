@@ -1,11 +1,11 @@
 import {
   buildBottomBarProps,
   buildCommunityTabProps,
+  buildDiscoverTabProps,
   buildInicioTabProps,
   buildMasTabProps,
   buildMisCafesTabProps,
   buildOfertasTabProps,
-  buildDiscoverTabProps,
   buildTopCafesTabProps,
   buildTrendingTabProps,
   buildUltimosAnadidosTabProps,
@@ -28,6 +28,7 @@ function buildDiscoveryTabProps({
   profileName,
   currentLevel,
   gamification,
+  onGamifyEvent,
   nextLevel,
   brandCardAnim,
   brandCardTranslateY,
@@ -224,6 +225,7 @@ function buildDiscoveryTabProps({
     buscandoOfertaId,
     openOfferCafeId,
     errorOfertas,
+    onGamifyEvent,
   });
 
   return {
@@ -619,6 +621,7 @@ export default function useMainScreenTabProps({
     profileName,
     currentLevel,
     gamification,
+    onGamifyEvent,
     nextLevel,
     brandCardAnim,
     brandCardTranslateY,

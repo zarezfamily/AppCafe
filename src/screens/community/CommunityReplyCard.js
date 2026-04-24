@@ -1,5 +1,5 @@
-import { Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Text, TouchableOpacity, View } from 'react-native';
 
 function CommunityReplyChild({
   child,
@@ -7,14 +7,17 @@ function CommunityReplyChild({
   theme,
   PremiumBadge,
   formatRelativeTime,
+  hasUserVotedForoItem,
   hasUserReportedForoItem,
   isForumOwner,
   isAdmin,
   isStaff,
   abrirMenuAutorForo,
+  votarEnForo,
   reportarForo,
 }) {
   const childUserReported = hasUserReportedForoItem(child);
+  const childUserVoted = hasUserVotedForoItem ? hasUserVotedForoItem(child) : false;
   const canModerate = isForumOwner(child) || isAdmin || isStaff;
 
   return (
@@ -39,6 +42,14 @@ function CommunityReplyChild({
       <Text style={s.forumThreadBody}>{child.body}</Text>
       <View style={{ flexDirection: 'row', gap: 10, marginTop: 6 }}>
         <TouchableOpacity
+          onPress={() => votarEnForo && votarEnForo('foro_respuestas', child)}
+          disabled={childUserVoted || childUserReported}
+        >
+          <Text style={[s.forumActionText, childUserVoted && s.forumActionTextDisabled]}>
+            👍 Útil {child.upvotes || 0}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
           onPress={() => reportarForo('foro_respuestas', child)}
           disabled={childUserReported}
         >
@@ -58,15 +69,18 @@ export default function CommunityReplyCard({
   theme,
   PremiumBadge,
   formatRelativeTime,
+  hasUserVotedForoItem,
   hasUserReportedForoItem,
   isForumOwner,
   isAdmin,
   isStaff,
   abrirMenuAutorForo,
+  votarEnForo,
   reportarForo,
   handleReplyPress,
 }) {
   const replyUserReported = hasUserReportedForoItem(reply);
+  const replyUserVoted = hasUserVotedForoItem ? hasUserVotedForoItem(reply) : false;
   const canModerate = isForumOwner(reply) || isAdmin || isStaff;
 
   return (
@@ -102,6 +116,14 @@ export default function CommunityReplyCard({
       <Text style={s.forumThreadBody}>{reply.body}</Text>
 
       <View style={{ flexDirection: 'row', gap: 10, marginTop: 8 }}>
+        <TouchableOpacity
+          onPress={() => votarEnForo && votarEnForo('foro_respuestas', reply)}
+          disabled={replyUserVoted || replyUserReported}
+        >
+          <Text style={[s.forumActionText, replyUserVoted && s.forumActionTextDisabled]}>
+            👍 Útil {reply.upvotes || 0}
+          </Text>
+        </TouchableOpacity>
         <TouchableOpacity onPress={() => handleReplyPress(reply)}>
           <Text style={s.forumActionText}>↩ Responder</Text>
         </TouchableOpacity>
@@ -128,6 +150,8 @@ export default function CommunityReplyCard({
           isAdmin={isAdmin}
           isStaff={isStaff}
           abrirMenuAutorForo={abrirMenuAutorForo}
+          votarEnForo={votarEnForo}
+          hasUserVotedForoItem={hasUserVotedForoItem}
           reportarForo={reportarForo}
         />
       ))}

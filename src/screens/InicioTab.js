@@ -1,10 +1,12 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { View } from 'react-native';
+import DailyChallengeSection from '../components/DailyChallengeSection';
 import HeroCafeCard from '../components/HeroCafeCard';
 import MemberInfoModal from '../components/MemberInfoModal';
 import { HeroCafeSkeleton } from '../components/SkeletonLoader';
 import { getHeroCafe } from '../domain/coffee/heroCoffee';
 import { getLiveRankingBuckets } from '../domain/coffee/liveRankings';
+import useDailyChallenge from '../hooks/useDailyChallenge';
 import {
   BioCoffeeSection,
   DailyCoffeeSection,
@@ -106,12 +108,24 @@ export default function InicioTab({
   cafeteriasInicio,
   cargarCafeteriasInicio,
   theme,
+  onGamifyEvent,
 }) {
   const [showMemberInfo, setShowMemberInfo] = useState(false);
 
   const handleMemberRoastLongPress = () => {
     setShowMemberInfo(true);
   };
+
+  const daily = useDailyChallenge({ allCafes });
+
+  const handleDailyComplete = useCallback(() => {
+    const newBadge = daily.completeDailyChallenge();
+    onGamifyEvent?.('daily_challenge', {
+      bestStreak: daily.bestStreak,
+      coffeeId: daily.dailyCoffee?.id,
+    });
+    return newBadge;
+  }, [daily, onGamifyEvent]);
 
   const specialtyCafes = useMemo(() => {
     return (allCafes || []).filter(
@@ -188,7 +202,7 @@ export default function InicioTab({
           toggleFav={toggleFav}
         />
       ) : (
-        <>
+        <View>
           {showHeroSkeleton ? <HeroCafeSkeleton /> : null}
 
           {!!heroEntry?.cafe && (
@@ -200,6 +214,16 @@ export default function InicioTab({
               onOpenRanking={() => setActiveTab(MAIN_TABS.TOP)}
             />
           )}
+
+          <DailyChallengeSection
+            dailyCoffee={daily.dailyCoffee}
+            completedToday={daily.completedToday}
+            streak={daily.streak}
+            bestStreak={daily.bestStreak}
+            nextBadge={daily.nextBadge}
+            onComplete={handleDailyComplete}
+            onOpenCafe={(item) => setCafeDetalle(item)}
+          />
 
           <LiveRankingSection
             s={s}
@@ -263,7 +287,7 @@ export default function InicioTab({
             cargarCafeteriasInicio={cargarCafeteriasInicio}
             theme={theme}
           />
-        </>
+        </View>
       )}
     </View>
   );

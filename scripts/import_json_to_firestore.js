@@ -270,10 +270,12 @@ async function run() {
         console.log(`Actualizado: ${cafe.nombre} -> ${docId}`);
         updated += 1;
       } else {
+        const importUid = process.env.FIREBASE_AUTH_UID || '';
         await firestorePatchDocument(
           docId,
           {
             ...data,
+            ...(importUid ? { uid: importUid } : {}),
             createdAt: new Date().toISOString(),
           },
           true

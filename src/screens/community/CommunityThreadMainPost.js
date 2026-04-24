@@ -1,5 +1,5 @@
-import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 
 function AccessBadge({ accessLevel }) {
   const isRegisteredOnly = accessLevel === 'registered_only';
@@ -100,7 +100,7 @@ export default function CommunityThreadMainPost({
               (threadUserVoted || threadUserReported) && s.forumActionTextDisabled,
             ]}
           >
-            ❤️ INTERESANTE
+            ❤️ INTERESANTE · 👍 Útil
           </Text>
         </TouchableOpacity>
 

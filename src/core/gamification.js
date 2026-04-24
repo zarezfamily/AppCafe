@@ -4,6 +4,7 @@ export const XP_RULES = {
   review: 14,
   addCafe: 18,
   favorite: 3,
+  dailyChallenge: 10,
 };
 
 export const LEVELS = [
@@ -21,6 +22,8 @@ export const defaultGamification = () => ({
   reviewsCount: 0,
   cafesAddedCount: 0,
   favoritesMarkedCount: 0,
+  dailyChallengeCount: 0,
+  bestStreak: 0,
   countriesRated: [],
   specialOriginsTasted: [],
   achievementIds: [],
@@ -40,7 +43,8 @@ export const computeXp = (state) =>
   state.photosCount * XP_RULES.photo +
   state.reviewsCount * XP_RULES.review +
   state.cafesAddedCount * XP_RULES.addCafe +
-  state.favoritesMarkedCount * XP_RULES.favorite;
+  state.favoritesMarkedCount * XP_RULES.favorite +
+  (state.dailyChallengeCount || 0) * XP_RULES.dailyChallenge;
 
 export const computeAchievements = (state) => {
   const lvl = getLevelFromXp(state.xp);
@@ -53,6 +57,11 @@ export const computeAchievements = (state) => {
   if (state.favoritesMarkedCount >= 25) out.push('coleccionista');
   if (state.reviewsCount >= 12) out.push('critico');
   if (state.specialOriginsTasted.length >= 1) out.push('origen_unico');
+  // Streak achievements
+  const best = state.bestStreak || 0;
+  if (best >= 3) out.push('racha_3');
+  if (best >= 7) out.push('racha_7');
+  if (best >= 30) out.push('racha_30');
   return out;
 };
 
@@ -88,4 +97,7 @@ export const getAchievementDefs = () => [
     title: 'Lote de autor',
     desc: 'Prueba Geisha, Bourbon Pointu o Yemen',
   },
+  { id: 'racha_3', icon: '🔥', title: 'Racha de fuego', desc: '3 dias seguidos catando' },
+  { id: 'racha_7', icon: '📅', title: 'Catador semanal', desc: '7 dias de racha ininterrumpida' },
+  { id: 'racha_30', icon: '💎', title: 'Catador PRO', desc: '30 dias seguidos catando' },
 ];

@@ -100,6 +100,8 @@ export default function CommunityThreadDetailView({
               isStaff={isStaff}
               abrirMenuAutorForo={abrirMenuAutorForo}
               reportarForo={reportarForo}
+              votarEnForo={votarEnForo}
+              hasUserVotedForoItem={hasUserVotedForoItem}
               handleReplyPress={handleReplyPress}
             />
           );

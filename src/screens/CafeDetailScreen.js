@@ -56,6 +56,120 @@ function getScaInfo(cafeToShow) {
   return null;
 }
 
+// ── "Por qué te puede gustar" & "Perfil ideal" helpers ──
+
+function buildWhyYouMightLike(cafe) {
+  const reasons = [];
+  const notas = (cafe.notas || cafe.notes || '').toLowerCase();
+  const proceso = (cafe.proceso || cafe.process || '').toLowerCase();
+  const variedad = (cafe.variedad || cafe.variety || '').toLowerCase();
+  const pais = (cafe.pais || cafe.origin || cafe.origen || '').toLowerCase();
+  const sca = cafe.sca?.score || Number(cafe.sca) || 0;
+  const tueste = (cafe.tueste || cafe.roastLevel || '').toLowerCase();
+
+  if (notas.includes('chocolate') || notas.includes('cacao'))
+    reasons.push({ icon: '🍫', text: 'Notas a chocolate — perfecto si buscas confort en taza' });
+  if (
+    notas.includes('fruta') ||
+    notas.includes('fruit') ||
+    notas.includes('berry') ||
+    notas.includes('cereza')
+  )
+    reasons.push({ icon: '🍒', text: 'Perfil afrutado — sorprendente y fresco' });
+  if (notas.includes('caramelo') || notas.includes('miel') || notas.includes('dulce'))
+    reasons.push({ icon: '🍯', text: 'Dulzor natural sin azúcar añadido' });
+  if (notas.includes('nuez') || notas.includes('almendra') || notas.includes('avellana'))
+    reasons.push({ icon: '🥜', text: 'Toque a frutos secos — redondo y familiar' });
+  if (notas.includes('floral') || notas.includes('jazmín') || notas.includes('lavanda'))
+    reasons.push({ icon: '🌸', text: 'Matices florales — delicado y elegante' });
+  if (notas.includes('cítrico') || notas.includes('limón') || notas.includes('naranja'))
+    reasons.push({ icon: '🍋', text: 'Acidez cítrica vibrante — café con personalidad' });
+
+  if (proceso.includes('natural') || proceso.includes('honey'))
+    reasons.push({
+      icon: '☀️',
+      text:
+        'Proceso ' +
+        (proceso.includes('honey') ? 'honey' : 'natural') +
+        ' — cuerpo intenso y más dulzor',
+    });
+  if (proceso.includes('lavado') || proceso.includes('washed'))
+    reasons.push({ icon: '💧', text: 'Lavado — taza limpia y bien definida' });
+
+  if (sca >= 85)
+    reasons.push({ icon: '🏅', text: 'Puntuación SCA excelente — calidad contrastada' });
+  else if (sca >= 80)
+    reasons.push({
+      icon: '✅',
+      text: 'Café de especialidad — un paso por encima del café industrial',
+    });
+
+  if (variedad.includes('geisha') || variedad.includes('gesha'))
+    reasons.push({ icon: '👑', text: 'Variedad Geisha — una de las más codiciadas del mundo' });
+  if (variedad.includes('bourbon'))
+    reasons.push({ icon: '🌿', text: 'Bourbon — variedad clásica con dulzor pronunciado' });
+
+  if (pais.includes('etiopía') || pais.includes('ethiopia'))
+    reasons.push({ icon: '🇪🇹', text: 'Etiopía — cuna del café, orígenes únicos' });
+  if (pais.includes('colombia'))
+    reasons.push({ icon: '🇨🇴', text: 'Colombia — equilibrio y versatilidad' });
+  if (pais.includes('kenia') || pais.includes('kenya'))
+    reasons.push({ icon: '🇰🇪', text: 'Kenia — acidez jugosa y complejidad' });
+
+  if (tueste.includes('claro') || tueste.includes('light'))
+    reasons.push({ icon: '☀️', text: 'Tueste claro — más matices de origen' });
+  if (tueste.includes('oscuro') || tueste.includes('dark'))
+    reasons.push({ icon: '🔥', text: 'Tueste oscuro — intenso y con cuerpo' });
+
+  return reasons.slice(0, 4);
+}
+
+function getIdealProfile(cafe) {
+  const notas = (cafe.notas || cafe.notes || '').toLowerCase();
+  const proceso = (cafe.proceso || cafe.process || '').toLowerCase();
+  const tueste = (cafe.tueste || cafe.roastLevel || '').toLowerCase();
+  const prep = (cafe.preparacion || '').toLowerCase();
+  const sca = cafe.sca?.score || Number(cafe.sca) || 0;
+
+  if (prep) {
+    const isEspresso = prep.includes('espresso') || prep.includes('cafetera');
+    const isFiltro =
+      prep.includes('filtro') ||
+      prep.includes('v60') ||
+      prep.includes('chemex') ||
+      prep.includes('aeropress');
+    if (isEspresso && !isFiltro)
+      return { method: 'espresso', icon: '☕', reason: 'Recomendado por el tostador' };
+    if (isFiltro && !isEspresso)
+      return { method: 'filtro', icon: '🫗', reason: 'Recomendado por el tostador' };
+    if (isEspresso && isFiltro)
+      return { method: 'ambos', icon: '✨', reason: 'Versátil — brilla en ambos métodos' };
+  }
+
+  if (tueste.includes('oscuro') || tueste.includes('dark'))
+    return { method: 'espresso', icon: '☕', reason: 'El tueste oscuro rinde mejor en espresso' };
+  if (tueste.includes('claro') || tueste.includes('light'))
+    return { method: 'filtro', icon: '🫗', reason: 'El tueste claro brilla en métodos de filtro' };
+  if (proceso.includes('natural') || proceso.includes('honey'))
+    return {
+      method: 'ambos',
+      icon: '✨',
+      reason: 'El cuerpo del natural funciona en ambos métodos',
+    };
+  if (sca >= 85)
+    return {
+      method: 'filtro',
+      icon: '🫗',
+      reason: 'Con esta calidad, un filtro resaltará todos los matices',
+    };
+
+  return {
+    method: 'ambos',
+    icon: '✨',
+    reason: 'Un café versátil que puedes preparar como prefieras',
+  };
+}
+
 function formatCategoryBadgeLabel(isDaily, cafeToShow) {
   if (isDaily) return 'Café diario';
   if (cafeToShow.category === 'bio') return 'Café bio';
@@ -222,6 +336,9 @@ export default function CafeDetailScreen({
     cafeToShow.variedad,
     isDaily,
   ]);
+
+  const whyReasons = useMemo(() => buildWhyYouMightLike(cafeToShow), [cafeToShow]);
+  const idealProfile = useMemo(() => getIdealProfile(cafeToShow), [cafeToShow]);
 
   const showDialog = (title, description, actions = [{ label: 'Cerrar' }]) => {
     setDialogConfig({ title, description, actions });
@@ -572,6 +689,65 @@ export default function CafeDetailScreen({
               </View>
               <Ionicons name="chevron-forward" size={18} color="#8b6d57" />
             </TouchableOpacity>
+
+            {/* Por qué te puede gustar */}
+            {whyReasons.length > 0 && (
+              <View style={det.whySection}>
+                <Text style={det.sectionTitle}>🧠 Por qué te puede gustar</Text>
+                {whyReasons.map((r, i) => (
+                  <View key={i} style={det.whyRow}>
+                    <Text style={det.whyIcon}>{r.icon}</Text>
+                    <Text style={det.whyText}>{r.text}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {/* Perfil ideal */}
+            <View style={det.idealSection}>
+              <Text style={det.sectionTitle}>🎯 Perfil ideal</Text>
+              <View style={det.idealCard}>
+                <View style={det.idealMethods}>
+                  <View
+                    style={[
+                      det.idealBadge,
+                      (idealProfile.method === 'espresso' || idealProfile.method === 'ambos') &&
+                        det.idealBadgeActive,
+                    ]}
+                  >
+                    <Text style={det.idealBadgeIcon}>☕</Text>
+                    <Text
+                      style={[
+                        det.idealBadgeLabel,
+                        (idealProfile.method === 'espresso' || idealProfile.method === 'ambos') &&
+                          det.idealBadgeLabelActive,
+                      ]}
+                    >
+                      Espresso
+                    </Text>
+                  </View>
+                  <View
+                    style={[
+                      det.idealBadge,
+                      (idealProfile.method === 'filtro' || idealProfile.method === 'ambos') &&
+                        det.idealBadgeActive,
+                    ]}
+                  >
+                    <Text style={det.idealBadgeIcon}>🫗</Text>
+                    <Text
+                      style={[
+                        det.idealBadgeLabel,
+                        (idealProfile.method === 'filtro' || idealProfile.method === 'ambos') &&
+                          det.idealBadgeLabelActive,
+                      ]}
+                    >
+                      Filtro
+                    </Text>
+                  </View>
+                </View>
+                <Text style={det.idealReason}>{idealProfile.reason}</Text>
+              </View>
+            </View>
 
             {/* Votación */}
             <View style={det.voteBox}>
@@ -1490,6 +1666,81 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     color: 'rgba(255,255,255,0.88)',
+  },
+
+  // ── "Por qué te puede gustar" ──
+  whySection: {
+    marginTop: 8,
+    marginBottom: 4,
+  },
+  whyRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    paddingVertical: 7,
+    gap: 10,
+  },
+  whyIcon: {
+    fontSize: 18,
+    lineHeight: 24,
+    width: 26,
+    textAlign: 'center',
+  },
+  whyText: {
+    flex: 1,
+    fontSize: 14,
+    color: '#3e2c1c',
+    lineHeight: 20,
+  },
+
+  // ── Perfil ideal ──
+  idealSection: {
+    marginTop: 4,
+    marginBottom: 4,
+  },
+  idealCard: {
+    backgroundColor: '#faf6f1',
+    borderRadius: 14,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(139,109,87,0.12)',
+  },
+  idealMethods: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 10,
+  },
+  idealBadge: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    borderRadius: 10,
+    backgroundColor: '#f0ebe5',
+    gap: 6,
+    borderWidth: 1.5,
+    borderColor: 'transparent',
+  },
+  idealBadgeActive: {
+    backgroundColor: '#fff8ef',
+    borderColor: '#c8a97c',
+  },
+  idealBadgeIcon: {
+    fontSize: 18,
+  },
+  idealBadgeLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#999',
+  },
+  idealBadgeLabelActive: {
+    color: '#5a3e28',
+  },
+  idealReason: {
+    fontSize: 13,
+    color: '#8b6d57',
+    lineHeight: 18,
+    textAlign: 'center',
   },
 });
 

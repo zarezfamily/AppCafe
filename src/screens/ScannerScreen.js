@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { CameraView } from 'expo-camera';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  ActivityIndicator,
+  Animated,
+  Easing,
   Image,
   SafeAreaView,
   ScrollView,
@@ -15,6 +16,213 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNetwork } from '../context/NetworkContext';
 import { getAuthToken } from '../services/firebaseCore';
+
+/* ─── Radar animation with rotating analysis messages ─── */
+
+const SCAN_MESSAGES = [
+  { icon: 'search-outline', text: 'Analizando imagen…' },
+  { icon: 'earth-outline', text: 'Detectando origen…' },
+  { icon: 'leaf-outline', text: 'Identificando variedad…' },
+  { icon: 'flask-outline', text: 'Analizando proceso…' },
+  { icon: 'musical-notes-outline', text: 'Detectando notas…' },
+  { icon: 'ribbon-outline', text: 'Evaluando calidad…' },
+  { icon: 'cafe-outline', text: 'Casi listo…' },
+];
+
+function ScanRadar({ color = '#c8a97c' }) {
+  const spin = useRef(new Animated.Value(0)).current;
+  const pulse1 = useRef(new Animated.Value(0)).current;
+  const pulse2 = useRef(new Animated.Value(0)).current;
+  const msgFade = useRef(new Animated.Value(1)).current;
+  const [msgIdx, setMsgIdx] = useState(0);
+
+  useEffect(() => {
+    // Radar sweep rotation
+    Animated.loop(
+      Animated.timing(spin, {
+        toValue: 1,
+        duration: 2400,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    ).start();
+
+    // Concentric pulse rings
+    const pulseAnim = (anim, delay) =>
+      Animated.loop(
+        Animated.sequence([
+          Animated.delay(delay),
+          Animated.timing(anim, {
+            toValue: 1,
+            duration: 1800,
+            easing: Easing.out(Easing.cubic),
+            useNativeDriver: true,
+          }),
+          Animated.timing(anim, {
+            toValue: 0,
+            duration: 0,
+            useNativeDriver: true,
+          }),
+        ])
+      );
+    pulseAnim(pulse1, 0).start();
+    pulseAnim(pulse2, 900).start();
+  }, [spin, pulse1, pulse2]);
+
+  // Rotate messages
+  useEffect(() => {
+    const interval = setInterval(() => {
+      Animated.timing(msgFade, {
+        toValue: 0,
+        duration: 180,
+        useNativeDriver: true,
+      }).start(() => {
+        setMsgIdx((i) => (i + 1) % SCAN_MESSAGES.length);
+        Animated.timing(msgFade, {
+          toValue: 1,
+          duration: 280,
+          useNativeDriver: true,
+        }).start();
+      });
+    }, 2200);
+    return () => clearInterval(interval);
+  }, [msgFade]);
+
+  const rotation = spin.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
+  const makePulseStyle = (anim) => ({
+    opacity: anim.interpolate({ inputRange: [0, 1], outputRange: [0.6, 0] }),
+    transform: [{ scale: anim.interpolate({ inputRange: [0, 1], outputRange: [0.35, 1.3] }) }],
+  });
+
+  const msg = SCAN_MESSAGES[msgIdx];
+
+  return (
+    <View style={radarStyles.wrap}>
+      {/* Pulse rings */}
+      <Animated.View style={[radarStyles.ring, { borderColor: color }, makePulseStyle(pulse1)]} />
+      <Animated.View style={[radarStyles.ring, { borderColor: color }, makePulseStyle(pulse2)]} />
+
+      {/* Radar sweep */}
+      <Animated.View style={[radarStyles.sweepWrap, { transform: [{ rotate: rotation }] }]}>
+        <View style={[radarStyles.sweep, { backgroundColor: color }]} />
+      </Animated.View>
+
+      {/* Center dot */}
+      <View style={[radarStyles.dot, { backgroundColor: color }]} />
+
+      {/* Message */}
+      <Animated.View style={[radarStyles.msgRow, { opacity: msgFade }]}>
+        <Ionicons name={msg.icon} size={18} color={color} />
+        <Text style={[radarStyles.msgText, { color }]}>{msg.text}</Text>
+      </Animated.View>
+    </View>
+  );
+}
+
+const RADAR_SIZE = 140;
+const radarStyles = StyleSheet.create({
+  wrap: {
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: RADAR_SIZE + 60,
+    height: RADAR_SIZE + 80,
+  },
+  ring: {
+    position: 'absolute',
+    width: RADAR_SIZE,
+    height: RADAR_SIZE,
+    borderRadius: RADAR_SIZE / 2,
+    borderWidth: 2,
+    top: 10,
+  },
+  sweepWrap: {
+    position: 'absolute',
+    width: RADAR_SIZE,
+    height: RADAR_SIZE,
+    top: 10,
+    alignItems: 'center',
+  },
+  sweep: {
+    width: 2,
+    height: RADAR_SIZE / 2,
+    borderRadius: 1,
+    opacity: 0.7,
+  },
+  dot: {
+    position: 'absolute',
+    top: 10 + RADAR_SIZE / 2 - 5,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  msgRow: {
+    position: 'absolute',
+    bottom: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  msgText: {
+    fontSize: 15,
+    fontWeight: '700',
+    letterSpacing: 0.3,
+  },
+});
+
+/* ─── Animated scan line for barcode viewfinder ─── */
+
+function ScanLine({ color = '#c8a97c', height = 160 }) {
+  const pos = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pos, {
+          toValue: 1,
+          duration: 1800,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+        Animated.timing(pos, {
+          toValue: 0,
+          duration: 1800,
+          easing: Easing.inOut(Easing.sin),
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, [pos]);
+
+  const translateY = pos.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, height - 4],
+  });
+
+  return (
+    <Animated.View
+      style={{
+        position: 'absolute',
+        left: 8,
+        right: 8,
+        top: 0,
+        height: 3,
+        borderRadius: 2,
+        backgroundColor: color,
+        opacity: 0.8,
+        shadowColor: color,
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.9,
+        shadowRadius: 8,
+        transform: [{ translateY }],
+      }}
+    />
+  );
+}
 
 const BARCODE_TYPES = ['ean13', 'ean8', 'upc_a', 'upc_e'];
 const RECOGNIZE_URL = 'https://europe-west1-miappdecafe.cloudfunctions.net/recognizeCoffee';
@@ -64,12 +272,22 @@ export default function ScannerScreen({
   const [lastExtracted, setLastExtracted] = useState(null);
   const [errorMsg, setErrorMsg] = useState('');
 
+  const pendingBarcodeRef = useRef(null);
+
   const handleBarcodeScanned = useCallback(
     ({ data }) => {
       if (!barcodeActive || barcodeLockRef.current) return;
       barcodeLockRef.current = true;
       setBarcodeActive(false);
-      onScanned?.({ ean: data });
+      pendingBarcodeRef.current = data;
+      setState('recognizing');
+
+      // Show radar for 1.2s so the user sees the magic
+      setTimeout(() => {
+        setState('idle');
+        onScanned?.({ ean: pendingBarcodeRef.current });
+        pendingBarcodeRef.current = null;
+      }, 1200);
     },
     [barcodeActive, onScanned]
   );
@@ -193,17 +411,13 @@ export default function ScannerScreen({
             <View style={[styles.corner, styles.tr, { borderColor: premiumAccent }]} />
             <View style={[styles.corner, styles.bl, { borderColor: premiumAccent }]} />
             <View style={[styles.corner, styles.br, { borderColor: premiumAccent }]} />
+            {!isPhotoMode && <ScanLine color={premiumAccent} height={160} />}
           </View>
         )}
 
         {/* States */}
         {state === 'capturing' || state === 'recognizing' ? (
-          <View style={styles.stateBox}>
-            <ActivityIndicator size="large" color={premiumAccent} />
-            <Text style={styles.stateText}>
-              {state === 'capturing' ? 'Capturando...' : 'Identificando café...'}
-            </Text>
-          </View>
+          <ScanRadar color={premiumAccent} />
         ) : null}
 
         {state === 'error' && (

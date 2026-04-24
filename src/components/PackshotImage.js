@@ -25,7 +25,7 @@ export default function PackshotImage({ uri, frameStyle, imageStyle }) {
         <Image
           source={{ uri: finalUri }}
           style={[shared.packshotImage, imageStyle]}
-          resizeMode="cover" // 🔥 CLAVE (antes era contain)
+          resizeMode="contain"
         />
       </View>
     </View>

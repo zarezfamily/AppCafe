@@ -1,0 +1,68 @@
+[
+  {
+    "id": "bonka_natural_hosteleria_grano_1kg",
+    "nombre": "Bonka Café en Grano Tostado Natural 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/bonka_natural_hosteleria_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/bonka_natural_hosteleria_grano_1kg.png"
+  },
+  {
+    "id": "cafe_saula_gran_espresso_premium_grano_500g",
+    "nombre": "Café Saula Gran Espresso Premium Grano 500g",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/cafe_saula_gran_espresso_premium_grano_500g.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/cafe_saula_gran_espresso_premium_grano_500g.png"
+  },
+  {
+    "id": "julius_meinl_wiener_grano_1kg",
+    "nombre": "Julius Meinl Wiener Espresso Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/julius_meinl_wiener_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/julius_meinl_wiener_grano_1kg.png"
+  },
+  {
+    "id": "kimbo_espresso_napoletano_grano_1kg",
+    "nombre": "Kimbo Espresso Napoletano Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/kimbo_espresso_napoletano_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/kimbo_espresso_napoletano_grano_1kg.png"
+  },
+  {
+    "id": "lavazza_qualita_oro_grano_250g",
+    "nombre": "Lavazza Qualità Oro Grano 250g",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/lavazza_qualita_oro_grano_250g.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/lavazza_qualita_oro_grano_250g.png"
+  },
+  {
+    "id": "marcilla_gran_aroma_natural_grano_1kg",
+    "nombre": "Marcilla Gran Aroma Natural Café en Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/marcilla_gran_aroma_natural_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/marcilla_gran_aroma_natural_grano_1kg.png"
+  },
+  {
+    "id": "mocay_etiqueta_oro_grano_1kg",
+    "nombre": "Mocay Etiqueta Oro Café en Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/mocay_etiqueta_oro_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/mocay_etiqueta_oro_grano_1kg.png"
+  },
+  {
+    "id": "pellini_top_arabica_grano_1kg",
+    "nombre": "Pellini Top 100% Arabica Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/pellini_top_arabica_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/pellini_top_arabica_grano_1kg.png"
+  },
+  {
+    "id": "saimaza_tueste_natural_grano_1kg",
+    "nombre": "Saimaza Tueste Natural Café en Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/saimaza_tueste_natural_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/saimaza_tueste_natural_grano_1kg.png"
+  },
+  {
+    "id": "supracafe_descafeinado_grano_1kg",
+    "nombre": "Supracafé Descafeinado Natural Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/supracafe_descafeinado_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/supracafe_descafeinado_grano_1kg.png"
+  },
+  {
+    "id": "vergnano_espresso_grano_1kg",
+    "nombre": "Caffè Vergnano 1882 Espresso Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/vergnano_espresso_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/vergnano_espresso_grano_1kg.png"
+  }
+]

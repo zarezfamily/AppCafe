@@ -1,0 +1,266 @@
+[
+  {
+    "id": "amazon_classico_grano_1kg",
+    "nombre": "by Amazon Café Grano Classico 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/amazon_classico_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/amazon_classico_grano_1kg.png"
+  },
+  {
+    "id": "amazon_colombiano_grano_1kg",
+    "nombre": "by Amazon Colombiano Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/amazon_colombiano_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/amazon_colombiano_grano_1kg.png"
+  },
+  {
+    "id": "amazon_espresso_crema_grano_1kg",
+    "nombre": "by Amazon Espresso Crema Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/amazon_espresso_crema_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/amazon_espresso_crema_grano_1kg.png"
+  },
+  {
+    "id": "amazon_fuerte_grano_1kg",
+    "nombre": "by Amazon Café Grano Fuerte 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/amazon_fuerte_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/amazon_fuerte_grano_1kg.png"
+  },
+  {
+    "id": "amazon_intenso_grano_1kg",
+    "nombre": "by Amazon Granos Intenso Tostado Ligero 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/amazon_intenso_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/amazon_intenso_grano_1kg.png"
+  },
+  {
+    "id": "barco_natural_grano_500g",
+    "nombre": "Barco Natural Café en Grano 500g",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/generic-coffee-placeholder.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/barco_natural_grano_500g.png"
+  },
+  {
+    "id": "barco_torrefacto_grano_500g",
+    "nombre": "Barco Torrefacto Café en Grano 500g",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/generic-coffee-placeholder.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/barco_torrefacto_grano_500g.png"
+  },
+  {
+    "id": "black_donkey_colombia_grano_250g",
+    "nombre": "Black Donkey Colombia Grano 250g",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/generic-coffee-placeholder.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/black_donkey_colombia_grano_250g.png"
+  },
+  {
+    "id": "black_donkey_world_coffees_6x100g",
+    "nombre": "Black Donkey World Coffees 6 Orígenes 600g",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/generic-coffee-placeholder.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/black_donkey_world_coffees_6x100g.png"
+  },
+  {
+    "id": "caffe_mauro_100_arabica_grano_1kg",
+    "nombre": "Caffè Mauro 100% Arabica Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/caffe_mauro_100_arabica_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/caffe_mauro_100_arabica_grano_1kg.png"
+  },
+  {
+    "id": "caffè_corsini_arabica_grano_1kg",
+    "nombre": "Caffè Corsini Compagnia dell'Arabica Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/caffè_corsini_arabica_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/caffè_corsini_arabica_grano_1kg.png"
+  },
+  {
+    "id": "crazybeans_brasil_specialty_500g",
+    "nombre": "69 CrazyBeans Brasil Specialty Grano 500g",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/crazybeans_brasil_specialty_500g.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/crazybeans_brasil_specialty_500g.png"
+  },
+  {
+    "id": "crazybeans_colombia_specialty_500g",
+    "nombre": "69 CrazyBeans Colombia Specialty Grano 500g",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/crazybeans_colombia_specialty_500g.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/crazybeans_colombia_specialty_500g.png"
+  },
+  {
+    "id": "daddy_long_legs_house_blend_250g",
+    "nombre": "Daddy Long Legs House Blend Grano 250g",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/generic-coffee-placeholder.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/daddy_long_legs_house_blend_250g.png"
+  },
+  {
+    "id": "daddy_long_legs_kenya_250g",
+    "nombre": "Daddy Long Legs Kenya AA Grano 250g",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/generic-coffee-placeholder.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/daddy_long_legs_kenya_250g.png"
+  },
+  {
+    "id": "delta_colombia_origen_grano_500g",
+    "nombre": "Delta Cafés Origen Colombia Grano 500g",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/delta_colombia_origen_grano_500g.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/delta_colombia_origen_grano_500g.png"
+  },
+  {
+    "id": "delta_expresso_bar_grano_1kg",
+    "nombre": "Delta Cafés Expresso Bar Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/delta_expresso_bar_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/delta_expresso_bar_grano_1kg.png"
+  },
+  {
+    "id": "delta_lote_chavena_grano_1kg",
+    "nombre": "Delta Cafés Lote Chávena Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/generic-coffee-placeholder.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/delta_lote_chavena_grano_1kg.png"
+  },
+  {
+    "id": "delta_lote_superior_grano_1kg",
+    "nombre": "Delta Cafés Lote Superior Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/delta_lote_superior_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/delta_lote_superior_grano_1kg.png"
+  },
+  {
+    "id": "delta_platinum_grano_1kg",
+    "nombre": "Delta Cafés Platinum Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/delta_platinum_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/delta_platinum_grano_1kg.png"
+  },
+  {
+    "id": "der_franz_colombia_grano_1kg",
+    "nombre": "Der-Franz Colombia Single Origin Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/generic-coffee-placeholder.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/der_franz_colombia_grano_1kg.png"
+  },
+  {
+    "id": "der_franz_espresso_grano_1kg",
+    "nombre": "Der-Franz Espresso Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/generic-coffee-placeholder.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/der_franz_espresso_grano_1kg.png"
+  },
+  {
+    "id": "el_criollo_blend_especial_grano_250g",
+    "nombre": "El Criollo Blend Especial Grano 250g",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/el_criollo_blend_especial_grano_250g.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/el_criollo_blend_especial_grano_250g.png"
+  },
+  {
+    "id": "el_criollo_colombia_specialty_250g",
+    "nombre": "El Criollo Colombia Specialty Grano 250g",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/el_criollo_colombia_specialty_250g.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/el_criollo_colombia_specialty_250g.png"
+  },
+  {
+    "id": "el_criollo_etiopia_specialty_250g",
+    "nombre": "El Criollo Etiopía Specialty Grano 250g",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/el_criollo_etiopia_specialty_250g.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/el_criollo_etiopia_specialty_250g.png"
+  },
+  {
+    "id": "guilis_blend_gourmet_grano_1kg",
+    "nombre": "Cafés Guilis Blend Gourmet Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/guilis_blend_gourmet_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/guilis_blend_gourmet_grano_1kg.png"
+  },
+  {
+    "id": "guilis_colombiano_grano_1kg",
+    "nombre": "Cafés Guilis Colombiano Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/guilis_colombiano_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/guilis_colombiano_grano_1kg.png"
+  },
+  {
+    "id": "guilis_etiopia_grano_1kg",
+    "nombre": "Cafés Guilis Etiopía Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/guilis_etiopia_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/guilis_etiopia_grano_1kg.png"
+  },
+  {
+    "id": "jurado_descafeinado_molido_250g",
+    "nombre": "Café Jurado Descafeinado Molido 250g",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/jurado_descafeinado_molido_250g.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/jurado_descafeinado_molido_250g.png"
+  },
+  {
+    "id": "jurado_dolcegusto_extra_intenso",
+    "nombre": "Café Jurado Cápsulas Dolce Gusto Extra Intenso",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/jurado_dolcegusto_extra_intenso.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/jurado_dolcegusto_extra_intenso.png"
+  },
+  {
+    "id": "jurado_ecologico_molido_250g",
+    "nombre": "Café Jurado Ecológico 100% Arábica Molido 250g",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/jurado_ecologico_molido_250g.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/jurado_ecologico_molido_250g.png"
+  },
+  {
+    "id": "jurado_excellence_arabica_grano_1kg",
+    "nombre": "Café Jurado Excellence 100% Arábica Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/jurado_excellence_arabica_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/jurado_excellence_arabica_grano_1kg.png"
+  },
+  {
+    "id": "jurado_natural_molido_250g",
+    "nombre": "Café Jurado Natural Molido 250g",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/jurado_natural_molido_250g.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/jurado_natural_molido_250g.png"
+  },
+  {
+    "id": "la_brasilena_mezcla_grano_250g",
+    "nombre": "Cafés La Brasileña Mezcla Grano 250g",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/la_brasilena_mezcla_grano_250g.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/la_brasilena_mezcla_grano_250g.png"
+  },
+  {
+    "id": "la_brasilena_natural_grano_250g",
+    "nombre": "Cafés La Brasileña Natural Grano 250g",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/la_brasilena_natural_grano_250g.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/la_brasilena_natural_grano_250g.png"
+  },
+  {
+    "id": "montecelio_brazil_grano_1kg",
+    "nombre": "Montecelio Brasil Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/montecelio_brazil_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/montecelio_brazil_grano_1kg.png"
+  },
+  {
+    "id": "montecelio_colombia_grano_1kg",
+    "nombre": "Montecelio Colombia Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/montecelio_colombia_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/montecelio_colombia_grano_1kg.png"
+  },
+  {
+    "id": "montecelio_etiopia_grano_1kg",
+    "nombre": "Montecelio Etiopía Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/montecelio_etiopia_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/montecelio_etiopia_grano_1kg.png"
+  },
+  {
+    "id": "note_espresso_clasico_grano_1kg",
+    "nombre": "Note d'Espresso Clásico Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/generic-coffee-placeholder.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/note_espresso_clasico_grano_1kg.png"
+  },
+  {
+    "id": "pont_arabica_premium_grano_250g",
+    "nombre": "Cafès Pont Arábica Premium Grano 250g",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/pont_arabica_premium_grano_250g.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/pont_arabica_premium_grano_250g.png"
+  },
+  {
+    "id": "pont_descafeinado_grano_250g",
+    "nombre": "Cafès Pont Descafeinado Grano 250g",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/pont_descafeinado_grano_250g.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/pont_descafeinado_grano_250g.png"
+  },
+  {
+    "id": "toscaf_descafeinado_grano_500g",
+    "nombre": "Toscaf Descafeinado Grano 500g",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/toscaf_descafeinado_grano_500g.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/toscaf_descafeinado_grano_500g.png"
+  },
+  {
+    "id": "toscaf_mezcla_grano_1kg",
+    "nombre": "Toscaf Mezcla Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/toscaf_mezcla_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/toscaf_mezcla_grano_1kg.png"
+  },
+  {
+    "id": "toscaf_natural_grano_1kg",
+    "nombre": "Toscaf Natural Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/toscaf_natural_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/toscaf_natural_grano_1kg.png"
+  }
+]

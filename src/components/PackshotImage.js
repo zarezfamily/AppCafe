@@ -18,7 +18,7 @@ export default function PackshotImage({ uri, frameStyle, imageStyle }) {
         style={[
           shared.packshotInner,
           {
-            backgroundColor: '#f4efe9', // fondo tipo café premium
+            backgroundColor: '#ffffff',
           },
         ]}
       >

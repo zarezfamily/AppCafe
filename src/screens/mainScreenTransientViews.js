@@ -561,6 +561,13 @@ function ScannerMatchFlow({
   }, [matchedCafe, setCafeDetalle, setScanning]);
 
   if (matchedCafe) {
+    // Don't render intermediate screen when autoOpen — the useEffect will
+    // navigate directly to detail, avoiding a 1-frame flash.
+    const matchCopyForRender = getCafeMatchCopy(matchedCafe);
+    if (matchCopyForRender.autoOpen) {
+      return null;
+    }
+
     return (
       <ExistingCafeMatchScreen
         cafe={matchedCafe}

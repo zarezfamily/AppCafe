@@ -427,7 +427,7 @@ export default function CafeDetailScreen({
         <TouchableOpacity
           style={{
             flex: 1,
-            backgroundColor: 'rgba(0,0,0,0.92)',
+            backgroundColor: '#ffffff',
             justifyContent: 'center',
             alignItems: 'center',
           }}
@@ -441,7 +441,7 @@ export default function CafeDetailScreen({
           />
           <Text
             style={{
-              color: 'rgba(255,255,255,0.5)',
+              color: 'rgba(0,0,0,0.35)',
               fontSize: 12,
               marginTop: 16,
               fontWeight: '600',
@@ -1172,7 +1172,7 @@ const det = StyleSheet.create({
   hero: {
     width: '100%',
     minHeight: 360,
-    backgroundColor: '#f6f0e9',
+    backgroundColor: '#ffffff',
     overflow: 'hidden',
   },
   heroOverlayTop: {
@@ -1601,7 +1601,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   packshotBg: {
-    backgroundColor: '#f7f2eb',
+    backgroundColor: '#ffffff',
     alignItems: 'center',
     justifyContent: 'center',
   },

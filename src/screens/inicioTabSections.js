@@ -842,7 +842,7 @@ export function NearbyCafeteriasSection({
 }) {
   return (
     <HomeSectionCard>
-      <View style={{ position: 'relative' }}>
+      <View style={{ position: 'relative', paddingRight: 36 }}>
         <SectionHeaderNav
           s={s}
           title="Cafeterías cerca de ti"
@@ -965,7 +965,7 @@ export function SocialFeedSection({
 
   return (
     <HomeSectionCard>
-      <View style={{ position: 'relative' }}>
+      <View style={{ position: 'relative', paddingRight: 36 }}>
         <SectionHeaderNav
           s={s}
           title="Lo que están catando"

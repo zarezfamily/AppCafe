@@ -253,6 +253,147 @@ async function confirmRecognition(extracted, cafeId) {
   }).catch(() => {});
 }
 
+/* ─── Mode chooser shown on scanner open ─── */
+
+function ModeChooser({ premiumAccent, insets, onChoose, onBack, onSkip }) {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 260,
+      useNativeDriver: true,
+    }).start();
+  }, [fadeAnim]);
+
+  return (
+    <Animated.View
+      style={[
+        chooserStyles.root,
+        { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 24, opacity: fadeAnim },
+      ]}
+    >
+      <View style={chooserStyles.topRow}>
+        <TouchableOpacity style={styles.iconBtn} onPress={onBack}>
+          <Ionicons name="arrow-back" size={24} color="#fff" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.iconBtn} onPress={onSkip}>
+          <Text style={[styles.skipText, { color: premiumAccent }]}>Omitir</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={chooserStyles.center}>
+        <Ionicons name="cafe-outline" size={48} color={premiumAccent} />
+        <Text style={chooserStyles.title}>¿Cómo quieres escanear?</Text>
+        <Text style={chooserStyles.subtitle}>Elige una opción para identificar tu café</Text>
+
+        <TouchableOpacity
+          style={[chooserStyles.optionBtn, { borderColor: premiumAccent }]}
+          onPress={() => onChoose('photo')}
+          activeOpacity={0.85}
+        >
+          <View style={[chooserStyles.optionIcon, { backgroundColor: premiumAccent }]}>
+            <Ionicons name="camera" size={28} color="#fff" />
+          </View>
+          <View style={chooserStyles.optionInfo}>
+            <Text style={chooserStyles.optionTitle}>Foto del paquete</Text>
+            <Text style={chooserStyles.optionDesc}>
+              Saca una foto de la bolsa y la IA identifica el café
+            </Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color="#aaa" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[chooserStyles.optionBtn, { borderColor: premiumAccent }]}
+          onPress={() => onChoose('barcode')}
+          activeOpacity={0.85}
+        >
+          <View style={[chooserStyles.optionIcon, { backgroundColor: premiumAccent }]}>
+            <Ionicons name="barcode" size={28} color="#fff" />
+          </View>
+          <View style={chooserStyles.optionInfo}>
+            <Text style={chooserStyles.optionTitle}>Código de barras</Text>
+            <Text style={chooserStyles.optionDesc}>
+              Escanea el código EAN del envase para buscarlo
+            </Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color="#aaa" />
+        </TouchableOpacity>
+      </View>
+
+      <Text style={chooserStyles.footer}>Puedes cambiar de modo en cualquier momento</Text>
+    </Animated.View>
+  );
+}
+
+const chooserStyles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: '#0b0b0b',
+    paddingHorizontal: 24,
+    justifyContent: 'space-between',
+  },
+  topRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  center: {
+    alignItems: 'center',
+    gap: 16,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: '#fff',
+    textAlign: 'center',
+    marginTop: 8,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.55)',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  optionBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1,
+    borderRadius: 16,
+    padding: 16,
+    gap: 14,
+  },
+  optionIcon: {
+    width: 52,
+    height: 52,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  optionInfo: {
+    flex: 1,
+  },
+  optionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  optionDesc: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.55)',
+    marginTop: 3,
+    lineHeight: 17,
+  },
+  footer: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.35)',
+    textAlign: 'center',
+  },
+});
+
 export default function ScannerScreen({
   onScanned,
   onRecognized,
@@ -265,7 +406,7 @@ export default function ScannerScreen({
   const insets = useSafeAreaInsets();
   const { isOnline } = useNetwork();
 
-  const [mode, setMode] = useState('photo');
+  const [mode, setMode] = useState(null); // null = chooser, 'photo', 'barcode'
   const [barcodeActive, setBarcodeActive] = useState(true);
   const [state, setState] = useState('idle'); // idle | capturing | recognizing | results | error | offline
   const [candidates, setCandidates] = useState([]);
@@ -355,6 +496,25 @@ export default function ScannerScreen({
 
   const isPhotoMode = mode === 'photo';
 
+  // Show mode chooser before activating camera
+  if (mode === null) {
+    return (
+      <SafeAreaView style={styles.root}>
+        <StatusBar barStyle="light-content" backgroundColor="#0b0b0b" />
+        <ModeChooser
+          premiumAccent={premiumAccent}
+          insets={insets}
+          onChoose={(m) => {
+            setMode(m);
+            handleReset();
+          }}
+          onBack={onBack}
+          onSkip={onSkip}
+        />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.root}>
       <StatusBar barStyle="light-content" backgroundColor="#000" />
@@ -370,7 +530,7 @@ export default function ScannerScreen({
       <View style={styles.overlay}>
         {/* Top bar */}
         <View style={[styles.topBar, { paddingTop: insets.top + 10 }]}>
-          <TouchableOpacity style={styles.iconBtn} onPress={onBack}>
+          <TouchableOpacity style={styles.iconBtn} onPress={() => setMode(null)}>
             <Ionicons name="arrow-back" size={24} color="#fff" />
           </TouchableOpacity>
 
@@ -382,6 +542,12 @@ export default function ScannerScreen({
                 handleReset();
               }}
             >
+              <Ionicons
+                name="camera"
+                size={16}
+                color={isPhotoMode ? '#111' : 'rgba(255,255,255,0.7)'}
+                style={{ marginRight: 5 }}
+              />
               <Text style={[styles.modeBtnText, isPhotoMode && styles.modeBtnTextActive]}>
                 Foto
               </Text>
@@ -393,6 +559,12 @@ export default function ScannerScreen({
                 handleReset();
               }}
             >
+              <Ionicons
+                name="barcode"
+                size={16}
+                color={!isPhotoMode ? '#111' : 'rgba(255,255,255,0.7)'}
+                style={{ marginRight: 5 }}
+              />
               <Text style={[styles.modeBtnText, !isPhotoMode && styles.modeBtnTextActive]}>
                 Código
               </Text>
@@ -406,12 +578,32 @@ export default function ScannerScreen({
 
         {/* Viewfinder */}
         {state === 'idle' && (
-          <View style={isPhotoMode ? styles.viewfinderPhoto : styles.viewfinderBarcode}>
-            <View style={[styles.corner, styles.tl, { borderColor: premiumAccent }]} />
-            <View style={[styles.corner, styles.tr, { borderColor: premiumAccent }]} />
-            <View style={[styles.corner, styles.bl, { borderColor: premiumAccent }]} />
-            <View style={[styles.corner, styles.br, { borderColor: premiumAccent }]} />
-            {!isPhotoMode && <ScanLine color={premiumAccent} height={160} />}
+          <View style={{ alignItems: 'center' }}>
+            <View style={isPhotoMode ? styles.viewfinderPhoto : styles.viewfinderBarcode}>
+              <View style={[styles.corner, styles.tl, { borderColor: premiumAccent }]} />
+              <View style={[styles.corner, styles.tr, { borderColor: premiumAccent }]} />
+              <View style={[styles.corner, styles.bl, { borderColor: premiumAccent }]} />
+              <View style={[styles.corner, styles.br, { borderColor: premiumAccent }]} />
+              {!isPhotoMode && <ScanLine color={premiumAccent} height={160} />}
+            </View>
+            <Text style={styles.viewfinderHint}>
+              {isPhotoMode
+                ? 'Centra la bolsa o paquete de café en el recuadro'
+                : 'Alinea el código de barras dentro del recuadro'}
+            </Text>
+            {isPhotoMode && (
+              <TouchableOpacity
+                style={styles.barcodeShortcut}
+                onPress={() => {
+                  setMode('barcode');
+                  handleReset();
+                }}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="barcode-outline" size={18} color="rgba(255,255,255,0.85)" />
+                <Text style={styles.barcodeShortcutText}>¿Tiene código de barras? Toca aquí</Text>
+              </TouchableOpacity>
+            )}
           </View>
         )}
 
@@ -545,10 +737,42 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 3,
   },
-  modeBtn: { paddingHorizontal: 14, paddingVertical: 5, borderRadius: 16 },
+  modeBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
   modeBtnActive: { backgroundColor: '#fff' },
   modeBtnText: { fontSize: 13, fontWeight: '700', color: 'rgba(255,255,255,0.7)' },
   modeBtnTextActive: { color: '#111' },
+
+  viewfinderHint: {
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: 12,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginTop: 12,
+    paddingHorizontal: 40,
+  },
+  barcodeShortcut: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 16,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+  },
+  barcodeShortcutText: {
+    color: 'rgba(255,255,255,0.85)',
+    fontSize: 13,
+    fontWeight: '600',
+  },
 
   viewfinderPhoto: {
     width: 240,

@@ -4,7 +4,6 @@ import {
   ActivityIndicator,
   Dimensions,
   Image,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -136,6 +135,39 @@ function GridCard({ item, onPress, favs, onToggleFav }) {
 
 // ─── Widget oscuro: Perfil de sabor ─────────────────────────────────────────
 
+const COUNTRY_NAMES = {
+  ES: 'España',
+  CO: 'Colombia',
+  BR: 'Brasil',
+  ET: 'Etiopía',
+  GT: 'Guatemala',
+  HN: 'Honduras',
+  CR: 'Costa Rica',
+  PE: 'Perú',
+  MX: 'México',
+  KE: 'Kenia',
+  IN: 'India',
+  ID: 'Indonesia',
+  VN: 'Vietnam',
+  UG: 'Uganda',
+  TZ: 'Tanzania',
+  RW: 'Ruanda',
+  NI: 'Nicaragua',
+  SV: 'El Salvador',
+  PA: 'Panamá',
+  JM: 'Jamaica',
+  CU: 'Cuba',
+  BO: 'Bolivia',
+  EC: 'Ecuador',
+  IT: 'Italia',
+  FR: 'Francia',
+  PT: 'Portugal',
+  US: 'EE.UU.',
+  GB: 'Reino Unido',
+  DE: 'Alemania',
+  CN: 'China',
+};
+
 function computeProfile(favCafes) {
   if (!favCafes.length) return null;
   const specialty = favCafes.filter(
@@ -144,10 +176,16 @@ function computeProfile(favCafes) {
   const origins = {};
   const processes = {};
   favCafes.forEach((c) => {
-    const o = c.pais || c.origen;
-    if (o) origins[o] = (origins[o] || 0) + 1;
+    let o = c.pais || c.origen;
+    if (typeof o === 'string' && o.trim()) {
+      o = o.trim();
+      if (o.length === 2 && COUNTRY_NAMES[o.toUpperCase()]) o = COUNTRY_NAMES[o.toUpperCase()];
+      origins[o] = (origins[o] || 0) + 1;
+    }
     const p = c.proceso;
-    if (p) processes[p] = (processes[p] || 0) + 1;
+    if (typeof p === 'string' && p.trim() && p !== 'false' && p !== 'null') {
+      processes[p.trim()] = (processes[p.trim()] || 0) + 1;
+    }
   });
   return {
     specialtyPct: Math.round((specialty / favCafes.length) * 100),
@@ -378,6 +416,33 @@ export default function MisCafesTab({
           </View>
         ) : null}
 
+        {!cargando && favCafes.length > 0 ? (
+          <View style={styles.tasteOuter}>
+            <TasteProfile
+              favCafes={favCafes}
+              recs={personalizedFeed?.items || []}
+              setCafeDetalle={setCafeDetalle}
+            />
+          </View>
+        ) : null}
+
+        {notebook ? (
+          <View style={[styles.sectionCard, { padding: 0, overflow: 'hidden' }]}>
+            <DiarioCatasSection
+              s={ext}
+              theme={theme}
+              premiumAccent={premiumAccent || PREMIUM_ACCENT}
+              catas={notebook.catas || []}
+              catasFiltradas={notebook.catasFiltradas || []}
+              stats={notebook.stats || { totalCatas: 0, promedioPuntuacion: 0, cafesProbados: 0 }}
+              filtroPeriodo={notebook.filtroPeriodo}
+              setFiltroPeriodo={notebook.setFiltroPeriodo}
+              irAbrirModal={notebook.irAbrirModal}
+              irAbrirDetail={notebook.irAbrirDetail}
+            />
+          </View>
+        ) : null}
+
         {favCafes.length > 0 ? (
           <Section>
             <View style={{ position: 'relative' }}>
@@ -406,35 +471,6 @@ export default function MisCafesTab({
               </ScrollView>
             )}
           </Section>
-        ) : null}
-
-        {!cargando && favCafes.length > 0 ? (
-          <View style={styles.tasteOuter}>
-            <TasteProfile
-              favCafes={favCafes}
-              recs={personalizedFeed?.items || []}
-              setCafeDetalle={setCafeDetalle}
-            />
-          </View>
-        ) : null}
-
-        {notebook ? (
-          <View style={[styles.sectionCard, { padding: 0, overflow: 'hidden' }]}>
-            <DiarioCatasSection
-              s={ext}
-              theme={theme}
-              premiumAccent={premiumAccent || PREMIUM_ACCENT}
-              catas={notebook.catas || []}
-              catasFiltradas={notebook.catasFiltradas || []}
-              stats={notebook.stats || { totalCatas: 0, promedioPuntuacion: 0, cafesProbados: 0 }}
-              filtroPeriodo={notebook.filtroPeriodo}
-              setFiltroPeriodo={notebook.setFiltroPeriodo}
-              irAbrirModal={notebook.irAbrirModal}
-              irAbrirDetail={notebook.irAbrirDetail}
-              collapsed={isCollapsed('diario')}
-              onToggle={() => toggle('diario')}
-            />
-          </View>
         ) : null}
 
         <Section>
@@ -674,7 +710,7 @@ const styles = StyleSheet.create({
     width: '100%',
     aspectRatio: 0.9,
     borderRadius: 11,
-    backgroundColor: '#231209',
+    backgroundColor: '#f5efe8',
     overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',

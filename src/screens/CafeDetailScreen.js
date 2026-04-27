@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 
 import AppDialogModal from '../components/AppDialogModal';
+import { BuyButton, BuyLinksSection } from '../components/BuyButton';
 import PackshotImage from '../components/PackshotImage';
 import { getCafePhoto } from '../core/utils';
 import { getComparableCafes } from '../domain/coffee/compareCoffee';
@@ -815,6 +816,14 @@ export default function CafeDetailScreen({
             />
 
             <PrecioSection precioTexto={precioTexto} />
+
+            {cafeToShow.buyLinks?.length > 0 && (
+              <>
+                <View style={det.divider} />
+                <BuyButton buyLinks={cafeToShow.buyLinks} premiumAccent={premiumAccent} />
+                <BuyLinksSection buyLinks={cafeToShow.buyLinks} premiumAccent={premiumAccent} />
+              </>
+            )}
 
             <View style={det.divider} />
 

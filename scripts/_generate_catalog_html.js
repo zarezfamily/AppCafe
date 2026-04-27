@@ -48,6 +48,10 @@ function bustCache(url) {
   const cafes = [];
   snap.forEach((d) => {
     const data = d.data();
+    const buyLinks = Array.isArray(data.buyLinks) ? data.buyLinks : [];
+    const hasAmazon = buyLinks.some(
+      (l) => l && (/amazon/i.test(l.store || '') || /amazon\./i.test(l.url || ''))
+    );
     cafes.push({
       id: d.id,
       nombre: data.nombre || '',
@@ -57,6 +61,8 @@ function bustCache(url) {
       photo: getPhoto(data),
       formato: data.formato || '',
       source: data.source || '',
+      buyLinks,
+      hasAmazon,
     });
   });
 
@@ -87,8 +93,15 @@ function bustCache(url) {
     for (const c of items) {
       num++;
       const scaStr = c.sca ? Number(c.sca).toFixed(1) : '';
-      cardsHtml += `<div class="card">
+      const amazonBadge = c.hasAmazon ? `<div class="amazon-badge">🛒 Amazon</div>` : '';
+      const buyCount = c.buyLinks.length;
+      const buyBadge =
+        buyCount > 0 && !c.hasAmazon
+          ? `<div class="buy-badge">${buyCount} enlace${buyCount > 1 ? 's' : ''}</div>`
+          : '';
+      cardsHtml += `<div class="card${c.hasAmazon ? ' has-amazon' : ''}">
   <div class="num">#${num}</div>
+  ${amazonBadge}
   <div class="img-wrap">${c.photo ? `<img src="${esc(bustCache(c.photo))}" loading="lazy" alt="${esc(c.nombre)}"/>` : `<div class="no-img">☕</div>`}</div>
   <div class="info">
     <div class="brand">${esc(c.marca)}</div>
@@ -96,6 +109,7 @@ function bustCache(url) {
     ${c.pais ? `<div class="meta">${esc(c.pais)}</div>` : ''}
     ${scaStr ? `<div class="sca">SCA ${scaStr}</div>` : ''}
     ${c.formato ? `<div class="meta">${esc(c.formato)}</div>` : ''}
+    ${buyBadge}
   </div>
 </div>\n`;
     }
@@ -139,6 +153,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .name{font-size:13px;font-weight:800;color:#24160f;line-height:1.3;margin-bottom:4px}
 .meta{font-size:11px;color:#9e7c62;margin-bottom:2px}
 .sca{font-size:10px;font-weight:700;background:#c8a97c;color:#fff;display:inline-block;padding:2px 6px;border-radius:6px;margin-top:2px}
+.amazon-badge{position:absolute;top:6px;right:6px;background:#FF9900;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px;z-index:1}
+.buy-badge{font-size:10px;color:#8f5e3b;margin-top:2px}
+.card.has-amazon{border-color:#FF9900;border-width:2px}
 .hidden{display:none!important}
 @media(max-width:600px){.grid{grid-template-columns:repeat(2,1fr);gap:8px}.header h1{font-size:18px}}
 </style>
@@ -146,7 +163,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <body>
 <div class="header">
 <h1>☕ Catálogo Etiove</h1>
-<div class="stats">${cafes.length} cafés · ${Object.keys(byBrand).length} marcas</div>
+<div class="stats">${cafes.length} cafés · ${Object.keys(byBrand).length} marcas · ${cafes.filter((c) => c.hasAmazon).length} con enlace Amazon 🛒</div>
 </div>
 <div class="search-wrap">
 <input type="text" id="search" placeholder="Buscar café, marca, país..." autocomplete="off"/>

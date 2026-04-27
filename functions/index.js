@@ -65,6 +65,27 @@ async function getAllPushSubscriptions() {
   return snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 }
 
+// ── Safety net: ensure every new café has required visibility fields ──
+exports.onCafeCreatedEnsureDefaults = onDocumentCreated('cafes/{cafeId}', async (event) => {
+  const data = event.data?.data();
+  if (!data) return;
+
+  const now = new Date().toISOString();
+  const patch = {};
+
+  if (!data.fecha) patch.fecha = data.createdAt?.toDate?.().toISOString?.() || now;
+  if (data.puntuacion === undefined || data.puntuacion === null) patch.puntuacion = 0;
+  if (data.votos === undefined || data.votos === null) patch.votos = 0;
+  if (!data.status) patch.status = 'approved';
+  if (!data.reviewStatus) patch.reviewStatus = 'approved';
+  if (data.appVisible === undefined || data.appVisible === null) patch.appVisible = true;
+
+  if (Object.keys(patch).length === 0) return;
+
+  logger.info(`Backfilling defaults on ${event.params.cafeId}:`, patch);
+  await db.collection('cafes').doc(event.params.cafeId).update(patch);
+});
+
 exports.onCafeCreatedNotifyCommunity = onDocumentCreated('cafes/{cafeId}', async (event) => {
   const cafe = event.data?.data();
   if (!cafe) return;

@@ -74,6 +74,23 @@ function getLegacyAwareValue(payload = {}, keys = []) {
   return '';
 }
 
+/**
+ * Ensure a café document has all the fields the app needs to display it.
+ * Call this on any new café data before writing to Firestore.
+ */
+export function ensureCafeDefaults(data = {}) {
+  const now = new Date().toISOString();
+  return {
+    fecha: data.fecha || data.createdAt || now,
+    puntuacion: data.puntuacion ?? 0,
+    votos: data.votos ?? 0,
+    status: data.status || 'approved',
+    reviewStatus: data.reviewStatus || 'approved',
+    appVisible: data.appVisible ?? true,
+    ...data,
+  };
+}
+
 export function sanitizeCafePayload(payload = {}) {
   const ean = normalizeEan(payload.ean || payload.normalizedEan);
 
@@ -117,6 +134,23 @@ export function sanitizeCafePayload(payload = {}) {
 
   const decaf = normalizeBoolean(getLegacyAwareValue(payload, ['decaf', 'descafeinado']));
 
+  const buyLinks = Array.isArray(payload.buyLinks)
+    ? payload.buyLinks
+        .filter(
+          (link) =>
+            link &&
+            typeof link === 'object' &&
+            typeof link.store === 'string' &&
+            typeof link.url === 'string' &&
+            /^https?:\/\//.test(link.url)
+        )
+        .map((link) => ({
+          store: String(link.store).trim().slice(0, 60),
+          url: String(link.url).trim().slice(0, 600),
+          ...(link.tag ? { tag: String(link.tag).trim().slice(0, 40) } : {}),
+        }))
+    : [];
+
   return {
     ean,
     normalizedEan: ean,
@@ -154,6 +188,7 @@ export function sanitizeCafePayload(payload = {}) {
     altura: altitude,
     scaScoreOfficial,
     decaf,
+    buyLinks,
   };
 }
 
@@ -741,7 +776,12 @@ export async function createOrGetPendingCafeFromScan(rawEan, userId = null) {
     await setDocument(CAFES_COLLECTION, normalizedEan, {
       ...basePayload,
       sca: buildScaPayload(basePayload),
+      fecha: now,
+      puntuacion: 0,
+      votos: 0,
       status: 'pending',
+      reviewStatus: 'pending',
+      appVisible: false,
       completionStatus: 'incomplete',
       provisional: true,
       createdFrom: 'scan',
@@ -818,8 +858,13 @@ export async function approveCafe(cafeId, userId = null) {
   const now = new Date().toISOString();
   await updateDocument(CAFES_COLLECTION, cafeId, {
     status: 'approved',
+    reviewStatus: 'approved',
+    appVisible: true,
     completionStatus: 'complete',
     provisional: false,
+    fecha: current.fecha || now,
+    puntuacion: current.puntuacion ?? 0,
+    votos: current.votos ?? 0,
     approvedBy: userId,
     approvedAt: now,
     updatedBy: userId,

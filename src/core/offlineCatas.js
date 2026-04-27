@@ -1,6 +1,6 @@
 // offlineCatas.js
 // Maneja el guardado y sincronización offline de catas individuales
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import { scheduleEtioveNotification } from './notifications';
 
 const CATAS_DIR = `${FileSystem.documentDirectory || ''}etiove-catas`;

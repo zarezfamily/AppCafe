@@ -173,6 +173,7 @@ export function buildInicioTabProps({
   buscandoOfertaId,
   openOfferCafeId,
   errorOfertas,
+  onGamifyEvent,
 }) {
   return {
     s,
@@ -222,6 +223,7 @@ export function buildInicioTabProps({
     buscandoOfertaId,
     openOfferCafeId,
     errorOfertas,
+    onGamifyEvent,
   };
 }
 
@@ -308,6 +310,7 @@ export function buildTopCafesTabProps({
   perfil,
   cargando,
   top100,
+  allCafes,
   CardVertical,
   setCafeDetalle,
   favs,
@@ -322,6 +325,7 @@ export function buildTopCafesTabProps({
     perfil,
     cargando,
     top100,
+    allCafes,
     CardVertical,
     setCafeDetalle,
     favs,

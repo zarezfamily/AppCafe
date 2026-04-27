@@ -78,6 +78,7 @@ Thumbs.db
 # ---------------------------------------
 serviceAccountKey*.json
 *serviceAccount*.json
+credentials.json
 *.secret.json
 
 # ---------------------------------------

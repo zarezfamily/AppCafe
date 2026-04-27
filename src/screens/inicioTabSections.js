@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import CollapsibleSectionHeader from '../components/CollapsibleSectionHeader';
 import HorizontalCardRow from '../components/HorizontalCardRow';
 import SectionHeaderNav from '../components/SectionHeaderNav';
 import SocialCataCard from '../components/SocialCataCard';
@@ -238,41 +239,51 @@ export function SpecialtyForYouSection({
   favs,
   toggleFav,
   CardHorizontal,
+  collapsed,
+  onToggle,
 }) {
   if (!cafes?.length) return null;
 
+  const { spreadByBrand } = require('../utils/coffeeRanking');
   const sorted = [...cafes].sort(
     (a, b) =>
       Number(b?.rankingScore || b?.puntuacion || 0) - Number(a?.rankingScore || a?.puntuacion || 0)
   );
   const top = sorted.slice(0, 25);
-  const items = top;
+  const items = spreadByBrand(top);
   const handlePress = (item) => {
     const index = top.findIndex((c) => c.id === item.id);
     setCafeDetalle({ cafes: top, cafeIndex: index });
   };
   return (
     <HomeSectionCard>
-      <SectionHeaderNav s={s} title="Especialidad para ti" marginTop={0} hideAction />
-      <Text style={[s.sectionSub, { paddingHorizontal: 0 }]}>
-        Cafés curados y bien valorados para descubrir algo especial sin perderte entre demasiadas
-        opciones
-      </Text>
-      <HorizontalCardRow
-        s={s}
-        loading={false}
-        items={items}
-        renderItem={(item, index) => (
-          <CardHorizontal
-            key={item.id}
-            item={item}
-            badge={`#${index + 1} Especialidad`}
-            onPress={() => handlePress(item)}
-            favs={favs}
-            onToggleFav={toggleFav}
+      <View style={{ position: 'relative' }}>
+        <SectionHeaderNav s={s} title="Especialidad para ti" marginTop={0} hideAction />
+        {onToggle && <CollapsibleSectionHeader collapsed={collapsed} onToggle={onToggle} />}
+      </View>
+      {collapsed ? null : (
+        <>
+          <Text style={[s.sectionSub, { paddingHorizontal: 0 }]}>
+            Cafés curados y bien valorados para descubrir algo especial sin perderte entre
+            demasiadas opciones
+          </Text>
+          <HorizontalCardRow
+            s={s}
+            loading={false}
+            items={items}
+            renderItem={(item, index) => (
+              <CardHorizontal
+                key={item.id}
+                item={item}
+                badge={`#${index + 1} Especialidad`}
+                onPress={() => handlePress(item)}
+                favs={favs}
+                onToggleFav={toggleFav}
+              />
+            )}
           />
-        )}
-      />
+        </>
+      )}
     </HomeSectionCard>
   );
 }
@@ -328,6 +339,8 @@ export function LiveRankingSection({
   favs,
   toggleFav,
   CardHorizontal,
+  collapsed,
+  onToggle,
 }) {
   const [activeBucket, setActiveBucket] = useState('weeklyTop');
 
@@ -371,7 +384,37 @@ export function LiveRankingSection({
 
   const currentKey = availableKeys.includes(activeBucket) ? activeBucket : availableKeys[0];
   const currentConfig = config[currentKey];
-  const items = rankingBuckets?.[currentKey] || [];
+  const { spreadByBrand } = require('../utils/coffeeRanking');
+  // Agrupar por formato y aplicar spreadByBrand para variedad de tostadores y evitar saltos de formato
+  function groupByFormat(items) {
+    const formats = {};
+    for (const item of items) {
+      const fmt = (item.formato || item.format || '').toLowerCase();
+      if (!formats[fmt]) formats[fmt] = [];
+      formats[fmt].push(item);
+    }
+    return formats;
+  }
+
+  let items = rankingBuckets?.[currentKey] || [];
+  // Agrupar y repartir variedad de tostadores en todos los buckets, incluyendo 'Nuevos'
+  if (currentKey === 'newcomers') {
+    const grouped = groupByFormat(items);
+    const orderedFormats = ['grano', 'beans', 'molido', 'ground', 'cápsulas', 'capsules'];
+    items = orderedFormats.flatMap((fmt) => spreadByBrand(grouped[fmt] || []));
+    const used = new Set(orderedFormats);
+    Object.keys(grouped).forEach((fmt) => {
+      if (!used.has(fmt)) items.push(...spreadByBrand(grouped[fmt]));
+    });
+  } else {
+    const grouped = groupByFormat(items);
+    const orderedFormats = ['grano', 'beans', 'molido', 'ground', 'cápsulas', 'capsules'];
+    items = orderedFormats.flatMap((fmt) => spreadByBrand(grouped[fmt] || []));
+    const used = new Set(orderedFormats);
+    Object.keys(grouped).forEach((fmt) => {
+      if (!used.has(fmt)) items.push(...spreadByBrand(grouped[fmt]));
+    });
+  }
 
   const handlePress = (item) => {
     const index = items.findIndex((c) => c.id === item.id);
@@ -380,124 +423,160 @@ export function LiveRankingSection({
 
   return (
     <HomeSectionCard>
-      <SectionHeaderNav s={s} title="Rankings vivos" marginTop={0} hideAction />
-      <Text style={[s.sectionSub, { paddingHorizontal: 0 }]}>
-        Lectura rapida de lo que sube, baja y entra nuevo dentro de ETIOVE.
-      </Text>
+      <View style={{ position: 'relative' }}>
+        <SectionHeaderNav s={s} title="Rankings vivos" marginTop={0} hideAction />
+        {onToggle && <CollapsibleSectionHeader collapsed={collapsed} onToggle={onToggle} />}
+      </View>
+      {collapsed ? null : (
+        <>
+          <Text style={[s.sectionSub, { paddingHorizontal: 0 }]}>
+            Lectura rapida de lo que sube, baja y entra nuevo dentro de ETIOVE.
+          </Text>
 
-      <View style={styles.liveRankingTabs}>
-        {availableKeys.map((key) => {
-          const tab = config[key];
-          const active = key === currentKey;
-          return (
-            <TouchableOpacity
-              key={key}
-              activeOpacity={0.88}
-              onPress={() => setActiveBucket(key)}
-              style={[styles.liveRankingTab, active && styles.liveRankingTabActive]}
-            >
-              <Ionicons name={tab.icon} size={13} color={active ? '#fffaf5' : '#8f5e3b'} />
-              <Text style={[styles.liveRankingTabText, active && styles.liveRankingTabTextActive]}>
-                {tab.label}
+          <View style={styles.liveRankingTabs}>
+            {availableKeys.map((key) => {
+              const tab = config[key];
+              const active = key === currentKey;
+              return (
+                <TouchableOpacity
+                  key={key}
+                  activeOpacity={0.88}
+                  onPress={() => setActiveBucket(key)}
+                  style={[styles.liveRankingTab, active && styles.liveRankingTabActive]}
+                >
+                  <Ionicons name={tab.icon} size={13} color={active ? '#fffaf5' : '#8f5e3b'} />
+                  <Text
+                    style={[styles.liveRankingTabText, active && styles.liveRankingTabTextActive]}
+                  >
+                    {tab.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+          <View style={styles.liveRankingHero}>
+            <View style={[styles.liveRankingHeroIcon, { backgroundColor: currentConfig.softBg }]}>
+              <Ionicons name={currentConfig.icon} size={18} color={currentConfig.accent} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.liveRankingHeroTitle}>{currentConfig.label}</Text>
+              <Text style={styles.liveRankingHeroSub}>{currentConfig.subtitle}</Text>
+            </View>
+          </View>
+
+          <View style={styles.liveRankingStatsRow}>
+            <View style={styles.liveRankingStatCard}>
+              <Text style={[styles.liveRankingStatValue, { color: currentConfig.accent }]}>
+                {items.length}
               </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
+              <Text style={styles.liveRankingStatLabel}>{currentConfig.statsLabel}</Text>
+            </View>
+            <View style={styles.liveRankingStatCard}>
+              <Text style={[styles.liveRankingStatValue, { color: currentConfig.accent }]}>
+                {Number(items[0]?.puntuacion || 0).toFixed(1)}
+              </Text>
+              <Text style={styles.liveRankingStatLabel}>Mejor nota visible</Text>
+            </View>
+            <View style={styles.liveRankingStatCard}>
+              <Text style={[styles.liveRankingStatValue, { color: currentConfig.accent }]}>
+                {Math.max(...items.map((item) => Number(item?.votos || 0)), 0)}
+              </Text>
+              <Text style={styles.liveRankingStatLabel}>Pico de votos</Text>
+            </View>
+          </View>
 
-      <View style={styles.liveRankingHero}>
-        <View style={[styles.liveRankingHeroIcon, { backgroundColor: currentConfig.softBg }]}>
-          <Ionicons name={currentConfig.icon} size={18} color={currentConfig.accent} />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.liveRankingHeroTitle}>{currentConfig.label}</Text>
-          <Text style={styles.liveRankingHeroSub}>{currentConfig.subtitle}</Text>
-        </View>
-      </View>
-
-      <View style={styles.liveRankingStatsRow}>
-        <View style={styles.liveRankingStatCard}>
-          <Text style={[styles.liveRankingStatValue, { color: currentConfig.accent }]}>
-            {items.length}
-          </Text>
-          <Text style={styles.liveRankingStatLabel}>{currentConfig.statsLabel}</Text>
-        </View>
-        <View style={styles.liveRankingStatCard}>
-          <Text style={[styles.liveRankingStatValue, { color: currentConfig.accent }]}>
-            {Number(items[0]?.puntuacion || 0).toFixed(1)}
-          </Text>
-          <Text style={styles.liveRankingStatLabel}>Mejor nota visible</Text>
-        </View>
-        <View style={styles.liveRankingStatCard}>
-          <Text style={[styles.liveRankingStatValue, { color: currentConfig.accent }]}>
-            {Math.max(...items.map((item) => Number(item?.votos || 0)), 0)}
-          </Text>
-          <Text style={styles.liveRankingStatLabel}>Pico de votos</Text>
-        </View>
-      </View>
-
-      <HorizontalCardRow
-        s={s}
-        loading={false}
-        items={items}
-        renderItem={(item, index) => (
-          <CardHorizontal
-            key={item.id}
-            item={item}
-            badge={`#${index + 1} ${item.rankingTag}`}
-            recommendationText={item.rankingReason || ''}
-            secondaryText={item.rankingMomentum || ''}
-            onPress={() => handlePress(item)}
-            favs={favs}
-            onToggleFav={toggleFav}
+          <HorizontalCardRow
+            s={s}
+            loading={false}
+            items={items}
+            renderItem={(item, index) => (
+              <CardHorizontal
+                key={item.id}
+                item={item}
+                badge={`#${index + 1} ${item.rankingTag}`}
+                recommendationText={item.rankingReason || ''}
+                secondaryText={item.rankingMomentum || ''}
+                onPress={() => handlePress(item)}
+                favs={favs}
+                onToggleFav={toggleFav}
+              />
+            )}
           />
-        )}
-      />
+        </>
+      )}
     </HomeSectionCard>
   );
 }
 
-export function DailyCoffeeSection({ s, cafes, setCafeDetalle, favs, toggleFav, CardHorizontal }) {
+export function DailyCoffeeSection({
+  s,
+  cafes,
+  setCafeDetalle,
+  favs,
+  toggleFav,
+  CardHorizontal,
+  collapsed,
+  onToggle,
+}) {
   if (!cafes?.length) return null;
 
+  const { spreadByBrand } = require('../utils/coffeeRanking');
   const sorted = [...cafes].sort((a, b) => Number(b?.puntuacion || 0) - Number(a?.puntuacion || 0));
   const top = sorted.slice(0, 25);
-  const items = top;
+  const items = spreadByBrand(top);
   const handlePress = (item) => {
     const index = top.findIndex((c) => c.id === item.id);
     setCafeDetalle({ cafes: top, cafeIndex: index });
   };
   return (
     <HomeSectionCard>
-      <SectionHeaderNav s={s} title="Tu café diario" marginTop={0} hideAction />
-      <Text style={[s.sectionSub, { paddingHorizontal: 0 }]}>
-        Cafés habituales del día a día para comparar y decidir mejor tu compra
-      </Text>
-      <HorizontalCardRow
-        s={s}
-        loading={false}
-        items={items}
-        renderItem={(item, index) => (
-          <CardHorizontal
-            key={item.id}
-            item={item}
-            badge={`#${index + 1} Diario`}
-            onPress={() => handlePress(item)}
-            favs={favs}
-            onToggleFav={toggleFav}
+      <View style={{ position: 'relative' }}>
+        <SectionHeaderNav s={s} title="Tu café diario" marginTop={0} hideAction />
+        {onToggle && <CollapsibleSectionHeader collapsed={collapsed} onToggle={onToggle} />}
+      </View>
+      {collapsed ? null : (
+        <>
+          <Text style={[s.sectionSub, { paddingHorizontal: 0 }]}>
+            Cafés habituales del día a día para comparar y decidir mejor tu compra
+          </Text>
+          <HorizontalCardRow
+            s={s}
+            loading={false}
+            items={items}
+            renderItem={(item, index) => (
+              <CardHorizontal
+                key={item.id}
+                item={item}
+                badge={`#${index + 1} Diario`}
+                onPress={() => handlePress(item)}
+                favs={favs}
+                onToggleFav={toggleFav}
+              />
+            )}
           />
-        )}
-      />
+        </>
+      )}
     </HomeSectionCard>
   );
 }
 
-export function BioCoffeeSection({ s, cafes, setCafeDetalle, favs, toggleFav, CardHorizontal }) {
+export function BioCoffeeSection({
+  s,
+  cafes,
+  setCafeDetalle,
+  favs,
+  toggleFav,
+  CardHorizontal,
+  collapsed,
+  onToggle,
+}) {
   if (!cafes?.length) return null;
 
+  const { spreadByBrand } = require('../utils/coffeeRanking');
   const sorted = [...cafes].sort((a, b) => Number(b?.puntuacion || 0) - Number(a?.puntuacion || 0));
   const top = sorted.slice(0, 25);
-  const items = top;
+  const items = spreadByBrand(top);
   const handlePress = (item) => {
     const index = top.findIndex((c) => c.id === item.id);
     setCafeDetalle({ cafes: top, cafeIndex: index });
@@ -505,31 +584,47 @@ export function BioCoffeeSection({ s, cafes, setCafeDetalle, favs, toggleFav, Ca
 
   return (
     <HomeSectionCard>
-      <SectionHeaderNav s={s} title="Cafés BIO" marginTop={0} hideAction />
-      <Text style={[s.sectionSub, { paddingHorizontal: 0 }]}>
-        Una selección de cafés BIO y ecológicos, tanto diarios como de especialidad
-      </Text>
+      <View style={{ position: 'relative' }}>
+        <SectionHeaderNav s={s} title="Cafés BIO" marginTop={0} hideAction />
+        {onToggle && <CollapsibleSectionHeader collapsed={collapsed} onToggle={onToggle} />}
+      </View>
+      {collapsed ? null : (
+        <>
+          <Text style={[s.sectionSub, { paddingHorizontal: 0 }]}>
+            Una selección de cafés BIO y ecológicos, tanto diarios como de especialidad
+          </Text>
 
-      <HorizontalCardRow
-        s={s}
-        loading={false}
-        items={items}
-        renderItem={(item, index) => (
-          <CardHorizontal
-            key={item.id}
-            item={item}
-            badge={`#${index + 1} BIO`}
-            onPress={() => handlePress(item)}
-            favs={favs}
-            onToggleFav={toggleFav}
+          <HorizontalCardRow
+            s={s}
+            loading={false}
+            items={items}
+            renderItem={(item, index) => (
+              <CardHorizontal
+                key={item.id}
+                item={item}
+                badge={`#${index + 1} BIO`}
+                onPress={() => handlePress(item)}
+                favs={favs}
+                onToggleFav={toggleFav}
+              />
+            )}
           />
-        )}
-      />
+        </>
+      )}
     </HomeSectionCard>
   );
 }
 
-export function StepUpSection({ s, pairs, setCafeDetalle, favs, toggleFav, CardHorizontal }) {
+export function StepUpSection({
+  s,
+  pairs,
+  setCafeDetalle,
+  favs,
+  toggleFav,
+  CardHorizontal,
+  collapsed,
+  onToggle,
+}) {
   const [activeIndex, setActiveIndex] = useState(() => {
     if (!pairs?.length) return 0;
     const favIdx = pairs.findIndex(
@@ -540,8 +635,24 @@ export function StepUpSection({ s, pairs, setCafeDetalle, favs, toggleFav, CardH
 
   if (!pairs?.length) return null;
 
-  const total = pairs.length;
-  const pair = pairs[activeIndex] || pairs[0];
+  // Filtrar pares para que el specialty tenga el mismo formato que el daily
+  const filterSameFormatPairs = (pairs) => {
+    return pairs.filter((pair) => {
+      const dailyFormat = (pair.daily?.formato || pair.daily?.format || '').toLowerCase();
+      const specialtyFormat = (
+        pair.specialty?.formato ||
+        pair.specialty?.format ||
+        ''
+      ).toLowerCase();
+      // Si no hay formato, dejar pasar; si hay, deben coincidir
+      if (!dailyFormat || !specialtyFormat) return true;
+      return dailyFormat === specialtyFormat;
+    });
+  };
+  const filteredPairs = filterSameFormatPairs(pairs);
+  const total = filteredPairs.length;
+  const pair = filteredPairs[activeIndex] || filteredPairs[0];
+  if (!filteredPairs.length) return null;
 
   const cycleNext = () => setActiveIndex((prev) => (prev + 1) % total);
 
@@ -550,13 +661,17 @@ export function StepUpSection({ s, pairs, setCafeDetalle, favs, toggleFav, CardH
       <View style={styles.stepUpHeader}>
         <View style={{ flex: 1 }}>
           <SectionHeaderNav s={s} title="Da el salto" marginTop={0} hideAction />
-          <Text style={[s.sectionSub, { paddingHorizontal: 0 }]}>
-            Si te gusta un café diario, aquí tienes una opción specialty parecida para subir de
-            nivel
-          </Text>
+          {!collapsed && (
+            <Text style={[s.sectionSub, { paddingHorizontal: 0 }]}>
+              Si te gusta un café diario, aquí tienes una opción specialty parecida para subir de
+              nivel
+            </Text>
+          )}
         </View>
 
-        {total > 1 && (
+        {onToggle && <CollapsibleSectionHeader collapsed={collapsed} onToggle={onToggle} />}
+
+        {!collapsed && total > 1 && (
           <TouchableOpacity onPress={cycleNext} activeOpacity={0.8} style={styles.stepUpCycleBtn}>
             <Text style={styles.stepUpCycleBtnText}>
               {activeIndex + 1}/{total}
@@ -566,48 +681,50 @@ export function StepUpSection({ s, pairs, setCafeDetalle, favs, toggleFav, CardH
         )}
       </View>
 
-      <View style={{ marginTop: 10 }}>
-        <View
-          key={`${pair.daily?.id || 'daily'}-${pair.specialty?.id || 'specialty'}`}
-          style={styles.stepUpCard}
-        >
-          <View style={styles.stepUpTop}>
-            <View style={styles.stepUpBadgeDaily}>
-              <Text style={styles.stepUpBadgeDailyText}>Café diario</Text>
-            </View>
-            <Ionicons name="arrow-forward" size={18} color="#8f5e3b" />
-            <View style={styles.stepUpBadgeSpecialty}>
-              <Text style={styles.stepUpBadgeSpecialtyText}>Especialidad</Text>
-            </View>
-          </View>
-
-          <View style={styles.stepUpColumns}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.stepUpLabel}>Empiezas con</Text>
-              <CardHorizontal
-                item={pair.daily}
-                badge="☕ Diario"
-                onPress={setCafeDetalle}
-                favs={favs}
-                onToggleFav={toggleFav}
-              />
+      {collapsed ? null : (
+        <View style={{ marginTop: 10 }}>
+          <View
+            key={`${pair.daily?.id || 'daily'}-${pair.specialty?.id || 'specialty'}`}
+            style={styles.stepUpCard}
+          >
+            <View style={styles.stepUpTop}>
+              <View style={styles.stepUpBadgeDaily}>
+                <Text style={styles.stepUpBadgeDailyText}>Café diario</Text>
+              </View>
+              <Ionicons name="arrow-forward" size={18} color="#8f5e3b" />
+              <View style={styles.stepUpBadgeSpecialty}>
+                <Text style={styles.stepUpBadgeSpecialtyText}>Especialidad</Text>
+              </View>
             </View>
 
-            <View style={{ width: 10 }} />
+            <View style={styles.stepUpColumns}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.stepUpLabel}>Empiezas con</Text>
+                <CardHorizontal
+                  item={pair.daily}
+                  badge="☕ Diario"
+                  onPress={setCafeDetalle}
+                  favs={favs}
+                  onToggleFav={toggleFav}
+                />
+              </View>
 
-            <View style={{ flex: 1 }}>
-              <Text style={styles.stepUpLabel}>Prueba después</Text>
-              <CardHorizontal
-                item={pair.specialty}
-                badge="⭐ Specialty"
-                onPress={setCafeDetalle}
-                favs={favs}
-                onToggleFav={toggleFav}
-              />
+              <View style={{ width: 10 }} />
+
+              <View style={{ flex: 1 }}>
+                <Text style={styles.stepUpLabel}>Prueba después</Text>
+                <CardHorizontal
+                  item={pair.specialty}
+                  badge="⭐ Specialty"
+                  onPress={setCafeDetalle}
+                  favs={favs}
+                  onToggleFav={toggleFav}
+                />
+              </View>
             </View>
           </View>
         </View>
-      </View>
+      )}
     </HomeSectionCard>
   );
 }
@@ -720,102 +837,126 @@ export function NearbyCafeteriasSection({
   cafeteriasInicio,
   cargarCafeteriasInicio,
   theme,
+  collapsed,
+  onToggle,
 }) {
   return (
     <HomeSectionCard>
-      <SectionHeaderNav
-        s={s}
-        title="Cafeterías cerca de ti"
-        onPress={() => setActiveTab(MAIN_TABS.CAFETERIAS)}
-        marginTop={0}
-      />
-      <Text style={[s.sectionSub, { paddingHorizontal: 0 }]}>
-        Cafeterías cercanas para tomar buen café fuera de casa
-      </Text>
-
-      {cargandoCafInicio ? (
-        <ActivityIndicator color={premiumAccent} style={{ margin: 18 }} />
-      ) : errorCafInicio ? (
-        <View style={{ marginTop: 10 }}>
-          <Text style={[s.empty, { marginTop: 6 }]}>{errorCafInicio}</Text>
-          <TouchableOpacity style={[s.redBtn, { marginTop: 12 }]} onPress={cargarCafeteriasInicio}>
-            <Text style={s.redBtnText}>Reintentar cafeterías</Text>
-          </TouchableOpacity>
-        </View>
-      ) : cafeteriasInicio.length === 0 ? (
-        <View style={{ marginTop: 10 }}>
-          <Text style={[s.empty, { marginTop: 6 }]}>
-            Todavía no hemos cargado cafeterías cercanas en esta sesión.
-          </Text>
-          <TouchableOpacity style={[s.redBtn, { marginTop: 12 }]} onPress={cargarCafeteriasInicio}>
-            <Text style={s.redBtnText}>Cargar cafeterías cercanas</Text>
-          </TouchableOpacity>
-        </View>
-      ) : (
-        <HorizontalCardRow
+      <View style={{ position: 'relative', paddingRight: 36 }}>
+        <SectionHeaderNav
           s={s}
-          loading={false}
-          items={cafeteriasInicio.slice(0, 8)}
-          renderItem={(cafItem) => (
-            <TouchableOpacity
-              key={cafItem.id}
-              style={s.cardH}
-              onPress={() => setActiveTab(MAIN_TABS.CAFETERIAS)}
-              activeOpacity={0.88}
-            >
-              <View style={s.cardHImg}>
-                {cafItem.foto ? (
-                  <Image
-                    source={{ uri: cafItem.foto }}
-                    style={{ width: '100%', height: '100%' }}
-                    resizeMode="cover"
-                  />
-                ) : (
-                  <View
-                    style={[
-                      styles.absoluteFill,
-                      {
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        backgroundColor: '#f2ece5',
-                      },
-                    ]}
-                  >
-                    <Text style={{ fontSize: 30 }}>☕</Text>
-                  </View>
-                )}
-
-                <View style={[s.badgeRed, { right: 8, left: 'auto' }]}>
-                  <Text style={s.badgeText}>
-                    {cafItem.abierto === null ? '—' : cafItem.abierto ? 'Abierto' : 'Cerrado'}
-                  </Text>
-                </View>
-              </View>
-
-              <Text style={s.cardHName} numberOfLines={2}>
-                {cafItem.nombre}
-              </Text>
-
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 4 }}>
-                <Ionicons name="star" size={12} color={theme.status.favorite} />
-                <Text style={s.cardHRating}>{cafItem.rating}</Text>
-                <Text style={s.cardHVotos}>({cafItem.numResenas})</Text>
-              </View>
-
-              <Text style={s.cardHOrigin}>
-                {cafItem.distancia < 1000
-                  ? `${cafItem.distancia}m`
-                  : `${(cafItem.distancia / 1000).toFixed(1)}km`}
-              </Text>
-            </TouchableOpacity>
-          )}
+          title="Cafeterías cerca de ti"
+          onPress={collapsed ? undefined : () => setActiveTab(MAIN_TABS.CAFETERIAS)}
+          marginTop={0}
         />
+        {onToggle && <CollapsibleSectionHeader collapsed={collapsed} onToggle={onToggle} />}
+      </View>
+      {collapsed ? null : (
+        <>
+          <Text style={[s.sectionSub, { paddingHorizontal: 0 }]}>
+            Cafeterías cercanas para tomar buen café fuera de casa
+          </Text>
+
+          {cargandoCafInicio ? (
+            <ActivityIndicator color={premiumAccent} style={{ margin: 18 }} />
+          ) : errorCafInicio ? (
+            <View style={{ marginTop: 10 }}>
+              <Text style={[s.empty, { marginTop: 6 }]}>{errorCafInicio}</Text>
+              <TouchableOpacity
+                style={[s.redBtn, { marginTop: 12 }]}
+                onPress={cargarCafeteriasInicio}
+              >
+                <Text style={s.redBtnText}>Reintentar cafeterías</Text>
+              </TouchableOpacity>
+            </View>
+          ) : cafeteriasInicio.length === 0 ? (
+            <View style={{ marginTop: 10 }}>
+              <Text style={[s.empty, { marginTop: 6 }]}>
+                Todavía no hemos cargado cafeterías cercanas en esta sesión.
+              </Text>
+              <TouchableOpacity
+                style={[s.redBtn, { marginTop: 12 }]}
+                onPress={cargarCafeteriasInicio}
+              >
+                <Text style={s.redBtnText}>Cargar cafeterías cercanas</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <HorizontalCardRow
+              s={s}
+              loading={false}
+              items={cafeteriasInicio.slice(0, 8)}
+              renderItem={(cafItem) => (
+                <TouchableOpacity
+                  key={cafItem.id}
+                  style={s.cardH}
+                  onPress={() => setActiveTab(MAIN_TABS.CAFETERIAS)}
+                  activeOpacity={0.88}
+                >
+                  <View style={s.cardHImg}>
+                    {cafItem.foto ? (
+                      <Image
+                        source={{ uri: cafItem.foto }}
+                        style={{ width: '100%', height: '100%' }}
+                        resizeMode="cover"
+                      />
+                    ) : (
+                      <View
+                        style={[
+                          styles.absoluteFill,
+                          {
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            backgroundColor: '#f2ece5',
+                          },
+                        ]}
+                      >
+                        <Text style={{ fontSize: 30 }}>☕</Text>
+                      </View>
+                    )}
+
+                    <View style={[s.badgeRed, { right: 8, left: 'auto' }]}>
+                      <Text style={s.badgeText}>
+                        {cafItem.abierto === null ? '—' : cafItem.abierto ? 'Abierto' : 'Cerrado'}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <Text style={s.cardHName} numberOfLines={2}>
+                    {cafItem.nombre}
+                  </Text>
+
+                  <View
+                    style={{ flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 4 }}
+                  >
+                    <Ionicons name="star" size={12} color={theme.status.favorite} />
+                    <Text style={s.cardHRating}>{cafItem.rating}</Text>
+                    <Text style={s.cardHVotos}>({cafItem.numResenas})</Text>
+                  </View>
+
+                  <Text style={s.cardHOrigin}>
+                    {cafItem.distancia < 1000
+                      ? `${cafItem.distancia}m`
+                      : `${(cafItem.distancia / 1000).toFixed(1)}km`}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            />
+          )}
+        </>
       )}
     </HomeSectionCard>
   );
 }
 
-export function SocialFeedSection({ s, allCafes, setCafeDetalle, setActiveTab }) {
+export function SocialFeedSection({
+  s,
+  allCafes,
+  setCafeDetalle,
+  setActiveTab,
+  collapsed,
+  onToggle,
+}) {
   const { recentCatas, loadingSocial } = useSocialFeed({ allCafes });
 
   const visible = recentCatas.slice(0, 12);
@@ -824,39 +965,46 @@ export function SocialFeedSection({ s, allCafes, setCafeDetalle, setActiveTab })
 
   return (
     <HomeSectionCard>
-      <SectionHeaderNav
-        s={s}
-        title="Lo que están catando"
-        onPress={() => setActiveTab?.(MAIN_TABS.NOTEBOOK)}
-        marginTop={0}
-      />
-      <Text style={[s.sectionSub, { paddingHorizontal: 0 }]}>
-        Catas recientes de la comunidad ETIOVE
-      </Text>
+      <View style={{ position: 'relative', paddingRight: 36 }}>
+        <SectionHeaderNav
+          s={s}
+          title="Lo que están catando"
+          onPress={collapsed ? undefined : () => setActiveTab?.(MAIN_TABS.NOTEBOOK)}
+          marginTop={0}
+        />
+        {onToggle && <CollapsibleSectionHeader collapsed={collapsed} onToggle={onToggle} />}
+      </View>
+      {collapsed ? null : (
+        <>
+          <Text style={[s.sectionSub, { paddingHorizontal: 0 }]}>
+            Catas recientes de la comunidad ETIOVE
+          </Text>
 
-      {loadingSocial ? (
-        <ActivityIndicator size="small" color="#8f5e3b" style={{ marginTop: 14 }} />
-      ) : (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingRight: 4, marginTop: 12 }}
-        >
-          {visible.map((cata, idx) => (
-            <SocialCataCard
-              key={cata.id || `${cata.fechaHora}-${idx}`}
-              cata={cata}
-              onPress={(c) => {
-                if (!setCafeDetalle) return;
-                // Attempt to open the cafe detail if we have a cafeId
-                if (c.cafeId) {
-                  const match = (allCafes || []).find((cafe) => cafe.id === c.cafeId);
-                  if (match) setCafeDetalle(match);
-                }
-              }}
-            />
-          ))}
-        </ScrollView>
+          {loadingSocial ? (
+            <ActivityIndicator size="small" color="#8f5e3b" style={{ marginTop: 14 }} />
+          ) : (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingRight: 4, marginTop: 12 }}
+            >
+              {visible.map((cata, idx) => (
+                <SocialCataCard
+                  key={cata.id || `${cata.fechaHora}-${idx}`}
+                  cata={cata}
+                  onPress={(c) => {
+                    if (!setCafeDetalle) return;
+                    // Attempt to open the cafe detail if we have a cafeId
+                    if (c.cafeId) {
+                      const match = (allCafes || []).find((cafe) => cafe.id === c.cafeId);
+                      if (match) setCafeDetalle(match);
+                    }
+                  }}
+                />
+              ))}
+            </ScrollView>
+          )}
+        </>
       )}
     </HomeSectionCard>
   );

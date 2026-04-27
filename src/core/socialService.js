@@ -13,6 +13,8 @@
  * Until rules are updated, the hook handles the error silently and returns [].
  */
 
+import { getCafePhoto } from './utils';
+
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 const MONTH_MS = 30 * 24 * 60 * 60 * 1000;
 
@@ -67,7 +69,7 @@ export function computeWeeklyHotCafes(catas, allCafes = []) {
           entry.ratedCount > 0
             ? Math.round((entry.totalPuntuacion / entry.ratedCount) * 10) / 10
             : 0,
-        foto: cafeObj?.bestPhoto || cafeObj?.officialPhoto || cafeObj?.foto || null,
+        foto: getCafePhoto(cafeObj),
         cafe: cafeObj,
       };
     });

@@ -1,0 +1,20 @@
+[
+  {
+    "id": "delta_platinum_grano_1kg",
+    "nombre": "Delta Cafés Platinum Café en Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/delta_platinum_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/delta_platinum_grano_1kg.png"
+  },
+  {
+    "id": "el_criollo_colombia_especialidad_grano_1kg",
+    "nombre": "Cafés El Criollo Colombia Especialidad Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/el_criollo_colombia_especialidad_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/el_criollo_colombia_especialidad_grano_1kg.png"
+  },
+  {
+    "id": "oquendo_mezcla_grano_1kg",
+    "nombre": "Oquendo Mezcla Café en Grano 1kg",
+    "original": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/oquendo_mezcla_grano_1kg.png",
+    "newUrl": "https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/oquendo_mezcla_grano_1kg.png"
+  }
+]

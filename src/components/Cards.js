@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { PREMIUM_ACCENT, THEME } from '../constants/theme';
+import { getCafePhoto } from '../core/utils';
 import { shared } from '../styles/sharedStyles';
 import PackshotImage from './PackshotImage';
 import Stars from './Stars';
@@ -38,7 +39,7 @@ function getMetaLabel(item) {
 }
 
 function getImageUri(item) {
-  return item.bestPhoto || item.officialPhoto || item.foto || item.image || null;
+  return getCafePhoto(item);
 }
 
 function CategoryBadge({ item }) {

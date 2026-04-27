@@ -8,17 +8,20 @@ export default function DailyTopTab({
   premiumAccent,
   cargando,
   top100,
+  allCafes,
   CardVertical,
   setCafeDetalle,
   favs,
   toggleFav,
 }) {
   const dailyItems = useMemo(() => {
-    const sorted = [...(top100 || [])]
+    const source = allCafes?.length ? allCafes : top100 || [];
+    const sorted = [...source]
       .filter((item) => item?.coffeeCategory === 'daily')
-      .sort((a, b) => Number(b?.rankingScore || 0) - Number(a?.rankingScore || 0));
+      .sort((a, b) => Number(b?.rankingScore || 0) - Number(a?.rankingScore || 0))
+      .slice(0, 50);
     return spreadByBrand(sorted);
-  }, [top100]);
+  }, [allCafes, top100]);
 
   return (
     <SimpleCoffeeListTab

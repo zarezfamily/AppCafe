@@ -15,12 +15,18 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { getCafePhoto } from '../core/utils';
+import {
+  buildApprovalPayload,
+  buildScaPayload,
+  computeDataCompleteness,
+} from '../services/cafeService';
 import { getAuthToken } from '../services/firebaseCore';
-import { buildScaPayload } from '../services/cafeService';
-import { getCollection, updateDocument } from '../services/firestoreService';
+import { deleteDocument, getCollection, updateDocument } from '../services/firestoreService';
 import { uploadImageToStorage } from '../services/storageService';
 
 const FILTERS = {
+  PENDING: 'pending',
   ALL: 'all',
   WITHOUT_IMAGE: 'without_image',
   WITHOUT_PRICE: 'without_price',
@@ -28,10 +34,17 @@ const FILTERS = {
   WITHOUT_EAN: 'without_ean',
   INCOMPLETE: 'incomplete',
   READY: 'ready',
+  SUSPICIOUS: 'suspicious',
+  HIDDEN_GEMS: 'hidden_gems',
+  BEST_VALUE: 'best_value',
 };
 
 const ADMIN_ENRICH_URL =
   'https://europe-west1-miappdecafe.cloudfunctions.net/adminEnrichCoffeeDraft';
+const ADMIN_RETRY_URL = 'https://europe-west1-miappdecafe.cloudfunctions.net/adminRetryEnrichment';
+
+const CLEAN_COFFEE_IMAGE =
+  'https://images.openfoodfacts.org/images/products/761/303/656/9927/front_en.44.400.jpg';
 
 async function resizeForApp(uri) {
   const manipulated = await ImageManipulator.manipulateAsync(uri, [{ resize: { width: 800 } }], {
@@ -52,9 +65,8 @@ function getUserPhoto(cafe) {
 }
 
 function getBestPhoto(cafe) {
-  return String(
-    cafe?.bestPhoto || cafe?.officialPhoto || cafe?.foto || cafe?.imageUrl || ''
-  ).trim();
+  const url = getCafePhoto(cafe);
+  return url === CLEAN_COFFEE_IMAGE ? '' : url;
 }
 
 function parsePrice(value) {
@@ -76,10 +88,300 @@ function isPriceInputInvalid(value) {
   return parsePrice(raw) === null;
 }
 
+// ═══════════════════════════════════════════════════════════════
+// CATALOG INTELLIGENCE — Truth Score, Fraud Detector, DNA, Gems, Value
+// ═══════════════════════════════════════════════════════════════
+
+function computeTruthScore(cafe) {
+  if (!cafe) return 0;
+  let score = 0;
+
+  // Data completeness (40pts)
+  const dc = computeDataCompleteness(cafe);
+  score += dc.score * 40;
+
+  // Photo quality (20pts)
+  const official = String(cafe?.officialPhoto || '').trim();
+  const user = String(cafe?.foto || cafe?.imageUrl || '').trim();
+  if (official) score += 20;
+  else if (user) score += 12;
+
+  // EAN validity (15pts)
+  const ean = String(cafe?.ean || '').trim();
+  if (ean && ean !== 'N/A' && ean.length >= 8) score += 15;
+  else if (ean === 'N/A') score += 5;
+
+  // SCA data quality (15pts)
+  const sca = cafe?.sca;
+  if (sca?.type === 'official') score += 15;
+  else if (sca?.confidence >= 0.7) score += 10;
+  else if (sca?.confidence >= 0.4) score += 5;
+
+  // Consistency signals (10pts)
+  const hasOrigin = !!String(cafe?.origen || '').trim();
+  const hasNotes = !!String(cafe?.notas || '').trim();
+  const hasProcess = !!String(cafe?.proceso || '').trim();
+  const hasVariety = !!String(cafe?.variedad || '').trim();
+  if (hasOrigin && hasNotes) score += 4;
+  if (hasProcess) score += 3;
+  if (hasVariety) score += 3;
+
+  return Math.round(score);
+}
+
+function getTruthLevel(score) {
+  if (score >= 80) return { label: `${score}% veraz`, color: '#166534', bg: '#DCFCE7' };
+  if (score >= 55) return { label: `${score}% parcial`, color: '#92400E', bg: '#FEF3C7' };
+  return { label: `${score}% bajo`, color: '#991B1B', bg: '#FEE2E2' };
+}
+
+function detectFraudSignals(cafe) {
+  const signals = [];
+  const nombre = normalizeText(cafe?.nombre || cafe?.name || '');
+  const notas = normalizeText(cafe?.notas || '');
+  const origen = normalizeText(cafe?.origen || '');
+  const variedad = normalizeText(cafe?.variedad || '');
+  const proceso = normalizeText(cafe?.proceso || '');
+  const category = cafe?.coffeeCategory || 'specialty';
+
+  // "100% arábica" without origin
+  if (
+    (nombre.includes('100%') || nombre.includes('100 %')) &&
+    (nombre.includes('arábica') || nombre.includes('arabica'))
+  ) {
+    if (!origen) signals.push({ type: 'warn', msg: '"100% arábica" sin origen' });
+  }
+
+  // Marketing buzzwords without real data
+  const buzz = [
+    'premium',
+    'gourmet',
+    'selección',
+    'seleccion',
+    'superior',
+    'excellence',
+    'gran reserva',
+    'gold',
+    'supreme',
+  ];
+  if (buzz.some((b) => nombre.includes(b)) && !origen && !variedad) {
+    signals.push({ type: 'warn', msg: 'Marketing sin datos reales' });
+  }
+
+  // Exotic notes on industrial coffee
+  const exotic = [
+    'mango',
+    'maracuyá',
+    'jazmín',
+    'bergamota',
+    'lichi',
+    'frambuesa',
+    'arándano',
+    'hibiscus',
+    'melocotón',
+    'papaya',
+    'lychee',
+    'jasmine',
+  ];
+  if (category === 'daily') {
+    const count = exotic.filter((n) => notas.includes(n)).length;
+    if (count >= 2)
+      signals.push({ type: 'sus', msg: `${count} notas exóticas en café industrial` });
+  }
+
+  // Labeled "specialty" without specialty data
+  if (category === 'specialty' && !origen && !variedad && !proceso) {
+    signals.push({ type: 'warn', msg: '"Especialidad" sin datos de especialidad' });
+  }
+
+  // Approved without photo
+  if (!getBestPhoto(cafe) && String(cafe?.reviewStatus || '') === 'approved') {
+    signals.push({ type: 'sus', msg: 'Aprobado sin foto' });
+  }
+
+  return signals;
+}
+
+function computeCoffeeDna(cafe) {
+  const notas = normalizeText(cafe?.notas || '');
+  const origen = normalizeText(cafe?.origen || '');
+  const proceso = normalizeText(cafe?.proceso || '');
+  const tueste = normalizeText(cafe?.tueste || '');
+  const category = cafe?.coffeeCategory || 'specialty';
+
+  let acidity = 50,
+    body = 50,
+    sweetness = 50,
+    bitterness = 40,
+    complexity = 30;
+
+  // Origin
+  if (/etiop|kenya|kenia/.test(origen)) {
+    acidity += 20;
+    sweetness += 10;
+    complexity += 15;
+  }
+  if (/colombia/.test(origen)) {
+    acidity += 10;
+    sweetness += 10;
+    body += 5;
+    complexity += 10;
+  }
+  if (/brasil|brazil/.test(origen)) {
+    body += 15;
+    sweetness += 10;
+    bitterness += 5;
+  }
+  if (/guatemala|costa rica/.test(origen)) {
+    acidity += 10;
+    body += 10;
+    complexity += 10;
+  }
+  if (/indonesia|sumatra|java/.test(origen)) {
+    body += 20;
+    bitterness += 10;
+    acidity -= 10;
+  }
+
+  // Process
+  if (/natural/.test(proceso)) {
+    body += 12;
+    sweetness += 15;
+    acidity -= 5;
+    complexity += 5;
+  }
+  if (/lavado|washed/.test(proceso)) {
+    acidity += 10;
+    body -= 5;
+    complexity += 5;
+  }
+  if (/honey|miel/.test(proceso)) {
+    sweetness += 12;
+    body += 8;
+    complexity += 8;
+  }
+  if (/anaeróbico|anaerobic/.test(proceso)) {
+    complexity += 20;
+    sweetness += 10;
+  }
+
+  // Roast
+  if (/claro|light/.test(tueste)) {
+    acidity += 10;
+    bitterness -= 10;
+    complexity += 5;
+  }
+  if (/medio|medium/.test(tueste)) {
+    body += 5;
+  }
+  if (/oscuro|dark|espresso/.test(tueste)) {
+    bitterness += 15;
+    body += 10;
+    acidity -= 10;
+  }
+
+  // Notes
+  if (/frutal|fruta|fruit|berry|berries|cereza|cherry/.test(notas)) {
+    acidity += 8;
+    sweetness += 8;
+    complexity += 5;
+  }
+  if (/chocolate|cacao|cocoa/.test(notas)) {
+    body += 8;
+    sweetness += 5;
+    bitterness += 3;
+  }
+  if (/caramelo|caramel|toffee|miel|honey/.test(notas)) {
+    sweetness += 12;
+    body += 5;
+  }
+  if (/floral|jazmín|jasmine|rosa|hibiscus/.test(notas)) {
+    acidity += 5;
+    complexity += 12;
+  }
+  if (/nuez|walnut|almendra|almond|avellana|hazelnut/.test(notas)) {
+    body += 5;
+    sweetness += 3;
+  }
+  if (/cítrico|citric|limón|lemon|naranja|orange/.test(notas)) {
+    acidity += 12;
+  }
+  if (/especia|spice|canela|clove|pimienta/.test(notas)) {
+    complexity += 8;
+    bitterness += 3;
+  }
+  if (/tabaco|tobacco|madera|wood|ahumado|smoky/.test(notas)) {
+    body += 8;
+    bitterness += 8;
+  }
+
+  // Category adjustment
+  if (category === 'daily') {
+    complexity -= 10;
+    acidity -= 5;
+    bitterness += 5;
+  }
+
+  const clamp = (v) => Math.max(0, Math.min(100, v));
+  return {
+    acidez: clamp(acidity),
+    cuerpo: clamp(body),
+    dulzor: clamp(sweetness),
+    amargor: clamp(bitterness),
+    complejidad: clamp(complexity),
+  };
+}
+
+function isHiddenGem(cafe, truthScore) {
+  const scaScore = cafe?.sca?.score || 0;
+  const reviewCount = cafe?.totalReviews || cafe?.reviewCount || 0;
+  return truthScore >= 65 && scaScore >= 78 && reviewCount <= 3;
+}
+
+function computeValueScore(cafe) {
+  const precio = cafe?.precio;
+  if (!precio || precio <= 0) return null;
+
+  const scaScore = cafe?.sca?.score || 70;
+  const formato = normalizeText(cafe?.formato || '');
+
+  let grams = 250;
+  const gMatch = formato.match(/(\d+)\s*(?:g|gr)\b/i);
+  if (gMatch) grams = parseInt(gMatch[1], 10);
+  const kgMatch = formato.match(/(\d+(?:[.,]\d+)?)\s*kg/i);
+  if (kgMatch) grams = parseFloat(kgMatch[1].replace(',', '.')) * 1000;
+
+  // capsules: typically 5-7g each
+  if (/cáps|caps|nespresso|dolce/i.test(formato)) {
+    const capMatch = formato.match(/(\d+)/);
+    if (capMatch) grams = parseInt(capMatch[1], 10) * 5.5;
+  }
+
+  const pricePer100g = (precio / grams) * 100;
+  const value = scaScore / pricePer100g;
+  const tier = value >= 30 ? 'excellent' : value >= 15 ? 'good' : value >= 8 ? 'fair' : 'low';
+
+  return {
+    value: Math.round(value * 10) / 10,
+    pricePer100g: Math.round(pricePer100g * 100) / 100,
+    tier,
+  };
+}
+
+function _hasEan(cafe) {
+  const raw = String(cafe?.ean || cafe?.barcode || '').trim();
+  return !!raw && raw !== 'N/A';
+}
+
+function hasEanOrNA(cafe) {
+  const raw = String(cafe?.ean || cafe?.barcode || '').trim();
+  return !!raw;
+}
+
 function isCafeIncomplete(cafe) {
   if (!cafe) return true;
   return !(
-    String(cafe.ean || '').trim() &&
+    hasEanOrNA(cafe) &&
     String(cafe.nombre || cafe.name || '').trim() &&
     String(cafe.marca || cafe.roaster || '').trim() &&
     getBestPhoto(cafe)
@@ -217,7 +519,112 @@ function ReviewCheckPill({ label, ok }) {
   );
 }
 
-function PendingCafeCard({ item, onApprove, onReject, onEdit, busy }) {
+function TruthScorePill({ score }) {
+  const level = getTruthLevel(score);
+  return (
+    <View style={[styles.truthPill, { backgroundColor: level.bg }]}>
+      <Text style={[styles.truthPillText, { color: level.color }]}>{level.label}</Text>
+    </View>
+  );
+}
+
+function FraudSignalBadge({ signal }) {
+  const isSus = signal.type === 'sus';
+  return (
+    <View style={[styles.fraudBadge, isSus ? styles.fraudBadgeSus : styles.fraudBadgeWarn]}>
+      <Text
+        style={[
+          styles.fraudBadgeText,
+          isSus ? styles.fraudBadgeTextSus : styles.fraudBadgeTextWarn,
+        ]}
+      >
+        {isSus ? '🔍' : '⚠️'} {signal.msg}
+      </Text>
+    </View>
+  );
+}
+
+function DnaBar({ label, value, color }) {
+  return (
+    <View style={styles.dnaBarRow}>
+      <Text style={styles.dnaBarLabel}>{label}</Text>
+      <View style={styles.dnaBarTrack}>
+        <View style={[styles.dnaBarFill, { width: `${value}%`, backgroundColor: color }]} />
+      </View>
+      <Text style={styles.dnaBarValue}>{value}</Text>
+    </View>
+  );
+}
+
+function DnaRadar({ cafe }) {
+  const dna = computeCoffeeDna(cafe);
+  const bars = [
+    { label: 'Acidez', value: dna.acidez, color: '#EF4444' },
+    { label: 'Cuerpo', value: dna.cuerpo, color: '#8B5CF6' },
+    { label: 'Dulzor', value: dna.dulzor, color: '#F59E0B' },
+    { label: 'Amargor', value: dna.amargor, color: '#6B7280' },
+    { label: 'Complejidad', value: dna.complejidad, color: '#3B82F6' },
+  ];
+  return (
+    <View style={styles.dnaContainer}>
+      {bars.map((b) => (
+        <DnaBar key={b.label} label={b.label} value={b.value} color={b.color} />
+      ))}
+    </View>
+  );
+}
+
+function ValueScoreBadge({ cafe }) {
+  const vs = computeValueScore(cafe);
+  if (!vs) return null;
+  const colors = { excellent: '#166534', good: '#065F46', fair: '#92400E', low: '#991B1B' };
+  const bgs = { excellent: '#DCFCE7', good: '#D1FAE5', fair: '#FEF3C7', low: '#FEE2E2' };
+  const icons = { excellent: '🏆', good: '👍', fair: '📊', low: '💸' };
+  return (
+    <View style={[styles.valueBadge, { backgroundColor: bgs[vs.tier] }]}>
+      <Text style={[styles.valueBadgeText, { color: colors[vs.tier] }]}>
+        {icons[vs.tier]} {vs.pricePer100g}€/100g
+      </Text>
+    </View>
+  );
+}
+
+function CatalogInsightCard({ icon, title, value, subtitle, tone = 'default' }) {
+  const bg =
+    tone === 'success'
+      ? '#F0FDF4'
+      : tone === 'warn'
+        ? '#FFFBEB'
+        : tone === 'danger'
+          ? '#FEF2F2'
+          : '#F8FAFC';
+  const border =
+    tone === 'success'
+      ? '#BBF7D0'
+      : tone === 'warn'
+        ? '#FDE68A'
+        : tone === 'danger'
+          ? '#FECACA'
+          : '#E5E7EB';
+  const valueColor =
+    tone === 'success'
+      ? '#166534'
+      : tone === 'warn'
+        ? '#92400E'
+        : tone === 'danger'
+          ? '#991B1B'
+          : '#111827';
+  return (
+    <View style={[styles.insightCard, { backgroundColor: bg, borderColor: border }]}>
+      <Text style={styles.insightIcon}>{icon}</Text>
+      <Text style={styles.insightTitle}>{title}</Text>
+      <Text style={[styles.insightValue, { color: valueColor }]}>{value}</Text>
+      {!!subtitle && <Text style={styles.insightSubtitle}>{subtitle}</Text>}
+    </View>
+  );
+}
+
+function PendingCafeCard({ item, onApprove, onReject, onEdit, onRetryIA, busy }) {
   const allowApprove = canBeApproved(item);
   const incomplete = isCafeIncomplete(item);
   const nombre = item.nombre || item.name || 'Sin nombre';
@@ -226,9 +633,12 @@ function PendingCafeCard({ item, onApprove, onReject, onEdit, busy }) {
   const foto = getBestPhoto(item);
   const badge = getStatusBadge(item);
   const coffeeCategory = item.coffeeCategory || 'specialty';
+  const truthScore = computeTruthScore(item);
+  const fraudSignals = detectFraudSignals(item);
+  const gem = isHiddenGem(item, truthScore);
   const missingName = !String(nombre || '').trim() || nombre === 'Sin nombre';
   const missingBrand = !String(marca || '').trim();
-  const missingEan = !String(item.ean || item.barcode || '').trim();
+  const missingEan = !hasEanOrNA(item);
   const missingPrice = !item.precio;
   const cardToneStyle = allowApprove
     ? styles.cardReady
@@ -252,8 +662,18 @@ function PendingCafeCard({ item, onApprove, onReject, onEdit, busy }) {
       <View style={styles.cardHeader}>
         <View style={{ flex: 1, paddingRight: 12 }}>
           <View style={styles.cardPriorityRow}>
-            <View style={[styles.priorityPill, priorityStyle]}>
-              <Text style={[styles.priorityPillText, priorityTextStyle]}>{priorityLabel}</Text>
+            <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
+              <View style={[styles.priorityPill, priorityStyle]}>
+                <Text style={[styles.priorityPillText, priorityTextStyle]}>{priorityLabel}</Text>
+              </View>
+              <TruthScorePill score={truthScore} />
+              {gem && (
+                <View style={[styles.priorityPill, { backgroundColor: '#EDE9FE' }]}>
+                  <Text style={[styles.priorityPillText, { color: '#5B21B6' }]}>
+                    💎 Joya oculta
+                  </Text>
+                </View>
+              )}
             </View>
           </View>
           <Text style={styles.cardTitle} numberOfLines={2}>
@@ -268,6 +688,7 @@ function PendingCafeCard({ item, onApprove, onReject, onEdit, busy }) {
               <Badge label="Auto-IA" kind="successSoft" />
             ) : null}
             {!foto ? <Badge label="Sin imagen" kind="danger" /> : null}
+            <ValueScoreBadge cafe={item} />
           </View>
         </View>
 
@@ -296,19 +717,63 @@ function PendingCafeCard({ item, onApprove, onReject, onEdit, busy }) {
         <FieldRow label="Tipo" value={getCategoryLabel(coffeeCategory)} />
         <FieldRow label="BIO" value={item.isBio ? 'Sí' : 'No'} />
         {!!item.precio && <FieldRow label="Precio" value={`${item.precio} €`} />}
-        {!!item.aiConfidenceScore && (
-          <FieldRow label="Confianza IA" value={`${Math.round(item.aiConfidenceScore * 100)}%`} />
+        {item.aiConfidenceScore != null && (
+          <View style={styles.scoreRow}>
+            <Text style={styles.cardLineLabel}>Score IA: </Text>
+            <View style={styles.scoreBarBg}>
+              <View
+                style={[
+                  styles.scoreBarFill,
+                  { width: `${Math.round(item.aiConfidenceScore * 100)}%` },
+                  item.aiConfidenceScore >= 0.85
+                    ? styles.scoreBarGood
+                    : item.aiConfidenceScore >= 0.5
+                      ? styles.scoreBarMid
+                      : styles.scoreBarLow,
+                ]}
+              />
+            </View>
+            <Text style={styles.scoreText}>{Math.round(item.aiConfidenceScore * 100)}%</Text>
+          </View>
+        )}
+        {item.dataCompletenessScore != null && (
+          <View style={styles.scoreRow}>
+            <Text style={styles.cardLineLabel}>Completitud: </Text>
+            <View style={styles.scoreBarBg}>
+              <View
+                style={[
+                  styles.scoreBarFill,
+                  { width: `${Math.round(item.dataCompletenessScore * 100)}%` },
+                  item.dataCompletenessScore >= 0.7 ? styles.scoreBarGood : styles.scoreBarMid,
+                ]}
+              />
+            </View>
+            <Text style={styles.scoreText}>{Math.round(item.dataCompletenessScore * 100)}%</Text>
+          </View>
         )}
       </View>
+
+      {fraudSignals.length > 0 && (
+        <View style={styles.fraudBox}>
+          <Text style={styles.fraudBoxTitle}>🔍 Detector de humo</Text>
+          {fraudSignals.map((s, i) => (
+            <FraudSignalBadge key={i} signal={s} />
+          ))}
+        </View>
+      )}
 
       {incomplete ? (
         <View style={styles.warningBox}>
           <Text style={styles.warningText}>Faltan datos para aprobar.</Text>
           <Text style={styles.warningSubtext}>Revisa nombre, marca y foto final.</Text>
         </View>
+      ) : fraudSignals.length === 0 ? (
+        <View style={styles.readyBox}>
+          <Text style={styles.readyText}>✅ Café honesto · Lista para validación</Text>
+        </View>
       ) : (
         <View style={styles.readyBox}>
-          <Text style={styles.readyText}>Lista para validación.</Text>
+          <Text style={styles.readyText}>Lista para validación (revisar señales)</Text>
         </View>
       )}
 
@@ -319,7 +784,7 @@ function PendingCafeCard({ item, onApprove, onReject, onEdit, busy }) {
           disabled={busy}
           activeOpacity={0.8}
         >
-          <Text style={styles.actionBtnText}>Editar ficha</Text>
+          <Text style={styles.actionBtnText}>Editar</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -336,12 +801,21 @@ function PendingCafeCard({ item, onApprove, onReject, onEdit, busy }) {
         </TouchableOpacity>
 
         <TouchableOpacity
+          style={[styles.actionBtn, styles.retryIABtn, busy && styles.actionBtnDisabled]}
+          onPress={() => onRetryIA(item)}
+          disabled={busy}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.actionBtnText}>🤖 IA</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
           style={[styles.actionBtn, styles.rejectBtn, busy && styles.actionBtnDisabled]}
           onPress={() => onReject(item)}
           disabled={busy}
           activeOpacity={0.8}
         >
-          <Text style={styles.actionBtnTextDark}>Rechazar</Text>
+          <Text style={styles.actionBtnTextDark}>Eliminar</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -415,7 +889,7 @@ export default function AdminPanelScreen() {
   const [busyId, setBusyId] = useState(null);
   const [pendingCafes, setPendingCafes] = useState([]);
   const [searchText, setSearchText] = useState('');
-  const [activeFilter, setActiveFilter] = useState(FILTERS.ALL);
+  const [activeFilter, setActiveFilter] = useState(FILTERS.PENDING);
 
   const [editingCafe, setEditingCafe] = useState(null);
   const [editData, setEditData] = useState(null);
@@ -694,19 +1168,27 @@ export default function AdminPanelScreen() {
   const handleApprove = useCallback(async (item) => {
     try {
       setBusyId(item.id);
-      await updateDocument('cafes', item.id, {
-        status: 'approved',
-        completionStatus: 'complete',
-        provisional: false,
-        reviewStatus: 'approved',
-        appVisible: true,
-        scannerVisible: true,
-        approvedAt: new Date().toISOString(),
-        adminReviewedAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      });
+      const payload = buildApprovalPayload(item, item.id);
+      await updateDocument('cafes', item.id, payload);
       setPendingCafes((prev) => prev.filter((c) => c.id !== item.id));
-      Alert.alert('OK', 'Café aprobado');
+      const filled = Object.keys(payload).filter(
+        (k) =>
+          ![
+            'status',
+            'estado',
+            'reviewStatus',
+            'completionStatus',
+            'provisional',
+            'appVisible',
+            'scannerVisible',
+            'approvedAt',
+            'adminReviewedAt',
+            'updatedAt',
+            'createdAt',
+          ].includes(k)
+      );
+      const extra = filled.length > 0 ? `\nAuto-completados: ${filled.join(', ')}` : '';
+      Alert.alert('OK', `Café aprobado${extra}`);
     } catch (error) {
       Alert.alert('Error', error?.message || 'No se pudo aprobar');
     } finally {
@@ -715,24 +1197,29 @@ export default function AdminPanelScreen() {
   }, []);
 
   const handleReject = useCallback(async (item) => {
-    try {
-      setBusyId(item.id);
-      await updateDocument('cafes', item.id, {
-        status: 'rejected',
-        provisional: false,
-        reviewStatus: 'rejected',
-        appVisible: false,
-        scannerVisible: false,
-        adminReviewedAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      });
-      setPendingCafes((prev) => prev.filter((c) => c.id !== item.id));
-      Alert.alert('OK', 'Café rechazado');
-    } catch (error) {
-      Alert.alert('Error', error?.message || 'No se pudo rechazar');
-    } finally {
-      setBusyId(null);
-    }
+    Alert.alert(
+      'Eliminar café',
+      `¿Seguro que quieres eliminar "${item.nombre || item.name || 'Sin nombre'}" de la base de datos? Esta acción no se puede deshacer.`,
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Eliminar',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setBusyId(item.id);
+              await deleteDocument('cafes', item.id);
+              setPendingCafes((prev) => prev.filter((c) => c.id !== item.id));
+              Alert.alert('OK', 'Café eliminado de la base de datos');
+            } catch (error) {
+              Alert.alert('Error', error?.message || 'No se pudo eliminar');
+            } finally {
+              setBusyId(null);
+            }
+          },
+        },
+      ]
+    );
   }, []);
 
   const getScaPreviewPayload = useCallback((data) => {
@@ -779,9 +1266,12 @@ export default function AdminPanelScreen() {
           : userPhoto || officialPhoto || '';
 
       const draftPayload = {
-        ean: String(editData.ean || '')
-          .replace(/\D/g, '')
-          .trim(),
+        ean:
+          String(editData.ean || '').trim() === 'N/A'
+            ? 'N/A'
+            : String(editData.ean || '')
+                .replace(/\D/g, '')
+                .trim(),
         nombre: String(editData.nombre || '').trim(),
         name: String(editData.nombre || '').trim(),
         marca: String(editData.marca || '').trim(),
@@ -795,6 +1285,12 @@ export default function AdminPanelScreen() {
         imageUrl: bestPhoto || userPhoto || '',
         bestPhoto,
         foto: bestPhoto || userPhoto || '',
+        photos: {
+          official: officialPhoto ? [officialPhoto] : [],
+          user: userPhoto ? [userPhoto] : [],
+          selected: bestPhoto || '',
+          source: selectedBy,
+        },
         photoSources: {
           userPhoto,
           officialPhoto,
@@ -880,43 +1376,128 @@ export default function AdminPanelScreen() {
   }, [buildEditedPayload, closeEditor, editingCafe, loadCafes]);
 
   const handleRejectFromEditor = useCallback(async () => {
-    try {
-      if (!editingCafe) return;
-      setBusyId(editingCafe.id);
+    if (!editingCafe) return;
 
-      await updateDocument('cafes', editingCafe.id, {
-        status: 'rejected',
-        provisional: false,
-        reviewStatus: 'rejected',
-        appVisible: false,
-        scannerVisible: false,
-        adminReviewedAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+    Alert.alert(
+      'Eliminar café',
+      `¿Seguro que quieres eliminar "${editData?.nombre || editingCafe.nombre || 'Sin nombre'}" de la base de datos? Esta acción no se puede deshacer.`,
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Eliminar',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setBusyId(editingCafe.id);
+              await deleteDocument('cafes', editingCafe.id);
+              Alert.alert('OK', 'Café eliminado de la base de datos');
+              closeEditor();
+              loadCafes();
+            } catch (error) {
+              Alert.alert('Error', error?.message || 'No se pudo eliminar');
+            } finally {
+              setBusyId(null);
+            }
+          },
+        },
+      ]
+    );
+  }, [closeEditor, editingCafe, editData, loadCafes]);
+
+  const handleRetryEnrichment = useCallback(async (item) => {
+    try {
+      setBusyId(item.id);
+
+      const token = getAuthToken();
+      if (!token) {
+        Alert.alert('Sesión', 'No hay sesión activa.');
+        return;
+      }
+
+      const res = await fetch(ADMIN_RETRY_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ cafeId: item.id }),
       });
 
-      Alert.alert('OK', 'Café rechazado');
-      closeEditor();
-      loadCafes();
+      const json = await res.json().catch(() => null);
+
+      if (!res.ok || !json?.ok) {
+        throw new Error(json?.error || 'No se pudo relanzar el enrichment');
+      }
+
+      // Update local state to show it's processing
+      setPendingCafes((prev) =>
+        prev.map((c) => (c.id === item.id ? { ...c, aiStatus: 'queued' } : c))
+      );
+
+      Alert.alert('OK', 'Pipeline IA relanzado. Los datos se actualizarán en unos segundos.');
     } catch (error) {
-      Alert.alert('Error', error?.message || 'No se pudo rechazar');
+      Alert.alert('Error', error?.message || 'No se pudo completar con IA');
     } finally {
       setBusyId(null);
     }
-  }, [closeEditor, editingCafe, loadCafes]);
+  }, []);
 
   const stats = useMemo(() => {
     const total = pendingCafes.length;
+    const pending = pendingCafes.filter((c) => {
+      const st = String(c.reviewStatus || c.status || '');
+      return st !== 'approved' && st !== 'rejected';
+    }).length;
     const sinFoto = pendingCafes.filter((c) => !getBestPhoto(c)).length;
     const sinPrecio = pendingCafes.filter((c) => !c.precio).length;
     const sinNotas = pendingCafes.filter((c) => !String(c.notas || '').trim()).length;
-    const sinEan = pendingCafes.filter((c) => !String(c.ean || c.barcode || '').trim()).length;
+    const sinEan = pendingCafes.filter((c) => !hasEanOrNA(c)).length;
     const listos = pendingCafes.filter((c) => canBeApproved(c)).length;
-    return { total, sinFoto, sinPrecio, sinNotas, sinEan, listos };
+
+    // Catalog intelligence stats
+    let truthHigh = 0,
+      truthMid = 0,
+      truthLow = 0;
+    let suspicious = 0,
+      gems = 0;
+    let bestValueCafes = [];
+    for (const c of pendingCafes) {
+      const ts = computeTruthScore(c);
+      if (ts >= 80) truthHigh++;
+      else if (ts >= 55) truthMid++;
+      else truthLow++;
+      if (detectFraudSignals(c).length > 0) suspicious++;
+      if (isHiddenGem(c, ts)) gems++;
+      const vs = computeValueScore(c);
+      if (vs && vs.tier === 'excellent') bestValueCafes.push(c);
+    }
+
+    return {
+      total,
+      pending,
+      sinFoto,
+      sinPrecio,
+      sinNotas,
+      sinEan,
+      listos,
+      truthHigh,
+      truthMid,
+      truthLow,
+      suspicious,
+      gems,
+      bestValueCount: bestValueCafes.length,
+    };
   }, [pendingCafes]);
 
   const filteredCafes = useMemo(() => {
     let rows = pendingCafes.filter((cafe) => matchesSearch(cafe, searchText));
     switch (activeFilter) {
+      case FILTERS.PENDING:
+        rows = rows.filter((c) => {
+          const st = String(c.reviewStatus || c.status || '');
+          return st !== 'approved' && st !== 'rejected';
+        });
+        break;
       case FILTERS.WITHOUT_IMAGE:
         rows = rows.filter((c) => !getBestPhoto(c));
         break;
@@ -927,7 +1508,7 @@ export default function AdminPanelScreen() {
         rows = rows.filter((c) => !String(c.notas || '').trim());
         break;
       case FILTERS.WITHOUT_EAN:
-        rows = rows.filter((c) => !String(c.ean || c.barcode || '').trim());
+        rows = rows.filter((c) => !hasEanOrNA(c));
         break;
       case FILTERS.INCOMPLETE:
         rows = rows.filter(isCafeIncomplete);
@@ -935,6 +1516,21 @@ export default function AdminPanelScreen() {
       case FILTERS.READY:
         rows = rows.filter(canBeApproved);
         break;
+      case FILTERS.SUSPICIOUS:
+        rows = rows.filter((c) => detectFraudSignals(c).length > 0);
+        break;
+      case FILTERS.HIDDEN_GEMS:
+        rows = rows.filter((c) => isHiddenGem(c, computeTruthScore(c)));
+        break;
+      case FILTERS.BEST_VALUE:
+        rows = rows.filter((c) => {
+          const vs = computeValueScore(c);
+          return vs && vs.tier !== 'low';
+        });
+        rows.sort(
+          (a, b) => (computeValueScore(b)?.value || 0) - (computeValueScore(a)?.value || 0)
+        );
+        return rows; // skip default sort for value ranking
       default:
         break;
     }
@@ -947,6 +1543,7 @@ export default function AdminPanelScreen() {
       onApprove={handleApprove}
       onReject={handleReject}
       onEdit={openEditor}
+      onRetryIA={handleRetryEnrichment}
       busy={busyId === item.id}
     />
   );
@@ -988,9 +1585,7 @@ export default function AdminPanelScreen() {
     const completionItems = [
       {
         label: 'EAN',
-        ok: !!String(editData.ean || '')
-          .replace(/\D/g, '')
-          .trim(),
+        ok: !!String(editData.ean || '').trim(),
       },
       { label: 'Nombre', ok: !!String(editData.nombre || '').trim() },
       { label: 'Marca', ok: !!String(editData.marca || '').trim() },
@@ -1037,7 +1632,7 @@ export default function AdminPanelScreen() {
             onPress={handleRejectFromEditor}
             disabled={busyId === editingCafe.id}
           >
-            <Text style={styles.editorTopActionGhostText}>Rechazar</Text>
+            <Text style={[styles.editorTopActionGhostText, { color: '#991B1B' }]}>Eliminar</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.editorTopActionGhost} onPress={closeEditor}>
@@ -1074,6 +1669,62 @@ export default function AdminPanelScreen() {
               </View>
             ))}
           </View>
+        </AdminSectionCard>
+
+        {/* ── Inteligencia del café ── */}
+        <AdminSectionCard
+          title="🧠 Inteligencia del café"
+          subtitle="Veracidad, ADN sensorial y detector de humo."
+          tone={(() => {
+            const ts = computeTruthScore(editingCafe);
+            const fs = detectFraudSignals(editingCafe);
+            return fs.length > 0 ? 'accent' : ts >= 80 ? 'success' : 'default';
+          })()}
+        >
+          <View style={styles.editorStatsRow}>
+            <EditorStat
+              label="Veracidad"
+              value={`${computeTruthScore(editingCafe)}%`}
+              tone={computeTruthScore(editingCafe) >= 80 ? 'success' : 'default'}
+            />
+            <EditorStat
+              label="Señales"
+              value={
+                detectFraudSignals(editingCafe).length === 0
+                  ? '✅ Honesto'
+                  : `⚠️ ${detectFraudSignals(editingCafe).length}`
+              }
+              tone={detectFraudSignals(editingCafe).length === 0 ? 'success' : 'default'}
+            />
+            <EditorStat
+              label="Valor"
+              value={(() => {
+                const vs = computeValueScore(editingCafe);
+                return vs ? `${vs.pricePer100g}€/100g` : '-';
+              })()}
+            />
+          </View>
+
+          {detectFraudSignals(editingCafe).length > 0 && (
+            <View style={{ marginBottom: 12 }}>
+              {detectFraudSignals(editingCafe).map((s, i) => (
+                <FraudSignalBadge key={i} signal={s} />
+              ))}
+            </View>
+          )}
+
+          <Text style={[styles.adminSectionTitle, { fontSize: 14, marginBottom: 8 }]}>
+            🧬 ADN del café
+          </Text>
+          <DnaRadar cafe={editingCafe} />
+
+          {isHiddenGem(editingCafe, computeTruthScore(editingCafe)) && (
+            <View style={[styles.readyBox, { marginTop: 10, backgroundColor: '#EDE9FE' }]}>
+              <Text style={[styles.readyText, { color: '#5B21B6' }]}>
+                💎 Joya oculta — Alta calidad con poca visibilidad
+              </Text>
+            </View>
+          )}
         </AdminSectionCard>
 
         <CollapsibleAdminSection
@@ -1502,7 +2153,7 @@ export default function AdminPanelScreen() {
             onPress={handleRejectFromEditor}
             disabled={busyId === editingCafe.id}
           >
-            <Text style={styles.actionBtnTextDark}>Rechazar</Text>
+            <Text style={styles.actionBtnTextDark}>Eliminar</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -1521,6 +2172,59 @@ export default function AdminPanelScreen() {
       <Text style={styles.title}>Admin · Catálogo</Text>
       <Text style={styles.subtitle}>Gestiona y enriquece fichas. Filtra por datos faltantes.</Text>
 
+      {/* ── Catalog Intelligence Dashboard ── */}
+      <View style={styles.insightDashboard}>
+        <Text style={styles.insightDashboardTitle}>🧠 Inteligencia del catálogo</Text>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.insightRow}
+        >
+          <CatalogInsightCard
+            icon="🟢"
+            title="Veraces"
+            value={stats.truthHigh}
+            subtitle="80%+ veracidad"
+            tone="success"
+          />
+          <CatalogInsightCard
+            icon="🟡"
+            title="Parciales"
+            value={stats.truthMid}
+            subtitle="55-79%"
+            tone="warn"
+          />
+          <CatalogInsightCard
+            icon="🔴"
+            title="Bajo"
+            value={stats.truthLow}
+            subtitle="< 55%"
+            tone="danger"
+          />
+          <CatalogInsightCard
+            icon="🔍"
+            title="Sospechosos"
+            value={stats.suspicious}
+            subtitle="Señales de humo"
+            tone={stats.suspicious > 0 ? 'warn' : 'success'}
+          />
+          <CatalogInsightCard
+            icon="💎"
+            title="Joyas"
+            value={stats.gems}
+            subtitle="Ocultas"
+            tone={stats.gems > 0 ? 'success' : 'default'}
+          />
+          <CatalogInsightCard
+            icon="🏆"
+            title="Mejor valor"
+            value={stats.bestValueCount}
+            subtitle="€/calidad top"
+            tone={stats.bestValueCount > 0 ? 'success' : 'default'}
+          />
+        </ScrollView>
+      </View>
+
       <View style={styles.searchBox}>
         <TextInput
           value={searchText}
@@ -1536,6 +2240,11 @@ export default function AdminPanelScreen() {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.filtersRow}
       >
+        <FilterChip
+          label={`Pendientes (${stats.pending})`}
+          active={activeFilter === FILTERS.PENDING}
+          onPress={() => setActiveFilter(FILTERS.PENDING)}
+        />
         <FilterChip
           label="Todos"
           active={activeFilter === FILTERS.ALL}
@@ -1571,9 +2280,25 @@ export default function AdminPanelScreen() {
           active={activeFilter === FILTERS.READY}
           onPress={() => setActiveFilter(FILTERS.READY)}
         />
+        <FilterChip
+          label={`🔍 Sospechosos (${stats.suspicious})`}
+          active={activeFilter === FILTERS.SUSPICIOUS}
+          onPress={() => setActiveFilter(FILTERS.SUSPICIOUS)}
+        />
+        <FilterChip
+          label={`💎 Joyas (${stats.gems})`}
+          active={activeFilter === FILTERS.HIDDEN_GEMS}
+          onPress={() => setActiveFilter(FILTERS.HIDDEN_GEMS)}
+        />
+        <FilterChip
+          label={`🏆 Mejor valor`}
+          active={activeFilter === FILTERS.BEST_VALUE}
+          onPress={() => setActiveFilter(FILTERS.BEST_VALUE)}
+        />
       </ScrollView>
 
       <View style={styles.statsRow}>
+        <InfoPill label="Pendientes" value={stats.pending} />
         <InfoPill label="Total" value={stats.total} />
         <InfoPill label="Listos" value={stats.listos} />
         <InfoPill label="Sin foto" value={stats.sinFoto} />
@@ -1851,6 +2576,7 @@ const styles = StyleSheet.create({
   },
   editBtn: { backgroundColor: '#111827' },
   approveBtn: { backgroundColor: '#166534' },
+  retryIABtn: { backgroundColor: '#7C3AED' },
   rejectBtn: { backgroundColor: '#FEE2E2', borderWidth: 1, borderColor: '#FECACA' },
   actionBtnDisabled: { opacity: 0.4 },
   actionBtnText: { color: '#FFF', fontWeight: '700', fontSize: 14 },
@@ -2215,5 +2941,172 @@ const styles = StyleSheet.create({
     color: '#111827',
     fontWeight: '700',
     fontSize: 14,
+  },
+
+  scoreRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  scoreBarBg: {
+    flex: 1,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#E5E7EB',
+    marginHorizontal: 8,
+    overflow: 'hidden',
+  },
+  scoreBarFill: {
+    height: 8,
+    borderRadius: 4,
+  },
+  scoreBarGood: { backgroundColor: '#22C55E' },
+  scoreBarMid: { backgroundColor: '#F59E0B' },
+  scoreBarLow: { backgroundColor: '#EF4444' },
+  scoreText: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#111827',
+    minWidth: 38,
+    textAlign: 'right',
+  },
+
+  // ── Catalog Intelligence styles ──
+
+  truthPill: {
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  truthPillText: {
+    fontSize: 11,
+    fontWeight: '800',
+  },
+
+  fraudBox: {
+    marginTop: 10,
+    backgroundColor: '#FFFBEB',
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#FDE68A',
+  },
+  fraudBoxTitle: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#92400E',
+    marginBottom: 6,
+  },
+  fraudBadge: {
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    marginBottom: 4,
+  },
+  fraudBadgeWarn: {
+    backgroundColor: '#FEF3C7',
+  },
+  fraudBadgeSus: {
+    backgroundColor: '#FEE2E2',
+  },
+  fraudBadgeText: {
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  fraudBadgeTextWarn: {
+    color: '#92400E',
+  },
+  fraudBadgeTextSus: {
+    color: '#991B1B',
+  },
+
+  dnaContainer: {
+    gap: 8,
+  },
+  dnaBarRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  dnaBarLabel: {
+    width: 80,
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#374151',
+  },
+  dnaBarTrack: {
+    flex: 1,
+    height: 10,
+    backgroundColor: '#F3F4F6',
+    borderRadius: 5,
+    overflow: 'hidden',
+  },
+  dnaBarFill: {
+    height: 10,
+    borderRadius: 5,
+  },
+  dnaBarValue: {
+    width: 28,
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#6B7280',
+    textAlign: 'right',
+  },
+
+  valueBadge: {
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    marginRight: 6,
+    marginBottom: 6,
+  },
+  valueBadgeText: {
+    fontSize: 12,
+    fontWeight: '700',
+  },
+
+  insightDashboard: {
+    marginBottom: 14,
+    backgroundColor: '#FFF',
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    padding: 14,
+  },
+  insightDashboardTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#111827',
+    marginBottom: 10,
+  },
+  insightRow: {
+    gap: 10,
+    paddingRight: 10,
+  },
+  insightCard: {
+    width: 110,
+    borderRadius: 14,
+    borderWidth: 1,
+    padding: 12,
+  },
+  insightIcon: {
+    fontSize: 18,
+    marginBottom: 4,
+  },
+  insightTitle: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#6B7280',
+    textTransform: 'uppercase',
+  },
+  insightValue: {
+    marginTop: 4,
+    fontSize: 22,
+    fontWeight: '800',
+  },
+  insightSubtitle: {
+    marginTop: 2,
+    fontSize: 11,
+    color: '#9CA3AF',
   },
 });

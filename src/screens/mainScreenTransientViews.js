@@ -12,7 +12,11 @@ import {
 
 import AppDialogModal from '../components/AppDialogModal';
 import OnboardingModal from '../components/OnboardingModal';
+import { useNetwork } from '../context/NetworkContext';
+import { enqueueAction } from '../core/syncQueue';
+import { getCafePhoto } from '../core/utils';
 import { getUpgradeForScannedCafe } from '../domain/coffee/scanUpgrade';
+import { findAnyCafeByEan } from '../services/cafeService';
 import CafeDetailScreen from './CafeDetailScreen';
 import FormScreen from './FormScreen';
 import ProfileScreen from './ProfileScreen';
@@ -93,7 +97,7 @@ function ExistingCafeMatchScreen({
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.96)).current;
   const matchCopy = getCafeMatchCopy(cafe);
-  const image = cafe?.bestPhoto || cafe?.officialPhoto || cafe?.foto || null;
+  const image = getCafePhoto(cafe);
 
   useEffect(() => {
     Animated.parallel([
@@ -361,11 +365,7 @@ function ExistingCafeMatchScreen({
               <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
                 <Image
                   source={{
-                    uri:
-                      upgrade.cafe.bestPhoto ||
-                      upgrade.cafe.officialPhoto ||
-                      upgrade.cafe.foto ||
-                      undefined,
+                    uri: getCafePhoto(upgrade.cafe),
                   }}
                   style={{ width: 68, height: 68, borderRadius: 16, backgroundColor: '#1a1a1a' }}
                 />
@@ -541,6 +541,7 @@ function ScannerMatchFlow({
   showDialog,
 }) {
   const [matchedCafe, setMatchedCafe] = useState(null);
+  const { isOnline } = useNetwork();
   const scanUpgrade = useMemo(
     () => getUpgradeForScannedCafe(matchedCafe, allCafes),
     [allCafes, matchedCafe]
@@ -552,16 +553,21 @@ function ScannerMatchFlow({
     const matchCopy = getCafeMatchCopy(matchedCafe);
     if (!matchCopy.autoOpen) return undefined;
 
-    const timer = setTimeout(() => {
-      setScanning(false);
-      setCafeDetalle?.(matchedCafe);
-      setMatchedCafe(null);
-    }, 900);
-
-    return () => clearTimeout(timer);
+    // Go directly to detail without intermediate flash screen
+    setScanning(false);
+    setCafeDetalle?.(matchedCafe);
+    setMatchedCafe(null);
+    return undefined;
   }, [matchedCafe, setCafeDetalle, setScanning]);
 
   if (matchedCafe) {
+    // Don't render intermediate screen when autoOpen — the useEffect will
+    // navigate directly to detail, avoiding a 1-frame flash.
+    const matchCopyForRender = getCafeMatchCopy(matchedCafe);
+    if (matchCopyForRender.autoOpen) {
+      return null;
+    }
+
     return (
       <ExistingCafeMatchScreen
         cafe={matchedCafe}
@@ -599,7 +605,7 @@ function ScannerMatchFlow({
 
   return (
     <ScannerScreen
-      onScanned={(result) => {
+      onScanned={async (result) => {
         const ean = normalizeEan(result?.ean);
 
         if (!ean) {
@@ -607,11 +613,33 @@ function ScannerMatchFlow({
           return;
         }
 
+        // 1) Check local cache
         const existing = allCafes.find((c) => normalizeEan(c?.ean) === ean);
 
         if (existing) {
           setMatchedCafe(existing);
           return;
+        }
+
+        // 2) Offline: queue scan
+        if (!isOnline) {
+          enqueueAction('pending_scan', { ean, source: 'barcode', ts: Date.now() });
+          showDialog?.(
+            'Escaneo guardado',
+            `Código ${ean} guardado. Se procesará cuando vuelvas a tener conexión.`
+          );
+          return;
+        }
+
+        // 3) Fallback: check Firestore (covers legacy docs with auto-ID)
+        try {
+          const remote = await findAnyCafeByEan(ean);
+          if (remote) {
+            setMatchedCafe(remote);
+            return;
+          }
+        } catch (_err) {
+          // Network error — proceed to create new
         }
 
         onScannerDone?.({
@@ -723,7 +751,7 @@ export function MainScreenOverlayLayer({
   closeProfile,
   refrescarPerfil,
 }) {
-  return (
+  const renderOverlayContent = () => (
     <>
       <AppDialogModal
         visible={!!dialogVisible}
@@ -741,7 +769,7 @@ export function MainScreenOverlayLayer({
         onStartQuiz={startQuizFromOnboarding}
       />
 
-      {!!achievementToast && (
+      {achievementToast ? (
         <TouchableOpacity
           activeOpacity={0.95}
           onPress={closeAchievementToast}
@@ -769,9 +797,9 @@ export function MainScreenOverlayLayer({
             </View>
           </Animated.View>
         </TouchableOpacity>
-      )}
+      ) : null}
 
-      {cafeDetalle && (
+      {cafeDetalle ? (
         <CafeDetailScreen
           cafe={cafeDetalle?.cafes ? null : cafeDetalle}
           cafes={cafeDetalle?.cafes || null}
@@ -794,16 +822,18 @@ export function MainScreenOverlayLayer({
           s={s}
           keyVotes={keyVotes}
         />
-      )}
+      ) : null}
 
-      {!!showProfile && (
+      {showProfile ? (
         <ProfileScreen
           isPremium={premium.isPremium}
           premiumDaysLeft={premium.daysLeft}
           onClose={closeProfile}
           onProfileSaved={refrescarPerfil}
         />
-      )}
+      ) : null}
     </>
   );
+
+  return <View>{renderOverlayContent()}</View>;
 }

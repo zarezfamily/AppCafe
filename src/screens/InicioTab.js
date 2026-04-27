@@ -1,10 +1,13 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { View } from 'react-native';
+import DailyChallengeSection from '../components/DailyChallengeSection';
 import HeroCafeCard from '../components/HeroCafeCard';
 import MemberInfoModal from '../components/MemberInfoModal';
 import { HeroCafeSkeleton } from '../components/SkeletonLoader';
 import { getHeroCafe } from '../domain/coffee/heroCoffee';
 import { getLiveRankingBuckets } from '../domain/coffee/liveRankings';
+import useCollapsibleSections from '../hooks/useCollapsibleSections';
+import useDailyChallenge from '../hooks/useDailyChallenge';
 import {
   BioCoffeeSection,
   DailyCoffeeSection,
@@ -79,6 +82,20 @@ function buildStepUpPairs(dailyCafes, specialtyCafes) {
     .filter(Boolean);
 }
 
+function HeroArea({ showHeroSkeleton, heroEntry, premiumAccent, setCafeDetalle, setActiveTab }) {
+  if (showHeroSkeleton) return <HeroCafeSkeleton />;
+  if (!heroEntry?.cafe) return null;
+  return (
+    <HeroCafeCard
+      item={heroEntry.cafe}
+      variant={heroEntry.variant}
+      premiumAccent={premiumAccent}
+      onOpenCafe={(item) => setCafeDetalle(item)}
+      onOpenRanking={() => setActiveTab(MAIN_TABS.TOP)}
+    />
+  );
+}
+
 export default function InicioTab({
   s,
   perfil,
@@ -106,12 +123,34 @@ export default function InicioTab({
   cafeteriasInicio,
   cargarCafeteriasInicio,
   theme,
+  onGamifyEvent,
 }) {
   const [showMemberInfo, setShowMemberInfo] = useState(false);
+
+  const { isCollapsed, toggle } = useCollapsibleSections([
+    'liveRanking',
+    'specialty',
+    'daily',
+    'bio',
+    'stepUp',
+    'social',
+    'cafeterias',
+  ]);
 
   const handleMemberRoastLongPress = () => {
     setShowMemberInfo(true);
   };
+
+  const daily = useDailyChallenge({ allCafes });
+
+  const handleDailyComplete = useCallback(() => {
+    const newBadge = daily.completeDailyChallenge();
+    onGamifyEvent?.('daily_challenge', {
+      bestStreak: daily.bestStreak,
+      coffeeId: daily.dailyCoffee?.id,
+    });
+    return newBadge;
+  }, [daily, onGamifyEvent]);
 
   const specialtyCafes = useMemo(() => {
     return (allCafes || []).filter(
@@ -188,18 +227,24 @@ export default function InicioTab({
           toggleFav={toggleFav}
         />
       ) : (
-        <>
-          {showHeroSkeleton ? <HeroCafeSkeleton /> : null}
+        <View>
+          <HeroArea
+            showHeroSkeleton={showHeroSkeleton}
+            heroEntry={heroEntry}
+            premiumAccent={premiumAccent}
+            setCafeDetalle={setCafeDetalle}
+            setActiveTab={setActiveTab}
+          />
 
-          {!!heroEntry?.cafe && (
-            <HeroCafeCard
-              item={heroEntry.cafe}
-              variant={heroEntry.variant}
-              premiumAccent={premiumAccent}
-              onOpenCafe={(item) => setCafeDetalle(item)}
-              onOpenRanking={() => setActiveTab(MAIN_TABS.TOP)}
-            />
-          )}
+          <DailyChallengeSection
+            dailyCoffee={daily.dailyCoffee}
+            completedToday={daily.completedToday}
+            streak={daily.streak}
+            bestStreak={daily.bestStreak}
+            nextBadge={daily.nextBadge}
+            onComplete={handleDailyComplete}
+            onOpenCafe={(item) => setCafeDetalle(item)}
+          />
 
           <LiveRankingSection
             s={s}
@@ -208,6 +253,8 @@ export default function InicioTab({
             favs={favs}
             toggleFav={toggleFav}
             CardHorizontal={CardHorizontal}
+            collapsed={isCollapsed('liveRanking')}
+            onToggle={() => toggle('liveRanking')}
           />
 
           <SpecialtyForYouSection
@@ -217,6 +264,8 @@ export default function InicioTab({
             favs={favs}
             toggleFav={toggleFav}
             CardHorizontal={CardHorizontal}
+            collapsed={isCollapsed('specialty')}
+            onToggle={() => toggle('specialty')}
           />
 
           <DailyCoffeeSection
@@ -226,6 +275,8 @@ export default function InicioTab({
             favs={favs}
             toggleFav={toggleFav}
             CardHorizontal={CardHorizontal}
+            collapsed={isCollapsed('daily')}
+            onToggle={() => toggle('daily')}
           />
 
           <BioCoffeeSection
@@ -235,6 +286,8 @@ export default function InicioTab({
             favs={favs}
             toggleFav={toggleFav}
             CardHorizontal={CardHorizontal}
+            collapsed={isCollapsed('bio')}
+            onToggle={() => toggle('bio')}
           />
 
           <StepUpSection
@@ -244,6 +297,8 @@ export default function InicioTab({
             favs={favs}
             toggleFav={toggleFav}
             CardHorizontal={CardHorizontal}
+            collapsed={isCollapsed('stepUp')}
+            onToggle={() => toggle('stepUp')}
           />
 
           <SocialFeedSection
@@ -251,6 +306,8 @@ export default function InicioTab({
             allCafes={allCafes}
             setCafeDetalle={setCafeDetalle}
             setActiveTab={setActiveTab}
+            collapsed={isCollapsed('social')}
+            onToggle={() => toggle('social')}
           />
 
           <NearbyCafeteriasSection
@@ -262,8 +319,10 @@ export default function InicioTab({
             cafeteriasInicio={cafeteriasInicio}
             cargarCafeteriasInicio={cargarCafeteriasInicio}
             theme={theme}
+            collapsed={isCollapsed('cafeterias')}
+            onToggle={() => toggle('cafeterias')}
           />
-        </>
+        </View>
       )}
     </View>
   );

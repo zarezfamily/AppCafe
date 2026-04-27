@@ -1,0 +1,4390 @@
+◇ injected env (9) from .env // tip: ◈ encrypted .env [www.dotenvx.com]
+🔍 Buscando cafés pendientes en Firestore…
+
+🎨 Procesando 740 cafés con background-removal local…
+   (Primera ejecución descarga el modelo ~40MB, luego se cachea)
+
+[1/740] 🖼️  Bonka Grano Brasil 800gr
+       📥 Descargada (216 KB, image/png)
+       ✅ Fondo eliminado (65 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[2/740] 🖼️  Bonka Grano Colombia 500gr
+       📥 Descargada (219 KB, image/png)
+       ✅ Fondo eliminado (56 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[3/740] 🖼️  Bonka Grano Descafeinado 500gr
+       📥 Descargada (385 KB, image/png)
+       ✅ Fondo eliminado (108 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[4/740] 🖼️  Bonka Grano Mezcla Intensa 500gr
+       📥 Descargada (334 KB, image/png)
+       ✅ Fondo eliminado (106 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[5/740] 🖼️  Bonka Grano Natural 500gr
+       📥 Descargada (379 KB, image/png)
+       ✅ Fondo eliminado (85 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[6/740] 🖼️  Bonka Molido Descafeinado 250gr
+       📥 Descargada (269 KB, image/png)
+       ✅ Fondo eliminado (72 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[7/740] 🖼️  Bonka Molido Descafeinado 400gr
+       📥 Descargada (425 KB, image/png)
+       ✅ Fondo eliminado (91 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[8/740] 🖼️  Bonka Molido Extrafuerte 250gr
+       📥 Descargada (241 KB, image/png)
+       ✅ Fondo eliminado (76 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[9/740] 🖼️  Bonka Molido Mezcla 250gr
+       📥 Descargada (256 KB, image/png)
+       ✅ Fondo eliminado (81 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[10/740] 🖼️  Bonka Molido Mezcla 500gr
+       📥 Descargada (413 KB, image/png)
+       ✅ Fondo eliminado (68 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[11/740] 🖼️  Bonka Molido Natural 250gr
+       📥 Descargada (270 KB, image/png)
+       ✅ Fondo eliminado (87 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[12/740] 🖼️  Bonka Molido Natural 500gr
+       📥 Descargada (401 KB, image/png)
+       ✅ Fondo eliminado (85 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[13/740] 🖼️  Bonka Molido Colombia 250gr
+       📥 Descargada (260 KB, image/png)
+       ✅ Fondo eliminado (83 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[14/740] 🖼️  Bonka Molido Ecológico 250gr
+       📥 Descargada (297 KB, image/png)
+       ✅ Fondo eliminado (85 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[15/740] 🖼️  Bonka Molido Espresso Natural 250gr
+       📥 Descargada (277 KB, image/png)
+       ✅ Fondo eliminado (83 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[16/740] 🖼️  Café en grano tueste natural 100% Arábica origen Brasil Club del Gourmet
+       📥 Descargada (806 KB, image/png)
+       ✅ Fondo eliminado (295 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[17/740] 🖼️  Café en grano tueste natural 100% Arábica origen Etiopía Club del Gourmet
+       📥 Descargada (788 KB, image/png)
+       ✅ Fondo eliminado (266 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[18/740] 🖼️  Café en grano tueste natural 100% Arábica origen Guatemala Club del Gourmet
+       📥 Descargada (827 KB, image/png)
+       ✅ Fondo eliminado (299 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[19/740] 🖼️  Café en grano tueste natural 100% Arábica origen Kenya Club del Gourmet
+       📥 Descargada (827 KB, image/png)
+       ✅ Fondo eliminado (288 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[20/740] 🖼️  Descafeinado - Café diario
+       📥 Descargada (645 KB, image/png)
+       ✅ Fondo eliminado (175 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[21/740] 🖼️  Classic - Café diario
+       📥 Descargada (731 KB, image/png)
+       ✅ Fondo eliminado (194 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[22/740] 🖼️  Espresso - Café diario
+       📥 Descargada (653 KB, image/png)
+       ✅ Fondo eliminado (177 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[23/740] 🖼️  Espresso Intenso - Café diario
+       📥 Descargada (603 KB, image/png)
+       ✅ Fondo eliminado (146 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[24/740] 🖼️  Crema - Café diario
+       📥 Descargada (706 KB, image/png)
+       ✅ Fondo eliminado (190 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[25/740] 🖼️  Blonde Roast - Café diario
+       📥 Descargada (701 KB, image/png)
+       ✅ Fondo eliminado (182 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[26/740] 🖼️  Domus Barista Single Origin Brasil
+       📥 Descargada (873 KB, image/png)
+       ✅ Fondo eliminado (214 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[27/740] 🖼️  Domus Barista Single Origin Mexico
+       📥 Descargada (850 KB, image/png)
+       ✅ Fondo eliminado (198 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[28/740] 🖼️  Domus Barista Single Origin Colombia
+       📥 Descargada (814 KB, image/png)
+       ✅ Fondo eliminado (222 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[29/740] 🖼️  Domus Barista Single Orgin Sumatra
+       📥 Descargada (901 KB, image/png)
+       ✅ Fondo eliminado (211 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[30/740] 🖼️  Aroma - Café diario
+       📥 Descargada (664 KB, image/png)
+       ✅ Fondo eliminado (177 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[31/740] 🖼️  Segafredo Selezione Arabica
+       📥 Descargada (1344 KB, image/png)
+       ✅ Fondo eliminado (336 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[32/740] 🖼️  Segafredo Caffé Crema Classico
+       📥 Descargada (831 KB, image/png)
+       ✅ Fondo eliminado (221 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[33/740] 🖼️  Segafredo Caffé Crema Dolce
+       📥 Descargada (811 KB, image/png)
+       ✅ Fondo eliminado (228 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[34/740] 🖼️  Segafredo Caffé Crema Gustoso
+       📥 Descargada (756 KB, image/png)
+       ✅ Fondo eliminado (185 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[35/740] 🖼️  Zoegas Mollbergs
+       📥 Descargada (93 KB, image/jpeg)
+       ✅ Fondo eliminado (210 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[36/740] 🖼️  Zoegas Hazienda
+       📥 Descargada (94 KB, image/jpeg)
+       ✅ Fondo eliminado (240 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[37/740] 🖼️  Zoegas Espresso Della Casa
+       📥 Descargada (85 KB, image/jpeg)
+       ✅ Fondo eliminado (213 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[38/740] 🖼️  Zoegas Espresso Trattoria
+       📥 Descargada (90 KB, image/jpeg)
+       ✅ Fondo eliminado (217 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[39/740] 🖼️  Skånerost
+       📥 Descargada (705 KB, image/png)
+       ✅ Fondo eliminado (180 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[40/740] 🖼️  Blue Java
+       📥 Descargada (726 KB, image/png)
+       ✅ Fondo eliminado (185 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[41/740] 🖼️  Café en cápsula cortado Dolce Gusto
+       📥 Descargada (125 KB, image/jpeg)
+       ✅ Fondo eliminado (395 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[42/740] 🖼️  Café con leche en cápsula Dolce Gusto
+       📥 Descargada (140 KB, image/jpeg)
+       ✅ Fondo eliminado (430 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[43/740] 🖼️  Café en cápsula descafeinado espresso intenso Dolce Gusto
+       📥 Descargada (145 KB, image/jpeg)
+       ✅ Fondo eliminado (387 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[44/740] 🖼️  Café en cápsula ristretto napoli Dolce Gusto
+       📥 Descargada (132 KB, image/jpeg)
+       ✅ Fondo eliminado (399 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[45/740] 🖼️  Café en cápsula espresso intenso Dolce Gusto
+       📥 Descargada (129 KB, image/jpeg)
+       ✅ Fondo eliminado (374 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[46/740] 🖼️  Holiday Blend
+       📥 Descargada (163 KB, image/jpeg)
+       ✅ Fondo eliminado (299 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[47/740] 🖼️  Brasil Intenso - Café Royal
+       📥 Descargada (143 KB, image/jpeg)
+       ✅ Fondo eliminado (326 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[48/740] 🖼️  Gastro Descafeinado
+       📥 Descargada (543 KB, image/png)
+       ✅ Fondo eliminado (100 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[49/740] 🖼️  Crema Gastro - Café Royal
+       📥 Descargada (504 KB, image/png)
+       ✅ Fondo eliminado (111 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[50/740] 🖼️  Espresso Gastro
+       📥 Descargada (533 KB, image/png)
+       ✅ Fondo eliminado (128 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[51/740] 🖼️  Espresso Forte Gastro - Café Royal
+       📥 Descargada (551 KB, image/png)
+       ✅ Fondo eliminado (115 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[52/740] 🖼️  Espresso Barista Gran Crema
+       📥 Descargada (764 KB, image/png)
+       ✅ Fondo eliminado (213 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[53/740] 🖼️  Lavazza Crema E Aroma
+       📥 Descargada (1504 KB, image/png)
+       ✅ Fondo eliminado (335 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[54/740] 🖼️  Lavazza Caffé Crema Classico
+       📥 Descargada (1082 KB, image/png)
+       ✅ Fondo eliminado (276 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[55/740] 🖼️  Lavazza Caffè Crema Dolce
+       📥 Descargada (1008 KB, image/png)
+       ✅ Fondo eliminado (300 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[56/740] 🖼️  Decaf Classico
+       📥 Descargada (995 KB, image/png)
+       ✅ Fondo eliminado (222 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[57/740] 🖼️  Caffè Crema Gustoso
+       📥 Descargada (1103 KB, image/png)
+       ✅ Fondo eliminado (272 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[58/740] 🖼️  Qualità Rossa
+       📥 Descargada (864 KB, image/png)
+       ✅ Fondo eliminado (267 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[59/740] 🖼️  Crema e Gusto Forte
+       📥 Descargada (1141 KB, image/png)
+       ✅ Fondo eliminado (236 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[60/740] 🖼️  Espresso Napoli - Kimbo
+       📥 Descargada (984 KB, image/png)
+       ✅ Fondo eliminado (261 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[61/740] 🖼️  Aroma Gold - Kimbo
+       📥 Descargada (947 KB, image/png)
+       ✅ Fondo eliminado (269 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[62/740] 🖼️  Intenso
+       📥 Descargada (849 KB, image/png)
+       ✅ Fondo eliminado (259 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[63/740] 🖼️  Espresso Classico
+       📥 Descargada (909 KB, image/png)
+       ✅ Fondo eliminado (239 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[64/740] 🖼️  Espresso Crema Intensa
+       📥 Descargada (928 KB, image/png)
+       ✅ Fondo eliminado (253 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[65/740] 🖼️  Crema Classico
+       📥 Descargada (911 KB, image/png)
+       ✅ Fondo eliminado (246 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[66/740] 🖼️  Espresso Barista 100% Arabica
+       📥 Descargada (932 KB, image/png)
+       ✅ Fondo eliminado (257 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[67/740] 🖼️  Antica Miscela
+       📥 Descargada (677 KB, image/png)
+       ✅ Fondo eliminado (205 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[68/740] 🖼️  Gimoka Dulcis Vitae
+       📥 Descargada (895 KB, image/png)
+       ✅ Fondo eliminado (219 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[69/740] 🖼️  Garibaldi Intenso
+       📥 Descargada (1197 KB, image/png)
+       ✅ Fondo eliminado (271 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[70/740] 🖼️  Garibaldi Espresso Bar
+       📥 Descargada (895 KB, image/png)
+       ✅ Fondo eliminado (274 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[71/740] 🖼️  Garibaldi Gusto Dolce
+       📥 Descargada (643 KB, image/png)
+       ✅ Fondo eliminado (191 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[72/740] 🖼️  Gimoka Supremo
+       📥 Descargada (1023 KB, image/png)
+       ✅ Fondo eliminado (243 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[73/740] 🖼️  Intermezzo
+       📥 Descargada (957 KB, image/png)
+       ✅ Fondo eliminado (246 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[74/740] 🖼️  Segafredo Espresso Casa
+       📥 Descargada (860 KB, image/png)
+       ✅ Fondo eliminado (221 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[75/740] 🖼️  illy Colombia
+       📥 Descargada (744 KB, image/png)
+       ✅ Fondo eliminado (176 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[76/740] 🖼️  illy India
+       📥 Descargada (695 KB, image/png)
+       ✅ Fondo eliminado (174 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[77/740] 🖼️  illy Nicaragua
+       📥 Descargada (732 KB, image/png)
+       ✅ Fondo eliminado (179 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[78/740] 🖼️  illy Brasil
+       📥 Descargada (804 KB, image/png)
+       ✅ Fondo eliminado (184 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[79/740] 🖼️  illy Classico
+       📥 Descargada (761 KB, image/png)
+       ✅ Fondo eliminado (188 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[80/740] 🖼️  illy Descafeinado
+       📥 Descargada (765 KB, image/png)
+       ✅ Fondo eliminado (177 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[81/740] 🖼️  illy Intenso
+       📥 Descargada (703 KB, image/png)
+       ✅ Fondo eliminado (170 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[82/740] 🖼️  illy Ethiopia
+       📥 Descargada (757 KB, image/png)
+       ✅ Fondo eliminado (177 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[83/740] 🖼️  illy Guatemala
+       📥 Descargada (723 KB, image/png)
+       ✅ Fondo eliminado (173 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[84/740] 🖼️  Delonghi Caffé Crema
+       📥 Descargada (702 KB, image/png)
+       ✅ Fondo eliminado (168 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[85/740] 🖼️  Delonghi Classico Espresso
+       📥 Descargada (617 KB, image/png)
+       ✅ Fondo eliminado (130 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[86/740] 🖼️  Delonghi Selezione Espresso
+       📥 Descargada (593 KB, image/png)
+       ✅ Fondo eliminado (134 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[87/740] 🖼️  Delonghi Decaffeinato Espresso
+       📥 Descargada (596 KB, image/png)
+       ✅ Fondo eliminado (122 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[88/740] 🖼️  Café en cápsulas doble espresso Hacendado
+       📥 Descargada (115 KB, image/jpeg)
+       ✅ Fondo eliminado (349 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[89/740] 🖼️  Café cortado en cápsula Hacendado
+       📥 Descargada (121 KB, image/jpeg)
+       ✅ Fondo eliminado (370 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[90/740] 🖼️  Café con leche en cápsula Hacendado
+       📥 Descargada (119 KB, image/jpeg)
+       ✅ Fondo eliminado (489 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[91/740] 🖼️  Café en cápsula Colombia Hacendado
+       📥 Descargada (117 KB, image/jpeg)
+       ✅ Fondo eliminado (354 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[92/740] 🖼️  Café molido Colombia Hacendado
+       📥 Descargada (174 KB, image/jpeg)
+       ✅ Fondo eliminado (608 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[93/740] 🖼️  Café soluble Classic Hacendado
+       📥 Descargada (131 KB, image/jpeg)
+       ✅ Fondo eliminado (421 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[94/740] 🖼️  Café soluble Classic Hacendado
+       📥 Descargada (100 KB, image/jpeg)
+       ✅ Fondo eliminado (337 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[95/740] 🖼️  Café soluble descafeinado Hacendado
+       📥 Descargada (108 KB, image/jpeg)
+       ✅ Fondo eliminado (302 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[96/740] 🖼️  Café soluble descafeinado Hacendado
+       📥 Descargada (128 KB, image/jpeg)
+       ✅ Fondo eliminado (381 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[97/740] 🖼️  Café soluble classic en sobres Hacendado
+       📥 Descargada (212 KB, image/jpeg)
+       ✅ Fondo eliminado (603 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[98/740] 🖼️  Café soluble descafeinado en sobres Hacendado
+       📥 Descargada (210 KB, image/jpeg)
+       ✅ Fondo eliminado (529 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[99/740] 🖼️  Café en grano Colombia Hacendado
+       📥 Descargada (133 KB, image/jpeg)
+       ✅ Fondo eliminado (420 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[100/740] 🖼️  Cortado en cápsula descafeinado Hacendado
+       📥 Descargada (153 KB, image/jpeg)
+       ✅ Fondo eliminado (438 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[101/740] 🖼️  Café con leche en cápsula descafeinado Hacendado
+       📥 Descargada (137 KB, image/jpeg)
+       ✅ Fondo eliminado (468 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[102/740] 🖼️  Café en grano natural Hacendado
+       📥 Descargada (100 KB, image/jpeg)
+       ✅ Fondo eliminado (325 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[103/740] 🖼️  Café en cápsula sabor Caramel Hacendado
+       📥 Descargada (116 KB, image/jpeg)
+       ✅ Fondo eliminado (411 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[104/740] 🖼️  Café en grano fuerte Hacendado
+       📥 Descargada (107 KB, image/jpeg)
+       ✅ Fondo eliminado (340 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[105/740] 🖼️  Café en cápsula ristretto Hacendado
+       📥 Descargada (113 KB, image/jpeg)
+       ✅ Fondo eliminado (364 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[106/740] 🖼️  Café soluble descafeinado Nescafé classic
+       📥 Descargada (148 KB, image/jpeg)
+       ✅ Fondo eliminado (429 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[107/740] 🖼️  Café soluble descafeinado Nescafé classic
+       📥 Descargada (123 KB, image/jpeg)
+       ✅ Fondo eliminado (345 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[108/740] 🖼️  Café molido natural Bonka
+       📥 Descargada (265 KB, image/jpeg)
+       ✅ Fondo eliminado (887 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[109/740] 🖼️  Café molido natural Cafés Valiente
+       📥 Descargada (95 KB, image/jpeg)
+       ✅ Fondo eliminado (322 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[110/740] 🖼️  Café molido natural Climent
+       📥 Descargada (102 KB, image/jpeg)
+       ✅ Fondo eliminado (278 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[111/740] 🖼️  Café molido descafeinado Climent
+       📥 Descargada (104 KB, image/jpeg)
+       ✅ Fondo eliminado (315 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[112/740] 🖼️  Café en grano 100% natural Marca Mogorttini
+       📥 Descargada (11 KB, image/jpeg)
+       ✅ Fondo eliminado (20 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[113/740] 🖼️  Tasting box Mogorttini 4 Variedades
+       📥 Descargada (9 KB, image/jpeg)
+       ✅ Fondo eliminado (11 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[114/740] 🖼️  Espresso Mogorttini, caja 50 cápsulas. Compatibles con Nespresso Profesional.
+       📥 Descargada (8 KB, image/jpeg)
+       ✅ Fondo eliminado (9 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[115/740] 🖼️  Ristretto Mogorttini, caja 50 cápsulas. Compatibles con Nespresso Profesional.
+       📥 Descargada (8 KB, image/jpeg)
+       ✅ Fondo eliminado (12 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[116/740] 🖼️  Intenso Mogorttini, caja 50 cápsulas. Compatibles con Nespresso Profesional.
+       📥 Descargada (8 KB, image/jpeg)
+       ✅ Fondo eliminado (12 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[117/740] 🖼️  Descafeinado Mogorttini, caja 50 cápsulas. Compatibles con Nespresso Profesional.
+       📥 Descargada (8 KB, image/jpeg)
+       ✅ Fondo eliminado (13 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[118/740] 🖼️  Master Ristretto Mogorttini 300 cápsulas Nespresso Pro
+       📥 Descargada (7 KB, image/jpeg)
+       ✅ Fondo eliminado (13 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[119/740] 🖼️  Master Intenso Mogorttini 300 cápsulas Nespresso Pro
+       📥 Descargada (7 KB, image/jpeg)
+       ✅ Fondo eliminado (11 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[120/740] 🖼️  Master Espresso Mogorttini 300 cápsulas Nespresso Pro
+       📥 Descargada (7 KB, image/jpeg)
+       ✅ Fondo eliminado (8 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[121/740] 🖼️  Master Descafeinado Mogorttini 300 cápsulas Nespresso Pro
+       📥 Descargada (8 KB, image/jpeg)
+       ✅ Fondo eliminado (13 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[122/740] 🖼️  Extra Intenso Dolce gusto compatible marca Kfetea 48 cápsulas, Formato Super Ahorro
+       📥 Descargada (16 KB, image/jpeg)
+       ✅ Fondo eliminado (22 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[123/740] 🖼️  Cortado Dolce gusto compatible marca Kfetea 48 cápsulas, Formato Super Ahorro
+       📥 Descargada (15 KB, image/jpeg)
+       ✅ Fondo eliminado (22 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[124/740] 🖼️  Descafeinado Dolce gusto compatible marca Kfetea 48 cápsulas, Formato Super Ahorro
+       📥 Descargada (16 KB, image/jpeg)
+       ✅ Fondo eliminado (22 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[125/740] 🖼️  Ristretto Mogorttini, caja 20 cápsulas. Compatibles con Nespresso.
+       📥 Descargada (11 KB, image/jpeg)
+       ✅ Fondo eliminado (18 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[126/740] 🖼️  Intenso Mogorttini, caja 20 cápsulas. Compatibles con Nespresso.
+       📥 Descargada (11 KB, image/jpeg)
+       ✅ Fondo eliminado (17 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[127/740] 🖼️  Espresso Mogorttini, caja 20 cápsulas. Compatibles con Nespresso.
+       📥 Descargada (10 KB, image/jpeg)
+       ✅ Fondo eliminado (13 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[128/740] 🖼️  Kfetea Intenso café en grano Especial para Bares Bolsa de 1kg
+       📥 Descargada (10 KB, image/jpeg)
+       ✅ Fondo eliminado (16 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[129/740] 🖼️  Descafeinado Mogorttini, caja 20 cápsulas. Compatibles con Nespresso.
+       📥 Descargada (11 KB, image/jpeg)
+       ✅ Fondo eliminado (18 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[130/740] 🖼️  Café con Leche Dolce gusto compatible marca Kfetea 48 cápsulas, Formato Super Ahorro
+       📥 Descargada (16 KB, image/jpeg)
+       ✅ Fondo eliminado (22 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[131/740] 🖼️  Kfetea Mezcla Café para bares en bolsa de 1 Kilo
+       📥 Descargada (13 KB, image/jpeg)
+       ✅ Fondo eliminado (19 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[132/740] 🖼️  Café Intenso 16 cápsulas Mogorttini compatible Dolce Gusto
+       📥 Descargada (11 KB, image/jpeg)
+       ✅ Fondo eliminado (21 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[133/740] 🖼️  Extra Intenso 16 cápsulas Mogorttini compatible Dolce Gusto
+       📥 Descargada (11 KB, image/jpeg)
+       ✅ Fondo eliminado (20 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[134/740] 🖼️  Cortado 16 cápsulas Mogorttini compatible Dolce Gusto
+       📥 Descargada (11 KB, image/jpeg)
+       ✅ Fondo eliminado (20 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[135/740] 🖼️  Café con Leche Mogorttini 16 cápsulas compatibles con Dolce Gusto
+       📥 Descargada (11 KB, image/jpeg)
+       ✅ Fondo eliminado (19 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[136/740] 🖼️  Espresso Descafeinado Mogorttini 16 cápsulas, compatible Dolce Gusto
+       📥 Descargada (11 KB, image/jpeg)
+       ✅ Fondo eliminado (21 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[137/740] 🖼️  Selección de arábicas Mogorttini espresso calidad superior en bolsa de un kilo
+       📥 Descargada (53 KB, image/jpeg)
+       ✅ Fondo eliminado (21 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[138/740] 🖼️  Extra Intenso marca Kfetea 4 cajas de 48 unidades por caja para Dolce Gusto
+       📥 Descargada (20 KB, image/jpeg)
+       ✅ Fondo eliminado (29 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[139/740] 🖼️  Ristretto 12 cajas Mogorttini. 240 Cápsulas de aluminio compatibles con Nespresso
+       📥 Descargada (11 KB, image/jpeg)
+       ✅ Fondo eliminado (19 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[140/740] 🖼️  Café Intenso 12 cajas Mogorttini. 240 Cápsulas compatibles Nespresso, en aluminio
+       📥 Descargada (10 KB, image/jpeg)
+       ✅ Fondo eliminado (16 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[141/740] 🖼️  Espresso 12 cajas Mogorttini de 20 cápsulas aluminio . Compatibles con Nespresso.
+       📥 Descargada (10 KB, image/jpeg)
+       ✅ Fondo eliminado (14 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[142/740] 🖼️  Descafeinado Mogorttini 12 cajas de 20 cápsulas Compatibles Nespresso
+       📥 Descargada (11 KB, image/jpeg)
+       ✅ Fondo eliminado (19 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[143/740] 🖼️  Kfetea Descafeinado Café en grano Especial para bares bolsa 1kg
+       📥 Descargada (11 KB, image/jpeg)
+       ✅ Fondo eliminado (16 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[144/740] 🖼️  10 cajas de Ristretto Kfetea Nespresso 100 capsulas
+       📥 Descargada (15 KB, image/jpeg)
+       ✅ Fondo eliminado (23 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[145/740] 🖼️  10 Cajas de Intenso Kfetea Nespresso 100 capsulas
+       📥 Descargada (17 KB, image/jpeg)
+       ✅ Fondo eliminado (23 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[146/740] 🖼️  10 cajas de Colombia Kfetea Nespresso 100 capsulas
+       📥 Descargada (17 KB, image/jpeg)
+       ✅ Fondo eliminado (25 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[147/740] 🖼️  10 cajas de Descafeinado Kfetea Nespresso 100 cápsulas
+       📥 Descargada (17 KB, image/jpeg)
+       ✅ Fondo eliminado (25 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[148/740] 🖼️  Starbucks Espresso Roast
+       📥 Descargada (1320 KB, image/png)
+       ✅ Fondo eliminado (320 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[149/740] 🖼️  Starbucks Pike Place Roast
+       📥 Descargada (1060 KB, image/png)
+       ✅ Fondo eliminado (258 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[150/740] 🖼️  Café en cápsula extra fuerte Hacendado
+       📥 Descargada (110 KB, image/jpeg)
+       ✅ Fondo eliminado (288 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[151/740] 🖼️  Café en cápsula espresso Hacendado
+       📥 Descargada (111 KB, image/jpeg)
+       ✅ Fondo eliminado (360 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[152/740] 🖼️  Café en cápsula descafeinado Hacendado
+       📥 Descargada (110 KB, image/jpeg)
+       ✅ Fondo eliminado (295 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[153/740] 🖼️  Café en grano Hacendado descafeinado
+       📥 Descargada (100 KB, image/jpeg)
+       ✅ Fondo eliminado (320 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[154/740] 🖼️  Café soluble Espresso Creme Hacendado
+       📥 Descargada (102 KB, image/jpeg)
+       ✅ Fondo eliminado (306 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[155/740] 🖼️  Café molido fuerte Hacendado
+       📥 Descargada (153 KB, image/jpeg)
+       ✅ Fondo eliminado (566 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[156/740] 🖼️  Café molido natural Hacendado
+       📥 Descargada (172 KB, image/jpeg)
+       ✅ Fondo eliminado (634 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[157/740] 🖼️  Café molido natural Hacendado
+       📥 Descargada (168 KB, image/jpeg)
+       ✅ Fondo eliminado (706 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[158/740] 🖼️  Café molido natural Hacendado Espresso
+       📥 Descargada (113 KB, image/jpeg)
+       ✅ Fondo eliminado (349 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[159/740] 🖼️  Café monodosis mezcla Hacendado
+       📥 Descargada (149 KB, image/jpeg)
+       ✅ Fondo eliminado (490 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[160/740] 🖼️  Café monodosis natural Hacendado
+       📥 Descargada (149 KB, image/jpeg)
+       ✅ Fondo eliminado (522 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[161/740] 🖼️  Café monodosis descafeinado natural Hacendado
+       📥 Descargada (149 KB, image/jpeg)
+       ✅ Fondo eliminado (481 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[162/740] 🖼️  Café molido descafeinado Hacendado
+       📥 Descargada (143 KB, image/jpeg)
+       ✅ Fondo eliminado (513 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[163/740] 🖼️  Café molido descafeinado Hacendado
+       📥 Descargada (171 KB, image/jpeg)
+       ✅ Fondo eliminado (640 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[164/740] 🖼️  Café en cápsula descafeinado espresso Hacendado
+       📥 Descargada (107 KB, image/jpeg)
+       ✅ Fondo eliminado (300 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[165/740] 🖼️  Café en cápsula classic Hacendado
+       📥 Descargada (126 KB, image/jpeg)
+       ✅ Fondo eliminado (358 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[166/740] 🖼️  Café en cápsula forte Hacendado
+       📥 Descargada (129 KB, image/jpeg)
+       ✅ Fondo eliminado (394 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[167/740] 🖼️  Café en cápsula extra forte Hacendado
+       📥 Descargada (139 KB, image/jpeg)
+       ✅ Fondo eliminado (354 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[168/740] 🖼️  Café molido fuerte Hacendado
+       📥 Descargada (137 KB, image/jpeg)
+       ✅ Fondo eliminado (506 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[169/740] 🖼️  Café molido mezcla Hacendado
+       📥 Descargada (170 KB, image/jpeg)
+       ✅ Fondo eliminado (664 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[170/740] 🖼️  Café molido mezcla Hacendado
+       📥 Descargada (181 KB, image/jpeg)
+       ✅ Fondo eliminado (635 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[171/740] 🖼️  Café en cápsula doble espresso Hacendado
+       📥 Descargada (128 KB, image/jpeg)
+       ✅ Fondo eliminado (341 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[172/740] 🖼️  Café en cápsula descafeinado Hacendado
+       📥 Descargada (125 KB, image/jpeg)
+       ✅ Fondo eliminado (347 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[173/740] 🖼️  Crema Profond
+       📥 Descargada (811 KB, image/png)
+       ✅ Fondo eliminado (218 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[174/740] 🖼️  Crema Classique
+       📥 Descargada (944 KB, image/png)
+       ✅ Fondo eliminado (234 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[175/740] 🖼️  Espresso Forza
+       📥 Descargada (709 KB, image/png)
+       ✅ Fondo eliminado (171 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[176/740] 🖼️  Crema Absolu Classique - L'OR
+       📥 Descargada (842 KB, image/png)
+       ✅ Fondo eliminado (204 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[177/740] 🖼️  Espresso Brazil - L'OR
+       📥 Descargada (1038 KB, image/png)
+       ✅ Fondo eliminado (241 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[178/740] 🖼️  Café en cápsula espresso Tassimo
+       📥 Descargada (109 KB, image/jpeg)
+       ✅ Fondo eliminado (381 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[179/740] 🖼️  Café con leche en cápsula Tassimo
+       📥 Descargada (118 KB, image/jpeg)
+       ✅ Fondo eliminado (404 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[180/740] 🖼️  Crema
+       📥 Descargada (926 KB, image/png)
+       ✅ Fondo eliminado (253 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[181/740] 🖼️  Espresso
+       📥 Descargada (892 KB, image/png)
+       ✅ Fondo eliminado (240 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[182/740] 🖼️  Segafredo Selezione Espresso
+       📥 Descargada (790 KB, image/png)
+       ✅ Fondo eliminado (189 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[183/740] 🖼️  Segafredo Selezione Crema
+       📥 Descargada (788 KB, image/png)
+       ✅ Fondo eliminado (187 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[184/740] 🖼️  café en grano tueste natural 100% arábica Brasil
+       📥 Descargada (22 KB, image/jpeg)
+       ✅ Fondo eliminado (41 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[185/740] 🖼️  café en grano Colombia de tueste natural
+       📥 Descargada (27 KB, image/jpeg)
+       ✅ Fondo eliminado (39 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[186/740] 🖼️  Café en grano tueste natural 100% Arábica Brasil
+       📥 Descargada (22 KB, image/jpeg)
+       ✅ Fondo eliminado (41 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[187/740] 🖼️  café en grano tueste natural 100% arábica Colombia
+       📥 Descargada (23 KB, image/jpeg)
+       ✅ Fondo eliminado (43 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[188/740] 🖼️  Café Etiopía 10 cápsulas
+       📥 Descargada (13 KB, image/jpeg)
+       ✅ Fondo eliminado (22 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[189/740] 🖼️  Café Molido Natural 500g
+       📥 Descargada (13 KB, image/jpeg)
+       ✅ Fondo eliminado (18 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[190/740] 🖼️  Café Molido Descafeinado 400g
+       📥 Descargada (12 KB, image/jpeg)
+       ✅ Fondo eliminado (17 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[191/740] 🖼️  Café Despertar 10 cápsulas Fortaleza Platinium
+       📥 Descargada (9 KB, image/jpeg)
+       ✅ Fondo eliminado (12 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[192/740] 🖼️  Café Despertar Fortaleza Platinium 40 cápsulas
+       📥 Descargada (16 KB, image/jpeg)
+       ✅ Fondo eliminado (26 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[193/740] 🖼️  Café Natural 10 cápsulas Fortaleza Platinium
+       📥 Descargada (9 KB, image/jpeg)
+       ✅ Fondo eliminado (14 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[194/740] 🖼️  Café Cortado 10 cápsulas
+       📥 Descargada (13 KB, image/jpeg)
+       ✅ Fondo eliminado (23 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[195/740] 🖼️  Café Colombia 24 cápsulas
+       📥 Descargada (15 KB, image/jpeg)
+       ✅ Fondo eliminado (26 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[196/740] 🖼️  Café Unidosis Natural 25 uds
+       📥 Descargada (11 KB, image/jpeg)
+       ✅ Fondo eliminado (20 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[197/740] 🖼️  Café Unidosis Grandes Orígenes Colombia 25 uds
+       📥 Descargada (12 KB, image/jpeg)
+       ✅ Fondo eliminado (19 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[198/740] 🖼️  Café Unidosis Grandes Orígenes Costa Rica 25 uds
+       📥 Descargada (13 KB, image/jpeg)
+       ✅ Fondo eliminado (20 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[199/740] 🖼️  Café Excellence 10 cápsulas
+       📥 Descargada (14 KB, image/jpeg)
+       ✅ Fondo eliminado (22 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[200/740] 🖼️  Café Despertar 20 cápsulas Fortaleza Platinium
+       📥 Descargada (12 KB, image/jpeg)
+       ✅ Fondo eliminado (20 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[201/740] 🖼️  Café con aroma natural Vainilla Madagascar 20 cápsulas Fortaleza Platinium
+       📥 Descargada (13 KB, image/jpeg)
+       ✅ Fondo eliminado (21 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[202/740] 🖼️  Café Natural 20 cápsulas Fortaleza Platinium
+       📥 Descargada (12 KB, image/jpeg)
+       ✅ Fondo eliminado (18 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[203/740] 🖼️  Café Descafeinado 20 cápsulas Fortaleza Platinium
+       📥 Descargada (12 KB, image/jpeg)
+       ✅ Fondo eliminado (19 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[204/740] 🖼️  Café Grano Torrefacto 500g
+       📥 Descargada (13 KB, image/jpeg)
+       ✅ Fondo eliminado (21 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[205/740] 🖼️  Café Grano Colombia 500g
+       📥 Descargada (35 KB, image/jpeg)
+       ✅ Fondo eliminado (16 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[206/740] 🖼️  Café Molido Grandes Orígenes Colombia 250g
+       📥 Descargada (10 KB, image/jpeg)
+       ✅ Fondo eliminado (14 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[207/740] 🖼️  Café Molido Grandes Orígenes Costa Rica 250g
+       📥 Descargada (10 KB, image/jpeg)
+       ✅ Fondo eliminado (15 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[208/740] 🖼️  KOPI LUWAK
+       📥 Descargada (35 KB, image/jpeg)
+       ✅ Fondo eliminado (54 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[209/740] 🖼️  Sulawesi - Café Exótico en Grano
+       📥 Descargada (27 KB, image/jpeg)
+       ✅ Fondo eliminado (42 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[210/740] 🖼️  Descafeinado Classic
+       📥 Descargada (20 KB, image/jpeg)
+       ✅ Fondo eliminado (30 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[211/740] 🖼️  Blend Natural
+       📥 Descargada (22 KB, image/jpeg)
+       ✅ Fondo eliminado (30 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[212/740] 🖼️  Brasil - Café en Grano Arabica
+       📥 Descargada (23 KB, image/jpeg)
+       ✅ Fondo eliminado (33 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[213/740] 🖼️  Blend Gran Selección 1940
+       📥 Descargada (22 KB, image/jpeg)
+       ✅ Fondo eliminado (31 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[214/740] 🖼️  Café Daily Blend orgánico
+       📥 Descargada (23 KB, image/jpeg)
+       ✅ Fondo eliminado (38 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[215/740] 🖼️  Descafeinado orgánico
+       📥 Descargada (24 KB, image/jpeg)
+       ✅ Fondo eliminado (40 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[216/740] 🖼️  Rwanda Nova- Café des Mamas 250 g
+       📥 Descargada (19 KB, image/jpeg)
+       ✅ Fondo eliminado (28 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[217/740] 🖼️  Café de Costa Rica en Grano
+       📥 Descargada (24 KB, image/jpeg)
+       ✅ Fondo eliminado (36 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[218/740] 🖼️  Café en grano Guatemala
+       📥 Descargada (23 KB, image/jpeg)
+       ✅ Fondo eliminado (34 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[219/740] 🖼️  Café de Honduras - Finca La Nueva Esperanza 250 g
+       📥 Descargada (15 KB, image/jpeg)
+       ✅ Fondo eliminado (23 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[220/740] 🖼️  Café Costa Rica - Finca El Patio 250 g
+       📥 Descargada (16 KB, image/jpeg)
+       ✅ Fondo eliminado (22 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[221/740] 🖼️  Café Colombia Geisha Huila 125g
+       📥 Descargada (15 KB, image/jpeg)
+       ✅ Fondo eliminado (19 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[222/740] 🖼️  Monteblanco Caturra ‘Passionfruit’ – Colombia 125g
+       📥 Descargada (15 KB, image/jpeg)
+       ✅ Fondo eliminado (19 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[223/740] 🖼️  Etiopia Yirgacheffe Cherry – 125g
+       📥 Descargada (13 KB, image/jpeg)
+       ✅ Fondo eliminado (12 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[224/740] 🖼️  The Ritual Edit – Cafés que transforman lo cotidiano en extraordinario
+       📥 Descargada (28 KB, image/jpeg)
+       ✅ Fondo eliminado (34 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[225/740] 🖼️  Costa Rica Los Santos - Café de Especialidad (250 g)
+       📥 Descargada (21 KB, image/jpeg)
+       ✅ Fondo eliminado (27 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[226/740] 🖼️  México Mujeres de Chiapas – Café de Especialidad (250 g)
+       📥 Descargada (21 KB, image/jpeg)
+       ✅ Fondo eliminado (29 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[227/740] 🖼️  Burundi Gatukuza – Café de Especialidad (250 g)
+       📥 Descargada (22 KB, image/jpeg)
+       ✅ Fondo eliminado (26 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[228/740] 🖼️  Blend Selección
+       📥 Descargada (22 KB, image/jpeg)
+       ✅ Fondo eliminado (34 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[229/740] 🖼️  Gran Luxe
+       📥 Descargada (18 KB, image/jpeg)
+       ✅ Fondo eliminado (25 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[230/740] 🖼️  Café Costa Rica
+       📥 Descargada (38 KB, image/jpeg)
+       ✅ Fondo eliminado (46 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[231/740] 🖼️  Descafeinado Classic 1kg
+       📥 Descargada (27 KB, image/jpeg)
+       ✅ Fondo eliminado (43 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[232/740] 🖼️  Blend Combinado Bares
+       📥 Descargada (26 KB, image/jpeg)
+       ✅ Fondo eliminado (42 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[233/740] 🖼️  Blend Gran Luxe
+       📥 Descargada (23 KB, image/jpeg)
+       ✅ Fondo eliminado (44 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[234/740] 🖼️  Café Colombia
+       📥 Descargada (27 KB, image/jpeg)
+       ✅ Fondo eliminado (45 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[235/740] 🖼️  Bebida de avena con café Hacendado
+       📥 Descargada (6 KB, image/jpeg)
+       ✅ Fondo eliminado (16 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[236/740] 🖼️  Café en grano Colombia
+       📥 Descargada (25 KB, image/jpeg)
+       ✅ Fondo eliminado (70 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[237/740] 🖼️  Café en grano fuerte
+       📥 Descargada (28 KB, image/png)
+       ✅ Fondo eliminado (10 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[238/740] 🖼️  Café en grano natural
+       📥 Descargada (17 KB, image/jpeg)
+       ✅ Fondo eliminado (58 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[239/740] 🖼️  Café molido Colombia
+       📥 Descargada (28 KB, image/png)
+       ✅ Fondo eliminado (10 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[240/740] 🖼️  Café molido mezcla fuerte
+       📥 Descargada (25 KB, image/jpeg)
+       ✅ Fondo eliminado (81 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[241/740] 🖼️  Café molido natural
+       📥 Descargada (28 KB, image/png)
+       ✅ Fondo eliminado (10 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[242/740] 🖼️  Cápsulas descafeinado
+       📥 Descargada (23 KB, image/jpeg)
+       ✅ Fondo eliminado (53 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[243/740] 🖼️  Cápsulas Espresso
+       📥 Descargada (22 KB, image/jpeg)
+       ✅ Fondo eliminado (55 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[244/740] 🖼️  Cápsulas Extra Fuerte
+       📥 Descargada (19 KB, image/jpeg)
+       ✅ Fondo eliminado (48 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[245/740] 🖼️  Brazil - Fazenda Serra
+       📥 Descargada (56 KB, image/png)
+       ✅ Fondo eliminado (15 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[246/740] 🖼️  Colombia Cold Washed
+       📥 Descargada (59 KB, image/png)
+       ✅ Fondo eliminado (15 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[247/740] 🖼️  Lucero Blend
+       📥 Descargada (55 KB, image/png)
+       ✅ Fondo eliminado (14 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[248/740] 🖼️  Café descafeinado en grano Decaf Blend
+       📥 Descargada (386 KB, image/png)
+       ✅ Fondo eliminado (115 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[249/740] 🖼️  Café en grano Jungle Blend
+       📥 Descargada (86 KB, image/png)
+       ✅ Fondo eliminado (95 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[250/740] 🖼️  Café de Burundi en grano
+       📥 Descargada (362 KB, image/png)
+       ✅ Fondo eliminado (94 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[251/740] 🖼️  Café Dark Roast de Brasil
+       📥 Descargada (602 KB, image/png)
+       ✅ Fondo eliminado (109 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[252/740] 🖼️  Café Dark Roast Robusta Fino
+       📥 Descargada (245 KB, image/png)
+       ✅ Fondo eliminado (114 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[253/740] 🖼️  Café de México en grano
+       📥 Descargada (106 KB, image/png)
+       ✅ Fondo eliminado (106 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[254/740] 🖼️  Café de Edición Limitada – Pink Bourbon
+       📥 Descargada (519 KB, image/png)
+       ✅ Fondo eliminado (111 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[255/740] 🖼️  Café de Brasil en grano
+       📥 Descargada (101 KB, image/png)
+       ✅ Fondo eliminado (108 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[256/740] 🖼️  Café de Colombia en grano
+       📥 Descargada (161 KB, image/png)
+       ✅ Fondo eliminado (111 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[257/740] 🖼️  Café de Perú en grano
+       📥 Descargada (91 KB, image/png)
+       ✅ Fondo eliminado (99 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[258/740] 🖼️  Café de Etiopía en grano
+       📥 Descargada (129 KB, image/png)
+       ✅ Fondo eliminado (114 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[259/740] 🖼️  Café en grano Strong Blend
+       📥 Descargada (91 KB, image/png)
+       ✅ Fondo eliminado (96 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[260/740] 🖼️  Café de Guatemala en grano Ecológico
+       📥 Descargada (109 KB, image/png)
+       ✅ Fondo eliminado (123 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[261/740] 🖼️  Café INCAPTO x Hofmann
+       📥 Descargada (597 KB, image/png)
+       ✅ Fondo eliminado (161 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[262/740] 🖼️  Café Light Roast de Etiopía
+       📥 Descargada (611 KB, image/png)
+       ✅ Fondo eliminado (117 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[263/740] 🖼️  Café especial para Cold Brew
+       📥 Descargada (733 KB, image/png)
+       ✅ Fondo eliminado (188 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[264/740] 🖼️  Café de Ruanda en grano
+       📥 Descargada (91 KB, image/png)
+       ✅ Fondo eliminado (101 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[265/740] 🖼️  Café de Sumatra en grano
+       📥 Descargada (100 KB, image/png)
+       ✅ Fondo eliminado (108 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[266/740] 🖼️  ATOQ
+       📥 Descargada (47 KB, image/jpeg)
+       ✅ Fondo eliminado (92 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[267/740] 🖼️  Boku Snap Anaerobic 72h
+       📥 Descargada (50 KB, image/jpeg)
+       ✅ Fondo eliminado (99 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[268/740] 🖼️  Chapoleros Wush Wush
+       📥 Descargada (49 KB, image/jpeg)
+       ✅ Fondo eliminado (100 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[269/740] 🖼️  Descafeinado Swiss Water
+       📥 Descargada (35 KB, image/jpeg)
+       ✅ Fondo eliminado (75 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[270/740] 🖼️  Efrén Echeverría
+       📥 Descargada (49 KB, image/jpeg)
+       ✅ Fondo eliminado (99 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[271/740] 🖼️  Friends of Tolima
+       📥 Descargada (160 KB, image/png)
+       ✅ Fondo eliminado (84 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[272/740] 🖼️  Friends of Tolima
+       📥 Descargada (49 KB, image/jpeg)
+       ✅ Fondo eliminado (99 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[273/740] 🖼️  Gigante Cherry
+       📥 Descargada (185 KB, image/png)
+       ✅ Fondo eliminado (92 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[274/740] 🖼️  Gigante Cherry
+       📥 Descargada (51 KB, image/jpeg)
+       ✅ Fondo eliminado (111 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[275/740] 🖼️  Jose G. Gesha
+       📥 Descargada (46 KB, image/jpeg)
+       ✅ Fondo eliminado (93 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[276/740] 🖼️  La Coipa
+       📥 Descargada (152 KB, image/png)
+       ✅ Fondo eliminado (82 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[277/740] 🖼️  La Coipa
+       📥 Descargada (46 KB, image/jpeg)
+       ✅ Fondo eliminado (92 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[278/740] 🖼️  Munyinya Long Miles
+       📥 Descargada (48 KB, image/jpeg)
+       ✅ Fondo eliminado (107 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[279/740] 🖼️  Nestor Lasso Sidra 48h
+       📥 Descargada (52 KB, image/jpeg)
+       ✅ Fondo eliminado (102 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[280/740] 🖼️  Romario Umaña
+       📥 Descargada (48 KB, image/jpeg)
+       ✅ Fondo eliminado (98 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[281/740] 🖼️  Sasaba
+       📥 Descargada (147 KB, image/png)
+       ✅ Fondo eliminado (79 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[282/740] 🖼️  Sasaba
+       📥 Descargada (45 KB, image/jpeg)
+       ✅ Fondo eliminado (94 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[283/740] 🖼️  Sitio Amoreira
+       📥 Descargada (46 KB, image/jpeg)
+       ✅ Fondo eliminado (92 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[284/740] 🖼️  Tibebu Roba
+       📥 Descargada (33 KB, image/jpeg)
+       ✅ Fondo eliminado (66 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[285/740] 🖼️  Typica Mossto Decaf
+       📥 Descargada (49 KB, image/jpeg)
+       ✅ Fondo eliminado (100 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[286/740] 🖼️  Nespresso Ristretto
+       📥 Descargada (11 KB, image/jpeg)
+       ✅ Fondo eliminado (2 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[287/740] 🖼️  café en grano Colombia 100% arábica intensidad 8
+       📥 Descargada (16 KB, image/jpeg)
+       ✅ Fondo eliminado (22 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[288/740] 🖼️  café en grano intensidad 9 Forza
+       📥 Descargada (17 KB, image/jpeg)
+       ✅ Fondo eliminado (23 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[289/740] 🖼️  Afrique
+       📥 Descargada (428 KB, image/jpeg)
+       ✅ Fondo eliminado (928 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[290/740] 🖼️  All Dark
+       📥 Descargada (133 KB, image/jpeg)
+       ✅ Fondo eliminado (185 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[291/740] 🖼️  Bowery Blend - Organic
+       📥 Descargada (406 KB, image/jpeg)
+       ✅ Fondo eliminado (253 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[292/740] 🖼️  Brazil Nossa Mesa
+       📥 Descargada (974 KB, image/png)
+       ✅ Fondo eliminado (136 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[293/740] 🖼️  Colombia - Inga Red Honey
+       📥 Descargada (255 KB, image/jpeg)
+       ✅ Fondo eliminado (331 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[294/740] 🖼️  Colombia - San Roque
+       📥 Descargada (23 KB, image/jpeg)
+       ✅ Fondo eliminado (26 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[295/740] 🖼️  Corsica
+       📥 Descargada (1434 KB, image/png)
+       ✅ Fondo eliminado (148 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[296/740] 🖼️  Deep Bleu - Organic
+       📥 Descargada (245 KB, image/jpeg)
+       ✅ Fondo eliminado (155 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[297/740] 🖼️  Frogtown
+       📥 Descargada (26 KB, image/jpeg)
+       ✅ Fondo eliminado (28 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[298/740] 🖼️  Honduras - Luna Azul Decaf
+       📥 Descargada (27 KB, image/jpeg)
+       ✅ Fondo eliminado (33 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[299/740] 🖼️  Lyon
+       📥 Descargada (129 KB, image/jpeg)
+       ✅ Fondo eliminado (80 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[300/740] 🖼️  Monaco
+       📥 Descargada (2001 KB, image/png)
+       ✅ Fondo eliminado (221 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[301/740] 🖼️  Decaf Monte Carlo
+       📥 Descargada (26 KB, image/jpeg)
+       ✅ Fondo eliminado (32 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[302/740] 🖼️  Nizza
+       📥 Descargada (2435 KB, image/png)
+       ✅ Fondo eliminado (250 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[303/740] 🖼️  Rouge - Organic
+       📥 Descargada (24 KB, image/jpeg)
+       ✅ Fondo eliminado (29 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[304/740] 🖼️  Waymaker
+       📥 Descargada (393 KB, image/png)
+       ✅ Fondo eliminado (110 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[305/740] 🖼️  LA ESTRELLA GRANO PREMIUM
+[305/740] ❌ laestrella_https-www-cafeslaestrella-com-productos-cafe-premium-grano-tueste-natural-html: fetch failed
+
+[306/740] 🖼️  LA ESTRELLA GRANO NATURAL
+[306/740] ❌ laestrella_https-www-cafeslaestrella-com-productos-grano-natural-html: fetch failed
+
+[307/740] 🖼️  LA ESTRELLA GRANO TORREFACTO
+[307/740] ❌ laestrella_https-www-cafeslaestrella-com-productos-grano-torrefacto-html: fetch failed
+
+[308/740] 🖼️  LA ESTRELLA MOLIDO DESCAFEINADO MEZCLA
+[308/740] ❌ laestrella_https-www-cafeslaestrella-com-productos-molido-descafeinado-mezcla-html: fetch failed
+
+[309/740] 🖼️  LA ESTRELLA MOLIDO MEZCLA INTENSA
+[309/740] ❌ laestrella_https-www-cafeslaestrella-com-productos-molido-mezcla-intensa-html: fetch failed
+
+[310/740] 🖼️  LA ESTRELLA MOLIDO NATURAL
+[310/740] ❌ laestrella_https-www-cafeslaestrella-com-productos-molido-natural-html: fetch failed
+
+[311/740] 🖼️  Café Papúa Eastern Highlands
+       📥 Descargada (32 KB, image/jpeg)
+       ✅ Fondo eliminado (57 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[312/740] 🖼️  Café Zambia Kasama Estate
+       📥 Descargada (15 KB, image/jpeg)
+       ✅ Fondo eliminado (44 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[313/740] 🖼️  Café Colombia Nariño El Tambo
+       📥 Descargada (16 KB, image/jpeg)
+       ✅ Fondo eliminado (44 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[314/740] 🖼️  Café Kenia AA Plus
+       📥 Descargada (16 KB, image/jpeg)
+       ✅ Fondo eliminado (45 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[315/740] 🖼️  Café Guatemala Antigua
+       📥 Descargada (16 KB, image/jpeg)
+       ✅ Fondo eliminado (46 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[316/740] 🖼️  Café Indonesia Java Wib Jampit
+       📥 Descargada (16 KB, image/jpeg)
+       ✅ Fondo eliminado (48 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[317/740] 🖼️  Café Etiopía Moca Sidamo
+       📥 Descargada (16 KB, image/jpeg)
+       ✅ Fondo eliminado (46 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[318/740] 🖼️  1 Kg - Café Colombia Natural
+       📥 Descargada (37 KB, image/jpeg)
+       ✅ Fondo eliminado (72 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[319/740] 🖼️  1 Kg - Café Descafeinado Colombia Natural
+       📥 Descargada (37 KB, image/jpeg)
+       ✅ Fondo eliminado (73 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[320/740] 🖼️  Café Blend Arábica Premium
+       📥 Descargada (16 KB, image/jpeg)
+       ✅ Fondo eliminado (48 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[321/740] 🖼️  1 Kg - Café Descafeinado Colombia Mezcla Suave
+       📥 Descargada (34 KB, image/jpeg)
+       ✅ Fondo eliminado (70 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[322/740] 🖼️  Café 1890 Tueste Natural
+       📥 Descargada (18 KB, image/jpeg)
+       ✅ Fondo eliminado (64 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[323/740] 🖼️  Café 1890 Mezcla Suave
+       📥 Descargada (18 KB, image/jpeg)
+       ✅ Fondo eliminado (64 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[324/740] 🖼️  Café 1890 Mezcla Fuerte
+       📥 Descargada (18 KB, image/jpeg)
+       ✅ Fondo eliminado (65 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[325/740] 🖼️  Café Clásico Colombia Tueste Natural
+       📥 Descargada (17 KB, image/jpeg)
+       ✅ Fondo eliminado (64 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[326/740] 🖼️  Café Clásico Colombia Torrefacto
+       📥 Descargada (17 KB, image/jpeg)
+       ✅ Fondo eliminado (64 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[327/740] 🖼️  Café Clásico Colombia Mezcla Suave
+       📥 Descargada (17 KB, image/jpeg)
+       ✅ Fondo eliminado (64 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[328/740] 🖼️  Café Clásico Colombia Mezcla Fuerte
+       📥 Descargada (17 KB, image/jpeg)
+       ✅ Fondo eliminado (64 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[329/740] 🖼️  Café Descafeinado Colombia Natural
+       📥 Descargada (18 KB, image/jpeg)
+       ✅ Fondo eliminado (60 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[330/740] 🖼️  Café Descafeinado Colombia Mezcla Suave
+       📥 Descargada (18 KB, image/jpeg)
+       ✅ Fondo eliminado (61 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[331/740] 🖼️  Café Soluble Natural
+       📥 Descargada (36 KB, image/jpeg)
+       ✅ Fondo eliminado (72 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[332/740] 🖼️  Café Soluble Descafeinado
+       📥 Descargada (37 KB, image/jpeg)
+       ✅ Fondo eliminado (72 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[333/740] 🖼️  Café Soluble Descafeinado Estuche
+       📥 Descargada (52 KB, image/jpeg)
+       ✅ Fondo eliminado (92 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[334/740] 🖼️  Café Soluble Descafeinado Caja
+       📥 Descargada (40 KB, image/jpeg)
+       ✅ Fondo eliminado (94 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[335/740] 🖼️  café en grano 100% arábica intensidad 5/10 Qualitá Oro
+       📥 Descargada (15 KB, image/jpeg)
+       ✅ Fondo eliminado (26 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[336/740] 🖼️  café en grano natural Crema e Gusto classico intensidad 7/10
+       📥 Descargada (27 KB, image/jpeg)
+       ✅ Fondo eliminado (29 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[337/740] 🖼️  ¡Tierra! Bio-Organic For Planet Café en grano (1 kg)
+       📥 Descargada (25 KB, image/png)
+       ✅ Fondo eliminado (3 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[338/740] 🖼️  Caffè Decaffeinato (250 g)
+       📥 Descargada (50 KB, image/png)
+       ✅ Fondo eliminado (16 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[339/740] 🖼️  Café molido Dek Classico (250 g)
+       📥 Descargada (57 KB, image/png)
+       ✅ Fondo eliminado (4 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[340/740] 🖼️  Café molido Qualità Oro (250 g)
+       📥 Descargada (48 KB, image/png)
+       ✅ Fondo eliminado (13 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[341/740] 🖼️  Café molido Espresso Italiano (250 g)
+       📥 Descargada (54 KB, image/png)
+       ✅ Fondo eliminado (21 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[342/740] 🖼️  Espresso Italiano Classico en grano (250 g)
+       📥 Descargada (15 KB, image/png)
+       ✅ Fondo eliminado (3 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[343/740] 🖼️  Espresso Italiano Classico en grano (1 Kg)
+       📥 Descargada (28 KB, image/png)
+       ✅ Fondo eliminado (9 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[344/740] 🖼️  Espresso Italiano Classico en grano (500 g)
+       📥 Descargada (59 KB, image/png)
+       ✅ Fondo eliminado (19 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[345/740] 🖼️  Qualità Oro en grano (500 g)
+       📥 Descargada (18 KB, image/png)
+       ✅ Fondo eliminado (6 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[346/740] 🖼️  Qualità Oro en grano (1 Kg)
+       📥 Descargada (64 KB, image/png)
+       ✅ Fondo eliminado (15 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[347/740] 🖼️  Café en grano Espresso Barista Perfetto (1 Kg)
+       📥 Descargada (57 KB, image/png)
+       ✅ Fondo eliminado (21 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[348/740] 🖼️  Il Mattino (250 g)
+       📥 Descargada (42 KB, image/png)
+       ✅ Fondo eliminado (8 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[349/740] 🖼️  Café molido Qualità Rossa (250 g)
+       📥 Descargada (41 KB, image/png)
+       ✅ Fondo eliminado (15 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[350/740] 🖼️  Café en grano Qualità Rossa (1 kg)
+       📥 Descargada (50 KB, image/png)
+       ✅ Fondo eliminado (16 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[351/740] 🖼️  Café en grano Qualità Rossa (500 g)
+       📥 Descargada (39 KB, image/png)
+       ✅ Fondo eliminado (14 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[352/740] 🖼️  Espresso Barista Intenso en grano (1 Kg)
+       📥 Descargada (59 KB, image/png)
+       ✅ Fondo eliminado (22 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[353/740] 🖼️  Café molido Crema e Gusto Classico (250 g)
+       📥 Descargada (59 KB, image/png)
+       ✅ Fondo eliminado (13 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[354/740] 🖼️  Café molido Crema e Gusto Classico (500 g)
+       📥 Descargada (8 KB, image/jpeg)
+       ✅ Fondo eliminado (10 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[355/740] 🖼️  Espresso Cremoso (16 cápsulas)
+       📥 Descargada (9 KB, image/jpeg)
+       ✅ Fondo eliminado (2 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[356/740] 🖼️  Espresso Intenso (16 cápsulas)
+       📥 Descargada (7 KB, image/jpeg)
+       ✅ Fondo eliminado (2 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[357/740] 🖼️  Espresso Cremoso (30 cápsulas)
+       📥 Descargada (9 KB, image/jpeg)
+       ✅ Fondo eliminado (5 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[358/740] 🖼️  Espresso Intenso (30 cápsulas)
+       📥 Descargada (9 KB, image/jpeg)
+       ✅ Fondo eliminado (5 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[359/740] 🖼️  Espresso Barista Intenso en grano (500 g)
+       📥 Descargada (59 KB, image/png)
+       ✅ Fondo eliminado (21 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[360/740] 🖼️  Crema e Gusto Classico (1 Kg)
+       📥 Descargada (56 KB, image/png)
+       ✅ Fondo eliminado (10 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[361/740] 🖼️  Qualità Oro (10 cápsulas)
+       📥 Descargada (6 KB, image/jpeg)
+       ✅ Fondo eliminado (7 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[362/740] 🖼️  Crema e Gusto (10 cápsulas)
+       📥 Descargada (20 KB, image/jpeg)
+       ✅ Fondo eliminado (21 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[363/740] 🖼️  Decaf (10 cápsulas)
+       📥 Descargada (7 KB, image/jpeg)
+       ✅ Fondo eliminado (3 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[364/740] 🖼️  ¡Tierra! For Planet (10 cápsulas)
+       📥 Descargada (22 KB, image/jpeg)
+       ✅ Fondo eliminado (16 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[365/740] 🖼️  Espresso Maestro Ristretto (10 cápsulas)
+       📥 Descargada (19 KB, image/jpeg)
+       ✅ Fondo eliminado (7 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[366/740] 🖼️  Espresso Maestro Dek (10 cápsulas)
+       📥 Descargada (23 KB, image/jpeg)
+       ✅ Fondo eliminado (16 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[367/740] 🖼️  Espresso Maestro Classico (10 cápsulas)
+       📥 Descargada (21 KB, image/jpeg)
+       ✅ Fondo eliminado (9 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[368/740] 🖼️  Espresso Maestro Classico (30 cápsulas)
+       📥 Descargada (21 KB, image/jpeg)
+       ✅ Fondo eliminado (10 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[369/740] 🖼️  Espresso Maestro Ristretto (30 cápsulas)
+       📥 Descargada (21 KB, image/jpeg)
+       ✅ Fondo eliminado (16 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[370/740] 🖼️  Cápsulas A Modo Mio Divino (16 cápsulas)
+       📥 Descargada (7 KB, image/jpeg)
+       ✅ Fondo eliminado (7 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[371/740] 🖼️  Qualità Oro (30 cápsulas)
+       📥 Descargada (119 KB, image/png)
+       ✅ Fondo eliminado (24 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[372/740] 🖼️  Espresso Gourmet Caramel (10 cápsulas)
+       📥 Descargada (85 KB, image/png)
+       ✅ Fondo eliminado (21 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[373/740] 🖼️  Qualità Oro (60 cápsulas)
+       📥 Descargada (30 KB, image/png)
+       ✅ Fondo eliminado (6 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[374/740] 🖼️  Cápsulas A Modo Mio Passionale (16 cápsulas)
+       📥 Descargada (10 KB, image/jpeg)
+       ✅ Fondo eliminado (5 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[375/740] 🖼️  Cápsulas A Modo Mio Delizioso (16 cápsulas)
+       📥 Descargada (10 KB, image/jpeg)
+       ✅ Fondo eliminado (8 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[376/740] 🖼️  Cápsulas A Modo Mio Intenso (16 cápsulas)
+       📥 Descargada (9 KB, image/jpeg)
+       ✅ Fondo eliminado (8 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[377/740] 🖼️  Cápsulas A Modo Mio Dek Cremoso (16 cápsulas)
+       📥 Descargada (10 KB, image/jpeg)
+       ✅ Fondo eliminado (6 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[378/740] 🖼️  Cápsulas A Modo Mio Lungo Dolce (16 cápsulas)
+       📥 Descargada (9 KB, image/jpeg)
+       ✅ Fondo eliminado (6 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[379/740] 🖼️  Cápsulas A Modo Mio Soave (16 cápsulas)
+       📥 Descargada (9 KB, image/jpeg)
+       ✅ Fondo eliminado (7 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[380/740] 🖼️  Café cápsulas Bio Organic Espresso
+       📥 Descargada (2 KB, image/svg+xml)
+[380/740] ❌ lidl-cafe-capsulas-bio-organic-espresso: Unsupported format: image/svg+xml
+
+[381/740] 🖼️  Café cápsulas Bio Organic Lungo
+       📥 Descargada (2 KB, image/svg+xml)
+[381/740] ❌ lidl-cafe-capsulas-bio-organic-lungo: Unsupported format: image/svg+xml
+
+[382/740] 🖼️  Café en grano Bio Organic Descafeinado
+       📥 Descargada (2 KB, image/svg+xml)
+[382/740] ❌ lidl-cafe-en-grano-bio-organic-descafeinado: Unsupported format: image/svg+xml
+
+[383/740] 🖼️  Café en grano Bio Organic Honduras
+       📥 Descargada (2 KB, image/svg+xml)
+[383/740] ❌ lidl-cafe-en-grano-bio-organic-honduras: Unsupported format: image/svg+xml
+
+[384/740] 🖼️  Café en grano Bio Organic México
+       📥 Descargada (2 KB, image/svg+xml)
+[384/740] ❌ lidl-cafe-en-grano-bio-organic-mexico: Unsupported format: image/svg+xml
+
+[385/740] 🖼️  Café en grano Bio Organic Perú
+       📥 Descargada (2 KB, image/svg+xml)
+[385/740] ❌ lidl-cafe-en-grano-bio-organic-peru: Unsupported format: image/svg+xml
+
+[386/740] 🖼️  Café molido Bio Organic Blend
+       📥 Descargada (2 KB, image/svg+xml)
+[386/740] ❌ lidl-cafe-molido-bio-organic-blend: Unsupported format: image/svg+xml
+
+[387/740] 🖼️  Café molido Bio Organic Colombia
+       📥 Descargada (2 KB, image/svg+xml)
+[387/740] ❌ lidl-cafe-molido-bio-organic-colombia: Unsupported format: image/svg+xml
+
+[388/740] 🖼️  Café molido Bio Organic Descafeinado
+       📥 Descargada (2 KB, image/svg+xml)
+[388/740] ❌ lidl-cafe-molido-bio-organic-descafeinado: Unsupported format: image/svg+xml
+
+[389/740] 🖼️  Café molido Bio Organic Etiopía
+       📥 Descargada (2 KB, image/svg+xml)
+[389/740] ❌ lidl-cafe-molido-bio-organic-etiopia: Unsupported format: image/svg+xml
+
+[390/740] 🖼️  Gran Aroma - Natural
+       📥 Descargada (83 KB, image/png)
+       ✅ Fondo eliminado (85 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[391/740] 🖼️  Café Gran Aroma Mezcla
+       📥 Descargada (99 KB, image/png)
+       ✅ Fondo eliminado (37 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[392/740] 🖼️  Cápsulas Descafeinado
+       📥 Descargada (124 KB, image/jpeg)
+       ✅ Fondo eliminado (280 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[393/740] 🖼️  Cápsulas Extra Intenso
+       📥 Descargada (1174 KB, image/png)
+       ✅ Fondo eliminado (250 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[394/740] 🖼️  Cápsulas Intenso
+       📥 Descargada (780 KB, image/png)
+       ✅ Fondo eliminado (129 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[395/740] 🖼️  Cápsulas Largo
+       📥 Descargada (118 KB, image/jpeg)
+       ✅ Fondo eliminado (312 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[396/740] 🖼️  Cápsulas Puro Arábica Colombia
+       📥 Descargada (5468 KB, image/png)
+       ✅ Fondo eliminado (1349 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[397/740] 🖼️  Cápsulas Puro Arábica Colombia 20 Unidads
+       📥 Descargada (4869 KB, image/png)
+       ✅ Fondo eliminado (1619 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[398/740] 🖼️  Cápsulas Puro Arábica Espresso
+       📥 Descargada (5943 KB, image/png)
+       ✅ Fondo eliminado (1579 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[399/740] 🖼️  Cápsulas Ristretto
+       📥 Descargada (874 KB, image/png)
+       ✅ Fondo eliminado (347 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[400/740] 🖼️  Clásico Natural
+       📥 Descargada (1376 KB, image/png)
+       ✅ Fondo eliminado (457 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[401/740] 🖼️  Crème Express Descafeinado Soluble
+       📥 Descargada (1313 KB, image/png)
+       ✅ Fondo eliminado (321 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[402/740] 🖼️  Crème Express Mezcla Descafeinado
+       📥 Descargada (108 KB, image/png)
+       ✅ Fondo eliminado (37 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[403/740] 🖼️  Crème Express Mezcla
+       📥 Descargada (105 KB, image/png)
+       ✅ Fondo eliminado (38 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[404/740] 🖼️  Crème Express Natural
+       📥 Descargada (112 KB, image/png)
+       ✅ Fondo eliminado (40 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[405/740] 🖼️  Crème Express Natural Soluble
+       📥 Descargada (1274 KB, image/png)
+       ✅ Fondo eliminado (351 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[406/740] 🖼️  Crème Express Natural Paper Refill
+       📥 Descargada (105 KB, image/png)
+       ✅ Fondo eliminado (38 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[407/740] 🖼️  Gran Aroma Descafeinado Mezcla
+       📥 Descargada (101 KB, image/png)
+       ✅ Fondo eliminado (36 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[408/740] 🖼️  Gran Aroma Descafeinado Natural
+       📥 Descargada (101 KB, image/png)
+       ✅ Fondo eliminado (36 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[409/740] 🖼️  Gran Aroma Extra Fuerte
+       📥 Descargada (862 KB, image/png)
+       ✅ Fondo eliminado (350 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[410/740] 🖼️  Gran Aroma Mezcla Grano
+       📥 Descargada (3305 KB, image/png)
+       ✅ Fondo eliminado (1641 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[411/740] 🖼️  Gran Aroma Monodosis Descafeinado
+       📥 Descargada (179 KB, image/jpeg)
+       ✅ Fondo eliminado (408 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[412/740] 🖼️  Gran Aroma Monodosis Extra Fuerte
+       📥 Descargada (1098 KB, image/png)
+       ✅ Fondo eliminado (524 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[413/740] 🖼️  Gran Aroma Monodisis Fuerte
+       📥 Descargada (1109 KB, image/png)
+       ✅ Fondo eliminado (553 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[414/740] 🖼️  Gran Aroma Monodosis Natural
+       📥 Descargada (1219 KB, image/png)
+       ✅ Fondo eliminado (525 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[415/740] 🖼️  Gran Aroma Natural Grano
+       📥 Descargada (1028 KB, image/png)
+       ✅ Fondo eliminado (440 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[416/740] 🖼️  Gran Aroma Natural
+       📥 Descargada (99 KB, image/png)
+       ✅ Fondo eliminado (35 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[417/740] 🖼️  Marcilla Colombia Natural Molido
+       📥 Descargada (1434 KB, image/png)
+       ✅ Fondo eliminado (457 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[418/740] 🖼️  Puro Arábica Sudamérica
+       📥 Descargada (1903 KB, image/png)
+       ✅ Fondo eliminado (548 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[419/740] 🖼️  Tassimo Café con Leche
+       📥 Descargada (441 KB, image/png)
+       ✅ Fondo eliminado (172 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[420/740] 🖼️  Tassimo Café Espresso
+       📥 Descargada (746 KB, image/png)
+       ✅ Fondo eliminado (362 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[421/740] 🖼️  Tassimo Café Espresso Descafeinado
+       📥 Descargada (765 KB, image/png)
+       ✅ Fondo eliminado (353 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[422/740] 🖼️  Tassimo Café Largo
+       📥 Descargada (831 KB, image/png)
+       ✅ Fondo eliminado (362 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[423/740] 🖼️  Tassimo Colombia
+       📥 Descargada (126 KB, image/jpeg)
+       ✅ Fondo eliminado (269 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[424/740] 🖼️  Tassimo Cortado
+       📥 Descargada (78 KB, image/jpeg)
+       ✅ Fondo eliminado (187 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[425/740] 🖼️  Café en grano Hacendado descafeinado
+       📥 Descargada (7 KB, image/jpeg)
+       ✅ Fondo eliminado (17 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[426/740] 🖼️  Café soluble classic en sobres Hacendado
+       📥 Descargada (10 KB, image/jpeg)
+       ✅ Fondo eliminado (26 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[427/740] 🖼️  Café soluble descafeinado en sobres Hacendado
+       📥 Descargada (11 KB, image/jpeg)
+       ✅ Fondo eliminado (24 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[428/740] 🖼️  Café soluble descafeinado Nescafé classic
+       📥 Descargada (9 KB, image/jpeg)
+       ✅ Fondo eliminado (21 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[429/740] 🖼️  Café soluble natural Nescafé classic
+       📥 Descargada (7 KB, image/jpeg)
+       ✅ Fondo eliminado (18 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[430/740] 🖼️  Café soluble Espresso Creme Hacendado
+       📥 Descargada (6 KB, image/jpeg)
+       ✅ Fondo eliminado (15 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[431/740] 🖼️  Café molido fuerte Hacendado
+       📥 Descargada (9 KB, image/jpeg)
+       ✅ Fondo eliminado (26 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[432/740] 🖼️  Café molido natural Hacendado
+       📥 Descargada (8 KB, image/jpeg)
+       ✅ Fondo eliminado (26 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[433/740] 🖼️  Café molido natural Hacendado Espresso
+       📥 Descargada (9 KB, image/jpeg)
+       ✅ Fondo eliminado (22 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[434/740] 🖼️  Café monodosis mezcla Hacendado
+       📥 Descargada (10 KB, image/jpeg)
+       ✅ Fondo eliminado (29 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[435/740] 🖼️  Café molido natural Climent
+       📥 Descargada (8 KB, image/jpeg)
+       ✅ Fondo eliminado (20 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[436/740] 🖼️  Café molido descafeinado Climent
+       📥 Descargada (9 KB, image/jpeg)
+       ✅ Fondo eliminado (20 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[437/740] 🖼️  Café molido natural Bonka
+       📥 Descargada (12 KB, image/jpeg)
+       ✅ Fondo eliminado (37 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[438/740] 🖼️  Café monodosis natural Hacendado
+       📥 Descargada (10 KB, image/jpeg)
+       ✅ Fondo eliminado (30 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[439/740] 🖼️  Café monodosis descafeinado natural Hacendado
+       📥 Descargada (11 KB, image/jpeg)
+       ✅ Fondo eliminado (29 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[440/740] 🖼️  Café en cápsula cortado Dolce Gusto
+       📥 Descargada (10 KB, image/jpeg)
+       ✅ Fondo eliminado (23 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[441/740] 🖼️  Café con leche en cápsula Dolce Gusto
+       📥 Descargada (11 KB, image/jpeg)
+       ✅ Fondo eliminado (25 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[442/740] 🖼️  Café molido natural Cafés Valiente
+       📥 Descargada (8 KB, image/jpeg)
+       ✅ Fondo eliminado (19 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[443/740] 🖼️  Café en cápsula descafeinado espresso intenso Dolce Gusto
+       📥 Descargada (11 KB, image/jpeg)
+       ✅ Fondo eliminado (25 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[444/740] 🖼️  Café con leche en cápsula Tassimo
+       📥 Descargada (9 KB, image/jpeg)
+       ✅ Fondo eliminado (24 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[445/740] 🖼️  Café en cápsula espresso Tassimo
+       📥 Descargada (9 KB, image/jpeg)
+       ✅ Fondo eliminado (24 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[446/740] 🖼️  Café en cápsula descafeinado Tassimo
+       📥 Descargada (9 KB, image/jpeg)
+       ✅ Fondo eliminado (24 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[447/740] 🖼️  Café en cápsula ristretto napoli Dolce Gusto
+       📥 Descargada (11 KB, image/jpeg)
+       ✅ Fondo eliminado (26 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[448/740] 🖼️  Café en cápsula espresso intenso Dolce Gusto
+       📥 Descargada (10 KB, image/jpeg)
+       ✅ Fondo eliminado (24 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[449/740] 🖼️  Café molido descafeinado Hacendado
+       📥 Descargada (11 KB, image/jpeg)
+       ✅ Fondo eliminado (28 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[450/740] 🖼️  Café en cápsula descafeinado espresso Hacendado
+       📥 Descargada (9 KB, image/jpeg)
+       ✅ Fondo eliminado (19 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[451/740] 🖼️  Café en cápsula classic Hacendado
+       📥 Descargada (11 KB, image/jpeg)
+       ✅ Fondo eliminado (28 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[452/740] 🖼️  Café en cápsula forte Hacendado
+       📥 Descargada (11 KB, image/jpeg)
+       ✅ Fondo eliminado (29 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[453/740] 🖼️  Café en cápsula extra forte Hacendado
+       📥 Descargada (11 KB, image/jpeg)
+       ✅ Fondo eliminado (25 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[454/740] 🖼️  Café en cápsula sabor Caramel Hacendado
+       📥 Descargada (7 KB, image/jpeg)
+       ✅ Fondo eliminado (22 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[455/740] 🖼️  Café molido mezcla Hacendado
+       📥 Descargada (10 KB, image/jpeg)
+       ✅ Fondo eliminado (29 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[456/740] 🖼️  Café en cápsula ristretto Hacendado
+       📥 Descargada (8 KB, image/jpeg)
+       ✅ Fondo eliminado (20 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[457/740] 🖼️  Café soluble Classic Hacendado
+       📥 Descargada (6 KB, image/jpeg)
+       ✅ Fondo eliminado (16 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[458/740] 🖼️  Café soluble descafeinado Hacendado
+       📥 Descargada (6 KB, image/jpeg)
+       ✅ Fondo eliminado (15 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[459/740] 🖼️  Café en cápsula doble espresso Hacendado
+       📥 Descargada (11 KB, image/jpeg)
+       ✅ Fondo eliminado (29 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[460/740] 🖼️  Café en cápsula descafeinado Hacendado
+       📥 Descargada (11 KB, image/jpeg)
+       ✅ Fondo eliminado (28 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[461/740] 🖼️  Cortado en cápsula descafeinado Hacendado
+       📥 Descargada (12 KB, image/jpeg)
+       ✅ Fondo eliminado (28 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[462/740] 🖼️  Café con leche en cápsula descafeinado Hacendado
+       📥 Descargada (10 KB, image/jpeg)
+       ✅ Fondo eliminado (30 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[463/740] 🖼️  Café en cápsulas doble espresso Hacendado
+       📥 Descargada (8 KB, image/jpeg)
+       ✅ Fondo eliminado (18 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[464/740] 🖼️  Café cortado en cápsula Hacendado
+       📥 Descargada (10 KB, image/jpeg)
+       ✅ Fondo eliminado (28 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[465/740] 🖼️  Café con leche en cápsula Hacendado
+       📥 Descargada (9 KB, image/jpeg)
+       ✅ Fondo eliminado (31 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[466/740] 🖼️  Café en cápsula Colombia Hacendado
+       📥 Descargada (8 KB, image/jpeg)
+       ✅ Fondo eliminado (19 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[467/740] 🖼️  Chambakú
+       📥 Descargada (276 KB, image/png)
+       ✅ Fondo eliminado (107 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[468/740] 🖼️  Gahahe
+       📥 Descargada (249 KB, image/png)
+       ✅ Fondo eliminado (108 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[469/740] 🖼️  KII#1
+       📥 Descargada (242 KB, image/png)
+       ✅ Fondo eliminado (108 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[470/740] 🖼️  Timbuyacu Filter
+       📥 Descargada (236 KB, image/png)
+       ✅ Fondo eliminado (100 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[471/740] 🖼️  Ají Las Flores
+       📥 Descargada (77 KB, image/jpeg)
+       ✅ Fondo eliminado (148 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[472/740] 🖼️  Chiroso Las Flores
+       📥 Descargada (83 KB, image/jpeg)
+       ✅ Fondo eliminado (154 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[473/740] 🖼️  Gesha Lavado Fellow Farms
+       📥 Descargada (82 KB, image/jpeg)
+       ✅ Fondo eliminado (145 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[474/740] 🖼️  Sidra Las Flores
+       📥 Descargada (81 KB, image/jpeg)
+       ✅ Fondo eliminado (154 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[475/740] 🖼️  Descafeinado - Chambakú
+       📥 Descargada (66 KB, image/jpeg)
+       ✅ Fondo eliminado (132 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[476/740] 🖼️  Chambakú
+       📥 Descargada (78 KB, image/jpeg)
+       ✅ Fondo eliminado (144 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[477/740] 🖼️  Esperanza
+       📥 Descargada (71 KB, image/jpeg)
+       ✅ Fondo eliminado (124 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[478/740] 🖼️  Bochesa
+       📥 Descargada (73 KB, image/jpeg)
+       ✅ Fondo eliminado (135 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[479/740] 🖼️  Hambela
+       📥 Descargada (70 KB, image/jpeg)
+       ✅ Fondo eliminado (132 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[480/740] 🖼️  Samuel Tunisisa
+       📥 Descargada (72 KB, image/jpeg)
+       ✅ Fondo eliminado (130 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[481/740] 🖼️  KII#1
+       📥 Descargada (71 KB, image/jpeg)
+       ✅ Fondo eliminado (129 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[482/740] 🖼️  Timbuyacu
+       📥 Descargada (72 KB, image/jpeg)
+       ✅ Fondo eliminado (130 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[483/740] 🖼️  Pacas
+       📥 Descargada (74 KB, image/jpeg)
+       ✅ Fondo eliminado (140 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[484/740] 🖼️  Parainema
+       📥 Descargada (74 KB, image/jpeg)
+       ✅ Fondo eliminado (132 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[485/740] 🖼️  Gahahe
+       📥 Descargada (71 KB, image/jpeg)
+       ✅ Fondo eliminado (133 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[486/740] 🖼️  Abebe Hewiso
+       📥 Descargada (72 KB, image/jpeg)
+       ✅ Fondo eliminado (136 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[487/740] 🖼️  Kathima
+       📥 Descargada (54 KB, image/jpeg)
+       ✅ Fondo eliminado (103 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[488/740] 🖼️  KII#2
+       📥 Descargada (69 KB, image/jpeg)
+       ✅ Fondo eliminado (120 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[489/740] 🖼️  Mathare-ini
+       📥 Descargada (73 KB, image/jpeg)
+       ✅ Fondo eliminado (137 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[490/740] 🖼️  Pacamara
+       📥 Descargada (72 KB, image/jpeg)
+       ✅ Fondo eliminado (136 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[491/740] 🖼️  Bespoke Blend (1kg)
+       📥 Descargada (105 KB, image/jpeg)
+       ✅ Fondo eliminado (66 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[492/740] 🖼️  Café Descafeinado Natural Arábico en Grano (250g)
+       📥 Descargada (69 KB, image/jpeg)
+       ✅ Fondo eliminado (53 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[493/740] 🖼️  Café Descafeinado Natural Arábico Molido
+       📥 Descargada (549 KB, image/jpeg)
+       ✅ Fondo eliminado (56 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[494/740] 🖼️  Café en Grano - Indonesia (250g)
+       📥 Descargada (96 KB, image/jpeg)
+       ✅ Fondo eliminado (64 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[495/740] 🖼️  Café en Grano Cremoso Zero Waste (250 g)
+       📥 Descargada (97 KB, image/jpeg)
+       ✅ Fondo eliminado (66 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[496/740] 🖼️  Café en Grano Decaffeinato Zero Waste (250 g)
+       📥 Descargada (109 KB, image/jpeg)
+       ✅ Fondo eliminado (69 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[497/740] 🖼️  Café en Grano Intenso Zero Waste (250 g)
+       📥 Descargada (100 KB, image/jpeg)
+       ✅ Fondo eliminado (70 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[498/740] 🖼️  Café en Grano Aroma Zero Waste (250 g)
+       📥 Descargada (95 KB, image/jpeg)
+       ✅ Fondo eliminado (68 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[499/740] 🖼️  Café en Grano Ristretto Zero Waste (250 g)
+       📥 Descargada (94 KB, image/jpeg)
+       ✅ Fondo eliminado (65 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[500/740] 🖼️  Café Molido Cremoso Zero Waste (250 g)
+       📥 Descargada (98 KB, image/jpeg)
+       ✅ Fondo eliminado (67 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[501/740] 🖼️  Café Molido Decaffeinato Zero Waste (250 g)
+       📥 Descargada (111 KB, image/jpeg)
+       ✅ Fondo eliminado (68 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[502/740] 🖼️  Café Molido - Indonesia (250g)
+       📥 Descargada (97 KB, image/jpeg)
+       ✅ Fondo eliminado (66 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[503/740] 🖼️  Café Molido Intenso Zero Waste (250 g)
+       📥 Descargada (101 KB, image/jpeg)
+       ✅ Fondo eliminado (71 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[504/740] 🖼️  Café Molido Aroma Zero Waste (250 g)
+       📥 Descargada (100 KB, image/jpeg)
+       ✅ Fondo eliminado (69 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[505/740] 🖼️  Café Molido Ristretto Zero Waste (250 g)
+       📥 Descargada (94 KB, image/jpeg)
+       ✅ Fondo eliminado (64 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[506/740] 🖼️  Café Natural Arábico en Grano
+       📥 Descargada (67 KB, image/jpeg)
+       ✅ Fondo eliminado (49 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[507/740] 🖼️  Café Natural Arábico Molido (250g)
+       📥 Descargada (556 KB, image/jpeg)
+       ✅ Fondo eliminado (62 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[508/740] 🖼️  Cápsulas Cremoso Zero Waste (50 uds)
+       📥 Descargada (150 KB, image/jpeg)
+       ✅ Fondo eliminado (80 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[509/740] 🖼️  Cápsulas Cremoso Zero Waste (10 uds)
+       📥 Descargada (190 KB, image/jpeg)
+       ✅ Fondo eliminado (115 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[510/740] 🖼️  Cápsulas Decaffeinato Zero Waste (10 uds)
+       📥 Descargada (187 KB, image/jpeg)
+       ✅ Fondo eliminado (114 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[511/740] 🖼️  Cápsulas Decaffeinato Zero Waste (50 uds)
+       📥 Descargada (168 KB, image/jpeg)
+       ✅ Fondo eliminado (90 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[512/740] 🖼️  Cápsulas Digestive (10 uds)
+       📥 Descargada (52 KB, image/jpeg)
+       ✅ Fondo eliminado (62 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[513/740] 🖼️  Cápsulas Intenso Zero Waste (10 uds)
+       📥 Descargada (185 KB, image/jpeg)
+       ✅ Fondo eliminado (114 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[514/740] 🖼️  Cápsulas Intenso Zero Waste (50 uds)
+       📥 Descargada (158 KB, image/jpeg)
+       ✅ Fondo eliminado (83 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[515/740] 🖼️  Cápsulas Più Aroma Zero Waste (10 uds)
+       📥 Descargada (186 KB, image/jpeg)
+       ✅ Fondo eliminado (112 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[516/740] 🖼️  Cápsulas Ristretto Zero Waste (10 uds)
+       📥 Descargada (183 KB, image/jpeg)
+       ✅ Fondo eliminado (114 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[517/740] 🖼️  Cápsulas Ristretto Zero Waste (50 uds)
+       📥 Descargada (157 KB, image/jpeg)
+       ✅ Fondo eliminado (83 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[518/740] 🖼️  Collection - Selected Premium Coffees
+       📥 Descargada (114 KB, image/jpeg)
+       ✅ Fondo eliminado (71 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[519/740] 🖼️  Colombia (500g)
+       📥 Descargada (112 KB, image/jpeg)
+       ✅ Fondo eliminado (68 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[520/740] 🖼️  Dark Roast (500g)
+       📥 Descargada (103 KB, image/jpeg)
+       ✅ Fondo eliminado (68 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[521/740] 🖼️  Dekaff Responsable (2x500g)
+       📥 Descargada (116 KB, image/jpeg)
+       ✅ Fondo eliminado (67 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[522/740] 🖼️  Barista Espresso (1kg)
+       📥 Descargada (53 KB, image/jpeg)
+       ✅ Fondo eliminado (77 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[523/740] 🖼️  Espresso Blend Molido
+       📥 Descargada (26 KB, image/jpeg)
+       ✅ Fondo eliminado (47 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[524/740] 🖼️  Etiopía (500g)
+       📥 Descargada (115 KB, image/jpeg)
+       ✅ Fondo eliminado (71 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[525/740] 🖼️  Excelsior Plus (1kg)
+       📥 Descargada (60 KB, image/jpeg)
+       ✅ Fondo eliminado (87 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[526/740] 🖼️  Gourmet Responsable (1KG)
+       📥 Descargada (64 KB, image/jpeg)
+       ✅ Fondo eliminado (84 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[527/740] 🖼️  House Blend (500g)
+       📥 Descargada (110 KB, image/jpeg)
+       ✅ Fondo eliminado (73 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[528/740] 🖼️  Light Roast (500g)
+       📥 Descargada (110 KB, image/jpeg)
+       ✅ Fondo eliminado (72 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[529/740] 🖼️  OM (1kg)
+       📥 Descargada (91 KB, image/jpeg)
+       ✅ Fondo eliminado (50 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[530/740] 🖼️  Single Origin Brasil (1kg)
+       📥 Descargada (108 KB, image/jpeg)
+       ✅ Fondo eliminado (68 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[531/740] 🖼️  Single Origin Guatemala (1kg)
+       📥 Descargada (113 KB, image/jpeg)
+       ✅ Fondo eliminado (72 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[532/740] 🖼️  Colombia Gabriel Castaño
+       📥 Descargada (1781 KB, image/png)
+       ✅ Fondo eliminado (598 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[533/740] 🖼️  Ecuador La Papaya Oak Barrel Anaerobic
+       📥 Descargada (251 KB, image/png)
+       ✅ Fondo eliminado (220 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[534/740] 🖼️  Peru El Mirante Gesha
+       📥 Descargada (1091 KB, image/png)
+       ✅ Fondo eliminado (413 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[535/740] 🖼️  Café 100% Arábica BIO grano 500 g
+       📥 Descargada (66 KB, image/png)
+       ✅ Fondo eliminado (67 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[536/740] 🖼️  Café Torrefacto grano 500 g
+       📥 Descargada (69 KB, image/png)
+       ✅ Fondo eliminado (77 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[537/740] 🖼️  Café Natural grano 500 g
+       📥 Descargada (66 KB, image/png)
+       ✅ Fondo eliminado (73 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[538/740] 🖼️  Café Mezcla grano 500 g
+       📥 Descargada (66 KB, image/png)
+       ✅ Fondo eliminado (67 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[539/740] 🖼️  Café Descafeinado grano 500 g
+       📥 Descargada (66 KB, image/png)
+       ✅ Fondo eliminado (69 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[540/740] 🖼️  Café Espresso Italiano grano 500 g
+       📥 Descargada (70 KB, image/png)
+       ✅ Fondo eliminado (68 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[541/740] 🖼️  Café Natural grano 1000 g
+       📥 Descargada (48 KB, image/png)
+       ✅ Fondo eliminado (56 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[542/740] 🖼️  Café Mezcla grano 1000 g
+       📥 Descargada (49 KB, image/png)
+       ✅ Fondo eliminado (51 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[543/740] 🖼️  Café Descafeinado grano 1000 g
+       📥 Descargada (49 KB, image/png)
+       ✅ Fondo eliminado (51 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[544/740] 🖼️  Café Brasil grano 500 g
+       📥 Descargada (78 KB, image/png)
+       ✅ Fondo eliminado (83 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[545/740] 🖼️  Café Colombia grano 500 g
+       📥 Descargada (74 KB, image/png)
+       ✅ Fondo eliminado (81 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[546/740] 🖼️  Café Origen Brasil - 250 gr
+       📥 Descargada (110 KB, text/html; charset=UTF-8)
+[546/740] ❌ orus_https-cafesorus-es-tienda-producto-cafe-grano-brasil: Unsupported format: text/html
+
+[547/740] 🖼️  Café Origen Colombia Nariño "El Tambo" – 250 gr
+       📥 Descargada (110 KB, text/html; charset=UTF-8)
+[547/740] ❌ orus_https-cafesorus-es-tienda-producto-cafe-grano-colombianarino: Unsupported format: text/html
+
+[548/740] 🖼️  Café Origen Brasil - 250 gr
+       📥 Descargada (110 KB, text/html; charset=UTF-8)
+[548/740] ❌ orus_https-cafesorus-es-tienda-producto-cafe-molido-brasil: Unsupported format: text/html
+
+[549/740] 🖼️  Café Origen Colombia Nariño "El Tambo" – 250 gr
+       📥 Descargada (110 KB, text/html; charset=UTF-8)
+[549/740] ❌ orus_https-cafesorus-es-tienda-producto-cafe-molido-colombia-eltambo: Unsupported format: text/html
+
+[550/740] 🖼️  Cápsulas de café de aluminio- Compatibles con máquinas Nespresso® (Arábica)
+       📥 Descargada (110 KB, text/html; charset=UTF-8)
+[550/740] ❌ orus_https-cafesorus-es-tienda-producto-capsulas-puro-arabica: Unsupported format: text/html
+
+[551/740] 🖼️  Cápsulas de café de aluminio- Compatibles con máquinas Nespresso® (Origen Colombia)
+       📥 Descargada (110 KB, text/html; charset=UTF-8)
+[551/740] ❌ orus_https-cafesorus-es-tienda-producto-capsulas-tres-origenes: Unsupported format: text/html
+
+[552/740] 🖼️  Cápsulas de café de aluminio- Compatibles con máquinas Nespresso® (Natural)
+       📥 Descargada (110 KB, text/html; charset=UTF-8)
+[552/740] ❌ orus_https-cafesorus-es-tienda-producto-capsulas-tueste-natural: Unsupported format: text/html
+
+[553/740] 🖼️  Cápsulas compatibles con máquinas NESCAFÉ® Dolce Gusto® - Cafés Orús (Café con leche)
+       📥 Descargada (110 KB, text/html; charset=UTF-8)
+[553/740] ❌ orus_https-cafesorus-es-tienda-producto-molto-piacere-cafe-con-leche: Unsupported format: text/html
+
+[554/740] 🖼️  Cápsulas compatibles con máquinas NESCAFÉ® Dolce Gusto® - Cafés Orús (Descafeinado)
+       📥 Descargada (110 KB, text/html; charset=UTF-8)
+[554/740] ❌ orus_https-cafesorus-es-tienda-producto-molto-piacere-descafeinado: Unsupported format: text/html
+
+[555/740] 🖼️  Anniversary Blend 2026
+       📥 Descargada (197 KB, image/png)
+       ✅ Fondo eliminado (185 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[556/740] 🖼️  Bali Kintamani
+       📥 Descargada (200 KB, image/png)
+       ✅ Fondo eliminado (213 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[557/740] 🖼️  Bolivia Yungas Valley
+       📥 Descargada (1201 KB, image/png)
+       ✅ Fondo eliminado (413 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[558/740] 🖼️  Brazil Bright River
+       📥 Descargada (1173 KB, image/png)
+       ✅ Fondo eliminado (342 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[559/740] 🖼️  Brazil Encantador
+       📥 Descargada (179 KB, image/png)
+       ✅ Fondo eliminado (199 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[560/740] 🖼️  Brazil Fazendas Dutra Organic
+       📥 Descargada (764 KB, image/png)
+       ✅ Fondo eliminado (250 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[561/740] 🖼️  Brazil Peaberry
+       📥 Descargada (261 KB, image/png)
+       ✅ Fondo eliminado (264 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[562/740] 🖼️  Burundi Turashobora
+       📥 Descargada (383 KB, image/png)
+       ✅ Fondo eliminado (311 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[563/740] 🖼️  Costa Rica La Candelaria Estate
+       📥 Descargada (437 KB, image/png)
+       ✅ Fondo eliminado (176 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[564/740] 🖼️  Costa Rica Hacienda La Minita
+       📥 Descargada (172 KB, image/png)
+       ✅ Fondo eliminado (176 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[565/740] 🖼️  Costa Rica Los Santos
+       📥 Descargada (168 KB, image/png)
+       ✅ Fondo eliminado (187 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[566/740] 🖼️  Decaf Holiday Blend 2025
+       📥 Descargada (1459 KB, image/png)
+       ✅ Fondo eliminado (468 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[567/740] 🖼️  Dubs Blend 2022
+       📥 Descargada (1109 KB, image/png)
+       ✅ Fondo eliminado (295 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[568/740] 🖼️  Ethiopia Duet
+       📥 Descargada (1072 KB, image/png)
+       ✅ Fondo eliminado (304 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[569/740] 🖼️  Ethiopia Hambela Farm Organic
+       📥 Descargada (260 KB, image/png)
+       ✅ Fondo eliminado (268 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[570/740] 🖼️  Ethiopia Refisa Station
+       📥 Descargada (1182 KB, image/png)
+       ✅ Fondo eliminado (357 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[571/740] 🖼️  Ethiopian Super Natural
+       📥 Descargada (256 KB, image/png)
+       ✅ Fondo eliminado (284 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[572/740] 🖼️  Faithful Blend
+       📥 Descargada (1173 KB, image/png)
+       ✅ Fondo eliminado (319 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[573/740] 🖼️  Guatemala Huehuetenango Organic
+       📥 Descargada (1202 KB, image/png)
+       ✅ Fondo eliminado (1063 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[574/740] 🖼️  Guatemala Xocomil Sololá
+       📥 Descargada (1175 KB, image/png)
+       ✅ Fondo eliminado (352 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[575/740] 🖼️  Holiday Blend 2025
+       📥 Descargada (1317 KB, image/png)
+       ✅ Fondo eliminado (386 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[576/740] 🖼️  Holiday Blend 2025 Coffee Pods
+       📥 Descargada (3664 KB, image/png)
+       ✅ Fondo eliminado (1105 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[577/740] 🖼️  Organic New Crop Honduras Corquín
+       📥 Descargada (180 KB, image/png)
+       ✅ Fondo eliminado (200 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[578/740] 🖼️  Huatusco Mexico Microlot
+       📥 Descargada (249 KB, image/png)
+       ✅ Fondo eliminado (256 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[579/740] 🖼️  Java Kayumas Village
+       📥 Descargada (233 KB, image/png)
+       ✅ Fondo eliminado (223 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[580/740] 🖼️  Kenya Kilele
+       📥 Descargada (1172 KB, image/png)
+       ✅ Fondo eliminado (347 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[581/740] 🖼️  Los Cafeteros
+       📥 Descargada (315 KB, image/png)
+       ✅ Fondo eliminado (292 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[582/740] 🖼️  Malawi Ngapani Estate
+       📥 Descargada (256 KB, image/png)
+       ✅ Fondo eliminado (248 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[583/740] 🖼️  Mexico Chiapas Altura Organic - Press Pot & Espresso
+       📥 Descargada (383 KB, image/png)
+       ✅ Fondo eliminado (318 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[584/740] 🖼️  Moka Batak Blend
+       📥 Descargada (249 KB, image/png)
+       ✅ Fondo eliminado (251 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[585/740] 🖼️  Mount Elgon Uganda Organic
+       📥 Descargada (1175 KB, image/png)
+       ✅ Fondo eliminado (342 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[586/740] 🖼️  Nicaragua Angelina Estate
+       📥 Descargada (228 KB, image/png)
+       ✅ Fondo eliminado (181 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[587/740] 🖼️  Nicaragua Cabo Azul Estate
+       📥 Descargada (169 KB, image/png)
+       ✅ Fondo eliminado (187 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[588/740] 🖼️  Panama Don Bosco
+       📥 Descargada (394 KB, image/png)
+       ✅ Fondo eliminado (319 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[589/740] 🖼️  Papua New Guinea Bunum-wo
+       📥 Descargada (1244 KB, image/png)
+       ✅ Fondo eliminado (416 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[590/740] 🖼️  Papua New Guinea Kopi-Kuta
+       📥 Descargada (257 KB, image/png)
+       ✅ Fondo eliminado (253 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[591/740] 🖼️  Papua New Guinea Nebilyer Valley
+       📥 Descargada (389 KB, image/png)
+       ✅ Fondo eliminado (316 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[592/740] 🖼️  Peru Cajamarca Organic
+       📥 Descargada (157 KB, image/png)
+       ✅ Fondo eliminado (177 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[593/740] 🖼️  Peru Organic del Norte
+       📥 Descargada (363 KB, image/png)
+       ✅ Fondo eliminado (290 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[594/740] 🖼️  Rwanda Ejo Heza
+       📥 Descargada (398 KB, image/png)
+       ✅ Fondo eliminado (324 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[595/740] 🖼️  Rwanda Izuba
+       📥 Descargada (166 KB, image/png)
+       ✅ Fondo eliminado (185 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[596/740] 🖼️  Rwanda Kotukanya
+       📥 Descargada (349 KB, image/png)
+       ✅ Fondo eliminado (274 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[597/740] 🖼️  Simply Oatmeal
+       📥 Descargada (1333 KB, image/png)
+       ✅ Fondo eliminado (207 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[598/740] 🖼️  Sulawesi Tana Toraja
+       📥 Descargada (353 KB, image/png)
+       ✅ Fondo eliminado (297 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[599/740] 🖼️  Sumatra Batak
+       📥 Descargada (175 KB, image/png)
+       ✅ Fondo eliminado (191 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[600/740] 🖼️  Sumatra Solok Radjo
+       📥 Descargada (272 KB, image/png)
+       ✅ Fondo eliminado (209 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[601/740] 🖼️  Vietnam Lotus Bold
+       📥 Descargada (207 KB, image/png)
+       ✅ Fondo eliminado (227 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[602/740] 🖼️  Zenith Summer Blend
+       📥 Descargada (1187 KB, image/png)
+       ✅ Fondo eliminado (361 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[603/740] 🖼️  Pellini Café en Granos para Espresso Bio, Mezcla 100% Arábica, Café en Grano de Sabor Dulce y Delicado de Agricultura Orgánica, 500g
+       📥 Descargada (59 KB, image/jpeg)
+       ✅ Fondo eliminado (182 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[604/740] 🖼️  Pellini Café en Granos Top, Mezcla 100% Arábica, Café en Grano con Aromas Perfumados y Refinados y Toques de Regaliz y Cacao, 500g
+       📥 Descargada (54 KB, image/jpeg)
+       ✅ Fondo eliminado (120 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[605/740] 🖼️  Pellini Café Top 100% Arábica, 108 Café en Cápsulas Compostables ESE de Aroma Intenso y Envolvente y Tueste Delicado, 6 Paquetes de 18 Cápsulas
+       📥 Descargada (53 KB, image/jpeg)
+       ✅ Fondo eliminado (89 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[606/740] 🖼️  Pellini Café Top 100% Arabica, 60 Cápsulas Compatibles Dolce Gusto con Aroma Intenso y Envolvente, Tueste Delicado, 6 Paquetes de 10 Cápsulas
+       📥 Descargada (68 KB, image/jpeg)
+       ✅ Fondo eliminado (126 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[607/740] 🖼️  Pellini Café Top 100% Arábica, Café Molido para Moka de Aroma Intenso y Envolvente, Mezcla 100% Arábica de Tueste Delicado, Envase de 250g
+       📥 Descargada (53 KB, image/jpeg)
+       ✅ Fondo eliminado (116 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[608/740] 🖼️  pellini Caffè Top 100% Arabica, Granos, 1er Pack (1 x 1 kg)
+       📥 Descargada (25 KB, image/jpeg)
+       ✅ Fondo eliminado (56 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[609/740] 🖼️  Pellini Espresso Bio, Café Molido para Moka de Agricultura Biológica de Sabor Dulce y Delicado, Mezcla 100% Arábica de Tueste Medio, Envase de 250g
+       📥 Descargada (97 KB, image/jpeg)
+       ✅ Fondo eliminado (292 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[610/740] 🖼️  Pellini Gustobar N.1, Café Molido para Máquina Espresso de Sabor Aterciopelado, Mezcla de Arábica y Robusta con Tueste Medio, 2 Paquetes de 250g
+       📥 Descargada (92 KB, image/jpeg)
+       ✅ Fondo eliminado (185 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[611/740] 🖼️  Pellini N.20 Cremoso, Café Molido para Moka de Sabor Equilibrado y Redondo, Mezcla de Arábica y Robusta con Tueste Medio, 3 Paquetes de 250g
+       📥 Descargada (89 KB, image/jpeg)
+       ✅ Fondo eliminado (225 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[612/740] 🖼️  Pellini N.3 Gran Aroma, Café en Grano para Espresso 1kg, Mezcla 100% Arábica de Sabor Intenso y Armonioso, Tueste Lento
+       📥 Descargada (54 KB, image/jpeg)
+       ✅ Fondo eliminado (155 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[613/740] 🖼️  Pellini N.42 Tradicional, Café Molido para Moka de Sabor Vigoroso e Intenso, Mezcla de Arábica y Robusta con Tueste Decidido, 3 Paquetes de 250g
+       📥 Descargada (87 KB, image/jpeg)
+       ✅ Fondo eliminado (222 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[614/740] 🖼️  Pellini N.82 Vivace, Café en Grano para Espresso 1 kg, Mezcla Clásica de Arábica y Robusta de Sabor Intenso y Equilibrado, Tueste Medio
+       📥 Descargada (47 KB, image/jpeg)
+       ✅ Fondo eliminado (149 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[615/740] 🖼️  Pellini N.9 Cremoso, Café en Grano para Espresso 1kg, Mezcla de Arábica y Robusta de Sabor Rico y Armonioso, Tueste Medio
+       📥 Descargada (58 KB, image/jpeg)
+       ✅ Fondo eliminado (224 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[616/740] 🖼️  Pellini Top 100% Arabica, 100 Cápsulas Compatibles Lavazza Espresso Point con Aroma Intenso y Envolvente, Tueste Delicado
+       📥 Descargada (178 KB, image/jpeg)
+       ✅ Fondo eliminado (545 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[617/740] 🖼️  Pellini Caffè, Pellini Top 100% Arábica Para Cafetera Moka - 2 Latas de 250 gr (500 gr)
+       📥 Descargada (169 KB, image/jpeg)
+       ✅ Fondo eliminado (714 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[618/740] 🖼️  Pellini - Top 100% Arábica Granos 500 g & Caffè - Café en Grano Espresso Bar No. 82 Vivace - 1 kg
+       📥 Descargada (20 KB, image/jpeg)
+       ✅ Fondo eliminado (54 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[619/740] 🖼️  Pellini - Top 100% Arábica Granos 500 g & Caffè - Café en Grano Espresso Bar N. 9 Cremoso - 1 Kg
+       📥 Descargada (29 KB, image/jpeg)
+       ✅ Fondo eliminado (78 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[620/740] 🖼️  Alfredo Ordoñez Maragogype Filtro
+       📥 Descargada (136 KB, image/png)
+       ✅ Fondo eliminado (33 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[621/740] 🖼️  Ausberto Oblitas Filtro
+       📥 Descargada (131 KB, image/png)
+       ✅ Fondo eliminado (31 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[622/740] 🖼️  Benjamín Paz Espresso
+       📥 Descargada (130 KB, image/png)
+       ✅ Fondo eliminado (31 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[623/740] 🖼️  Esperanza SL34 Natural Mystic Filtro
+       📥 Descargada (143 KB, image/png)
+       ✅ Fondo eliminado (41 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[624/740] 🖼️  Heleanna's Secret Filtro
+       📥 Descargada (141 KB, image/png)
+       ✅ Fondo eliminado (35 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[625/740] 🖼️  Los Juiciosos Espresso
+       📥 Descargada (126 KB, image/png)
+       ✅ Fondo eliminado (28 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[626/740] 🖼️  Maracaturra Shake Filtro
+       📥 Descargada (139 KB, image/png)
+       ✅ Fondo eliminado (38 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[627/740] 🖼️  Sallique Typica Espresso
+       📥 Descargada (130 KB, image/png)
+       ✅ Fondo eliminado (31 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[628/740] 🖼️  Sallique Typica Filtro
+       📥 Descargada (127 KB, image/png)
+       ✅ Fondo eliminado (30 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[629/740] 🖼️  Swiss Water Decaf Espresso
+       📥 Descargada (126 KB, image/png)
+       ✅ Fondo eliminado (29 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[630/740] 🖼️  URDD Catuaí Natural Espresso
+       📥 Descargada (133 KB, image/png)
+       ✅ Fondo eliminado (33 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[631/740] 🖼️  Volcancitos Honey Espresso
+       📥 Descargada (132 KB, image/png)
+       ✅ Fondo eliminado (33 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[632/740] 🖼️  Saimaza Cápsulas Descafeinado
+       📥 Descargada (77 KB, image/jpeg)
+       ✅ Fondo eliminado (52 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[633/740] 🖼️  Saimaza Cápsulas Espresso Extra Fuerte
+       📥 Descargada (77 KB, image/jpeg)
+       ✅ Fondo eliminado (52 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[634/740] 🖼️  Saimaza Cápsulas Espresso Fuerte
+       📥 Descargada (77 KB, image/jpeg)
+       ✅ Fondo eliminado (52 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[635/740] 🖼️  Descafeinado Mezcla
+       📥 Descargada (77 KB, image/jpeg)
+       ✅ Fondo eliminado (52 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[636/740] 🖼️  Descafeinado Natural
+       📥 Descargada (77 KB, image/jpeg)
+       ✅ Fondo eliminado (52 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[637/740] 🖼️  Gran Selección Descafeinado
+       📥 Descargada (77 KB, image/jpeg)
+       ✅ Fondo eliminado (52 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[638/740] 🖼️  Gran Selección Natural
+       📥 Descargada (77 KB, image/jpeg)
+       ✅ Fondo eliminado (52 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[639/740] 🖼️  Saimaza Catering Mezcla
+       📥 Descargada (77 KB, image/jpeg)
+       ✅ Fondo eliminado (52 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[640/740] 🖼️  Saimaza Mezcla
+       📥 Descargada (77 KB, image/jpeg)
+       ✅ Fondo eliminado (52 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[641/740] 🖼️  Saimaza Natural
+       📥 Descargada (77 KB, image/jpeg)
+       ✅ Fondo eliminado (52 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[642/740] 🖼️  Cheto de Etiopía (1kg)
+       📥 Descargada (436 KB, image/jpeg)
+       ✅ Fondo eliminado (1152 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[643/740] 🖼️  Ballenato de Colombia (1kg)
+       📥 Descargada (274 KB, image/jpeg)
+       ✅ Fondo eliminado (625 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[644/740] 🖼️  Ballenato de Colombia (250gr)
+       📥 Descargada (350 KB, image/jpeg)
+       ✅ Fondo eliminado (802 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[645/740] 🖼️  NUEVO! 🔥 BLEND de TEMPORADA (1kg.)
+       📥 Descargada (225 KB, image/jpeg)
+       ✅ Fondo eliminado (225 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[646/740] 🖼️  Cheto de Etiopía (250 gr)
+       📥 Descargada (364 KB, image/jpeg)
+       ✅ Fondo eliminado (538 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[647/740] 🖼️  Mariachi Dormido de México (DESCAFEINADO Natural SWISS WATER) (1kg)
+       📥 Descargada (432 KB, image/jpeg)
+       ✅ Fondo eliminado (1001 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[648/740] 🖼️  Mariachi Dormido de México (DESCAFEINADO Natural SWISS WATER) (250gr)
+       📥 Descargada (337 KB, image/jpeg)
+       ✅ Fondo eliminado (792 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[649/740] 🖼️  MOKA WARRIORS
+       📥 Descargada (507 KB, image/jpeg)
+       ✅ Fondo eliminado (1330 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[650/740] 🖼️  Cápsulas compostables café ecológico. Compatibles nespresso®
+       📥 Descargada (122 KB, image/jpeg)
+       ✅ Fondo eliminado (199 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[651/740] 🖼️  Cápsulas compostables café ecológico descafeinado. Compatibles nespresso®
+       📥 Descargada (123 KB, image/jpeg)
+       ✅ Fondo eliminado (202 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[652/740] 🖼️  Cápsulas compostables café Original. Compatibles Nespresso®
+       📥 Descargada (104 KB, image/jpeg)
+       ✅ Fondo eliminado (181 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[653/740] 🖼️  Cápsulas compostables café ecológico Intenso. Compatibles nespresso®
+       📥 Descargada (126 KB, image/jpeg)
+       ✅ Fondo eliminado (201 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[654/740] 🖼️  Caja de 10 Cápsulas compostables café ecológico. Compatibles nespresso®
+       📥 Descargada (81 KB, image/jpeg)
+       ✅ Fondo eliminado (133 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[655/740] 🖼️  Gran Espresso Premium Dark India 500g. Grano
+       📥 Descargada (113 KB, image/jpeg)
+       ✅ Fondo eliminado (173 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[656/740] 🖼️  Gran Espresso Premium Ecológico Descafeinado Grano 500g.
+       📥 Descargada (96 KB, image/jpeg)
+       ✅ Fondo eliminado (177 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[657/740] 🖼️  Gran Espresso Premium Original Blend 250 Grs. Grano
+       📥 Descargada (106 KB, image/jpeg)
+       ✅ Fondo eliminado (164 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[658/740] 🖼️  Gran Espresso Premium Original Blend Grano 500g.
+       📥 Descargada (162 KB, image/jpeg)
+       ✅ Fondo eliminado (261 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[659/740] 🖼️  Gran Espresso Premium Ecológico Blend Grano 500g.
+       📥 Descargada (158 KB, image/jpeg)
+       ✅ Fondo eliminado (274 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[660/740] 🖼️  Gran Espresso Premium Bourbon 500g. Grano
+       📥 Descargada (132 KB, image/jpeg)
+       ✅ Fondo eliminado (267 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[661/740] 🖼️  Gran Espresso Premium Original Blend 250g. Molido
+       📥 Descargada (145 KB, image/jpeg)
+       ✅ Fondo eliminado (240 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[662/740] 🖼️  Gran Espresso Premium Barcelona 250g. Molido
+       📥 Descargada (203 KB, image/jpeg)
+       ✅ Fondo eliminado (316 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[663/740] 🖼️  Gran Espresso Premium Original & Fine Cinnamon Molido
+       📥 Descargada (169 KB, image/jpeg)
+       ✅ Fondo eliminado (276 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[664/740] 🖼️  Premium GENUINE ETHIOPIA Specialty Coffee Molido 250g.
+       📥 Descargada (148 KB, image/jpeg)
+       ✅ Fondo eliminado (287 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[665/740] 🖼️  Gran Espresso Premium Ecológico Blend Molido
+       📥 Descargada (144 KB, image/jpeg)
+       ✅ Fondo eliminado (228 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[666/740] 🖼️  Gran Espresso Premium Bourbon Blend Molido
+       📥 Descargada (146 KB, image/jpeg)
+       ✅ Fondo eliminado (236 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[667/740] 🖼️  Gran Espresso Premium Descafeinado Molido
+       📥 Descargada (147 KB, image/jpeg)
+       ✅ Fondo eliminado (242 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[668/740] 🖼️  Premium GENUINE COLOMBIA Specialty Coffee Molido 250g.
+       📥 Descargada (137 KB, image/jpeg)
+       ✅ Fondo eliminado (272 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[669/740] 🖼️  Segafredo 100% Arábica 10 cápsulas
+       📥 Descargada (208 KB, image/jpeg)
+       ✅ Fondo eliminado (187 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[670/740] 🖼️  Segafredo Brasil 10 cápsulas
+       📥 Descargada (248 KB, image/jpeg)
+       ✅ Fondo eliminado (245 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[671/740] 🖼️  Segafredo Clássico 10 cápsulas
+       📥 Descargada (202 KB, image/jpeg)
+       ✅ Fondo eliminado (170 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[672/740] 🖼️  Crema Rica (250g)
+       📥 Descargada (59 KB, image/jpeg)
+       ✅ Fondo eliminado (268 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[673/740] 🖼️  Segafredo Descafeinado 10 cápsulas
+       📥 Descargada (208 KB, image/jpeg)
+       ✅ Fondo eliminado (179 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[674/740] 🖼️  Espresso Casa (500mg)
+       📥 Descargada (55 KB, image/jpeg)
+       ✅ Fondo eliminado (233 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[675/740] 🖼️  Espresso Casa (250g)
+       📥 Descargada (62 KB, image/jpeg)
+       ✅ Fondo eliminado (296 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[676/740] 🖼️  Segafredo Intenso 10 cápsulas
+       📥 Descargada (197 KB, image/jpeg)
+       ✅ Fondo eliminado (175 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[677/740] 🖼️  Intermezzo (500mg)
+       📥 Descargada (50 KB, image/jpeg)
+       ✅ Fondo eliminado (209 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[678/740] 🖼️  Intermezzo (250g)
+       📥 Descargada (59 KB, image/jpeg)
+       ✅ Fondo eliminado (269 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[679/740] 🖼️  Massimo (200g)
+       📥 Descargada (46 KB, image/jpeg)
+       ✅ Fondo eliminado (221 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[680/740] 🖼️  Segafredo Perú 10 cápsulas
+       📥 Descargada (245 KB, image/jpeg)
+       ✅ Fondo eliminado (226 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[681/740] 🖼️  Segafredo Ristretto 10 cápsulas
+       📥 Descargada (190 KB, image/jpeg)
+       ✅ Fondo eliminado (164 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[682/740] 🖼️  Ecologicum Mezcla
+       📥 Descargada (173 KB, image/jpeg)
+       ✅ Fondo eliminado (594 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[683/740] 🖼️  Pirineos
+       📥 Descargada (220 KB, image/jpeg)
+       ✅ Fondo eliminado (619 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[684/740] 🖼️  Tranquilo
+       📥 Descargada (167 KB, image/jpeg)
+       ✅ Fondo eliminado (565 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[685/740] 🖼️  Ecologicum Arábica
+       📥 Descargada (171 KB, image/jpeg)
+       ✅ Fondo eliminado (591 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[686/740] 🖼️  Ecologicum Descafeinado
+       📥 Descargada (173 KB, image/jpeg)
+       ✅ Fondo eliminado (594 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[687/740] 🖼️  Canigó
+       📥 Descargada (170 KB, image/jpeg)
+       ✅ Fondo eliminado (589 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[688/740] 🖼️  Montserrat
+       📥 Descargada (168 KB, image/jpeg)
+       ✅ Fondo eliminado (570 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[689/740] 🖼️  Breakfast Blend
+       📥 Descargada (69 KB, image/jpeg)
+       ✅ Fondo eliminado (65 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[690/740] 🖼️  Starbucks Caffè Verona
+       📥 Descargada (28 KB, image/jpeg)
+       ✅ Fondo eliminado (16 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[691/740] 🖼️  Starbucks Colombia Medium Roast
+       📥 Descargada (31 KB, image/jpeg)
+       ✅ Fondo eliminado (29 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[692/740] 🖼️  Starbucks Decaf Espresso Roast
+       📥 Descargada (10 KB, image/jpeg)
+       ✅ Fondo eliminado (17 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[693/740] 🖼️  Espresso Roast
+       📥 Descargada (125 KB, image/jpeg)
+       ✅ Fondo eliminado (154 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[694/740] 🖼️  Starbucks House Blend
+       📥 Descargada (25 KB, image/jpeg)
+       ✅ Fondo eliminado (21 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[695/740] 🖼️  Italian Roast
+       📥 Descargada (113 KB, image/jpeg)
+       ✅ Fondo eliminado (126 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[696/740] 🖼️  Starbucks Pike Place Roast
+       📥 Descargada (65 KB, image/jpeg)
+       ✅ Fondo eliminado (133 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[697/740] 🖼️  Starbucks Sumatra
+       📥 Descargada (77 KB, image/jpeg)
+       ✅ Fondo eliminado (98 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[698/740] 🖼️  Starbucks® Blonde Decaf Espresso Roast
+       📥 Descargada (178 KB, text/html; charset=UTF-8)
+[698/740] ❌ starbucks_1711621270983: Unsupported format: text/html
+
+[699/740] 🖼️  Starbucks® Ristretto Shot
+       📥 Descargada (177 KB, text/html; charset=UTF-8)
+[699/740] ❌ starbucks_1732704053671: Unsupported format: text/html
+
+[700/740] 🖼️  Starbucks® Decaf Espresso Roast
+       📥 Descargada (172 KB, image/png)
+       ✅ Fondo eliminado (136 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[701/740] 🖼️  Starbucks® Blonde Espresso Roast
+       📥 Descargada (278 KB, image/png)
+       ✅ Fondo eliminado (275 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[702/740] 🖼️  Starbucks Blonde® Espresso Roast
+       📥 Descargada (644 KB, image/png)
+       ✅ Fondo eliminado (183 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[703/740] 🖼️  Starbucks® Pike Place® Roast
+       📥 Descargada (570 KB, image/png)
+       ✅ Fondo eliminado (151 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[704/740] 🖼️  Starbucks® Espresso Roast
+       📥 Descargada (588 KB, image/png)
+       ✅ Fondo eliminado (140 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[705/740] 🖼️  Starbucks® Italian Style Roast
+       📥 Descargada (604 KB, image/png)
+       ✅ Fondo eliminado (178 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[706/740] 🖼️  Colombia El Jordan
+       📥 Descargada (400 KB, image/png)
+       ✅ Fondo eliminado (327 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[707/740] 🖼️  French Roast
+       📥 Descargada (1724 KB, image/png)
+       ✅ Fondo eliminado (469 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[708/740] 🖼️  Homestead
+       📥 Descargada (1616 KB, image/png)
+       ✅ Fondo eliminado (409 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[709/740] 🖼️  Hundred Mile
+       📥 Descargada (1776 KB, image/png)
+       ✅ Fondo eliminado (473 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[710/740] 🖼️  Indonesia Bies Penantan
+       📥 Descargada (1627 KB, image/png)
+       ✅ Fondo eliminado (436 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[711/740] 🖼️  Café en grano Colombia de tueste natural
+       📥 Descargada (27 KB, image/jpeg)
+       ✅ Fondo eliminado (39 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[712/740] 🖼️  Bukonzo Fly
+       📥 Descargada (4345 KB, image/png)
+       ✅ Fondo eliminado (1519 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[713/740] 🖼️  Daniso Horsa
+       📥 Descargada (2039 KB, image/png)
+       ✅ Fondo eliminado (1020 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[714/740] 🖼️  El Balar
+       📥 Descargada (4328 KB, image/png)
+       ✅ Fondo eliminado (1538 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[715/740] 🖼️  El Campo
+       📥 Descargada (4369 KB, image/png)
+       ✅ Fondo eliminado (1481 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[716/740] 🖼️  El Tacaná
+       📥 Descargada (4326 KB, image/png)
+       ✅ Fondo eliminado (1528 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[717/740] 🖼️  Guama AA
+       📥 Descargada (4295 KB, image/png)
+       ✅ Fondo eliminado (1528 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[718/740] 🖼️  Guariroba
+       📥 Descargada (3271 KB, image/png)
+       ✅ Fondo eliminado (678 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[719/740] 🖼️  Hewa
+       📥 Descargada (4378 KB, image/png)
+       ✅ Fondo eliminado (1544 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[720/740] 🖼️  La Jaguara
+       📥 Descargada (2400 KB, image/png)
+       ✅ Fondo eliminado (1453 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[721/740] 🖼️  Marespi Crema
+       📥 Descargada (4378 KB, image/png)
+       ✅ Fondo eliminado (1500 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[722/740] 🖼️  Muraho Women
+       📥 Descargada (4405 KB, image/png)
+       ✅ Fondo eliminado (1546 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[723/740] 🖼️  Negash
+       📥 Descargada (4584 KB, image/png)
+       ✅ Fondo eliminado (1646 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[724/740] 🖼️  Queen of Sheba
+       📥 Descargada (4353 KB, image/png)
+       ✅ Fondo eliminado (1558 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[725/740] 🖼️  Rio Pardo
+       📥 Descargada (4337 KB, image/png)
+       ✅ Fondo eliminado (1618 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[726/740] 🖼️  Risaralda Decaf
+       📥 Descargada (4325 KB, image/png)
+       ✅ Fondo eliminado (1501 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[727/740] 🖼️  San Ignacio
+       📥 Descargada (4405 KB, image/png)
+       ✅ Fondo eliminado (1594 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[728/740] 🖼️  San Isidro
+       📥 Descargada (4560 KB, image/png)
+       ✅ Fondo eliminado (1607 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[729/740] 🖼️  Tefese Ya'u
+       📥 Descargada (4289 KB, image/png)
+       ✅ Fondo eliminado (1612 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[730/740] 🖼️  Café en cápsula descafeinado Tassimo
+       📥 Descargada (9 KB, image/jpeg)
+       ✅ Fondo eliminado (24 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[731/740] 🖼️  Adigio Compostable
+       📥 Descargada (6676 KB, image/png)
+       ✅ Fondo eliminado (1960 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[732/740] 🖼️  Café en grano Intense 250g
+       📥 Descargada (236 KB, image/jpeg)
+       ✅ Fondo eliminado (1051 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[733/740] 🖼️  Café en grano Organic 250g
+       📥 Descargada (497 KB, image/jpeg)
+       ✅ Fondo eliminado (2285 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[734/740] 🖼️  Café en grano Top Quality 250g
+       📥 Descargada (46 KB, image/png)
+       ✅ Fondo eliminado (11 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[735/740] 🖼️  Café molido Top Quality 250g
+       📥 Descargada (208 KB, image/png)
+       ✅ Fondo eliminado (45 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[736/740] 🖼️  Colombia Compostable
+       📥 Descargada (6263 KB, image/png)
+       ✅ Fondo eliminado (1806 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[737/740] 🖼️  Decaf Compostable HOME
+       📥 Descargada (2419 KB, image/png)
+       ✅ Fondo eliminado (2036 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[738/740] 🖼️  Intense Compostable
+       📥 Descargada (4938 KB, image/png)
+       ✅ Fondo eliminado (1493 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[739/740] 🖼️  Veneto Compostable
+       📥 Descargada (8071 KB, image/png)
+       ✅ Fondo eliminado (2480 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+[740/740] 🖼️  Saimaza Gran Selección
+       📥 Descargada (77 KB, image/jpeg)
+       ✅ Fondo eliminado (52 KB)
+       ✅ Subida: https://storage.googleapis.com/miappdecafe.firebasestorage.app/cafe-photos-nobg/…
+       ✅ Firestore actualizado.
+
+
+──────────────────────────────────────────────────
+✅ Procesados: 713   ⏭️ Ya hechos: 0   ❌ Fallidos: 27   Total: 740
+📋 Log guardado: /Users/homme.maktub/Apps Moviles/etiove/data/bg_removal_local_2026-04-24T15-29-06-392Z.json

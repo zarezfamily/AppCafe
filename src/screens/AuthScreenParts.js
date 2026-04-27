@@ -29,7 +29,7 @@ export function AuthCredentialsFields({
   showPasswordField,
 }) {
   return (
-    <>
+    <View>
       <Text style={styles.label}>Email</Text>
       <TextInput
         style={styles.input}
@@ -54,7 +54,7 @@ export function AuthCredentialsFields({
           />
         </>
       )}
-    </>
+    </View>
   );
 }
 
@@ -89,7 +89,7 @@ export function AuthActionButtons({
   disableSecondaryAction,
 }) {
   return (
-    <>
+    <View>
       <TouchableOpacity
         style={styles.primaryBtn}
         onPress={handleSubmit}
@@ -112,6 +112,6 @@ export function AuthActionButtons({
           <Text style={styles.secondaryBtnText}>Entrar con Face ID</Text>
         </TouchableOpacity>
       )}
-    </>
+    </View>
   );
 }

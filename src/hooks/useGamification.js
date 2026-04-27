@@ -125,6 +125,13 @@ export default function useGamification({ storageKey }) {
           if (payload?.hasReview) next.reviewsCount += 1;
         }
 
+        if (type === 'daily_challenge') {
+          next.dailyChallengeCount = (next.dailyChallengeCount || 0) + 1;
+          if (payload?.bestStreak) {
+            next.bestStreak = Math.max(next.bestStreak || 0, payload.bestStreak);
+          }
+        }
+
         const normalized = normalizeGamification(next);
         const newAchievementIds = (normalized.achievementIds || []).filter(
           (id) => !(base.achievementIds || []).includes(id)

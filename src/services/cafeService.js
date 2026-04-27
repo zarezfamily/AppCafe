@@ -74,6 +74,23 @@ function getLegacyAwareValue(payload = {}, keys = []) {
   return '';
 }
 
+/**
+ * Ensure a café document has all the fields the app needs to display it.
+ * Call this on any new café data before writing to Firestore.
+ */
+export function ensureCafeDefaults(data = {}) {
+  const now = new Date().toISOString();
+  return {
+    fecha: data.fecha || data.createdAt || now,
+    puntuacion: data.puntuacion ?? 0,
+    votos: data.votos ?? 0,
+    status: data.status || 'approved',
+    reviewStatus: data.reviewStatus || 'approved',
+    appVisible: data.appVisible ?? true,
+    ...data,
+  };
+}
+
 export function sanitizeCafePayload(payload = {}) {
   const ean = normalizeEan(payload.ean || payload.normalizedEan);
 
@@ -117,6 +134,23 @@ export function sanitizeCafePayload(payload = {}) {
 
   const decaf = normalizeBoolean(getLegacyAwareValue(payload, ['decaf', 'descafeinado']));
 
+  const buyLinks = Array.isArray(payload.buyLinks)
+    ? payload.buyLinks
+        .filter(
+          (link) =>
+            link &&
+            typeof link === 'object' &&
+            typeof link.store === 'string' &&
+            typeof link.url === 'string' &&
+            /^https?:\/\//.test(link.url)
+        )
+        .map((link) => ({
+          store: String(link.store).trim().slice(0, 60),
+          url: String(link.url).trim().slice(0, 600),
+          ...(link.tag ? { tag: String(link.tag).trim().slice(0, 40) } : {}),
+        }))
+    : [];
+
   return {
     ean,
     normalizedEan: ean,
@@ -154,6 +188,7 @@ export function sanitizeCafePayload(payload = {}) {
     altura: altitude,
     scaScoreOfficial,
     decaf,
+    buyLinks,
   };
 }
 
@@ -168,6 +203,43 @@ export function isCafeIncomplete(cafe) {
   const ean = String(cafe.ean || cafe.normalizedEan || '').trim();
 
   return !(ean && name && roaster && image);
+}
+
+/**
+ * Scores how complete a café record is (0-1).
+ * Matches the server-side computeDataCompleteness in functions/index.js.
+ */
+export function computeDataCompleteness(cafe) {
+  const has = (v, min = 2) => String(v || '').trim().length >= min;
+  const hasNum = (v) => typeof v === 'number' && v > 0;
+
+  const fields = [
+    { key: 'nombre', w: 0.2, ok: has(cafe?.nombre || cafe?.name, 3) },
+    { key: 'marca', w: 0.15, ok: has(cafe?.marca || cafe?.roaster, 2) },
+    { key: 'origen', w: 0.12, ok: has(cafe?.origen || cafe?.origin || cafe?.pais, 2) },
+    { key: 'ean', w: 0.1, ok: has(cafe?.ean, 8) },
+    { key: 'foto', w: 0.12, ok: has(cafe?.bestPhoto || cafe?.officialPhoto || cafe?.foto, 8) },
+    { key: 'notas', w: 0.08, ok: has(cafe?.notas || cafe?.notes, 3) },
+    { key: 'proceso', w: 0.06, ok: has(cafe?.proceso || cafe?.process, 2) },
+    { key: 'variedad', w: 0.05, ok: has(cafe?.variedad || cafe?.variety, 2) },
+    { key: 'tueste', w: 0.04, ok: has(cafe?.tueste || cafe?.roastLevel, 2) },
+    { key: 'formato', w: 0.04, ok: has(cafe?.formato || cafe?.format, 2) },
+    { key: 'precio', w: 0.04, ok: hasNum(cafe?.precio) },
+  ];
+
+  let score = 0;
+  const missing = [];
+  for (const f of fields) {
+    if (f.ok) score += f.w;
+    else missing.push(f.key);
+  }
+
+  return {
+    score: Math.round(score * 100) / 100,
+    missing,
+    total: fields.length,
+    filled: fields.length - missing.length,
+  };
 }
 
 export function canBeApproved(cafe) {
@@ -340,6 +412,300 @@ export function buildScaPayload(payload = {}) {
   };
 }
 
+// ── Auto-fill inference helpers (used on approve) ──────────────────
+
+const CAPSULE_BRANDS = ['dolce gusto', 'tassimo', 'nespresso', 'a modo mio'];
+const SPEC_GRANO_BRANDS = [
+  'nomad',
+  'ineffable',
+  'right side',
+  'hola coffee',
+  'syra',
+  'peet',
+  'la colombe',
+  'incapto',
+  'cafe de finca',
+];
+
+function inferTipo(nombre, marca, docId) {
+  const n = (nombre || '').toLowerCase();
+  const m = (marca || '').toLowerCase();
+  const id = (docId || '').toLowerCase();
+  if (CAPSULE_BRANDS.some((b) => n.includes(b) || m.includes(b) || id.includes(b)))
+    return 'cápsula';
+  if (/c[aá]psula|capsul|nespresso|compatible|compostable|monodosis/i.test(n)) return 'cápsula';
+  if (/molido|ground|moka|filtro/i.test(n)) return 'molido';
+  if (/soluble|instant|liofiliz/i.test(n)) return 'soluble';
+  if (/grano|beans|grain|whole|en gra/i.test(n)) return 'grano';
+  if (SPEC_GRANO_BRANDS.some((b) => m.includes(b) || id.includes(b))) return 'grano';
+  if (id.includes('grano') || id.includes('bean')) return 'grano';
+  if (id.includes('molido') || id.includes('ground')) return 'molido';
+  if (id.includes('capsul')) return 'cápsula';
+  if (/1\s*kg|500\s*g/i.test(n)) return 'grano';
+  return 'grano';
+}
+
+function inferPeso(nombre, tipo) {
+  const n = (nombre || '').toLowerCase();
+  const m2 = n.match(/(\d+(?:[.,]\d+)?)\s*(?:kg|kilo)/i);
+  if (m2) return m2[1].replace(',', '.') + 'kg';
+  const m3 = n.match(/(\d+)\s*(?:g|gr|gramos)\b/i);
+  if (m3) return m3[1] + 'g';
+  const m4 = n.match(/(\d+)\s*(?:c[aá]psulas|caps|unidades|uds|pods|sobres)/i);
+  if (m4) return m4[1] + ' uds';
+  if (tipo === 'cápsula') return '10 uds';
+  if (tipo === 'molido') return '250g';
+  return '250g';
+}
+
+function inferVariedad(nombre, marca, origen) {
+  const n = (nombre || '').toLowerCase();
+  const m = (marca || '').toLowerCase();
+  if (/100%\s*ar[aá]bic/i.test(n)) return '100% Arábica';
+  if (/ar[aá]bica\s*(?:y|&|\+|\/)\s*robusta/i.test(n)) return 'Arábica y Robusta';
+  if (/robusta/i.test(n)) return 'Robusta';
+  if (/ar[aá]bic/i.test(n)) return 'Arábica';
+  if (/geisha|gesha/i.test(n)) return 'Geisha';
+  if (/bourbon/i.test(n)) return 'Bourbon';
+  const singleOrigins = [
+    'colombia',
+    'etiopía',
+    'etiopia',
+    'guatemala',
+    'costa rica',
+    'kenia',
+    'kenya',
+    'perú',
+    'peru',
+    'honduras',
+    'nicaragua',
+    'brasil',
+    'ruanda',
+    'rwanda',
+    'tanzania',
+  ];
+  const o = (origen || '').toLowerCase();
+  if (singleOrigins.some((s) => n.includes(s) || o.includes(s))) return 'Arábica';
+  const italianBlend = ['lavazza', 'illy', 'kimbo', 'segafredo', 'pellini'];
+  if (italianBlend.some((b) => m.includes(b))) return 'Arábica y Robusta';
+  const spanishBlend = [
+    'marcilla',
+    'bonka',
+    'hacendado',
+    'la estrella',
+    'fortaleza',
+    'baqué',
+    'candelas',
+  ];
+  if (spanishBlend.some((b) => m.includes(b))) return 'Arábica y Robusta';
+  return 'Arábica';
+}
+
+function inferOrigen(nombre) {
+  const n = (nombre || '').toLowerCase();
+  const origins = {
+    colombia: 'Colombia',
+    colombiano: 'Colombia',
+    brasil: 'Brasil',
+    brazil: 'Brasil',
+    etiopía: 'Etiopía',
+    etiopia: 'Etiopía',
+    ethiopia: 'Etiopía',
+    yirgacheffe: 'Etiopía',
+    guatemala: 'Guatemala',
+    'costa rica': 'Costa Rica',
+    perú: 'Perú',
+    peru: 'Perú',
+    kenia: 'Kenia',
+    kenya: 'Kenia',
+    honduras: 'Honduras',
+    nicaragua: 'Nicaragua',
+    méxico: 'México',
+    mexico: 'México',
+    indonesia: 'Indonesia',
+    sumatra: 'Indonesia',
+    india: 'India',
+    ruanda: 'Ruanda',
+    rwanda: 'Ruanda',
+    tanzania: 'Tanzania',
+    jamaica: 'Jamaica',
+    panamá: 'Panamá',
+    bolivia: 'Bolivia',
+    cuba: 'Cuba',
+  };
+  for (const [key, val] of Object.entries(origins)) {
+    if (n.includes(key)) return val;
+  }
+  return 'Blend';
+}
+
+function inferPais(marca) {
+  const m = (marca || '').toLowerCase();
+  const map = {
+    lavazza: 'Italia',
+    illy: 'Italia',
+    kimbo: 'Italia',
+    segafredo: 'Italia',
+    pellini: 'Italia',
+    vergnano: 'Italia',
+    gimoka: 'Italia',
+    corsini: 'Italia',
+    hacendado: 'España',
+    marcilla: 'España',
+    bonka: 'España',
+    baqué: 'España',
+    novell: 'España',
+    catunambu: 'España',
+    mexicana: 'España',
+    candelas: 'España',
+    dromedario: 'España',
+    fortaleza: 'España',
+    granell: 'España',
+    camuy: 'España',
+    mogorttini: 'España',
+    saula: 'España',
+    oquendo: 'España',
+    nomad: 'España',
+    incapto: 'España',
+    ineffable: 'España',
+    criollo: 'España',
+    'right side': 'España',
+    platino: 'España',
+    estrella: 'España',
+    finca: 'España',
+    barco: 'España',
+    starbucks: 'EEUU',
+    "peet's": 'EEUU',
+    colombe: 'EEUU',
+    delta: 'Portugal',
+    nespresso: 'Suiza',
+    lidl: 'Alemania',
+    aldi: 'Alemania',
+    amazon: 'Internacional',
+    julius: 'Austria',
+    saimaza: 'España',
+    mocay: 'España',
+    supracafé: 'España',
+  };
+  for (const [key, val] of Object.entries(map)) {
+    if (m.includes(key)) return val;
+  }
+  return 'Internacional';
+}
+
+function inferTueste(nombre) {
+  const n = (nombre || '').toLowerCase();
+  if (/torrefacto/i.test(n)) return 'torrefacto';
+  if (/oscuro|dark|intenso|forte|extra/i.test(n)) return 'oscuro';
+  if (/claro|light|blonde|suave|ligero/i.test(n)) return 'claro';
+  return 'medio';
+}
+
+/**
+ * Builds a complete update payload to apply when approving a café.
+ * Auto-fills all missing fields using inference, normalizes photos,
+ * sets normalizedEan, and marks as approved.
+ */
+export function buildApprovalPayload(cafe, cafeId = '') {
+  if (!cafe) return {};
+
+  const nombre = cafe.nombre || cafe.name || '';
+  const marca = cafe.marca || cafe.roaster || '';
+  const updates = {};
+
+  // ── normalizedEan ──
+  const ean = normalizeEan(cafe.ean);
+  if (ean && !cafe.normalizedEan) {
+    updates.normalizedEan = ean;
+  }
+
+  // ── Photos: unify all fields from best available ──
+  const bestUrl = [
+    cafe.photos?.selected,
+    cafe.bestPhoto,
+    cafe.officialPhoto,
+    cafe.imagenUrl,
+    cafe.imageUrl,
+    cafe.foto,
+    cafe.image,
+  ].find(
+    (u) =>
+      typeof u === 'string' &&
+      u.startsWith('http') &&
+      u.length > 10 &&
+      !u.includes('placeholder') &&
+      !u.includes('generic')
+  );
+
+  if (bestUrl) {
+    if (
+      !cafe.imagenUrl ||
+      cafe.imagenUrl.includes('placeholder') ||
+      cafe.imagenUrl.includes('generic')
+    )
+      updates.imagenUrl = bestUrl;
+    if (
+      !cafe.imageUrl ||
+      cafe.imageUrl.includes('placeholder') ||
+      cafe.imageUrl.includes('generic')
+    )
+      updates.imageUrl = bestUrl;
+    if (
+      !cafe.officialPhoto ||
+      cafe.officialPhoto.includes('placeholder') ||
+      cafe.officialPhoto.includes('generic')
+    )
+      updates.officialPhoto = bestUrl;
+    if (!cafe.foto || cafe.foto.includes('placeholder') || cafe.foto.includes('generic'))
+      updates.foto = bestUrl;
+    if (
+      !cafe.bestPhoto ||
+      cafe.bestPhoto.includes('placeholder') ||
+      cafe.bestPhoto.includes('generic')
+    )
+      updates.bestPhoto = bestUrl;
+  }
+
+  // ── Auto-fill empty data fields ──
+  const empty = (v) => !v || (typeof v === 'string' && v.trim() === '');
+
+  if (empty(cafe.tipo)) updates.tipo = inferTipo(nombre, marca, cafeId);
+  if (empty(cafe.formato)) updates.formato = updates.tipo || cafe.tipo || 'grano';
+
+  if (empty(cafe.peso)) updates.peso = inferPeso(nombre, updates.tipo || cafe.tipo);
+
+  const pesoStr = updates.peso || cafe.peso;
+  if (pesoStr && (!cafe.pesoGramos || cafe.pesoGramos === 0)) {
+    const p = String(pesoStr).toLowerCase();
+    const kgM = p.match(/([\d.]+)\s*kg/);
+    const gM = p.match(/(\d+)\s*g/);
+    if (kgM) updates.pesoGramos = Math.round(parseFloat(kgM[1]) * 1000);
+    else if (gM) updates.pesoGramos = parseInt(gM[1], 10);
+  }
+
+  if (empty(cafe.origen)) updates.origen = inferOrigen(nombre);
+  if (empty(cafe.pais)) updates.pais = inferPais(marca);
+  if (empty(cafe.variedad))
+    updates.variedad = inferVariedad(nombre, marca, updates.origen || cafe.origen);
+  if (empty(cafe.tueste)) updates.tueste = inferTueste(nombre);
+
+  // ── Status fields ──
+  const now = new Date().toISOString();
+  updates.status = 'approved';
+  updates.estado = 'approved';
+  updates.reviewStatus = 'approved';
+  updates.completionStatus = 'complete';
+  updates.provisional = false;
+  updates.appVisible = true;
+  updates.scannerVisible = true;
+  updates.approvedAt = now;
+  updates.adminReviewedAt = now;
+  updates.updatedAt = now;
+  if (!cafe.createdAt) updates.createdAt = now;
+
+  return updates;
+}
+
 export async function findCafeByEan(rawEan) {
   const normalizedEan = normalizeEan(rawEan);
   if (!normalizedEan) return null;
@@ -410,7 +776,12 @@ export async function createOrGetPendingCafeFromScan(rawEan, userId = null) {
     await setDocument(CAFES_COLLECTION, normalizedEan, {
       ...basePayload,
       sca: buildScaPayload(basePayload),
+      fecha: now,
+      puntuacion: 0,
+      votos: 0,
       status: 'pending',
+      reviewStatus: 'pending',
+      appVisible: false,
       completionStatus: 'incomplete',
       provisional: true,
       createdFrom: 'scan',
@@ -487,8 +858,13 @@ export async function approveCafe(cafeId, userId = null) {
   const now = new Date().toISOString();
   await updateDocument(CAFES_COLLECTION, cafeId, {
     status: 'approved',
+    reviewStatus: 'approved',
+    appVisible: true,
     completionStatus: 'complete',
     provisional: false,
+    fecha: current.fecha || now,
+    puntuacion: current.puntuacion ?? 0,
+    votos: current.votos ?? 0,
     approvedBy: userId,
     approvedAt: now,
     updatedBy: userId,

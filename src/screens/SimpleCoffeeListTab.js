@@ -149,7 +149,21 @@ export default function SimpleCoffeeListTab({
                 padding: 16,
               }}
             >
-              <TopBadge label={heroBadge} />
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <View
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 999,
+                    backgroundColor: '#f3e7d9',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Text style={{ fontSize: 14, fontWeight: '900', color: '#8f5e3b' }}>#1</Text>
+                </View>
+                <TopBadge label={heroBadge} />
+              </View>
               <Text style={{ fontSize: 22, fontWeight: '900', color: '#24160f' }}>
                 {hero.nombre}
               </Text>
@@ -162,15 +176,38 @@ export default function SimpleCoffeeListTab({
             </TouchableOpacity>
           )}
 
-          {rest.map((item) => (
-            <CardVertical
-              key={item.id}
-              item={item}
-              onDelete={() => {}}
-              onPress={setCafeDetalle}
-              favs={favs}
-              onToggleFav={toggleFav}
-            />
+          {rest.map((item, idx) => (
+            <View key={item.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+              <View
+                style={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: 999,
+                  backgroundColor: idx < 2 ? '#f3e7d9' : '#f5f0ea',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 12,
+                    fontWeight: '800',
+                    color: idx < 2 ? '#8f5e3b' : '#9b8573',
+                  }}
+                >
+                  #{idx + 2}
+                </Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <CardVertical
+                  item={item}
+                  onDelete={() => {}}
+                  onPress={setCafeDetalle}
+                  favs={favs}
+                  onToggleFav={toggleFav}
+                />
+              </View>
+            </View>
           ))}
 
           {!items.length ? <Text style={[s.empty, { marginTop: 14 }]}>{emptyText}</Text> : null}

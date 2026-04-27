@@ -20,7 +20,8 @@ export default function SearchInput({ value, onChangeText, onSearch, allCafes, p
     const seen = new Set();
     const matches = [];
     allCafes.forEach((c) => {
-      [c.marca, c.nombre, c.pais, c.region, c.variedad, c.proceso, c.notas].forEach((field) => {
+      [c.marca, c.nombre, c.pais, c.region, c.variedad, c.proceso, c.notas].forEach((raw) => {
+        const field = typeof raw === 'string' ? raw : '';
         if (!field) return;
         if (normalize(field).includes(q) && !seen.has(field.toLowerCase())) {
           seen.add(field.toLowerCase());

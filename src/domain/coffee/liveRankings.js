@@ -1,3 +1,5 @@
+import { CLEAN_COFFEE_IMAGE, getCafePhoto } from '../../core/utils';
+
 function normalizeText(value) {
   return String(value || '').trim();
 }
@@ -22,10 +24,8 @@ function isApprovedCafe(item) {
 function hasVisibleEssentials(item) {
   const hasName = normalizeText(item?.nombre || item?.name).length > 0;
   const hasBrand = normalizeText(item?.roaster || item?.marca || item?.brand).length > 0;
-  const hasPhoto =
-    normalizeText(
-      item?.bestPhoto || item?.officialPhoto || item?.foto || item?.image || item?.imageUrl
-    ).length > 0;
+  const photo = getCafePhoto(item);
+  const hasPhoto = photo && photo !== CLEAN_COFFEE_IMAGE;
   return hasName && hasBrand && hasPhoto;
 }
 

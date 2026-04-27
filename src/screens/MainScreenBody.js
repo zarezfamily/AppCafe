@@ -59,46 +59,47 @@ export default function MainScreenBody({
     });
   }, [activeTab]);
 
-  return (
-    <>
-      <OfflineBanner />
-
-      {activeTab === MAIN_TABS.CAFETERIAS && (
+  const renderActiveTab = () => {
+    if (activeTab === MAIN_TABS.CAFETERIAS) {
+      return (
         <View style={{ flex: 1 }}>
           <CafeteriasScreen onBack={() => setActiveTab(MAIN_TABS.HOME)} />
         </View>
-      )}
-
-      {activeTab === MAIN_TABS.COMMUNITY && <CommunityTab {...communityTabProps} />}
-
-      {activeTab === MAIN_TABS.ADMIN && (
+      );
+    }
+    if (activeTab === MAIN_TABS.COMMUNITY) return <CommunityTab {...communityTabProps} />;
+    if (activeTab === MAIN_TABS.ADMIN) {
+      return (
         <View style={{ flex: 1 }}>
           <AdminPanelScreen />
         </View>
-      )}
+      );
+    }
+    return (
+      <ScrollView
+        ref={contentScrollRef}
+        contentContainerStyle={{ paddingBottom: 100 }}
+        showsVerticalScrollIndicator={false}
+      >
+        {activeTab === MAIN_TABS.HOME && <InicioTab {...inicioTabProps} />}
+        {activeTab === MAIN_TABS.NOTEBOOK && <MisCafesTab {...misCafesTabProps} />}
+        {activeTab === MAIN_TABS.LATEST && <UltimosAnadidosTab {...ultimosAnadidosTabProps} />}
+        {activeTab === MAIN_TABS.TOP && <RankingTab {...topCafesTabProps} />}
+        {activeTab === MAIN_TABS.DISCOVER && <DiscoverTab {...discoverTabProps} />}
+        {activeTab === MAIN_TABS.TRENDING && <TrendingTab {...trendingTabProps} />}
+        {activeTab === MAIN_TABS.OFFERS && <OfertasTab {...ofertasTabProps} />}
+        {activeTab === MAIN_TABS.MORE && <MasTab {...masTabProps} />}
+      </ScrollView>
+    );
+  };
 
-      {activeTab !== MAIN_TABS.CAFETERIAS &&
-        activeTab !== MAIN_TABS.COMMUNITY &&
-        activeTab !== MAIN_TABS.ADMIN && (
-          <ScrollView
-            ref={contentScrollRef}
-            contentContainerStyle={{ paddingBottom: 100 }}
-            showsVerticalScrollIndicator={false}
-          >
-            {activeTab === MAIN_TABS.HOME && <InicioTab {...inicioTabProps} />}
-            {activeTab === MAIN_TABS.NOTEBOOK && <MisCafesTab {...misCafesTabProps} />}
-            {activeTab === MAIN_TABS.LATEST && <UltimosAnadidosTab {...ultimosAnadidosTabProps} />}
-            {activeTab === MAIN_TABS.TOP && <RankingTab {...topCafesTabProps} />}
-            {activeTab === MAIN_TABS.DISCOVER && <DiscoverTab {...discoverTabProps} />}
-            {activeTab === MAIN_TABS.TRENDING && <TrendingTab {...trendingTabProps} />}
-            {activeTab === MAIN_TABS.OFFERS && <OfertasTab {...ofertasTabProps} />}
-            {activeTab === MAIN_TABS.MORE && <MasTab {...masTabProps} />}
-          </ScrollView>
-        )}
+  const showBottomBar = !(activeTab === MAIN_TABS.COMMUNITY && !!forumThread);
 
-      {!(activeTab === MAIN_TABS.COMMUNITY && !!forumThread) && (
-        <BottomBarNav {...bottomBarProps} />
-      )}
+  const renderBodyContent = () => (
+    <>
+      <OfflineBanner />
+      {renderActiveTab()}
+      {showBottomBar ? <BottomBarNav {...bottomBarProps} /> : null}
 
       <CataFormModal
         visible={!!notebook.modalFormOpen}
@@ -178,4 +179,6 @@ export default function MainScreenBody({
       />
     </>
   );
+
+  return <View style={{ flex: 1 }}>{renderBodyContent()}</View>;
 }

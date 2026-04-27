@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef } from 'react';
 import { Animated, Easing, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { PREMIUM_ACCENT, THEME } from '../constants/theme';
+import { getCafePhoto } from '../core/utils';
 import PackshotImage from './PackshotImage';
 
 function getScaScore(item) {
@@ -19,9 +20,7 @@ function getOriginLabel(item) {
 }
 
 function getPhoto(item) {
-  return (
-    item?.bestPhoto || item?.officialPhoto || item?.foto || item?.image || item?.imageUrl || null
-  );
+  return getCafePhoto(item);
 }
 
 function StatPill({ icon, label, value }) {
@@ -42,7 +41,7 @@ export default function HeroCafeCard({
   variant,
   premiumAccent = PREMIUM_ACCENT,
   onOpenCafe,
-  onOpenRanking,
+  onOpenRanking: _onOpenRanking,
 }) {
   if (!item) return null;
 
@@ -142,18 +141,10 @@ export default function HeroCafeCard({
           <View style={styles.actionsRow}>
             <TouchableOpacity
               activeOpacity={0.9}
-              style={[styles.primaryBtn, { backgroundColor: premiumAccent }]}
+              style={[styles.primaryBtn, { backgroundColor: premiumAccent, flex: 1 }]}
               onPress={() => onOpenCafe?.(item)}
             >
               <Text style={styles.primaryBtnText}>Ver ficha</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              activeOpacity={0.9}
-              style={styles.secondaryBtn}
-              onPress={onOpenRanking}
-            >
-              <Text style={styles.secondaryBtnText}>{variant?.ctaSecondary || 'Ver ranking'}</Text>
             </TouchableOpacity>
           </View>
         </View>

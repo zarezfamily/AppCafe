@@ -27,7 +27,7 @@ function renderLegalFooter() {
     </nav>
 
     <p class="footer-copy">
-      <span>© 2026 Etiove. Hecho con ☕ en España.</span>
+      <span>© 2026 ETIOVE™. Hecho con ☕ en España.</span>
 
       <span class="footer-copy-center">
         <span class="footer-wordmark-sm">Etiove</span>
@@ -57,7 +57,7 @@ function renderSiteFooter() {
     </nav>
 
     <p class="footer-copy">
-      <span>© 2026 Etiove. Hecho con ☕ en España.</span>
+      <span>© 2026 ETIOVE™. Hecho con ☕ en España.</span>
 
       <span class="footer-copy-center">
         <span class="footer-wordmark-sm">Etiove</span>
@@ -77,7 +77,7 @@ function renderBlogPostFooter() {
   return `
   <footer>
     <p class="footer-copy">
-      <span>© 2026 Etiove. Hecho con ☕ en España.</span>
+      <span>© 2026 ETIOVE™. Hecho con ☕ en España.</span>
 
       <span class="footer-copy-center">
         <span class="footer-wordmark-sm">Etiove</span>

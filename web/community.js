@@ -2377,6 +2377,7 @@ const logout = async () => {
   localStorage.removeItem('etiove_web_token');
   localStorage.removeItem('etiove_web_alias');
   localStorage.removeItem('etiove_web_email_verified');
+  localStorage.removeItem('etiove_web_refresh_token');
   canonicalAlias = '';
   aliasSyncDone = false;
   // No borramos saved_email/saved_pw — son las credenciales de "Recordarme"
@@ -2896,8 +2897,23 @@ const refreshFirebaseToken = async () => {
       body: `grant_type=refresh_token&refresh_token=${encodeURIComponent(refreshToken)}`,
     });
     if (!res.ok) {
-      clearAuthToken();
-      renderAuthState();
+      // No limpiar sesión agresivamente — el token existente puede seguir siendo
+      // válido (<1 h). Los handlers de 401 en getCollection/getDocument limpiarán
+      // si realmente ha caducado. Sólo limpiar si el refresh token está
+      // definitivamente revocado (400 con TOKEN_EXPIRED o INVALID_REFRESH_TOKEN).
+      try {
+        const errJson = await res.json().catch(() => null);
+        const errCode = (errJson && errJson.error && errJson.error.message) || '';
+        if (
+          errCode.includes('TOKEN_EXPIRED') ||
+          errCode.includes('INVALID_REFRESH_TOKEN') ||
+          errCode.includes('USER_NOT_FOUND') ||
+          errCode.includes('USER_DISABLED')
+        ) {
+          clearAuthToken();
+          renderAuthState();
+        }
+      } catch (_) {}
       return;
     }
     const json = await res.json();
@@ -3117,7 +3133,7 @@ const showConfirmModal = ({
 // ─── ACTUALIZACIÓN LOCAL DE ESTADO (evita recargar todo el foro) ─────────────
 // Después de operaciones que ya conocemos el resultado, actualizamos el estado
 // local y re-renderizamos sin ir a Firestore.
-const applyLocalUpdate = ({
+const applyLocalUpdate = async ({
   addThread,
   removeThreadId,
   addReply,
@@ -3148,6 +3164,17 @@ const applyLocalUpdate = ({
     replies = replies.map((r) => (r.id === updateReply.id ? { ...r, ...updateReply } : r));
   }
   renderThreads();
+  // Refresh member card stats when threads/replies change
+  if (removeThreadId || addThread || removeReplyId || addReply) {
+    const myProfile = auth.uid
+      ? await getDocument('user_profiles', auth.uid).catch(() => null)
+      : null;
+    renderMemberEvolutionCard({
+      profile: myProfile,
+      allThreads: threads,
+      allReplies: replies,
+    });
+  }
 };
 
 // ─── REPORTAR CONTENIDO ───────────────────────────────────────────────────────
@@ -3351,6 +3378,60 @@ const init = async () => {
       clearAuthToken();
     } else {
       await refreshFirebaseToken();
+    }
+  }
+
+  // Auto-login silencioso: si no hay sesión válida pero hay credenciales
+  // guardadas de "Recordarme", iniciar sesión automáticamente para que
+  // el usuario no pierda la sesión al navegar entre páginas.
+  if (!auth.token || !auth.uid) {
+    const savedEmail = localStorage.getItem('etiove_web_saved_email');
+    const savedPw = localStorage.getItem('etiove_web_saved_pw');
+    if (savedEmail && savedPw) {
+      try {
+        const autoRes = await fetch(`${AUTH_URL}:signInWithPassword?key=${FIREBASE_API_KEY}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Ios-Bundle-Identifier': FIREBASE_IOS_BUNDLE_ID,
+          },
+          body: JSON.stringify({ email: savedEmail, password: savedPw, returnSecureToken: true }),
+        });
+        if (autoRes.ok) {
+          const aj = await autoRes.json();
+          if (aj.idToken && aj.localId && aj.email) {
+            auth = { uid: aj.localId, email: aj.email, token: aj.idToken, emailVerified: false };
+            localStorage.setItem('etiove_web_uid', auth.uid);
+            localStorage.setItem('etiove_web_email', auth.email);
+            localStorage.setItem('etiove_web_token', auth.token);
+            if (aj.refreshToken) localStorage.setItem('etiove_web_refresh_token', aj.refreshToken);
+            // Verificación de email en segundo plano
+            try {
+              const lookupRes = await fetch(`${AUTH_URL}:lookup?key=${FIREBASE_API_KEY}`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-Ios-Bundle-Identifier': FIREBASE_IOS_BUNDLE_ID,
+                },
+                body: JSON.stringify({ idToken: aj.idToken }),
+              });
+              const lookupJson = await lookupRes.json();
+              if (lookupJson.users && lookupJson.users[0]) {
+                auth.emailVerified = lookupJson.users[0].emailVerified === true;
+                localStorage.setItem(
+                  'etiove_web_email_verified',
+                  auth.emailVerified ? 'true' : 'false'
+                );
+              }
+            } catch (_) {}
+            try {
+              await resolveAuthorAlias();
+            } catch (_) {}
+          }
+        }
+      } catch (_) {
+        /* red caída — no bloquear */
+      }
     }
   }
 

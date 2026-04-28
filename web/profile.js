@@ -935,6 +935,12 @@
       </div>`;
   };
 
+  const threadUrl = (threadId) => {
+    const safe = encodeURIComponent(String(threadId || '').trim());
+    return `/comunidad/hilo/${safe}?hilo=${safe}`;
+  };
+  const blogUrl = (postSlug) => `/blog/${encodeURIComponent(postSlug || '')}`;
+
   const renderActivity = () => {
     const mixed = [
       ...state.threads.map((item) => ({
@@ -943,6 +949,7 @@
         body: item.body || '',
         createdAt: item.createdAt,
         emoji: '💬',
+        href: threadUrl(item.id),
       })),
       ...state.replies.map((item) => ({
         type: 'respuesta',
@@ -950,6 +957,7 @@
         body: item.body || '',
         createdAt: item.createdAt,
         emoji: '☕',
+        href: item.threadId ? threadUrl(item.threadId) : '',
       })),
       ...state.blogComments.map((item) => ({
         type: 'comentario',
@@ -957,6 +965,7 @@
         body: item.body || '',
         createdAt: item.createdAt,
         emoji: '📝',
+        href: item.postSlug ? blogUrl(item.postSlug) : '',
       })),
     ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
@@ -982,7 +991,7 @@
                   ? 'Respuesta'
                   : 'Comentario';
             return `
-      <article class="post-card">
+      <article class="post-card"${item.href ? ` style="cursor:pointer" data-href="${esc(item.href)}"` : ''}>
         <div class="post-icon">${item.emoji}</div>
         <div class="post-body">
           <div class="post-meta">
@@ -1004,6 +1013,12 @@
           actPage++;
           renderActivityPage();
         });
+      // Wire clickable cards
+      el.content.querySelectorAll('.post-card[data-href]').forEach((card) => {
+        card.addEventListener('click', () => {
+          window.location.href = card.dataset.href;
+        });
+      });
     };
     renderActivityPage();
   };
@@ -1018,7 +1033,7 @@
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .map(
         (item) => `
-        <article class="post-card">
+        <article class="post-card" style="cursor:pointer" data-href="${esc(threadUrl(item.id))}">
           <div class="post-icon">💬</div>
           <div class="post-body">
             <div class="post-meta">
@@ -1032,6 +1047,11 @@
       `
       )
       .join('');
+    el.content.querySelectorAll('.post-card[data-href]').forEach((card) => {
+      card.addEventListener('click', () => {
+        window.location.href = card.dataset.href;
+      });
+    });
   };
 
   const renderReplyList = () => {
@@ -1044,7 +1064,7 @@
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .map(
         (item) => `
-        <article class="post-card">
+        <article class="post-card"${item.threadId ? ` style="cursor:pointer" data-href="${esc(threadUrl(item.threadId))}"` : ''}>
           <div class="post-icon">☕</div>
           <div class="post-body">
             <div class="post-meta">
@@ -1057,6 +1077,11 @@
       `
       )
       .join('');
+    el.content.querySelectorAll('.post-card[data-href]').forEach((card) => {
+      card.addEventListener('click', () => {
+        window.location.href = card.dataset.href;
+      });
+    });
   };
 
   const renderBlogList = () => {
@@ -1069,7 +1094,7 @@
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .map(
         (item) => `
-        <article class="post-card">
+        <article class="post-card"${item.postSlug ? ` style="cursor:pointer" data-href="${esc(blogUrl(item.postSlug))}"` : ''}>
           <div class="post-icon">📝</div>
           <div class="post-body">
             <div class="post-meta">
@@ -1083,6 +1108,11 @@
       `
       )
       .join('');
+    el.content.querySelectorAll('.post-card[data-href]').forEach((card) => {
+      card.addEventListener('click', () => {
+        window.location.href = card.dataset.href;
+      });
+    });
   };
 
   const renderStats = () => {

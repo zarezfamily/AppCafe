@@ -1,0 +1,187 @@
+Total: 3359 cafés, 206 marcas
+
+=== Marcas con <=10 cafés ===
+    1 Banania ✓
+    1 Benco ✓
+    1 Café Hag ✓
+    1 Ciao Caffè ✓
+    1 Eco Eliges ✓
+    1 Intenso ✓
+    1 Izzo ✓
+    1 KitKat ✓
+    1 Milky Way ✓
+    1 Minges ✓
+    1 Mocay ✓
+    1 Note d'Espresso ✓
+    1 Pelican Rouge ✓
+    1 Rwanda Farmers ✓
+    1 Snickers ✓
+    1 Tea Time ✓
+    1 Twix ✓
+    2 Alvorada ✓
+    2 Buondi ✓
+    2 clipper ✓
+    2 Der-Franz ✓
+    2 Drago Mocambo ✓
+    2 Drink Me Chai ✓
+    2 Eroski SeleQtia ✓
+    2 Espresso House ✓
+    2 Löfbergs ✓
+    2 Mars ✓
+    2 Oxfam Intermón ✓
+    2 Puro ✓
+    2 Saquella ✓
+    3 Baileys ✓
+    3 Friends ✓
+    3 Galaxy ✓
+    3 IKEA ✓
+    3 Merrild ✓
+    3 Milka ✓
+    3 Montecelio ✓
+    3 mount-hagen ✓
+    3 Onyx Coffee Lab ✓
+    3 PerfectTed ✓
+    3 Piazza d'Oro ✓
+    3 Röst ✓
+    3 Toscaf ✓
+    4 Alberto ✓
+    4 Aromix ✓
+    4 Gima Caffè ✓
+    4 Granda ✓
+    4 Looney Tunes ✓
+    4 Mokambo ✓
+    4 Mr. Viet ✓
+    5 Barco ✓
+    5 Brasilia ✓
+    5 Coffee Shop Selections [SIN FOTO: 1/5]
+    5 davidoff ✓
+    5 Delta Cafés ✓
+    5 Eilles ✓
+    5 Gina ✓
+    5 Good Life Coffee ✓
+    5 Grand'Mère ✓
+    5 La Brasiliana ✓
+    5 Lazarro ✓
+    5 Stumptown Coffee ✓
+    5 Trismoka ✓
+    6 Mmm! [SIN FOTO: 6/6]
+    6 Cafféluxe ✓
+    6 Columbus ✓
+    6 Foodness ✓
+    6 Friele ✓
+    6 Cafés Valiente ✓
+    7 69 CrazyBeans ✓
+    7 Arcaffè ✓
+    7 Café Intención ✓
+    7 Caffè Borbone ✓
+    7 Espoon Kahvipaahtimo ✓
+    7 Favor ✓
+    7 XO Noir [SIN FOTO: 1/7]
+    8 Alipende ✓
+    8 Barzini ✓
+    8 Dallmayr ✓
+    8 Domus Barista ✓
+    8 Eroski Basic ✓
+    8 Helsingin Kahvipaahtimo ✓
+    8 littles ✓
+    8 Tassimo ✓
+    8 Paulig ✓
+    8 San Jorge Coffee Roasters ✓
+    8 Schirmer ✓
+    9 Cafe Platino ✓
+    9 Kenco ✓
+    9 Covirán [SIN FOTO: 9/9]
+    9 Hausbrandt ✓
+    9 Cafes La Estrella ✓
+    9 Mokasirs ✓
+    9 Slowmov ✓
+    9 Tupinamba ✓
+   10 Idee Kaffee ✓
+   10 Black Coffee Roasters ✓
+   10 Gevalia ✓
+   10 Lykke ✓
+
+=== Marcas con 11-25 cafés ===
+   11 Douwe Egberts ✓
+   11 Dolce Vita ✓
+   11 Kfetea ✓
+   11 El Corte Inglés Selection ✓
+   11 HiperDino ✓
+   11 Johan & Nyström ✓
+   11 Pera ✓
+   11 Cafès Serra ✓
+   12 Crema ✓
+   12 Domino ✓
+   12 Melitta ✓
+   12 Mövenpick ✓
+   12 Gorilla ✓
+   12 Caffè Mauro ✓
+   12 Cafés Pont ✓
+   12 Right Side Coffee ✓
+   12 Saimaza ✓
+   12 Senso Nocturno ✓
+   13 Belmio ✓
+   13 Passalacqua ✓
+   14 Bristot ✓
+   14 Condis ✓
+   14 Zoégas ✓
+   16 Barissimo ✓
+   16 beanies ✓
+   16 Cafeclub ✓
+   16 Consum [SIN FOTO: 16/16]
+   16 Garibaldi ✓
+   16 La Colombe ✓
+   16 Cafés El Magnífico ✓
+   17 Bergstrands ✓
+   17 Bialetti ✓
+   17 Club del Gourmet ✓
+   17 Climent ✓
+   17 Trung Nguyen ✓
+   18 Cafés La Brasileña ✓
+   18 El Corte Inglés ✓
+   18 Mokaflor ✓
+   18 Pellini ✓
+   18 Syra Coffee ✓
+   19 Bonka ✓
+   19 Spar [SIN FOTO: 4/19]
+   20 Dia ✓
+   20 Ineffable Coffee ✓
+   21 INCAPTO ✓
+   21 Cafe Fortaleza ✓
+   21 Cafe Saula ✓
+   21 Bonpreu ✓
+   21 Carraro ✓
+   21 Eroski ✓
+   22 Cafés Camuy ✓
+   22 Gringo Nordic ✓
+   22 Nespresso ✓
+   22 Lucaffé ✓
+   23 BM ✓
+   23 De'Longhi ✓
+   23 Kimbo ✓
+   23 IFA Eliges ✓
+   24 by Amazon ✓
+   24 Burg ✓
+   24 Mogorttini ✓
+   24 Cafés La Mexicana ✓
+   24 Cafés Miñana [SIN FOTO: 5/24]
+   24 Nomad Coffee ✓
+   25 Jurado ✓
+   25 Cafés Siboney ✓
+
+=== Resumen fotos ===
+Cafés sin foto: 85/3359
+Peores marcas (más sin foto):
+   19 sin foto de 32 - Carrefour
+   16 sin foto de 16 - Consum
+    9 sin foto de 35 - Catunambú
+    9 sin foto de 9 - Covirán
+    8 sin foto de 30 - La Casa del Café
+    6 sin foto de 6 - Mmm!
+    5 sin foto de 33 - Jacobs
+    5 sin foto de 24 - Cafés Miñana
+    4 sin foto de 19 - Spar
+    1 sin foto de 5 - Coffee Shop Selections
+    1 sin foto de 59 - L'OR
+    1 sin foto de 44 - Marcilla
+    1 sin foto de 7 - XO Noir

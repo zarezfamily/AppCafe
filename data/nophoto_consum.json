@@ -1,0 +1,82 @@
+[
+  {
+    "id": "consum_capsulas_colombia_nesp_10",
+    "nombre": "Café cápsulas Colombia Consum compatible Nespresso 10 uds",
+    "marca": "Consum"
+  },
+  {
+    "id": "consum_capsulas_descaf_nesp_10",
+    "nombre": "Café cápsulas descafeinado Consum compatible Nespresso 10 uds",
+    "marca": "Consum"
+  },
+  {
+    "id": "consum_capsulas_espresso_nesp_10",
+    "nombre": "Café cápsulas espresso Consum compatible Nespresso 10 uds",
+    "marca": "Consum"
+  },
+  {
+    "id": "consum_capsulas_intenso_dg_16",
+    "nombre": "Café cápsulas intenso Consum compatible Dolce Gusto 16 uds",
+    "marca": "Consum"
+  },
+  {
+    "id": "consum_capsulas_intenso_nesp_10",
+    "nombre": "Café cápsulas intenso Consum compatible Nespresso 10 uds",
+    "marca": "Consum"
+  },
+  {
+    "id": "consum_capsulas_lungo_nesp_10",
+    "nombre": "Café cápsulas lungo Consum compatible Nespresso 10 uds",
+    "marca": "Consum"
+  },
+  {
+    "id": "consum_grano_descaf_500",
+    "nombre": "Café en grano descafeinado Consum 500 g",
+    "marca": "Consum"
+  },
+  {
+    "id": "consum_grano_mezcla_1kg",
+    "nombre": "Café en grano mezcla Consum 1 kg",
+    "marca": "Consum"
+  },
+  {
+    "id": "consum_grano_natural_1kg",
+    "nombre": "Café en grano natural Consum 1 kg",
+    "marca": "Consum"
+  },
+  {
+    "id": "consum_grano_natural_500",
+    "nombre": "Café en grano natural Consum 500 g",
+    "marca": "Consum"
+  },
+  {
+    "id": "consum_molido_colombia_250",
+    "nombre": "Café molido Colombia 100% Arábica Consum 250 g",
+    "marca": "Consum"
+  },
+  {
+    "id": "consum_molido_descaf_250",
+    "nombre": "Café molido descafeinado Consum 250 g",
+    "marca": "Consum"
+  },
+  {
+    "id": "consum_molido_mezcla_250",
+    "nombre": "Café molido mezcla Consum 250 g",
+    "marca": "Consum"
+  },
+  {
+    "id": "consum_molido_natural_250",
+    "nombre": "Café molido natural Consum 250 g",
+    "marca": "Consum"
+  },
+  {
+    "id": "consum_soluble_descaf_200",
+    "nombre": "Café soluble descafeinado Consum 200 g",
+    "marca": "Consum"
+  },
+  {
+    "id": "consum_soluble_natural_200",
+    "nombre": "Café soluble natural Consum 200 g",
+    "marca": "Consum"
+  }
+]

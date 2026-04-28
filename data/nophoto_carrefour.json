@@ -1,0 +1,97 @@
+[
+  {
+    "id": "carrefour_bio_grano_arabica_500",
+    "nombre": "Café en grano 100% Arábica ecológico Carrefour BIO 500 g",
+    "marca": "Carrefour"
+  },
+  {
+    "id": "carrefour_bio_molido_arabica_250",
+    "nombre": "Café molido 100% Arábica ecológico Carrefour BIO 250 g",
+    "marca": "Carrefour"
+  },
+  {
+    "id": "carrefour_classic_grano_descaf_500",
+    "nombre": "Café en grano descafeinado Carrefour Classic 500 g",
+    "marca": "Carrefour"
+  },
+  {
+    "id": "carrefour_classic_grano_mezcla_1kg",
+    "nombre": "Café en grano mezcla Carrefour Classic 1 kg",
+    "marca": "Carrefour"
+  },
+  {
+    "id": "carrefour_classic_grano_natural_1kg",
+    "nombre": "Café en grano natural Carrefour Classic 1 kg",
+    "marca": "Carrefour"
+  },
+  {
+    "id": "carrefour_classic_molido_mezcla_250",
+    "nombre": "Café molido mezcla Carrefour Classic 250 g",
+    "marca": "Carrefour"
+  },
+  {
+    "id": "carrefour_extra_capsulas_cortado_dg_16",
+    "nombre": "Café con leche cortado Carrefour Extra compatible Dolce Gusto 16 uds",
+    "marca": "Carrefour"
+  },
+  {
+    "id": "carrefour_extra_capsulas_espresso_nesp_50",
+    "nombre": "Café cápsulas espresso Carrefour Extra compatible Nespresso 50 uds",
+    "marca": "Carrefour"
+  },
+  {
+    "id": "carrefour_extra_capsulas_etiopia_nesp_20",
+    "nombre": "Café cápsulas Etiopía Carrefour Extra compatible Nespresso 20 uds",
+    "marca": "Carrefour"
+  },
+  {
+    "id": "carrefour_extra_capsulas_lungo_dg_16",
+    "nombre": "Café cápsulas lungo Carrefour Extra compatible Dolce Gusto 16 uds",
+    "marca": "Carrefour"
+  },
+  {
+    "id": "carrefour_extra_capsulas_lungo_nesp_20",
+    "nombre": "Café cápsulas lungo Carrefour Extra compatible Nespresso 20 uds",
+    "marca": "Carrefour"
+  },
+  {
+    "id": "carrefour_extra_capsulas_ristretto_nesp_20",
+    "nombre": "Café cápsulas ristretto Carrefour Extra compatible Nespresso 20 uds",
+    "marca": "Carrefour"
+  },
+  {
+    "id": "carrefour_extra_grano_arabica_1kg",
+    "nombre": "Café en grano 100% Arábica Carrefour Extra 1 kg",
+    "marca": "Carrefour"
+  },
+  {
+    "id": "carrefour_extra_molido_brasil_250",
+    "nombre": "Café molido Brasil 100% Arábica Carrefour Extra 250 g",
+    "marca": "Carrefour"
+  },
+  {
+    "id": "carrefour_extra_molido_colombia_250",
+    "nombre": "Café molido Colombia 100% Arábica Carrefour Extra 250 g",
+    "marca": "Carrefour"
+  },
+  {
+    "id": "carrefour_extra_molido_etiopia_250",
+    "nombre": "Café molido Etiopía 100% Arábica Carrefour Extra 250 g",
+    "marca": "Carrefour"
+  },
+  {
+    "id": "carrefour_extra_molido_kenya_250",
+    "nombre": "Café molido Kenia 100% Arábica Carrefour Extra 250 g",
+    "marca": "Carrefour"
+  },
+  {
+    "id": "carrefour_extra_soluble_etiopia_100",
+    "nombre": "Café soluble Etiopía liofilizado Carrefour Extra 100 g",
+    "marca": "Carrefour"
+  },
+  {
+    "id": "carrefour_soluble_descaf_200",
+    "nombre": "Café soluble descafeinado Carrefour Classic 200 g",
+    "marca": "Carrefour"
+  }
+]

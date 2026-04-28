@@ -1,0 +1,42 @@
+[
+  {
+    "id": "lacasadelcafe_grano_brasil",
+    "nombre": "La Casa del Café Brasil en grano 250g",
+    "marca": "La Casa del Café"
+  },
+  {
+    "id": "lacasadelcafe_grano_comercio_justo",
+    "nombre": "La Casa del Café Comercio Justo Natural en grano 250g",
+    "marca": "La Casa del Café"
+  },
+  {
+    "id": "lacasadelcafe_grano_costa_rica",
+    "nombre": "La Casa del Café Costa Rica en grano 250g",
+    "marca": "La Casa del Café"
+  },
+  {
+    "id": "lacasadelcafe_grano_descafeinado",
+    "nombre": "La Casa del Café Descafeinado en grano 250g",
+    "marca": "La Casa del Café"
+  },
+  {
+    "id": "lacasadelcafe_grano_ecologico",
+    "nombre": "La Casa del Café Ecológico Arábica en grano 250g",
+    "marca": "La Casa del Café"
+  },
+  {
+    "id": "lacasadelcafe_grano_etiopia",
+    "nombre": "La Casa del Café Etiopía en grano 250g",
+    "marca": "La Casa del Café"
+  },
+  {
+    "id": "lacasadelcafe_grano_guatemala",
+    "nombre": "La Casa del Café Guatemala en grano 250g",
+    "marca": "La Casa del Café"
+  },
+  {
+    "id": "lacasadelcafe_grano_vietnam",
+    "nombre": "La Casa del Café Vietnam en grano 250g",
+    "marca": "La Casa del Café"
+  }
+]

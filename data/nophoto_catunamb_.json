@@ -1,0 +1,47 @@
+[
+  {
+    "id": "catunambu-capsulas-descafeinado",
+    "nombre": "Cápsulas Descafeinado",
+    "marca": "Catunambú"
+  },
+  {
+    "id": "catunambu-capsulas-ecologico",
+    "nombre": "Cápsulas Ecológico",
+    "marca": "Catunambú"
+  },
+  {
+    "id": "catunambu-capsulas-expresso",
+    "nombre": "Cápsulas Expresso",
+    "marca": "Catunambú"
+  },
+  {
+    "id": "catunambu-metalbox-100-arabica-3kg",
+    "nombre": "Metalbox 100% Arábica 3 kg",
+    "marca": "Catunambú"
+  },
+  {
+    "id": "catunambu-metalbox-blend-3kg",
+    "nombre": "Metalbox Blend 3 kg",
+    "marca": "Catunambú"
+  },
+  {
+    "id": "catunambu-metalbox-descafeinado-3kg",
+    "nombre": "Metalbox Descafeinado 3 kg",
+    "marca": "Catunambú"
+  },
+  {
+    "id": "catunambu-serie-oro-grano-descafeinado-1kg",
+    "nombre": "Serie Oro Grano Descafeinado",
+    "marca": "Catunambú"
+  },
+  {
+    "id": "catunambu-serie-oro-grano-mezcla-1kg",
+    "nombre": "Serie Oro Grano Mezcla",
+    "marca": "Catunambú"
+  },
+  {
+    "id": "catunambu-serie-oro-grano-natural-1kg",
+    "nombre": "Serie Oro Grano Natural",
+    "marca": "Catunambú"
+  }
+]

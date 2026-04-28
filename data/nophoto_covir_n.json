@@ -1,0 +1,47 @@
+[
+  {
+    "id": "coviran_capsulas_descaf_nesp_10",
+    "nombre": "Café cápsulas descafeinado Covirán compatible Nespresso 10 uds",
+    "marca": "Covirán"
+  },
+  {
+    "id": "coviran_capsulas_espresso_nesp_10",
+    "nombre": "Café cápsulas espresso Covirán compatible Nespresso 10 uds",
+    "marca": "Covirán"
+  },
+  {
+    "id": "coviran_capsulas_intenso_nesp_10",
+    "nombre": "Café cápsulas intenso Covirán compatible Nespresso 10 uds",
+    "marca": "Covirán"
+  },
+  {
+    "id": "coviran_grano_natural_1kg",
+    "nombre": "Café en grano natural Covirán 1 kg",
+    "marca": "Covirán"
+  },
+  {
+    "id": "coviran_grano_natural_500",
+    "nombre": "Café en grano natural Covirán 500 g",
+    "marca": "Covirán"
+  },
+  {
+    "id": "coviran_molido_descaf_250",
+    "nombre": "Café molido descafeinado Covirán 250 g",
+    "marca": "Covirán"
+  },
+  {
+    "id": "coviran_molido_mezcla_250",
+    "nombre": "Café molido mezcla Covirán 250 g",
+    "marca": "Covirán"
+  },
+  {
+    "id": "coviran_molido_natural_250",
+    "nombre": "Café molido natural Covirán 250 g",
+    "marca": "Covirán"
+  },
+  {
+    "id": "coviran_soluble_natural_200",
+    "nombre": "Café soluble natural Covirán 200 g",
+    "marca": "Covirán"
+  }
+]

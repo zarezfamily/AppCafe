@@ -3133,7 +3133,7 @@ const showConfirmModal = ({
 // ─── ACTUALIZACIÓN LOCAL DE ESTADO (evita recargar todo el foro) ─────────────
 // Después de operaciones que ya conocemos el resultado, actualizamos el estado
 // local y re-renderizamos sin ir a Firestore.
-const applyLocalUpdate = ({
+const applyLocalUpdate = async ({
   addThread,
   removeThreadId,
   addReply,
@@ -3164,6 +3164,17 @@ const applyLocalUpdate = ({
     replies = replies.map((r) => (r.id === updateReply.id ? { ...r, ...updateReply } : r));
   }
   renderThreads();
+  // Refresh member card stats when threads/replies change
+  if (removeThreadId || addThread || removeReplyId || addReply) {
+    const myProfile = auth.uid
+      ? await getDocument('user_profiles', auth.uid).catch(() => null)
+      : null;
+    renderMemberEvolutionCard({
+      profile: myProfile,
+      allThreads: threads,
+      allReplies: replies,
+    });
+  }
 };
 
 // ─── REPORTAR CONTENIDO ───────────────────────────────────────────────────────

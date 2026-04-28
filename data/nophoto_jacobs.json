@@ -1,0 +1,27 @@
+[
+  {
+    "id": "jacobs_tassimo_crema_intenso_16",
+    "nombre": "Jacobs Caffè Crema Intenso 16 cápsulas para Tassimo",
+    "marca": "Jacobs"
+  },
+  {
+    "id": "jacobs_tassimo_crema_mild_16",
+    "nombre": "Jacobs Caffè Crema Mild 16 cápsulas para Tassimo",
+    "marca": "Jacobs"
+  },
+  {
+    "id": "jacobs_tassimo_flat_white_16",
+    "nombre": "Jacobs Flat White 16 cápsulas para Tassimo",
+    "marca": "Jacobs"
+  },
+  {
+    "id": "jacobs_tassimo_medaille_dor_16",
+    "nombre": "Jacobs Médaille d'Or 16 cápsulas para Tassimo",
+    "marca": "Jacobs"
+  },
+  {
+    "id": "jacobs_tassimo_monarch_16",
+    "nombre": "Jacobs Monarch 16 cápsulas para Tassimo",
+    "marca": "Jacobs"
+  }
+]

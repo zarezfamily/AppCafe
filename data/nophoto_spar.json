@@ -1,0 +1,22 @@
+[
+  {
+    "id": "spar_capsulas_espresso_nesp_10",
+    "nombre": "Café cápsulas espresso Spar compatible Nespresso 10 uds",
+    "marca": "Spar"
+  },
+  {
+    "id": "spar_grano_natural_1kg",
+    "nombre": "Café en grano natural Spar 1 kg",
+    "marca": "Spar"
+  },
+  {
+    "id": "spar_grano_natural_500",
+    "nombre": "Café en grano natural Spar 500 g",
+    "marca": "Spar"
+  },
+  {
+    "id": "spar_soluble_natural_200",
+    "nombre": "Café soluble natural Spar 200 g",
+    "marca": "Spar"
+  }
+]

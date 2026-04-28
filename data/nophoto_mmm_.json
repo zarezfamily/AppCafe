@@ -1,0 +1,32 @@
+[
+  {
+    "id": "alcampo_mmm_capsulas_colombia_nesp_10",
+    "nombre": "Mmm! Colombia cápsulas Nespresso 10 uds",
+    "marca": "Mmm!"
+  },
+  {
+    "id": "alcampo_mmm_capsulas_etiopia_nesp_10",
+    "nombre": "Mmm! Etiopía cápsulas Nespresso 10 uds",
+    "marca": "Mmm!"
+  },
+  {
+    "id": "alcampo_mmm_grano_100_arabica_250",
+    "nombre": "Mmm! Café en grano 100% Arábica 250 g",
+    "marca": "Mmm!"
+  },
+  {
+    "id": "alcampo_mmm_molido_colombia_250",
+    "nombre": "Mmm! Café molido Colombia 100% Arábica 250 g",
+    "marca": "Mmm!"
+  },
+  {
+    "id": "alcampo_mmm_molido_etiopia_250",
+    "nombre": "Mmm! Café molido Etiopía 100% Arábica 250 g",
+    "marca": "Mmm!"
+  },
+  {
+    "id": "alcampo_mmm_molido_kenya_250",
+    "nombre": "Mmm! Café molido Kenia 100% Arábica 250 g",
+    "marca": "Mmm!"
+  }
+]

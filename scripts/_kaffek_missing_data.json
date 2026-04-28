@@ -1,0 +1,65 @@
+[
+  {
+    "slug": "flat-white-cafe-diario-kaffekapslen-dolce-gusto",
+    "title": "Flat White - Café diario",
+    "img": "https://kaffekapslen.media/media/catalog/product/cache/6517c62f5899ad6aa0ba23ceb3eeff97/d/o/dolcegusto-kaffekapslen-16-flat-white-v2-1201.webp",
+    "price": "3.19",
+    "ean": "N/A"
+  },
+  {
+    "slug": "irish-coffee-cafe-diario-kaffekapslen-dolce-gusto",
+    "title": "Irish Coffee - Café diario",
+    "img": "https://kaffekapslen.media/media/catalog/product/cache/6517c62f5899ad6aa0ba23ceb3eeff97/d/o/dolcegusto-kaffekapslen-16-irish-coffee-1201.webp",
+    "price": "3.39",
+    "ean": "N/A"
+  },
+  {
+    "slug": "mocha-cafe-diario-kaffekapslen-dolce-gusto",
+    "title": "Mocha - Café diario",
+    "img": "https://kaffekapslen.media/media/catalog/product/cache/6517c62f5899ad6aa0ba23ceb3eeff97/d/o/dolcegusto-kaffekapslen-16-mocha-v2-1201.webp",
+    "price": "3.89",
+    "ean": "N/A"
+  },
+  {
+    "slug": "pistacho-cafe-diario-kaffekapslen-dolce-gusto",
+    "title": "Pistacho - Café diario",
+    "img": "https://kaffekapslen.media/media/catalog/product/cache/6517c62f5899ad6aa0ba23ceb3eeff97/d/o/dolcegusto-kaffekapslen-16-pistachio-1201.webp",
+    "price": "3.49",
+    "ean": "N/A"
+  },
+  {
+    "slug": "white-chocolate-cafe-diario-kaffekapslen-dolce-gusto",
+    "title": "Chocolate blanco caliente",
+    "img": "https://kaffekapslen.media/media/catalog/product/cache/6517c62f5899ad6aa0ba23ceb3eeff97/d/o/dolcegusto-kaffekapslen-16-white-chocolate-1201.webp",
+    "price": "3.89",
+    "ean": "N/A"
+  },
+  {
+    "slug": "chocolate-caliente-kaffekapslen-dolce-gusto",
+    "title": "Chocolate caliente",
+    "img": "https://kaffekapslen.media/media/catalog/product/cache/6517c62f5899ad6aa0ba23ceb3eeff97/d/o/dolce-gusto-kaffekapslen-16-chocolate-1201.webp",
+    "price": "2.85",
+    "ean": "N/A"
+  },
+  {
+    "slug": "lungo-xxl-premium-kaffekapslen-nespresso",
+    "title": "Lungo - Premium",
+    "img": "https://kaffekapslen.media/media/catalog/product/cache/6517c62f5899ad6aa0ba23ceb3eeff97/n/e/nespresso-kaffekapslen-50-premium-lungo-v1-1201.webp",
+    "price": "7.89",
+    "ean": "N/A"
+  },
+  {
+    "slug": "cafe-vainilla-kaffekapslen-nespresso-pro",
+    "title": "Café vainilla",
+    "img": "https://kaffekapslen.media/media/catalog/product/cache/6517c62f5899ad6aa0ba23ceb3eeff97/n/e/nespro-kaffekapslen-50-vanilla-1201.webp",
+    "price": "13.59",
+    "ean": "N/A"
+  },
+  {
+    "slug": "hazelnootdrank-alledaagse-koffie-kaffekapslen-dolce-gusto",
+    "title": "Bebida de avellana - Café diario",
+    "img": "https://kaffekapslen.media/media/catalog/product/cache/6517c62f5899ad6aa0ba23ceb3eeff97/d/o/dolcegusto-kaffekapslen-16-hazelnut-drink-1201.webp",
+    "price": "3.69",
+    "ean": "N/A"
+  }
+]

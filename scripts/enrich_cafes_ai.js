@@ -42,6 +42,7 @@
 const fetch = require('node-fetch');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 // ─────────────────────────────────────────────────────────────────────
 // CONFIG
@@ -59,15 +60,92 @@ const OPENAI_RPM = parseInt(process.env.OPENAI_RPM || '30', 10) || 30; // reques
 const OPENAI_API_URL = 'https://api.openai.com/v1/responses';
 const REPORT_PATH = path.resolve(process.cwd(), 'scripts/cafes-ai-enrichment-report.json');
 
-const PROJECT_ID =
-  process.env.FIREBASE_PROJECT_ID || process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID || '';
-const API_KEY = process.env.FIREBASE_API_KEY || process.env.EXPO_PUBLIC_FIREBASE_API_KEY || '';
-const AUTH_TOKEN = process.env.FIREBASE_AUTH_TOKEN || process.env.TOKEN || '';
+// ── Service-account JWT auth (no external packages needed) ─────────────
+// Looks for serviceAccountKey.json in cwd or project root.
+// Falls back to FIREBASE_AUTH_TOKEN env var if present.
+const SA_KEY_PATH =
+  process.env.SA_KEY_PATH ||
+  (fs.existsSync(path.resolve(process.cwd(), 'serviceAccountKey.json'))
+    ? path.resolve(process.cwd(), 'serviceAccountKey.json')
+    : null);
 
-if (!PROJECT_ID || !API_KEY || !AUTH_TOKEN) {
-  console.error(
-    '❌  Faltan variables de entorno: EXPO_PUBLIC_FIREBASE_PROJECT_ID, EXPO_PUBLIC_FIREBASE_API_KEY, FIREBASE_AUTH_TOKEN'
+let _serviceAccount = null;
+let _cachedToken = null;
+let _tokenExpiry = 0;
+
+function loadServiceAccount() {
+  if (_serviceAccount) return _serviceAccount;
+  if (!SA_KEY_PATH) return null;
+  try {
+    _serviceAccount = JSON.parse(fs.readFileSync(SA_KEY_PATH, 'utf8'));
+    return _serviceAccount;
+  } catch {
+    return null;
+  }
+}
+
+function base64url(buf) {
+  return buf.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+}
+
+async function mintAccessToken() {
+  const sa = loadServiceAccount();
+  if (!sa) return process.env.FIREBASE_AUTH_TOKEN || process.env.TOKEN || '';
+
+  const now = Math.floor(Date.now() / 1000);
+  if (_cachedToken && now < _tokenExpiry - 60) return _cachedToken;
+
+  const header = base64url(Buffer.from(JSON.stringify({ alg: 'RS256', typ: 'JWT' })));
+  const claim = base64url(
+    Buffer.from(
+      JSON.stringify({
+        iss: sa.client_email,
+        sub: sa.client_email,
+        aud: 'https://oauth2.googleapis.com/token',
+        iat: now,
+        exp: now + 3600,
+        scope:
+          'https://www.googleapis.com/auth/datastore https://www.googleapis.com/auth/cloud-platform',
+      })
+    )
   );
+
+  const sign = crypto.createSign('RSA-SHA256');
+  sign.update(`${header}.${claim}`);
+  const signature = base64url(sign.sign(sa.private_key));
+
+  const jwt = `${header}.${claim}.${signature}`;
+
+  const res = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+      assertion: jwt,
+    }),
+  });
+
+  const json = await res.json();
+  if (!res.ok) throw new Error(`Token mint failed: ${JSON.stringify(json)}`);
+
+  _cachedToken = json.access_token;
+  _tokenExpiry = now + (json.expires_in || 3600);
+  return _cachedToken;
+}
+
+const PROJECT_ID =
+  process.env.FIREBASE_PROJECT_ID ||
+  process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID ||
+  loadServiceAccount()?.project_id ||
+  '';
+
+if (!PROJECT_ID) {
+  console.error('❌  No se encontró EXPO_PUBLIC_FIREBASE_PROJECT_ID ni serviceAccountKey.json');
+  process.exit(1);
+}
+
+if (!SA_KEY_PATH && !process.env.FIREBASE_AUTH_TOKEN && !process.env.TOKEN) {
+  console.error('❌  No se encontró serviceAccountKey.json ni FIREBASE_AUTH_TOKEN');
   process.exit(1);
 }
 
@@ -76,8 +154,8 @@ if (!SKIP_AI && !process.env.OPENAI_API_KEY) {
 }
 
 const BASE_URL = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents`;
-const authHeaders = () => ({
-  Authorization: `Bearer ${AUTH_TOKEN}`,
+const authHeaders = async () => ({
+  Authorization: `Bearer ${await mintAccessToken()}`,
   'Content-Type': 'application/json',
 });
 
@@ -131,7 +209,7 @@ async function listAllCafes() {
 
   do {
     const url = `${BASE_URL}/cafes?pageSize=${PAGE_SIZE}${pageToken ? `&pageToken=${pageToken}` : ''}`;
-    const res = await fetch(url, { headers: authHeaders() });
+    const res = await fetch(url, { headers: await authHeaders() });
     if (!res.ok) {
       const txt = await res.text();
       throw new Error(`Firestore list failed ${res.status}: ${txt.slice(0, 200)}`);
@@ -157,7 +235,7 @@ async function patchCafe(cafeId, fields) {
   const url = `${BASE_URL}/cafes/${encodeURIComponent(cafeId)}?${updateMask}`;
   const res = await fetch(url, {
     method: 'PATCH',
-    headers: authHeaders(),
+    headers: await authHeaders(),
     body: JSON.stringify({ fields: firestoreFields }),
   });
 

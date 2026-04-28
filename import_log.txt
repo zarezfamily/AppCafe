@@ -1,0 +1,24 @@
+﻿node : (node:9608) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a 
+userland alternative instead.
+At line:1 char:1
++ node scripts/import_cafes_generic.js scripts/cafe-import-slowmov.json ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ((node:9608) [DE...native instead.:String) [], RemoteEx 
+   ception
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Existing cafes: 3182
+To process: 9
+  SKIP (id): slowmov_rumu_damo_250g
+  SKIP (id): slowmov_olman_sauceda_250g
+  SKIP (id): slowmov_boku_250g
+  SKIP (id): slowmov_la_divisa_250g
+  SKIP (id): slowmov_alexis_200g
+  SKIP (id): slowmov_san_sebastian_250g
+  SKIP (id): slowmov_tapachula_250g
+  SKIP (id): slowmov_el_indio_250g
+  SKIP (id): slowmov_tolima_250g
+
+Done. Added: 0, Skipped: 9
+Total cafes now: 3182

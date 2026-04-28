@@ -1,0 +1,18 @@
+threemarkscoffee.com: 404 [html-page] len=186539
+www.threemarkscoffee.com: 404 [html-page] len=186539
+www.misioncafe.com: ERR The operation was aborted due to timeout
+misioncafe.com: ERR The operation was aborted due to timeout
+www.puchero.coffee: ERR fetch failed
+puchero.coffee: ERR fetch failed
+www.anomalacoffee.com: ERR fetch failed
+anomalacoffee.com: ERR fetch failed
+misterwilson.es: ERR fetch failed
+www.misterwilson.es: ERR fetch failed
+tomacafe.es: ERR fetch failed
+www.tomacafe.es: ERR fetch failed
+hiddencoffeeroasters.com: 404 [html-page] len=385221
+www.hiddencoffeeroasters.com: 404 [html-page] len=385221
+mokita.es: ERR fetch failed
+mokitacoffee.com: ERR fetch failed
+www.mokita.es: ERR fetch failed
+tomacafe.com: 200 [html-page] len=54238
